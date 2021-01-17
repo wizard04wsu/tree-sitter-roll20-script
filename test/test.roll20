@@ -1,0 +1,13 @@
+?{Hands||,|a|b,|,c|d,D|e,E,_|f@{x}f,F@{X}F|g@{x,y}g|h@{selected|character_name}h}
+[[5 + 2d10cs>5]]
+
+@{wtype}
+&{template:atkdmg}
+{{attack=1}}
+{{charname=@{character_name}}}
+{{r1=[[1d20 + [[@{strength_mod}]][STR] + [[@{PB}]][PROF]]]}}
+@{rtype} + [[@{strength_mod}]][STR] + [[@{PB}]][PROF]]]}}
+{{mod=+[[[[@{strength_mod}]][STR] + [[@{PB}]][PROF]]]}}
+{{desc=You may perform a maneuver:}}
+{{desc=You may perform a maneuver: &nbsp;[[0 --- Add 🎲 to the attack roll before the DM reveals whether it hits. ---]] [Precision Attack (🎲)](~@{character_name}|Precision Attack)}}
+[Precision Attack (🎲)](~@{character_name}|Precision Attack)
