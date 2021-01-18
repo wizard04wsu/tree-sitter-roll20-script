@@ -10,7 +10,11 @@ const unescapedAtDepth = (char, escapes) => {
 };
 const unescapedAtDepthOrAbove = (char, escapes) => {
 	if(!depth) return RegExp(char);
-	return RegExp(char + "|&(("+escapes.ampersand+");){0," + (depth) + "}(" + escapes + ");");
+	return RegExp(char + "|&(("+escapes.ampersand+");){0," + (depth-1) + "}(" + escapes + ");");
+};
+const queryBegin = () => {
+	if(!depth) return /\?\{/;
+	return RegExp("\\?\\{|&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.questionMark+");&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.leftBrace+");");
 };
 
 let escapes = {
@@ -54,94 +58,81 @@ module.exports = grammar({
 	
 	rules: {
 		
-		roll20_script: $ => seq(
-			repeat(
-				prec.right(choice(
+		roll20_script: $ => repeat(
+			choice(
+				choice(
 					$.attribute,
 					$.ability,
 					$._macro,
 					$.inlineRoll,
+					$.query,
 					
 					$.template,
 					$.tracker,
-					alias(repeat1(
-						///./,
-						/[^#]/,
-					), $.string),
-				)),
+				),
+				alias(prec.right(repeat1(/./)), $.string),
 			),
 		),
 		
 		/*** attribute ***/
 		
-		attribute: $ => seq(
-			/@\{/,
-			prec.right(choice(
-				$.attributeName,
-				seq(
-					choice(
-						alias(/selected/, $.token),
-						alias(/target/, $.token),
-						alias($.attributeName, $.characterName),
-					),
-					/\|/,
-					$.attributeName,
-					optional(seq(
-						/\|/,
-						alias(/max/, $.keyword),
-					)),
+		attribute: $ => choice(
+			seq("@{", $.attributeName, "}"),
+			seq(
+				"@{",
+				choice(
+					alias("selected", $.token),
+					alias("target", $.token),
+					alias($.attributeName, $.characterName),
 				),
-			)),
-			/\}/,
+				"|",
+				$.attributeName,
+				choice(
+					"}",
+					seq("|", alias("max", $.keyword), "}"),
+					seq("|", alias(/[^}]*/, $.invalid), "}"),
+				),
+			),
+			alias(token(seq("@{", /(\|[^}]*|[^}]+\|)?/, "}")), $.invalid),
 		),
 		attributeName: $ => /[^|}]+/,
 		
 		/*** ability ***/
 		
 		ability: $ => seq(
-			/%\{/,
+			"%{",
 			choice(
 				alias(/selected/i, $.token),
 				alias(/target/i, $.token),
 				alias(repeat1(
 					choice(
 						/[^|}@]+/,
-						prec.right(choice(
-							$.attribute,
-							/@/,
-						)),
+						$.attribute,
+						/@/,
 					),
 				), $.characterName),
 			),
-			/\|/,
+			"|",
 			$.abilityName,
-			/\}/,
+			"}",
 		),
 		abilityName: $ => seq(
 			/[^|}]+/,
-			repeat(
-				choice(
-					/[^|}]+/,
-					alias(/\|/, $.invalid),
-				),
-			),
 		),
 		
 		/*** macro ***/
 		
 		macro: $ => seq(
-			/#/,
+			"#",
 			$.macroName,
 		),
-		macroName: $ => prec.right(repeat1(
+		macroName: $ => repeat1(
 			choice(
 				/[^\s@]+/,
-				prec.right(choice(
-					$.attribute,
-					/@/,
-				)),
+				$.attribute,
+				/@/,
 			),
-		)),
+		),
 		_macro: $ => seq(
 			$.macro,
 			choice(
@@ -153,18 +144,18 @@ module.exports = grammar({
 		/*** inline roll ***/
 		
 		inlineRoll: $ => seq(
-			/\[\[/,
+			"[[",
 			alias($._rollMath, $.formula),
-			/\]\]/,
+			"]]",
 		),
 		
 		_mathOperator: $ => alias(/[+*/-]/, $.operator),
 		
 		_mathFunction: $ => seq(
 			alias(/abs|ceil|floor|round/, $.functionName),
-			/\(/,
+			"(",
 			alias($._rollMath, $.formula),
-			/\)/,
+			")",
 		),
 		
 		_rollMath: $ => seq(
@@ -176,9 +167,9 @@ module.exports = grammar({
 				$._groupRoll,
 				$._rollTable,
 				seq(
-					/\(/,
+					"(",
 					alias($._rollMath, $.formula),
-					/\)/,
+					")",
 				),
 				$._variablesAndMacro,
 			)),
@@ -322,79 +313,85 @@ module.exports = grammar({
 		
 		/*** query ***/
 		
-/*		query: $ => seq(
-			alias(seq(
-				$._questionMark,
-				$._leftBrace,
-				incrementDepth(),
-			), $.delimiter),
-			optional($.prompt),
-			optional(prec.right(choice(
+		query: $ => seq(
+			queryBegin(),
+			incrementDepth(),
+			choice(
+				$.prompt,
+				$._pipe,
 				seq(
+					optional($.prompt),
 					$._pipe,
-					optional($.default),
-				),
-				seq(
-					$._queryOption,
-					repeat1(
-						$._queryOption,
+					choice(
+						seq(
+							$.option,
+							$._pipe,
+							$.option,
+							repeat(
+								seq(
+									$._pipe,
+									$.option,
+								),
+							),
+						),
+						optional($.defaultValue),
 					),
 				),
-			))),
-			alias(seq(
-				decrementDepth(),
-				$._rightBrace,
-			), $.delimiter),
-		),
-		prompt: $ => repeat1(
-			choice(
-				/[^|}&@%#]+/,
-				prec.right(choice(
-					$.attribute,
-					$.ability,
-					$._macro,
-					$._escapedCharacter,
-					$._ampersand,
-					$._at,
-					$._percent,
-					$._hash,
-				)),
 			),
+			decrementDepth(),
+			$._rightBrace,
 		),
-		default: $ => repeat1(
-			choice(
-				/[^|}@%#]+/,
-				prec.right(choice(
-					$.attribute,
-					$.ability,
-					$._macro,
-					$._at,
-					$._percent,
-					$._hash,
-				)),
-			),
-		),
-		optionName: $ => repeat1(
-			choice(
-				/[^|},&@%#]+/,
-				prec.right(choice(
-					$.attribute,
-					$.ability,
-					$._macro,
-					$._escapedCharacter,
-					$._ampersand,
-					$._at,
-					$._percent,
-					$._hash,
-				)),
-			),
-		),
-		_queryOptionValue: $ => choice(
-			/[^|},&@%#?{]+/,
+		prompt: $ => prec.right(repeat1(
 			prec.right(choice(
+				/[^|}&@%#]+/,
+				$.attribute,
+				$.ability,
+				$._macro,
+				$._escapedCharacter,
+				$._ampersand,
+				$._at,
+				$._percent,
+				$._hash,
+			)),
+		)),
+		defaultValue: $ => repeat1(
+			prec.right(choice(
+				/[^|}@%#]+/,
+				$.attribute,
+				$.ability,
+				$._macro,
+				$._at,
+				$._percent,
+				$._hash,
+			)),
+		),
+		option: $ => prec.right(choice(
+			$.optionName,
+			seq(
+				optional($.optionName),
+				$._comma,
+				optional($.optionValue),
+			),
+		)),
+		optionName: $ => repeat1(
+			prec.right(1, choice(
+				/[^|},&@%#]+/,
+				$.attribute,
+				$.ability,
+				$._macro,
+				$._escapedCharacter,
+				$._ampersand,
+				$._at,
+				$._percent,
+				$._hash,
+			)),
+		),
+		optionValue: $ => repeat1(
+			prec.right(choice(
+				/[^|},&@%#?{]+/,
 				$.query,
-				$.property,
-				$.button,
+				//$.property,
+				//$.button,
 				$.attribute,
 				$.ability,
 				$._macro,
@@ -406,24 +403,6 @@ module.exports = grammar({
 				$._questionMark,
 				$._leftBrace,
 			)),
-		),
-		_queryOption: $ => seq(
-			$._pipe,
-			alias(seq(
-				optional($.optionName),
-				optional(seq(
-					$._comma,
-					alias(seq(
-						repeat($._queryOptionValue),
-						repeat(
-							seq(
-								alias(unescapedAtDepthOrAbove(",", escapes.comma), $.invalid),
-								repeat($._queryOptionValue),
-							),
-						),
-					), $.optionValue),
-				)),
-			), $.option),
 		),
 		
 		/*** property ***/

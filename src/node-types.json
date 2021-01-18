@@ -25,17 +25,7 @@
   {
     "type": "abilityName",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "invalid",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "attribute",
@@ -51,6 +41,10 @@
         },
         {
           "type": "characterName",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {
@@ -79,6 +73,29 @@
       "types": [
         {
           "type": "attribute",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "defaultValue",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "macro",
           "named": true
         }
       ]
@@ -232,6 +249,121 @@
     "fields": {}
   },
   {
+    "type": "option",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "optionName",
+          "named": true
+        },
+        {
+          "type": "optionValue",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "optionName",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "optionValue",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        },
+        {
+          "type": "query",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "prompt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "query",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "defaultValue",
+          "named": true
+        },
+        {
+          "type": "option",
+          "named": true
+        },
+        {
+          "type": "prompt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "roll",
     "named": true,
     "fields": {},
@@ -276,6 +408,10 @@
         },
         {
           "type": "macro",
+          "named": true
+        },
+        {
+          "type": "query",
           "named": true
         },
         {
@@ -374,6 +510,34 @@
     "fields": {}
   },
   {
+    "type": "#",
+    "named": false
+  },
+  {
+    "type": "%{",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
+    "named": false
+  },
+  {
+    "type": "@{",
+    "named": false
+  },
+  {
+    "type": "[[",
+    "named": false
+  },
+  {
+    "type": "]]",
+    "named": false
+  },
+  {
     "type": "diceCount",
     "named": true
   },
@@ -400,5 +564,13 @@
   {
     "type": "token",
     "named": true
+  },
+  {
+    "type": "|",
+    "named": false
+  },
+  {
+    "type": "}",
+    "named": false
   }
 ]
