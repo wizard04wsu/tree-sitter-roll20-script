@@ -16,6 +16,10 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "token",
           "named": true
         }
@@ -185,6 +189,10 @@
       "types": [
         {
           "type": "formula",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         }
       ]
