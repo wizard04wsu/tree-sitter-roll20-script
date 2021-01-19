@@ -17,6 +17,7 @@ const queryBegin = () => {
 	return RegExp("\\?\\{|&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.questionMark+");&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.leftBrace+");");
 };
 
+
 let escapes = {
 	htmlCharacter: "[a-zA-Z\\d]+|#\\d+|#[xX]([a-fA-F\\d]{2}){1,2}",
 	
@@ -41,6 +42,7 @@ let escapes = {
 	tilde: "#126|#[xX](00)?7[eE]",
 };
 
+
 module.exports = grammar({
 	name: 'roll20_script',
 	
@@ -64,7 +66,7 @@ module.exports = grammar({
 					$.attribute,
 					$.ability,
 					$._macro,
-					$.inlineRoll,
+					$.___inlineRoll,
 					$.query,
 					
 					$.template,
@@ -106,9 +108,13 @@ module.exports = grammar({
 				choice(
 					alias(/selected/i, $.token),
 					alias(/target/i, $.token),
-					alias(repeat1(
-						choice(/@|[^|}@]+/, $.attribute),
-					), $.characterName),
+					alias(token(choice(
+						"@",
+						seq(
+							repeat1(/@+[^|}@{]|[^|}@]+/),
+							optional("@"),
+						)
+					)), $.characterName),
 				),
 				"|",
 				$.abilityName,
@@ -136,184 +142,95 @@ module.exports = grammar({
 			choice(/\s+/, $._end_of_content),
 		),
 		
-		/*** inline roll ***/
 		
-		inlineRoll: $ => choice(
-			seq(
-				"[[",
-				alias($._formula, $.formula),
-				/*optional(alias(choice(
-					$._mathOperator,
-					///([^\]]|\][^\]])+/,
-				), $.invalid)),*/
-				"]]"
-			),
+		___inlineRoll: $ => alias($._formula_inlineRoll, $.inlineRoll),
+		_formula_inlineRoll: $ => choice(
+			seq( "[[", $.___formula, "]]" ),
 			alias(/\[\[\s*\]\]/, $.invalid),
 		),
 		
-		_mathOperator: $ => alias(/[+*/-]/, $.operator),
+		
+		___formula: $ => alias($._formula, $.formula),
+		_formula: $ => choice(
+			$._formula_expression_binary_leftmost,
+			$._formula_expression_leftmost,
+		),
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		___formula: $ => alias($._formula_expression_leftmost, $.formula),
-		
-		
-		_formula_parenthesised: $ => seq( "(", $.___formula, ")" ),
-		
-		
-		_formula_expression: $ => choice(
+		_formula_expression_right: $ => choice(
+			$._formula_expression_binary_right,
+			seq(
+				$._formula_element,
+				optional(alias(token(repeat1(/\]?[^\]]+/)), $.invalid_noOp_right)),
+			),
+		),
+		_formula_expression_mid: $ => choice(
 			$._formula_element,
-			$._formula_expression_binary,
 		),
 		_formula_expression_leftmost: $ => choice(
-			$._formula_element,
 			$._formula_expression_unary,
-			$._formula_expression_binary_leftmost,
+			$._formula_element,
+			alias(token(seq( /[^*/+\-\]\s]/, repeat(/\]?[^\]]+/), )), $.invalid_noOp_left),
 		),
-		_formula_expression_unary: $ => choice(
-			seq( alias("+", $.operator), $._number_unsigned_decimal_withWhole ),
-			seq( alias("-", $.operator), $._number_unsigned_decimal_withWhole ),
-		),
-		_formula_expression_binary: $ => choice(
-			prec.left(2, seq( $._formula_expression, alias("*", $.operator), $._formula_expression )),
-			prec.left(2, seq( $._formula_expression, alias("/", $.operator), $._formula_expression )),
-			prec.left(1, seq( $._formula_expression, alias("+", $.operator), $._formula_expression )),
-			prec.left(1, seq( $._formula_expression, alias(/-|\+\s*-|-\s*\+/, $.operator), $._formula_expression )),
+		
+		
+		_formula_expression_binary_right: $ => choice(
+			prec.left(2, seq( $._formula_expression_mid, alias(/[*/]/, $.operator), $._formula_expression_right )),
+			prec.left(1, seq( $._formula_expression_mid, alias(/[+-]|\+\s*-|-\s*\+/, $.operator), $._formula_expression_right )),
+			seq( $._formula_expression_mid, alias(/[*/+-]/, $.operator), alias(token(repeat1(/\]?[^\]]+/)), $.invalid_op_remainder_mid) ),
+			seq( $._formula_expression_mid, alias(/[*/+-]/, $.invalid_op_mid) ),
 		),
 		_formula_expression_binary_leftmost: $ => choice(
-			prec.left(2, seq( $._formula_expression_leftmost, alias("*", $.operator), $._formula_expression )),
-			prec.left(2, seq( $._formula_expression_leftmost, alias("/", $.operator), $._formula_expression )),
-			prec.left(1, seq( $._formula_expression_leftmost, alias("+", $.operator), $._formula_expression )),
-			prec.left(1, seq( $._formula_expression_leftmost, alias(/-|\+\s*-|-\s*\+/, $.operator), $._formula_expression )),
+			prec.left(2, seq( $._formula_expression_leftmost, alias(/[*/]/, $.operator), $._formula_expression_right )),
+			prec.left(1, seq( $._formula_expression_leftmost, alias(/[+-]|\+\s*-|-\s*\+/, $.operator), $._formula_expression_right )),
+			seq( $._formula_expression_leftmost, alias(/[*/+-]/, $.operator), alias(token(repeat1(/\]?[^\]]+/)), $.invalid_op_remainder_mid) ),
+			seq( $._formula_expression_leftmost, alias(/[*/+-]/, $.invalid_op_left) ),
+			
 		),
+		_formula_expression_unary: $ => seq( /[+=]/, $._number_unsigned_decimal_withWhole ),
 		
 		
 		_formula_element: $ => seq(
 			optional($._inline_text),
 			choice(
-				seq($._replacements,
-					choice(
-						alias($._table_roll_expression, $.rollTable),
-					)),
-				seq($._replacements,
+				seq(optional($._replacements), $.___rollTable),
+				seq(optional($._replacements),
 					choice(
 						alias($._number_unsigned_decimal, $.number),
-						alias($._roll_expression, $.roll),
+						$.___roll,
 					),
-					$._replacements_macro,),
-				seq(
-					choice(
-						alias($._group_roll_expression, $.groupRoll),
-					),
-					$._replacements_macro),
-				$._math_function,
-				$._replacements_macro,
+					optional($._replacements_incl_macro)),
+				seq($.___groupRoll, optional($._replacements_incl_macro)),
+				$.___function,
+				$._replacements_incl_macro,
 				$._formula_parenthesised,
+				$.___inlineRoll,
+				
 			),
 			optional($._inline_text),
 		),
 		_formula_element_leftmost: $ => seq(
 			optional($._inline_text),
 			choice(
-				seq($._replacements,
-					choice(
-						alias($._table_roll_expression, $.rollTable),
-					)),
-				seq($._replacements,
+				seq(optional($._replacements), $.___rollTable),
+				seq(optional($._replacements),
 					choice(
 						alias($._number_unsigned_decimal, $.number),
-						alias($._roll_expression, $.roll),
+						$.___roll,
 					),
-					$._replacements_macro,),
+					optional($._replacements_incl_macro)),
 				seq(
 					choice(
 						alias($._formula_expression_unary, $.number),
-						alias($._group_roll_expression, $.groupRoll),
+						$.___groupRoll,
 					),
-					$._replacements_macro),
-				$._math_function,
-				$._replacements_macro,
+					optional($._replacements_incl_macro)),
+				$.___function,
+				$._replacements_incl_macro,
 				$._formula_parenthesised,
+				$.___inlineRoll,
 			),
 			optional($._inline_text),
-		),
-		
-		
-		_number_unsigned_decimal: $ => /\d+(\.\d+)?|\.\d+/,		//valid:  5  5.5  .5  invalid:  5.
-		_number_unsigned_decimal_withWhole: $ => /\d+(\.\d+)?/,	//valid:  5  5.5  invalid:  .5  5.
-		
-		
-		_math_function: $ => seq(
-			alias(/abs|ceil|floor|round/, $.functionName),
-			$._formula_parenthesised,
-		),
-		
-		
-		_roll_expression: $ => seq(
-			optional(alias(/\d+/, $.diceCount)),
-			"d",
-			alias(/\d+|f/i, $.diceSides),
-			optional(alias($._roll_modifiers, $.rollModifiers)),
-		),
-		_roll_modifiers: $ => repeat1(
-			choice(
-				/ro?[<=>]?\d+/i,			//reroll / reroll once
-				/![!p]?([<=>]?\d+)?/i,		//explode / compound / penetrate
-				/[kd][hl]?\d+/i,			//keep / drop
-				/[<=>]\d+(f[<=>]?\d+)?/i,	//count successes / count successes - failures
-				/c[sf][<=>]?\d+/i,			//critical success / critical failure
-				/mt?\d*([<=>]\d+)?/i,		//show matches / count matches (a match is a group of 2 or more dice with the same result)
-				/s[ad]/i,					//sort
-			),
-		),
-		
-		
-		_group_roll_expression: $ => seq(
-			$._leftBrace,
-			$.___formula,
-			repeat(seq( $._comma, $.___formula )),
-			$._rightBrace,
-			optional(alias($._group_roll_modifiers, $.rollModifiers)),
-		),
-		_group_roll_modifiers: $ => repeat1(
-			choice(
-				/[kd][hl]?\d+/i,			//keep / drop
-				/[<=>]\d+(f[<=>]?\d+)?/i,	//count successes / count successes - failures
-			),
-		),
-		
-		
-		_table_roll_expression: $ => seq(
-			optional(alias(/\d+/, $.diceCount)),
-			/t/i,
-			$._leftBracket,
-			alias(repeat1(
-				choice(
-					/[^|}&@%#]+/,
-					$.attribute,
-					$.ability,
-					$._macro,
-					$._escapedCharacter,
-					$._ampersand,
-					$._at,
-					$._percent,
-					$._hash,
-				),
-			), $.tableName),
-			$._rightBracket,
-		),
-		
-		
-		_replacements: $ => repeat1(choice( $.attribute, $.ability )),
-		_replacements_macro: $ => choice(
-			seq( $._replacements, optional($._macro) ),
-			$._macro,
 		),
 		
 		
@@ -335,175 +252,106 @@ module.exports = grammar({
 		),
 		
 		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		
-		_formula: $ => seq(
-			optional($._inlineLabels),
-			prec.right(choice(
-				$._mathFunction,
-				$._roll,
-				$._number,
-				$._groupRoll,
-				$._rollTable,
-				seq(
-					"(",
-					alias($._formula, $.formula),
-					")",
-				),
-				$._variablesAndMacro,
-			)),
-			optional($._inlineLabels),
-			optional(seq(
-				$._mathOperator,
-				$._formula,
-			)),
+		_replacements: $ => repeat1(choice( $.attribute, $.ability )),
+		_replacements_incl_macro: $ => choice(
+			seq( $._replacements, optional($._macro) ),
+			$._macro,
 		),
 		
-		number: $ => choice(
+		
+		_formula_parenthesised: $ => seq( "(", $.___formula, ")" ),
+		
+		
+		_number_unsigned_integer: $ => /\d+/,
+		_number_unsigned_decimal: $ => choice(	//valid:  5  5.5  .5  invalid:  5.
 			seq(
-				/\d+/,
-				optional(/\.\d+/),
+				$._number_unsigned_integer,
+				optional(seq( ".", $._number_unsigned_integer )),
 			),
-			/\.\d+/,
+			seq( ".", $._number_unsigned_integer ),
 		),
-		_number: $ => seq(
-			optional($._variables),
-			$.number,
-			optional($._variablesAndMacro),
+		_number_unsigned_decimal_withWhole: $ => seq(	//valid:  5  5.5  invalid:  .5  5.
+			$._number_unsigned_integer,
+			optional(seq( ".", $._number_unsigned_integer )),
 		),
 		
-		_mathFunction: $ => seq(
+		
+		___function: $ => alias($._math_function, $.function),
+		_math_function: $ => seq(
 			alias(/abs|ceil|floor|round/, $.functionName),
-			"(", alias($._formula, $.formula), ")",
+			$._formula_parenthesised,
 		),
 		
-		/*** roll of same-sided dice ***/
 		
-		roll: $ => seq(
-			optional(alias(/\d+/, $.diceCount)),
-			/d/i,
+		___roll: $ => alias($._roll_expression, $.roll),
+		_roll_expression: $ => seq(
+			optional(alias($._number_unsigned_integer, $.diceCount)),
+			"d",
 			alias(/\d+|f/i, $.diceSides),
-			alias(repeat(
-				choice(
-					/ro?[<=>]?\d+/i,			//reroll / reroll once
-					/![!p]?([<=>]?\d+)?/i,		//explode / compound / penetrate
-					/[kd][hl]?\d+/i,			//keep / drop
-					/[<=>]\d+(f[<=>]?\d+)?/i,	//count successes / count successes - failures
-					/c[sf][<=>]?\d+/i,			//critical success / critical failure
-					/mt?\d*([<=>]\d+)?/i,		//show matches / count matches (a match is a group of 2 or more dice with the same result)
-					/s[ad]/i,					//sort
-				),
-			), $.rollModifiers),
+			optional(alias($._roll_modifiers, $.rollModifiers)),
 		),
-		_roll: $ => seq(
-			optional($._variables),
-			$.roll,
-			optional($._variablesAndMacro),
-		),
-		
-		/*** group roll ***/
-		
-		groupRoll: $ => seq(
-			$._leftBrace,
-			alias($._formula, $.formula),
-			repeat(
-				seq(
-					$._comma,
-					alias($._formula, $.formula),
-				),
+		_roll_modifiers: $ => repeat1(
+			choice(
+				/ro?[<=>]?\d+/i,			//reroll / reroll once
+				/![!p]?([<=>]?\d+)?/i,		//explode / compound / penetrate
+				/[kd][hl]?\d+/i,			//keep / drop
+				/[<=>]\d+(f[<=>]?\d+)?/i,	//count successes / count successes - failures
+				/c[sf][<=>]?\d+/i,			//critical success / critical failure
+				/mt?\d*([<=>]\d+)?/i,		//show matches / count matches (a match is a group of 2 or more dice with the same result)
+				/s[ad]/i,					//sort
 			),
+		),
+		
+		
+		___groupRoll: $ => alias($._group_roll_expression, $.groupRoll),
+		_group_roll_expression: $ => seq(
+			$._leftBrace,
+			$.___formula,
+			repeat(seq( $._comma, $.___formula )),
 			$._rightBrace,
-			alias(repeat(
-				choice(
-					/[kd][hl]?\d+/i,			//keep / drop
-					/[<=>]\d+(f[<=>]?\d+)?/i,	//count successes / count successes - failures
-				),
-			), $.rollModifiers),
+			optional(alias($._group_roll_modifiers, $.rollModifiers)),
 		),
-		_groupRoll: $ => seq(
-			$.groupRoll,
-			optional($._variablesAndMacro),
+		_group_roll_modifiers: $ => repeat1(
+			choice(
+				/[kd][hl]?\d+/i,			//keep / drop
+				/[<=>]\d+(f[<=>]?\d+)?/i,	//count successes / count successes - failures
+			),
 		),
 		
-		/*** roll table ***/
 		
-		rollTable: $ => seq(
-			optional(alias(/\d+/, $.diceCount)),
+		___rollTable: $ => alias($._table_roll_expression, $.rollTable),
+		_table_roll_expression: $ => seq(
+			optional(alias($._number_unsigned_integer, $.diceCount)),
 			/t/i,
 			$._leftBracket,
 			alias(repeat1(
 				choice(
 					/[^|}&@%#]+/,
-					prec.right(choice(
-						$.attribute,
-						$.ability,
-						$._macro,
-						$._escapedCharacter,
-						$._ampersand,
-						$._at,
-						$._percent,
-						$._hash,
-					)),
-				),
-			), $.tableName),
-			$._rightBracket,
-		),
-		_rollTable: $ => seq(
-			optional($._variables),
-			$.rollTable,
-		),
-		
-		/*** labels within formulas ***/
-		
-		_inlineLabels: $ => repeat1(
-			choice(
-				/\s+/,
-				$.label,
-			),
-		),
-		label: $ => prec(1, seq(
-			$._leftBracket,
-			repeat(
-				prec.right(choice(
-					/[^\]&@%#]+/,
 					$.attribute,
 					$.ability,
 					$._macro,
+					$._escapedCharacter,
 					$._ampersand,
 					$._at,
 					$._percent,
 					$._hash,
-					$._escapedCharacter,
-				)),
-			),
+				),
+			), $.tableName),
 			$._rightBracket,
-		)),
-		
-		/*** general use of attributes, abilities, and macros within math expressions ***/
-		
-		_variables: $ => repeat1(
-			choice(
-				$.attribute,
-				$.ability,
-			),
 		),
-		_variablesAndMacro: $ => choice(
-			$._macro,
-			seq(
-				$._variables,
-				optional($._macro),
-			),
-		),
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		/*** query ***/
 		

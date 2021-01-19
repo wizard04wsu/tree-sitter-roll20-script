@@ -70,17 +70,7 @@
   {
     "type": "characterName",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "attribute",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "defaultValue",
@@ -111,7 +101,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "ability",
@@ -126,11 +116,35 @@
           "named": true
         },
         {
-          "type": "functionName",
+          "type": "function",
           "named": true
         },
         {
           "type": "groupRoll",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid_noOp_left",
+          "named": true
+        },
+        {
+          "type": "invalid_noOp_right",
+          "named": true
+        },
+        {
+          "type": "invalid_op_left",
+          "named": true
+        },
+        {
+          "type": "invalid_op_mid",
+          "named": true
+        },
+        {
+          "type": "invalid_op_remainder_mid",
           "named": true
         },
         {
@@ -155,6 +169,25 @@
         },
         {
           "type": "rollTable",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "function",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        },
+        {
+          "type": "functionName",
           "named": true
         }
       ]
@@ -534,6 +567,10 @@
     "named": false
   },
   {
+    "type": ".",
+    "named": false
+  },
+  {
     "type": "@{",
     "named": false
   },
@@ -543,6 +580,10 @@
   },
   {
     "type": "]]",
+    "named": false
+  },
+  {
+    "type": "d",
     "named": false
   },
   {
@@ -559,6 +600,26 @@
   },
   {
     "type": "invalid",
+    "named": true
+  },
+  {
+    "type": "invalid_noOp_left",
+    "named": true
+  },
+  {
+    "type": "invalid_noOp_right",
+    "named": true
+  },
+  {
+    "type": "invalid_op_left",
+    "named": true
+  },
+  {
+    "type": "invalid_op_mid",
+    "named": true
+  },
+  {
+    "type": "invalid_op_remainder_mid",
     "named": true
   },
   {
