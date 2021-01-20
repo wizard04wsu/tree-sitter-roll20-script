@@ -128,23 +128,11 @@
           "named": true
         },
         {
-          "type": "invalid_noOp_left",
+          "type": "invalid_operator",
           "named": true
         },
         {
-          "type": "invalid_noOp_right",
-          "named": true
-        },
-        {
-          "type": "invalid_op_left",
-          "named": true
-        },
-        {
-          "type": "invalid_op_mid",
-          "named": true
-        },
-        {
-          "type": "invalid_op_remainder_mid",
+          "type": "invalid_remainder",
           "named": true
         },
         {
@@ -603,23 +591,15 @@
     "named": true
   },
   {
-    "type": "invalid_noOp_left",
+    "type": "invalid_element",
     "named": true
   },
   {
-    "type": "invalid_noOp_right",
+    "type": "invalid_operator",
     "named": true
   },
   {
-    "type": "invalid_op_left",
-    "named": true
-  },
-  {
-    "type": "invalid_op_mid",
-    "named": true
-  },
-  {
-    "type": "invalid_op_remainder_mid",
+    "type": "invalid_remainder",
     "named": true
   },
   {

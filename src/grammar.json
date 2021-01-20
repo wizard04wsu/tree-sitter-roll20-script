@@ -413,12 +413,12 @@
       "type": "ALIAS",
       "content": {
         "type": "SYMBOL",
-        "name": "_formula_inlineRoll"
+        "name": "_inlineRoll"
       },
       "named": true,
       "value": "inlineRoll"
     },
-    "_formula_inlineRoll": {
+    "_inlineRoll": {
       "type": "CHOICE",
       "members": [
         {
@@ -463,67 +463,12 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_formula_expression_binary_leftmost"
+          "name": "_formula_expression_binary_first"
         },
         {
           "type": "SYMBOL",
-          "name": "_formula_expression_leftmost"
-        }
-      ]
-    },
-    "_formula_expression_right": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_formula_expression_binary_right"
+          "name": "_invalid_expression_adjacent_elements"
         },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_formula_element"
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "TOKEN",
-                    "content": {
-                      "type": "REPEAT1",
-                      "content": {
-                        "type": "PATTERN",
-                        "value": "\\]?[^\\]]+"
-                      }
-                    }
-                  },
-                  "named": true,
-                  "value": "invalid_noOp_right"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    "_formula_expression_mid": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_formula_element"
-        }
-      ]
-    },
-    "_formula_expression_leftmost": {
-      "type": "CHOICE",
-      "members": [
         {
           "type": "SYMBOL",
           "name": "_formula_expression_unary"
@@ -531,263 +476,174 @@
         {
           "type": "SYMBOL",
           "name": "_formula_element"
+        }
+      ]
+    },
+    "_formula_expression_binary_first": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_formula_expression_unary"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_formula_element"
+            }
+          ]
         },
         {
           "type": "ALIAS",
           "content": {
-            "type": "TOKEN",
-            "content": {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "[^*\\/+\\-\\]\\s]"
-                },
-                {
-                  "type": "REPEAT",
-                  "content": {
-                    "type": "PATTERN",
-                    "value": "\\]?[^\\]]+"
-                  }
-                }
-              ]
-            }
+            "type": "PATTERN",
+            "value": "[*\\/+-]|\\+\\s*-|-\\s*\\+"
           },
           "named": true,
-          "value": "invalid_noOp_left"
-        }
-      ]
-    },
-    "_formula_expression_binary_right": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "PREC_LEFT",
-          "value": 2,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_mid"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "[*\\/]"
-                },
-                "named": true,
-                "value": "operator"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_right"
-              }
-            ]
-          }
+          "value": "operator"
         },
         {
-          "type": "PREC_LEFT",
-          "value": 1,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_mid"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "[+-]|\\+\\s*-|-\\s*\\+"
-                },
-                "named": true,
-                "value": "operator"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_right"
-              }
-            ]
-          }
-        },
-        {
-          "type": "SEQ",
+          "type": "CHOICE",
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_formula_expression_mid"
+              "name": "_formula_expression_binary"
             },
+            {
+              "type": "SYMBOL",
+              "name": "_formula_element"
+            }
+          ]
+        }
+      ]
+    },
+    "_formula_expression_binary": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_formula_element"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "PATTERN",
+            "value": "[*\\/+-]|\\+\\s*-|-\\s*\\+"
+          },
+          "named": true,
+          "value": "operator"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_formula_expression_binary"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_formula_element"
+            }
+          ]
+        }
+      ]
+    },
+    "_invalid_expression_adjacent_elements": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_formula_expression_unary"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_formula_element"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
             {
               "type": "ALIAS",
               "content": {
                 "type": "PATTERN",
-                "value": "[*\\/+-]"
+                "value": "[*\\/+-]|\\+\\s*-|-\\s*\\+"
               },
               "named": true,
-              "value": "operator"
+              "value": "invalid_operator"
             },
             {
               "type": "ALIAS",
               "content": {
                 "type": "TOKEN",
                 "content": {
-                  "type": "REPEAT1",
-                  "content": {
-                    "type": "PATTERN",
-                    "value": "\\]?[^\\]]+"
-                  }
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": "[^*\\/+\\-\\]\\s]"
+                    },
+                    {
+                      "type": "REPEAT",
+                      "content": {
+                        "type": "PATTERN",
+                        "value": "\\]?[^\\]]+"
+                      }
+                    }
+                  ]
                 }
               },
               "named": true,
-              "value": "invalid_op_remainder_mid"
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_formula_expression_mid"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "[*\\/+-]"
-              },
-              "named": true,
-              "value": "invalid_op_mid"
-            }
-          ]
-        }
-      ]
-    },
-    "_formula_expression_binary_leftmost": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "PREC_LEFT",
-          "value": 2,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_leftmost"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "[*\\/]"
-                },
-                "named": true,
-                "value": "operator"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_right"
-              }
-            ]
-          }
-        },
-        {
-          "type": "PREC_LEFT",
-          "value": 1,
-          "content": {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_leftmost"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "[+-]|\\+\\s*-|-\\s*\\+"
-                },
-                "named": true,
-                "value": "operator"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_formula_expression_right"
-              }
-            ]
-          }
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_formula_expression_leftmost"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "[*\\/+-]"
-              },
-              "named": true,
-              "value": "operator"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "TOKEN",
-                "content": {
-                  "type": "REPEAT1",
-                  "content": {
-                    "type": "PATTERN",
-                    "value": "\\]?[^\\]]+"
-                  }
-                }
-              },
-              "named": true,
-              "value": "invalid_op_remainder_mid"
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_formula_expression_leftmost"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "PATTERN",
-                "value": "[*\\/+-]"
-              },
-              "named": true,
-              "value": "invalid_op_left"
+              "value": "invalid_remainder"
             }
           ]
         }
       ]
     },
     "_formula_expression_unary": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
         {
-          "type": "PATTERN",
-          "value": "[+=]"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_number_unsigned_decimal_withWhole"
+          "type": "ALIAS",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "PATTERN",
+                  "value": "[+-]"
+                },
+                "named": true,
+                "value": "operator"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_number_unsigned_decimal_withWhole"
+              }
+            ]
+          },
+          "named": true,
+          "value": "number"
         }
       ]
     },
     "_formula_element": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_valid_element"
+        }
+      ]
+    },
+    "_valid_element": {
       "type": "SEQ",
       "members": [
         {
@@ -926,158 +782,20 @@
         }
       ]
     },
-    "_formula_element_leftmost": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_inline_text"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_replacements"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "___rollTable"
-                }
-              ]
-            },
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_replacements"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "SYMBOL",
-                        "name": "_number_unsigned_decimal"
-                      },
-                      "named": true,
-                      "value": "number"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "___roll"
-                    }
-                  ]
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_replacements_incl_macro"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "SYMBOL",
-                        "name": "_formula_expression_unary"
-                      },
-                      "named": true,
-                      "value": "number"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "___groupRoll"
-                    }
-                  ]
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_replacements_incl_macro"
-                    },
-                    {
-                      "type": "BLANK"
-                    }
-                  ]
-                }
-              ]
-            },
-            {
-              "type": "SYMBOL",
-              "name": "___function"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_replacements_incl_macro"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_formula_parenthesised"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "___inlineRoll"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_inline_text"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+    "_invalid_element": {
+      "type": "ALIAS",
+      "content": {
+        "type": "TOKEN",
+        "content": {
+          "type": "REPEAT1",
+          "content": {
+            "type": "PATTERN",
+            "value": "\\]?[^\\]]+"
+          }
         }
-      ]
+      },
+      "named": true,
+      "value": "invalid_element"
     },
     "_inline_text": {
       "type": "REPEAT1",

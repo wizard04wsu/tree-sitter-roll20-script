@@ -68,7 +68,7 @@ module.exports = grammar({
 					$._macro,
 					$.___inlineRoll,
 					$.query,
-					
+					//TODO
 					$.template,
 					$.tracker,
 				),
@@ -143,8 +143,8 @@ module.exports = grammar({
 		),
 		
 		
-		___inlineRoll: $ => alias($._formula_inlineRoll, $.inlineRoll),
-		_formula_inlineRoll: $ => choice(
+		___inlineRoll: $ => alias($._inlineRoll, $.inlineRoll),
+		_inlineRoll: $ => choice(
 			seq( "[[", $.___formula, "]]" ),
 			alias(/\[\[\s*\]\]/, $.invalid),
 		),
@@ -152,45 +152,38 @@ module.exports = grammar({
 		
 		___formula: $ => alias($._formula, $.formula),
 		_formula: $ => choice(
-			$._formula_expression_binary_leftmost,
-			$._formula_expression_leftmost,
-		),
-		
-		
-		_formula_expression_right: $ => choice(
-			$._formula_expression_binary_right,
-			seq(
-				$._formula_element,
-				optional(alias(token(repeat1(/\]?[^\]]+/)), $.invalid_noOp_right)),
-			),
-		),
-		_formula_expression_mid: $ => choice(
-			$._formula_element,
-		),
-		_formula_expression_leftmost: $ => choice(
+			$._formula_expression_binary_first,
+			$._invalid_expression_adjacent_elements,
 			$._formula_expression_unary,
 			$._formula_element,
-			alias(token(seq( /[^*/+\-\]\s]/, repeat(/\]?[^\]]+/), )), $.invalid_noOp_left),
+		),
+		_formula_expression_binary_first: $ => seq(
+			choice( $._formula_expression_unary, $._formula_element ),
+			alias(/[*/+-]|\+\s*-|-\s*\+/, $.operator),
+			choice( $._formula_expression_binary, $._formula_element ),
+		),
+		_formula_expression_binary: $ => seq(
+			$._formula_element,
+			alias(/[*/+-]|\+\s*-|-\s*\+/, $.operator),
+			choice( $._formula_expression_binary, $._formula_element ),
+		),
+		_invalid_expression_adjacent_elements: $ => seq(
+			choice( $._formula_expression_unary, $._formula_element ),
+			choice(
+				alias(/[*/+-]|\+\s*-|-\s*\+/, $.invalid_operator),
+				alias(token(seq( /[^*/+\-\]\s]/, repeat(/\]?[^\]]+/) )), $.invalid_remainder),
+			),
+		),
+		_formula_expression_unary: $ => choice(
+			alias(seq( alias(/[+-]/, $.operator), $._number_unsigned_decimal_withWhole ), $.number),
 		),
 		
 		
-		_formula_expression_binary_right: $ => choice(
-			prec.left(2, seq( $._formula_expression_mid, alias(/[*/]/, $.operator), $._formula_expression_right )),
-			prec.left(1, seq( $._formula_expression_mid, alias(/[+-]|\+\s*-|-\s*\+/, $.operator), $._formula_expression_right )),
-			seq( $._formula_expression_mid, alias(/[*/+-]/, $.operator), alias(token(repeat1(/\]?[^\]]+/)), $.invalid_op_remainder_mid) ),
-			seq( $._formula_expression_mid, alias(/[*/+-]/, $.invalid_op_mid) ),
+		_formula_element: $ => choice(
+			$._valid_element,
+			//$._invalid_element,
 		),
-		_formula_expression_binary_leftmost: $ => choice(
-			prec.left(2, seq( $._formula_expression_leftmost, alias(/[*/]/, $.operator), $._formula_expression_right )),
-			prec.left(1, seq( $._formula_expression_leftmost, alias(/[+-]|\+\s*-|-\s*\+/, $.operator), $._formula_expression_right )),
-			seq( $._formula_expression_leftmost, alias(/[*/+-]/, $.operator), alias(token(repeat1(/\]?[^\]]+/)), $.invalid_op_remainder_mid) ),
-			seq( $._formula_expression_leftmost, alias(/[*/+-]/, $.invalid_op_left) ),
-			
-		),
-		_formula_expression_unary: $ => seq( /[+=]/, $._number_unsigned_decimal_withWhole ),
-		
-		
-		_formula_element: $ => seq(
+		_valid_element: $ => seq(
 			optional($._inline_text),
 			choice(
 				seq(optional($._replacements), $.___rollTable),
@@ -209,29 +202,7 @@ module.exports = grammar({
 			),
 			optional($._inline_text),
 		),
-		_formula_element_leftmost: $ => seq(
-			optional($._inline_text),
-			choice(
-				seq(optional($._replacements), $.___rollTable),
-				seq(optional($._replacements),
-					choice(
-						alias($._number_unsigned_decimal, $.number),
-						$.___roll,
-					),
-					optional($._replacements_incl_macro)),
-				seq(
-					choice(
-						alias($._formula_expression_unary, $.number),
-						$.___groupRoll,
-					),
-					optional($._replacements_incl_macro)),
-				$.___function,
-				$._replacements_incl_macro,
-				$._formula_parenthesised,
-				$.___inlineRoll,
-			),
-			optional($._inline_text),
-		),
+		_invalid_element: $ => alias(token(repeat1(/\]?[^\]]+/)), $.invalid_element),
 		
 		
 		_inline_text: $ => repeat1(choice( /\s+/, alias($._inline_label, $.label) )),
