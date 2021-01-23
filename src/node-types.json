@@ -16,7 +16,7 @@
           "named": true
         },
         {
-          "type": "invalid",
+          "type": "invalid_ability",
           "named": true
         },
         {
@@ -48,7 +48,11 @@
           "named": true
         },
         {
-          "type": "invalid",
+          "type": "invalid_attribute1",
+          "named": true
+        },
+        {
+          "type": "invalid_attribute2",
           "named": true
         },
         {
@@ -73,23 +77,79 @@
     "fields": {}
   },
   {
-    "type": "defaultValue",
+    "type": "diceRoll",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "ability",
+          "type": "char",
           "named": true
         },
         {
-          "type": "attribute",
+          "type": "compounding",
           "named": true
         },
         {
-          "type": "macro",
+          "type": "count",
+          "named": true
+        },
+        {
+          "type": "countMatches",
+          "named": true
+        },
+        {
+          "type": "criticalFailure",
+          "named": true
+        },
+        {
+          "type": "criticalSuccess",
+          "named": true
+        },
+        {
+          "type": "drop",
+          "named": true
+        },
+        {
+          "type": "exploding",
+          "named": true
+        },
+        {
+          "type": "keep",
+          "named": true
+        },
+        {
+          "type": "penetrating",
+          "named": true
+        },
+        {
+          "type": "reroll",
+          "named": true
+        },
+        {
+          "type": "reroll_once",
+          "named": true
+        },
+        {
+          "type": "showMatches",
+          "named": true
+        },
+        {
+          "type": "sides",
+          "named": true
+        },
+        {
+          "type": "sort",
+          "named": true
+        },
+        {
+          "type": "successes",
+          "named": true
+        },
+        {
+          "type": "successesMinusFailures",
           "named": true
         }
       ]
@@ -112,11 +172,7 @@
           "named": true
         },
         {
-          "type": "formula",
-          "named": true
-        },
-        {
-          "type": "function",
+          "type": "diceRoll",
           "named": true
         },
         {
@@ -128,11 +184,11 @@
           "named": true
         },
         {
-          "type": "invalid_operator",
+          "type": "invalid_formula1",
           "named": true
         },
         {
-          "type": "invalid_remainder",
+          "type": "invalid_formula2",
           "named": true
         },
         {
@@ -152,30 +208,11 @@
           "named": true
         },
         {
-          "type": "roll",
+          "type": "parenthetical",
           "named": true
         },
         {
-          "type": "rollTable",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "function",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "formula",
-          "named": true
-        },
-        {
-          "type": "functionName",
+          "type": "tableRoll",
           "named": true
         }
       ]
@@ -194,7 +231,7 @@
           "named": true
         },
         {
-          "type": "rollModifiers",
+          "type": "modifiers",
           "named": true
         }
       ]
@@ -213,11 +250,16 @@
           "named": true
         },
         {
-          "type": "invalid",
+          "type": "invalid_inlineRoll",
           "named": true
         }
       ]
     }
+  },
+  {
+    "type": "invalid_formula2",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "label",
@@ -273,127 +315,7 @@
     }
   },
   {
-    "type": "number",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "option",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "optionName",
-          "named": true
-        },
-        {
-          "type": "optionValue",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "optionName",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "optionValue",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "query",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "prompt",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "query",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "defaultValue",
-          "named": true
-        },
-        {
-          "type": "option",
-          "named": true
-        },
-        {
-          "type": "prompt",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "roll",
+    "type": "modifiers",
     "named": true,
     "fields": {},
     "children": {
@@ -401,15 +323,39 @@
       "required": true,
       "types": [
         {
-          "type": "diceCount",
+          "type": "drop",
           "named": true
         },
         {
-          "type": "diceSides",
+          "type": "keep",
           "named": true
         },
         {
-          "type": "rollModifiers",
+          "type": "successes",
+          "named": true
+        },
+        {
+          "type": "successesMinusFailures",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "number",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "parenthetical",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
           "named": true
         }
       ]
@@ -440,43 +386,50 @@
           "named": true
         },
         {
-          "type": "query",
-          "named": true
-        },
-        {
           "type": "string",
-          "named": true
-        },
-        {
-          "type": "template",
-          "named": true
-        },
-        {
-          "type": "tracker",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "rollModifiers",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "rollTable",
+    "type": "sides",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "diceCount",
+          "type": "abilityName",
           "named": true
         },
         {
-          "type": "tableName",
+          "type": "attributeName",
+          "named": true
+        },
+        {
+          "type": "characterName",
+          "named": true
+        },
+        {
+          "type": "invalid_ability",
+          "named": true
+        },
+        {
+          "type": "invalid_attribute1",
+          "named": true
+        },
+        {
+          "type": "invalid_attribute2",
+          "named": true
+        },
+        {
+          "type": "keyword",
+          "named": true
+        },
+        {
+          "type": "token",
           "named": true
         }
       ]
@@ -511,32 +464,27 @@
     }
   },
   {
-    "type": "template",
+    "type": "tableRoll",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "ability",
+          "type": "count",
           "named": true
         },
         {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "macro",
+          "type": "tableName",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "tracker",
-    "named": true,
-    "fields": {}
+    "type": "",
+    "named": false
   },
   {
     "type": "#",
@@ -571,35 +519,59 @@
     "named": false
   },
   {
-    "type": "d",
-    "named": false
-  },
-  {
-    "type": "diceCount",
+    "type": "char",
     "named": true
   },
   {
-    "type": "diceSides",
+    "type": "compounding",
     "named": true
   },
   {
-    "type": "functionName",
+    "type": "count",
     "named": true
   },
   {
-    "type": "invalid",
+    "type": "countMatches",
     "named": true
   },
   {
-    "type": "invalid_element",
+    "type": "criticalFailure",
     "named": true
   },
   {
-    "type": "invalid_operator",
+    "type": "criticalSuccess",
     "named": true
   },
   {
-    "type": "invalid_remainder",
+    "type": "drop",
+    "named": true
+  },
+  {
+    "type": "exploding",
+    "named": true
+  },
+  {
+    "type": "invalid_ability",
+    "named": true
+  },
+  {
+    "type": "invalid_attribute1",
+    "named": true
+  },
+  {
+    "type": "invalid_attribute2",
+    "named": true
+  },
+  {
+    "type": "invalid_formula1",
+    "named": true
+  },
+  {
+    "type": "invalid_inlineRoll",
+    "named": true
+  },
+  {
+    "type": "keep",
     "named": true
   },
   {
@@ -608,6 +580,34 @@
   },
   {
     "type": "operator",
+    "named": true
+  },
+  {
+    "type": "penetrating",
+    "named": true
+  },
+  {
+    "type": "reroll",
+    "named": true
+  },
+  {
+    "type": "reroll_once",
+    "named": true
+  },
+  {
+    "type": "showMatches",
+    "named": true
+  },
+  {
+    "type": "sort",
+    "named": true
+  },
+  {
+    "type": "successes",
+    "named": true
+  },
+  {
+    "type": "successesMinusFailures",
     "named": true
   },
   {
