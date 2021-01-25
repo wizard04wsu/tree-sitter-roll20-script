@@ -17,6 +17,8 @@ const queryBegin = () => {
 	return RegExp("\\?\\{|&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.questionMark+");&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.leftBrace+");");
 };
 
+const stringOfChars = (charRxp) => prec.right(repeat1(charRxp));
+
 
 let escapes = {
 	htmlCharacter: "[a-zA-Z\\d]+|#\\d+|#[xX]([a-fA-F\\d]{2}){1,2}",
@@ -47,35 +49,274 @@ module.exports = grammar({
 	name: 'roll20_script',
 	
 	externals: $ => [
-		$._EOF,	// (no content) determines if there are no more tokens
+		//$._EOF,	// (no content) determines if there are no more tokens
+		$._will_close_brace,
 	],
 	
-	extras: $ => [],
-	
-	conflicts: $ => [
-		//[ $.macro, $._hash, ],
-		//[ $._diceRoll_modifiers, $._diceRoll_modifiers_alt, ],
+	extras: $ => [
+		//(manually handle whitespace)
 	],
+	
+	conflicts: $ => [],
 	
 	inline: $ => [],
 	
 	rules: {
 		
-		roll20_script: $ => repeat(
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Start rule
+		  ╚╤═══════════════════════════════════════════════════════════
+		   │ Roll20 seems to evaluate script elements in this order:
+		   │ 1. abilities
+		   │ 2. attributes
+		   │ 3. macros
+		   │ 4. attributes (again)
+		   │ 5. inline rolls, ... TODO
+		   └───────────────────────────────────────────────────────────*/
+		
+		roll20_script: $ => //seq(
+			prec.right(repeat(
+				//seq(
+					//prec.right(repeat1(
+						//seq(
+							//optional(alias(/([^@%#\[]|\r?\n)+/, $.string)),
+							choice(
+								//alias(prec.right(repeat1( /.|\n|#\s/ )), $.string),
+								//alias(prec.right(repeat1( /.|\n/ )), $.string),
+								///\r?\n/,
+								//alias(/(.|\r?\n)+/, $.string),
+								$._stringNL,
+								$.attribute,
+								//$.ability,
+								//$._macroNL,
+								//$.inlineRoll,
+							),
+							//alias(prec.right(repeat(/.|\r?\n/)), $.string),
+						//),
+					//)),
+					//optional(alias(/(.|\r?\n)+/, $.string)),
+				//),
+			)),
+			//alias(prec.right(repeat(/.|\r?\n/)), $.string),
+			//optional($.macro),
+		//),
+		/*_string: $ => prec.left(seq(
 			choice(
-				$.inlineRoll,
-				$.attribute,
-				$.ability,
-				$.macro,
-				seq( alias("#", $.string), $._EOF ),
-				alias(prec.right(repeat1( /.|\n|#\s/ )), $.string),
+				/[^\[@%#]+/,
+				/[\[@%#\n]+/,
+			),
+			optional($._string),
+		)),*/
+		
+		
+		/*┌──────────────────────────────
+		  │ helper rules
+		  └──────────────────────────────*/
+		
+		_string: $ => stringOfChars(/./),
+		_stringNL: $ => stringOfChars(/.|\r?\n/),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Attributes, Abilities, and Macros
+		  ╚════════════════════════════════════════════════════════════
+		
+		/*┌──────────────────────────────
+		  │ helper rules
+		  └┬─────────────────────────────
+		   │ A character name, attribute name, or ability name:
+		   │ • can contain spaces and tabs.
+		   │ • cannot contain new lines, pipes, closing curly braces, or the
+		   │   character sequences "@{" and "%{".
+		   │ • cannot be injected with attributes or abilities.
+		   │ 
+		   │ Note that the website sometimes allows these special characters in
+		   │   names, even though it prevents the property from being accessed
+		   │   from within a macro.
+		   └─────────────────────────────*/
+		
+		_tokenSelector: $ => choice(
+			alias("selected", $.token),
+			alias("target", $.token),
+		),
+		_propertyName: $ => /[@%]|([^|}\r\n@%]|[@%][^|}\r\n{])+[@%]?/,
+		_propertyNameWithMacros: $ => choice(
+			/[@%#]/,
+			seq(
+				prec.right(repeat1(choice(
+					/[^|}\r\n@%#]+/,
+					/[@%]+[^|}\r\n@%#{]/,
+					seq( optional(/[@%]/), alias($._macroInsideAttributeName, $.macro), " " ),
+					"# ",
+					alias(/[@%]\{/, $.invalid),
+				))),
+				optional(choice(
+					/[@%#]/,
+					alias($._macroInsideAttributeName, ""),
+				)),
+			),
+		),
+		_selector: $ => choice(
+			$._tokenSelector,
+			alias($._propertyName, $.characterName),
+		),
+		_selectorWithMacros: $ => prec(1, choice(
+			$._tokenSelector,
+			alias($._propertyNameWithMacros, $.characterName),
+		)),
+		
+		
+		/*┌──────────────────────────────
+		  │ Attribute
+		  └┬─────────────────────────────
+		   │ For an attribute, the character name and/or attribute name:
+		   │ • can contain spaces and tabs.
+		   │ • cannot contain new lines, pipes, closing curly braces, or the
+		   │   character sequences "@{" and "%{".
+		   │ • cannot be injected with attributes or abilities.
+		   │ • can be injected with macros, but the space required after each
+		   │   macro name must also be part of the character/attribute
+		   │   name itself. (So the name has to have a space in it for each
+		   │   macro you want to inject.)
+		   │ • can contain hash characters that do not reference an existing
+		   │   macro.
+		   │ 
+		   │ @{attributeName}
+		   │ @{selected|attributeName}
+		   │ @{selected|attributeName|max}
+		   │ @{target|attributeName}
+		   │ @{target|attributeName|max}
+		   │ @{characterName|attributeName}
+		   │ @{characterName|attributeName|max}
+		   └─────────────────────────────*/
+		
+		attribute: $ => choice(
+			seq(
+				$._will_close_brace,
+				choice(
+					alias("@{}", $.invalid_empty),
+					seq(
+						"@{",
+						$._attribute,
+						"}",
+					),
+				),
+			),
+			alias("@{", $.invalid_open),
+		),
+		_attribute: $ => choice(
+			alias($._propertyNameWithMacros, $.attributeName),
+			seq(
+				$._selectorWithMacros,
+				"|",
+				choice(
+					alias($._propertyNameWithMacros, $.attributeName),
+					seq(
+						alias($._propertyNameWithMacros, $.attributeName),
+						"|",
+						choice(
+							alias("max", $.keyword),
+							alias(/max[^}]+/, $.invalid_6),
+							alias(stringOfChars(/[^}]/), $.invalid_5),
+						),
+					),
+					seq(
+						alias($._propertyNameWithMacros, $.attributeName),
+						alias("|", $.invalid_4),
+					),
+					alias(stringOfChars(/[^}]/), $.invalid_3),
+				),
+			),
+			seq(
+				$._selectorWithMacros,
+				alias("|", $.invalid_2),
+			),
+			alias(stringOfChars(/[^}]/), $.invalid_1),
+		),
+		
+		
+		/*┌──────────────────────────────
+		  │ Ability
+		  └┬─────────────────────────────
+		   │ For an ability, the character name and/or ability name:
+		   │ • can contain spaces, tabs, and hash characters.
+		   │ • cannot contain new lines, pipes, closing curly braces, or the
+		   │   character sequences "@{" and "%{".
+		   │ • cannot be injected with attributes, abilities, or macros.
+		   │ 
+		   │ %{selected|abilityName}
+		   │ %{target|abilityName}
+		   │ %{characterName|abilityName}
+		   └─────────────────────────────*/
+		
+		ability: $ => seq(
+			"%{",
+			$._selector,
+			"|",
+			alias($._propertyName, $.abilityName),
+		),
+		/*ability: $ => choice(
+			seq(
+				"%{",
+				choice(
+					alias(/selected/i, $.token),
+					alias(/target/i, $.token),
+					alias(token(choice(
+						"@",
+						seq(
+							repeat1(/@+[^|}@{]|[^|}@]+/),
+							optional("@"),
+						)
+					)), $.characterName),
+				),
+				"|",
+				$.abilityName,
+				"}",
+			),
+*///			alias(token(seq("%{", /[^|}]*|\|[^|}]*|[^|}]+\||[^|}]*\|[^|}]*\|[^}]*/, "}")), $.invalid_ability),
+//		),
+//		abilityName: $ => /[^|}\n]+/,
+		
+		
+		/*┌──────────────────────────────
+		  │ Macro
+		  └┬─────────────────────────────
+		   │ For a macro, the macro name:
+		   │ • cannot contain spaces, new lines, pipes, closing curly braces, or the
+		   │   character sequence "%{".
+		   │ • cannot be injected with macros.
+		   │ • can be injected with attributes and abilities.
+		   │ 
+		   │ To call the macro, its name must be followed by either a space or
+		   │   a new line. Exception: the space or new line isn't required if it
+		   │   would be the last character in the script.
+		   │ 
+		   │ #macroName 
+		   └─────────────────────────────*/
+		
+		_macroSp: $ => prec(1, seq( $.macro, " " )),
+		_macroNL: $ => prec(1, seq( $.macro, / |\r?\n/ )),
+		macro: $ => seq( "#", $.macroName ),
+		macroName: $ => prec.right(repeat1(choice( $.attribute, "@", /[^ \r\n@]+/ ))),
+		_macroInsideAttributeName: $ => seq( "#", alias($._macroNameInsideAttributeName, $.macroName) ),
+		_macroNameInsideAttributeName: $ => choice(
+			"@",
+			seq(
+				prec.right(repeat1( /[^ \r\n@]+|@+[^ \r\n@{]/ )),
+				optional("@"),
 			),
 		),
 		
 		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Formulas
+		  ╚════════════════════════════════════════════════════════════*/
+		 
+		/*** inline roll ***/
+		
 		inlineRoll: $ => choice(
 			seq( "[[", $.formula, "]]" ),
-			alias(/\[\[[\s\n]*\]\]/, $.invalid_inlineRoll),
+			//alias(/\[\[[\s\n]*\]\]/, $.invalid_inlineRoll),
 		),
 		
 		
@@ -137,7 +378,7 @@ module.exports = grammar({
 					),
 				),
 			),
-			optional($._macro),
+			optional($._macroSp),
 			optional($._labels),
 		),
 		_element: $ => prec(1, seq(
@@ -157,7 +398,7 @@ module.exports = grammar({
 					optional($._placeholders),
 				),
 			),
-			optional($._macro),
+			optional($._macroSp),
 			optional($._labels),
 		)),
 		
@@ -173,7 +414,7 @@ module.exports = grammar({
 				/[^\]&@%#\n]+/,
 				$.attribute,
 				$.ability,
-				$._macro,
+				$._macroSp,
 				$._ampersand,
 				$._at,
 				$._percent,
@@ -182,72 +423,6 @@ module.exports = grammar({
 			)),
 			$._rightBracket,
 		),
-		
-		
-		/*** attribute ***/
-		
-		attribute: $ => choice(
-			seq("@{", $.attributeName, "}"),
-			seq(
-				"@{",
-				choice(
-					alias("selected", $.token),
-					alias("target", $.token),
-					alias($.attributeName, $.characterName),
-				),
-				"|",
-				$.attributeName,
-				choice(
-					"}",
-					seq("|", alias("max", $.keyword), "}"),
-					seq("|", alias(/[^}]*/, $.invalid_attribute1), "}"),
-				),
-			),
-			alias(token(seq("@{", /(\|[^}]*|[^}]+\|)?/, "}")), $.invalid_attribute2),
-		),
-		attributeName: $ => /[^|}\n]+/,
-		
-		
-		/*** ability ***/
-		
-		ability: $ => choice(
-			seq(
-				"%{",
-				choice(
-					alias(/selected/i, $.token),
-					alias(/target/i, $.token),
-					alias(token(choice(
-						"@",
-						seq(
-							repeat1(/@+[^|}@{]|[^|}@]+/),
-							optional("@"),
-						)
-					)), $.characterName),
-				),
-				"|",
-				$.abilityName,
-				"}",
-			),
-			alias(token(seq("%{", /[^|}]*|\|[^|}]*|[^|}]+\||[^|}]*\|[^|}]*\|[^}]*/, "}")), $.invalid_ability),
-		),
-		abilityName: $ => /[^|}\n]+/,
-		
-		
-		/*** macro ***/
-		
-		_macro: $ => seq(
-			$.macro,
-			choice($._wsp, $._EOF),
-		),
-		macro: $ => choice(
-			seq("#", $.macroName),
-		),
-		macroName: $ => prec.right(repeat1(
-			choice(
-				/@|[^@\s\n]+/,
-				$.attribute,
-			),
-		)),
 		
 		
 		/*** dice roll ***/
@@ -325,7 +500,7 @@ module.exports = grammar({
 					/[^|}&@%#\n]+/,
 					$.attribute,
 					$.ability,
-					$._macro,
+					$._macroSp,
 					$._escapedCharacter,
 					$._ampersand,
 					$._at,
@@ -382,7 +557,7 @@ module.exports = grammar({
 		
 		/*** characters ***/
 		
-		_wsp: $ => /[\s\n]+/,
+		_wsp: $ => /(\s|\r?\n)+/,
 		
 		_questionMark: $ => unescapedAtDepthOrAbove("\\?", escapes.questionMark),
 		_leftBrace: $ => unescapedAtDepthOrAbove("\\{", escapes.leftBrace),

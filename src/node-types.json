@@ -1,5 +1,20 @@
 [
   {
+    "type": "",
+    "named": false,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "macroName",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "ability",
     "named": true,
     "fields": {},
@@ -16,20 +31,11 @@
           "named": true
         },
         {
-          "type": "invalid_ability",
-          "named": true
-        },
-        {
           "type": "token",
           "named": true
         }
       ]
     }
-  },
-  {
-    "type": "abilityName",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "attribute",
@@ -48,11 +54,35 @@
           "named": true
         },
         {
-          "type": "invalid_attribute1",
+          "type": "invalid_1",
           "named": true
         },
         {
-          "type": "invalid_attribute2",
+          "type": "invalid_2",
+          "named": true
+        },
+        {
+          "type": "invalid_3",
+          "named": true
+        },
+        {
+          "type": "invalid_4",
+          "named": true
+        },
+        {
+          "type": "invalid_5",
+          "named": true
+        },
+        {
+          "type": "invalid_6",
+          "named": true
+        },
+        {
+          "type": "invalid_empty",
+          "named": true
+        },
+        {
+          "type": "invalid_open",
           "named": true
         },
         {
@@ -69,12 +99,40 @@
   {
     "type": "attributeName",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "characterName",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "diceRoll",
@@ -248,13 +306,24 @@
         {
           "type": "formula",
           "named": true
-        },
-        {
-          "type": "invalid_inlineRoll",
-          "named": true
         }
       ]
     }
+  },
+  {
+    "type": "invalid_1",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "invalid_3",
+    "named": true,
+    "fields": {}
+  },
+  {
+    "type": "invalid_5",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "invalid_formula2",
@@ -370,23 +439,7 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
           "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "string",
           "named": true
         }
       ]
@@ -413,15 +466,35 @@
           "named": true
         },
         {
-          "type": "invalid_ability",
+          "type": "invalid_1",
           "named": true
         },
         {
-          "type": "invalid_attribute1",
+          "type": "invalid_2",
           "named": true
         },
         {
-          "type": "invalid_attribute2",
+          "type": "invalid_3",
+          "named": true
+        },
+        {
+          "type": "invalid_4",
+          "named": true
+        },
+        {
+          "type": "invalid_5",
+          "named": true
+        },
+        {
+          "type": "invalid_6",
+          "named": true
+        },
+        {
+          "type": "invalid_empty",
+          "named": true
+        },
+        {
+          "type": "invalid_open",
           "named": true
         },
         {
@@ -434,11 +507,6 @@
         }
       ]
     }
-  },
-  {
-    "type": "string",
-    "named": true,
-    "fields": {}
   },
   {
     "type": "tableName",
@@ -487,7 +555,15 @@
     "named": false
   },
   {
+    "type": " ",
+    "named": false
+  },
+  {
     "type": "#",
+    "named": false
+  },
+  {
+    "type": "# ",
     "named": false
   },
   {
@@ -507,6 +583,10 @@
     "named": false
   },
   {
+    "type": "@",
+    "named": false
+  },
+  {
     "type": "@{",
     "named": false
   },
@@ -517,6 +597,10 @@
   {
     "type": "]]",
     "named": false
+  },
+  {
+    "type": "abilityName",
+    "named": true
   },
   {
     "type": "char",
@@ -551,15 +635,23 @@
     "named": true
   },
   {
-    "type": "invalid_ability",
+    "type": "invalid",
     "named": true
   },
   {
-    "type": "invalid_attribute1",
+    "type": "invalid_2",
     "named": true
   },
   {
-    "type": "invalid_attribute2",
+    "type": "invalid_4",
+    "named": true
+  },
+  {
+    "type": "invalid_6",
+    "named": true
+  },
+  {
+    "type": "invalid_empty",
     "named": true
   },
   {
@@ -567,7 +659,7 @@
     "named": true
   },
   {
-    "type": "invalid_inlineRoll",
+    "type": "invalid_open",
     "named": true
   },
   {

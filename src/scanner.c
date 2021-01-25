@@ -2,7 +2,8 @@
 #include <string.h>
 
 enum TokenType {
-	END,
+	//END,
+	WILL_CLOSE_BRACE,
 };
 
 void * tree_sitter_roll20_script_external_scanner_create() { return NULL; }
@@ -21,10 +22,23 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 ) {
 	lexer->mark_end(lexer);
 	
-	if (lexer->lookahead == 0 && valid_symbols[END]) {
+	/*if (lexer->lookahead == 0 && valid_symbols[END]) {
 		lexer->result_symbol = END;
 		return true;
+	}*/
+	char c;
+	if (valid_symbols[WILL_CLOSE_BRACE]) {
+		c = lexer->lookahead;
+		while (c != 0 && c != '\n' && c != '}') {
+			advance(lexer),
+			c = lexer->lookahead;
+		}
+		if (c == '}') {
+			lexer->result_symbol = WILL_CLOSE_BRACE;
+			return true;
+		}
 	}
+	
 	
 	return false;
 }
