@@ -1,0 +1,108 @@
+==================
+Valid Abilities
+==================
+
+%{c|a}
+%{selected|a}
+%{target|a}
+
+---
+
+(roll20_script
+	(ability
+		(characterName)
+		(abilityName))
+	(ability
+		(token)
+		(abilityName))
+	(ability
+		(token)
+		(abilityName)))
+
+==================
+Invalid Abilities
+==================
+
+%{}
+%{|}
+%{||}
+%{c|}
+%{|a}
+%{c||}
+%{|a|}
+%{c|a|}
+
+---
+
+(roll20_script
+ 	(ability
+		(invalid))
+	(ability
+		(invalid))
+	(ability
+		(invalid))
+	(ability
+		(characterName)
+		(invalid))
+	(ability
+		(invalid))
+	(ability
+		(characterName)
+		(invalid))
+	(ability
+		(invalid))
+	(ability
+		(characterName)
+		(invalid)))
+
+==================
+Invalid Abilities: no closing brace
+==================
+
+%{c
+%{c|
+%{c|a
+
+---
+
+(roll20_script
+	(ability
+		(invalid))
+	(ability
+		(invalid))
+	(ability
+		(invalid)))
+
+==================
+Invalid Abilities: illegal Attribute character sequence
+==================
+
+%{x@{y}
+%{x@{y}z
+%{x@{y}z}
+%{x@{y}|
+%{x@{y}|z
+%{x@{y}|z}
+
+---
+
+(roll20_script
+	(ability
+		(abilityName
+			(invalid)))
+	(ability
+		(abilityName
+			(invalid)))
+	(ability
+		(abilityName
+			(invalid)))
+	(ability
+		(abilityName
+			(invalid)))
+	(ability
+		(abilityName
+			(invalid)))
+	(ability
+		(abilityName
+			(invalid))))
+

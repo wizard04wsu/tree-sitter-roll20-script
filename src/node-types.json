@@ -4,9 +4,13 @@
     "named": false,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": true,
+      "multiple": true,
+      "required": false,
       "types": [
+        {
+          "type": "invalid",
+          "named": true
+        },
         {
           "type": "macroName",
           "named": true
@@ -36,6 +40,21 @@
         },
         {
           "type": "token",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "abilityName",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "invalid",
           "named": true
         }
       ]
@@ -411,6 +430,10 @@
         {
           "type": "attribute",
           "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
         }
       ]
     }
@@ -531,10 +554,6 @@
   {
     "type": "]]",
     "named": false
-  },
-  {
-    "type": "abilityName",
-    "named": true
   },
   {
     "type": "char",

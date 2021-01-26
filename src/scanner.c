@@ -2,7 +2,7 @@
 #include <string.h>
 
 enum TokenType {
-	//END,
+	EOF,
 	ATTRIBUTE_START,
 	ABILITY_START,
 };
@@ -19,7 +19,7 @@ char advance(TSLexer *lexer) {
 bool check_for_braces(
 	TSLexer *lexer,
 	const bool *valid_symbols,
-	bool symbol,
+	int symbol,
 	char start_char
 ) {
 	char c = lexer->lookahead;
@@ -48,10 +48,11 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 ) {
 	lexer->mark_end(lexer);
 	
-	/*if (lexer->lookahead == 0 && valid_symbols[END]) {
-		lexer->result_symbol = END;
+	if (lexer->lookahead == 0 && valid_symbols[EOF]) {
+		lexer->result_symbol = EOF;
 		return true;
-	}*/
+	}
+	
 	if (check_for_braces(lexer, valid_symbols, ATTRIBUTE_START, '@') ||
 		check_for_braces(lexer, valid_symbols, ABILITY_START, '%')
 	) {

@@ -49,9 +49,9 @@ module.exports = grammar({
 	name: 'roll20_script',
 	
 	externals: $ => [
-		//$._EOF,	// (no content) determines if there are no more tokens
-		$.__attribute_start,
-		$.__ability_start,
+		$._EOF,	// (no content) determines if there are no more tokens
+		$.__attribute_start,	// returns "@{" if there is also a closing brace
+		$.__ability_start,	// returns "%{" if there is also a closing brace
 	],
 	
 	extras: $ => [
@@ -116,6 +116,14 @@ module.exports = grammar({
 		
 		_string: $ => stringOfChars(/./),
 		_stringNL: $ => stringOfChars(/.|\r?\n/),
+		/*_string: $ => stringOfChars(choice(
+			/./,
+			seq( "#", choice( " ", $._EOF ) ),
+		)),
+		_stringNL: $ => stringOfChars(choice(
+			/.|\r?\n/,
+			seq( "#", choice( / |\r?\n/, $._EOF ) ),
+		)),*/
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -134,7 +142,17 @@ module.exports = grammar({
 			alias("selected", $.token),
 			alias("target", $.token),
 		),
-		_propertyName: $ => /[@%]|([^|}\r\n@%]|[@%][^|}\r\n{])+[@%]?/,
+		_propertyName: $ => choice(
+			/[@%]/,
+			seq(
+				prec.right(repeat1(choice(
+					/[^|}\r\n@%]+/,
+					/[@%]+[^|}\r\n@%{]/,
+					alias(/[@%]\{/, $.invalid),
+				))),
+				optional(/[@%]/),
+			),
+		),
 		_propertyNameWithMacros: $ => choice(
 			/[@%#]/,
 			seq(
@@ -243,7 +261,7 @@ module.exports = grammar({
 		   │ %{characterName|abilityName}
 		   └─────────────────────────────*/
 		
-		ability: $ => seq(
+		ability: $ => choice(
 			alias($._ability_empty, $.invalid),
 			seq(
 				$.__ability_start,
@@ -263,6 +281,10 @@ module.exports = grammar({
 				"|",
 				choice(
 					alias($._propertyName, $.abilityName),
+					alias(seq(
+						alias($._propertyName, ""),
+						stringOfChars(/[^}]/),
+					), $.invalid),
 					alias(stringOfChars(/[^}]/), $.invalid),
 				),
 			),
@@ -290,10 +312,10 @@ module.exports = grammar({
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		_macroSp: $ => prec(1, seq( $.macro, " " )),
-		_macroNL: $ => prec(1, seq( $.macro, / |\r?\n/ )),
+		_macroSp: $ => prec(1, seq( $.macro, choice( " ", $._EOF ) )),
+		_macroNL: $ => prec(1, seq( $.macro, choice( / |\r?\n/, $._EOF ) )),
 		macro: $ => seq( "#", $.macroName ),
-		macroName: $ => prec.right(repeat1(choice( $.attribute, "@", /[^ \r\n@]+/ ))),
+		macroName: $ => prec.right(repeat1(choice( $.attribute, /@+|[^ \r\n@]+/ ))),
 		_macroInsideAttributeName: $ => seq( "#", alias($._macroNameInsideAttributeName, $.macroName) ),
 		_macroNameInsideAttributeName: $ => choice(
 			"@",

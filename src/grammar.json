@@ -20,6 +20,10 @@
             {
               "type": "SYMBOL",
               "name": "ability"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_macroNL"
             }
           ]
         }
@@ -71,8 +75,59 @@
       ]
     },
     "_propertyName": {
-      "type": "PATTERN",
-      "value": "[@%]|([^|}\\r\\n@%]|[@%][^|}\\r\\n{])+[@%]?"
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[@%]"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "PREC_RIGHT",
+              "value": 0,
+              "content": {
+                "type": "REPEAT1",
+                "content": {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": "[^|}\\r\\n@%]+"
+                    },
+                    {
+                      "type": "PATTERN",
+                      "value": "[@%]+[^|}\\r\\n@%{]"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "PATTERN",
+                        "value": "[@%]\\{"
+                      },
+                      "named": true,
+                      "value": "invalid"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[@%]"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        }
+      ]
     },
     "_propertyNameWithMacros": {
       "type": "CHOICE",
@@ -442,7 +497,7 @@
       ]
     },
     "ability": {
-      "type": "SEQ",
+      "type": "CHOICE",
       "members": [
         {
           "type": "ALIAS",
@@ -532,6 +587,36 @@
                 {
                   "type": "ALIAS",
                   "content": {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "ALIAS",
+                        "content": {
+                          "type": "SYMBOL",
+                          "name": "_propertyName"
+                        },
+                        "named": false,
+                        "value": ""
+                      },
+                      {
+                        "type": "PREC_RIGHT",
+                        "value": 0,
+                        "content": {
+                          "type": "REPEAT1",
+                          "content": {
+                            "type": "PATTERN",
+                            "value": "[^}]"
+                          }
+                        }
+                      }
+                    ]
+                  },
+                  "named": true,
+                  "value": "invalid"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
                     "type": "PREC_RIGHT",
                     "value": 0,
                     "content": {
@@ -596,8 +681,17 @@
             "name": "macro"
           },
           {
-            "type": "STRING",
-            "value": " "
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "STRING",
+                "value": " "
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_EOF"
+              }
+            ]
           }
         ]
       }
@@ -613,8 +707,17 @@
             "name": "macro"
           },
           {
-            "type": "PATTERN",
-            "value": " |\\r?\\n"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": " |\\r?\\n"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_EOF"
+              }
+            ]
           }
         ]
       }
@@ -645,12 +748,8 @@
               "name": "attribute"
             },
             {
-              "type": "STRING",
-              "value": "@"
-            },
-            {
               "type": "PATTERN",
-              "value": "[^ \\r\\n@]+"
+              "value": "@+|[^ \\r\\n@]+"
             }
           ]
         }
@@ -1927,6 +2026,10 @@
   "extras": [],
   "conflicts": [],
   "externals": [
+    {
+      "type": "SYMBOL",
+      "name": "_EOF"
+    },
     {
       "type": "SYMBOL",
       "name": "__attribute_start"
