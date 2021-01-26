@@ -23,7 +23,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "_macroNL"
+              "name": "_macro_spaceNL"
             }
           ]
         }
@@ -36,7 +36,7 @@
         "type": "REPEAT1",
         "content": {
           "type": "PATTERN",
-          "value": "."
+          "value": ".|# "
         }
       }
     },
@@ -47,7 +47,7 @@
         "type": "REPEAT1",
         "content": {
           "type": "PATTERN",
-          "value": ".|\\r?\\n"
+          "value": ".|# |#?\\r?\\n"
         }
       }
     },
@@ -670,7 +670,7 @@
         }
       ]
     },
-    "_macroSp": {
+    "_macro_space": {
       "type": "PREC",
       "value": 1,
       "content": {
@@ -696,7 +696,7 @@
         ]
       }
     },
-    "_macroNL": {
+    "_macro_spaceNL": {
       "type": "PREC",
       "value": 1,
       "content": {
@@ -749,7 +749,7 @@
             },
             {
               "type": "PATTERN",
-              "value": "@+|[^ \\r\\n@]+"
+              "value": "@|[^ \\r\\n@]+"
             }
           ]
         }
@@ -1091,7 +1091,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_macroSp"
+              "name": "_macro_space"
             },
             {
               "type": "BLANK"
@@ -1207,7 +1207,7 @@
             "members": [
               {
                 "type": "SYMBOL",
-                "name": "_macroSp"
+                "name": "_macro_space"
               },
               {
                 "type": "BLANK"
@@ -1291,7 +1291,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "_macroSp"
+                "name": "_macro_space"
               },
               {
                 "type": "SYMBOL",
@@ -1716,7 +1716,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "_macroSp"
+                  "name": "_macro_space"
                 },
                 {
                   "type": "SYMBOL",

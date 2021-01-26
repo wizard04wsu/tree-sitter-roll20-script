@@ -1,0 +1,74 @@
+==================
+Not a Macro
+==================
+
+#
+# #
+
+---
+
+(roll20_script)
+
+==================
+Valid Macros
+==================
+
+##
+#m
+#m#
+#m#m
+# #m
+#m #
+#m #m
+
+---
+
+(roll20_script
+	(macro
+		(macroName))
+	(macro
+		(macroName))
+	(macro
+		(macroName))
+	(macro
+		(macroName))
+	(macro
+		(macroName))
+	(macro
+		(macroName))
+	(macro
+		(macroName))
+	(macro
+		(macroName)))
+
+==================
+Valid Macros: with Attributes
+==================
+
+#m@{a}
+#m@{a}m
+#m@{c|a}
+#m@{c|a}m
+
+---
+
+(roll20_script
+	(macro
+		(macroName
+			(attribute
+				(attributeName))))
+	(macro
+		(macroName
+			(attribute
+				(attributeName))))
+	(macro
+		(macroName
+			(attribute
+				(characterName)
+				(attributeName))))
+	(macro
+		(macroName
+			(attribute
+				(characterName)
+				(attributeName)))))
+

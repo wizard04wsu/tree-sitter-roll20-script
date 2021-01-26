@@ -75,55 +75,23 @@ module.exports = grammar({
 		   │ 5. inline rolls, ... TODO
 		   └───────────────────────────────────────────────────────────*/
 		
-		roll20_script: $ => //seq(
-			prec.right(repeat(
-				//seq(
-					//prec.right(repeat1(
-						//seq(
-							//optional(alias(/([^@%#\[]|\r?\n)+/, $.string)),
-							choice(
-								//alias(prec.right(repeat1( /.|\n|#\s/ )), $.string),
-								//alias(prec.right(repeat1( /.|\n/ )), $.string),
-								///\r?\n/,
-								//alias(/(.|\r?\n)+/, $.string),
-								$._stringNL,
-								$.attribute,
-								$.ability,
-								//$._macroNL,
-								//$.inlineRoll,
-							),
-							//alias(prec.right(repeat(/.|\r?\n/)), $.string),
-						//),
-					//)),
-					//optional(alias(/(.|\r?\n)+/, $.string)),
-				//),
-			)),
-			//alias(prec.right(repeat(/.|\r?\n/)), $.string),
-			//optional($.macro),
-		//),
-		/*_string: $ => prec.left(seq(
+		roll20_script: $ => prec.right(repeat(
 			choice(
-				/[^\[@%#]+/,
-				/[\[@%#\n]+/,
+				$._stringNL,
+				$.attribute,
+				$.ability,
+				$._macro_spaceNL,
+				//$.inlineRoll,
 			),
-			optional($._string),
-		)),*/
+		)),
 		
 		
 		/*┌──────────────────────────────
 		  │ helper rules
 		  └──────────────────────────────*/
 		
-		_string: $ => stringOfChars(/./),
-		_stringNL: $ => stringOfChars(/.|\r?\n/),
-		/*_string: $ => stringOfChars(choice(
-			/./,
-			seq( "#", choice( " ", $._EOF ) ),
-		)),
-		_stringNL: $ => stringOfChars(choice(
-			/.|\r?\n/,
-			seq( "#", choice( / |\r?\n/, $._EOF ) ),
-		)),*/
+		_string: $ => stringOfChars(/.|# /),
+		_stringNL: $ => stringOfChars(/.|# |#?\r?\n/),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -312,10 +280,10 @@ module.exports = grammar({
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		_macroSp: $ => prec(1, seq( $.macro, choice( " ", $._EOF ) )),
-		_macroNL: $ => prec(1, seq( $.macro, choice( / |\r?\n/, $._EOF ) )),
+		_macro_space: $ => prec(1, seq( $.macro, choice( " ", $._EOF ) )),
+		_macro_spaceNL: $ => prec(1, seq( $.macro, choice( / |\r?\n/, $._EOF ) )),
 		macro: $ => seq( "#", $.macroName ),
-		macroName: $ => prec.right(repeat1(choice( $.attribute, /@+|[^ \r\n@]+/ ))),
+		macroName: $ => prec.right(repeat1(choice( $.attribute, /@|[^ \r\n@]+/ ))),
 		_macroInsideAttributeName: $ => seq( "#", alias($._macroNameInsideAttributeName, $.macroName) ),
 		_macroNameInsideAttributeName: $ => choice(
 			"@",
@@ -396,7 +364,7 @@ module.exports = grammar({
 					),
 				),
 			),
-			optional($._macroSp),
+			optional($._macro_space),
 			optional($._labels),
 		),
 		_element: $ => prec(1, seq(
@@ -416,7 +384,7 @@ module.exports = grammar({
 					optional($._placeholders),
 				),
 			),
-			optional($._macroSp),
+			optional($._macro_space),
 			optional($._labels),
 		)),
 		
@@ -432,7 +400,7 @@ module.exports = grammar({
 				/[^\]&@%#\n]+/,
 				$.attribute,
 				$.ability,
-				$._macroSp,
+				$._macro_space,
 				$._ampersand,
 				$._at,
 				$._percent,
@@ -518,7 +486,7 @@ module.exports = grammar({
 					/[^|}&@%#\n]+/,
 					$.attribute,
 					$.ability,
-					$._macroSp,
+					$._macro_space,
 					$._escapedCharacter,
 					$._ampersand,
 					$._at,
