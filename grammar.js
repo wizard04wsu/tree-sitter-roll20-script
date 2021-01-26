@@ -51,6 +51,7 @@ module.exports = grammar({
 	externals: $ => [
 		//$._EOF,	// (no content) determines if there are no more tokens
 		$.__attribute_start,
+		$.__ability_start,
 	],
 	
 	extras: $ => [
@@ -87,7 +88,7 @@ module.exports = grammar({
 								//alias(/(.|\r?\n)+/, $.string),
 								$._stringNL,
 								$.attribute,
-								//$.ability,
+								$.ability,
 								//$._macroNL,
 								//$.inlineRoll,
 							),
@@ -124,15 +125,9 @@ module.exports = grammar({
 		/*┌──────────────────────────────
 		  │ helper rules
 		  └┬─────────────────────────────
-		   │ A character name, attribute name, or ability name:
-		   │ • can contain spaces and tabs.
-		   │ • cannot contain new lines, pipes, closing curly braces, or the
-		   │   character sequences "@{" and "%{".
-		   │ • cannot be injected with attributes or abilities.
-		   │ 
-		   │ Note that the website sometimes allows these special characters in
+		   │ Note that the website sometimes allows special characters in
 		   │   names, even though it prevents the property from being accessed
-		   │   from within a macro.
+		   │   from within a script.
 		   └─────────────────────────────*/
 		
 		_tokenSelector: $ => choice(
@@ -249,32 +244,34 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		ability: $ => seq(
-			"%{",
-			$._selector,
-			"|",
-			alias($._propertyName, $.abilityName),
-		),
-		/*ability: $ => choice(
+			alias($._ability_empty, $.invalid),
 			seq(
-				"%{",
-				choice(
-					alias(/selected/i, $.token),
-					alias(/target/i, $.token),
-					alias(token(choice(
-						"@",
-						seq(
-							repeat1(/@+[^|}@{]|[^|}@]+/),
-							optional("@"),
-						)
-					)), $.characterName),
-				),
-				"|",
-				$.abilityName,
+				$.__ability_start,
+				$._ability,
 				"}",
 			),
-*///			alias(token(seq("%{", /[^|}]*|\|[^|}]*|[^|}]+\||[^|}]*\|[^|}]*\|[^}]*/, "}")), $.invalid_ability),
-//		),
-//		abilityName: $ => /[^|}\n]+/,
+			alias("%{", $.invalid),
+		),
+		_ability_empty: $ => seq(
+			$.__ability_start,
+			"}",
+		),
+		_ability: $ => choice(
+			alias($._propertyName, $.abilityName),
+			seq(
+				$._selector,
+				"|",
+				choice(
+					alias($._propertyName, $.abilityName),
+					alias(stringOfChars(/[^}]/), $.invalid),
+				),
+			),
+			seq(
+				$._selector,
+				alias("|", $.invalid),
+			),
+			alias(stringOfChars(/[^}]/), $.invalid),
+		),
 		
 		
 		/*┌──────────────────────────────

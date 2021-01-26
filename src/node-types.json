@@ -31,6 +31,10 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "token",
           "named": true
         }
@@ -401,6 +405,10 @@
       "required": false,
       "types": [
         {
+          "type": "ability",
+          "named": true
+        },
+        {
           "type": "attribute",
           "named": true
         }
@@ -498,10 +506,6 @@
   },
   {
     "type": "# ",
-    "named": false
-  },
-  {
-    "type": "%{",
     "named": false
   },
   {

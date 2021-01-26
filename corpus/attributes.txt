@@ -92,6 +92,7 @@ Invalid Attributes
 @{c||max}
 @{c|a|m}
 @{c|a|maxx}
+@{c|a|max|}
 @{c||max|}
 @{c||max|x}
 
@@ -130,6 +131,10 @@ Invalid Attributes
 		(invalid))
 	(attribute
 		(characterName)
+		(invalid))
+	(attribute
+		(characterName)
+		(attributeName)
 		(invalid))
 	(attribute
 		(characterName)
