@@ -52,6 +52,7 @@ module.exports = grammar({
 		$._EOF,	// (no content) determines if there are no more tokens
 		$.__attribute_start,	// returns "@{" if there is also a closing brace
 		$.__ability_start,	// returns "%{" if there is also a closing brace
+		$.__inlineRoll_start,	// returns "[[" if there is also a closing pair
 	],
 	
 	extras: $ => [
@@ -72,7 +73,7 @@ module.exports = grammar({
 		   │ 2. attributes
 		   │ 3. macros
 		   │ 4. attributes (again)
-		   │ 5. inline rolls, ... TODO
+		   │ 5. inline rolls & parentheticals (most-nested first)
 		   └───────────────────────────────────────────────────────────*/
 		
 		roll20_script: $ => prec.right(repeat(
@@ -87,7 +88,7 @@ module.exports = grammar({
 		
 		
 		/*┌──────────────────────────────
-		  │ helper rules
+		  │ String
 		  └──────────────────────────────*/
 		
 		_string: $ => stringOfChars(/.|# /),
@@ -295,103 +296,121 @@ module.exports = grammar({
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Formulas
+		  ║ Rolls and Formulas
 		  ╚════════════════════════════════════════════════════════════*/
 		 
-		/*** inline roll ***/
+		/*┌──────────────────────────────
+		  │ Inline Roll
+		  └┬─────────────────────────────
+		   │ A nested inline roll is simplified for use in its parent formula.
+		   │   Labels are removed and the formula is evaluated, reducing it to
+		   │   only a number.
+		   └─────────────────────────────*/
 		
 		inlineRoll: $ => choice(
-			seq( "[[", $.formula, "]]" ),
-			//alias(/\[\[[\s\n]*\]\]/, $.invalid_inlineRoll),
+			seq( $.__inlineRoll_start, $.formula, "]]" ),
+			alias($._inlineRoll_invalid, $.invalid),
+			alias("[[", $.invalid),
 		),
+		_inlineRoll_invalid: $ => alias(seq(
+			$.__inlineRoll_start,
+			repeat(choice(
+				/[\s\r\n]+/,
+				$._labels,
+				$._inlineRoll_invalid,
+			)),
+			"]]",
+		), ""),
 		
+		
+		/*┌──────────────────────────────
+		  │ Parenthetical
+		  └┬─────────────────────────────
+		   │ Parentheticals may be used as elements inside an inline roll,
+		   │   containing their own formula. Parentheticals are not simplified
+		   │   like nested inline rolls are.
+		   └─────────────────────────────*/
 		
 		parenthetical: $ => seq( "(", $.formula, ")" ),
 		
 		
+		/*┌──────────────────────────────
+		  │ Operator
+		  └┬─────────────────────────────
+		   │ `+-` and `-+` are evaluated as subtraction.
+		   │ The only place a unary negative operator can be is as a prefix of
+		   │   a number that is the first element in an inline roll or
+		   │   parenthetical.
+		   └─────────────────────────────*/
+		
 		operator: $ => /[*/+-]|\+\s*-|-\s*\+/,
 		
 		
+		/*┌──────────────────────────────
+		  │ Formula
+		  └┬─────────────────────────────
+		   │ 
+		   └─────────────────────────────*/
+		
 		formula: $ => seq(
-			$._element_first,
-			repeat(
-				choice(
-					seq(
-						$.operator,
-						$._element,
-					),
-					seq(
-						alias($.operator, $.invalid_formula1),
-						"",
-					),
-				),
-			),
-			alias(repeat( /[^\]]|\][^\]]|\n/ ), $.invalid_formula2),
-		),
-		
-		
-		_element_first: $ => seq(
-			optional($._wsp),
 			choice(
 				seq(
-					$.label,
 					optional($._labels),
-					choice(
-						$._placeholders,
-						seq(
-							optional($._placeholders),
-							choice(
-								$.diceRoll,
-								$.tableRoll,
-							),
-							optional($._placeholders),
-						),
-					),
-				),
-				choice(
 					$._placeholders,
-					seq(
-						optional($._placeholders),
-						choice(
-							$.inlineRoll,
-							$.parenthetical,
-							$.diceRoll,
-							$.tableRoll,
-							$.groupRoll,
-							seq(alias($._number_signed_decimal, $.number), ""),
-						),
-						optional($._placeholders),
-					),
+					optional($._macro_space),
 				),
-			),
-			optional($._macro_space),
-			optional($._labels),
-		),
-		_element: $ => prec(1, seq(
-			optional($._labels),
-			choice(
-				$._placeholders,
+				seq(
+					optional($._labels),
+					optional($._placeholders),
+					choice(
+						$.diceRoll,
+						$.tableRoll,
+					),
+					optional($._placeholders),
+					optional($._macro_space),
+				),
 				seq(
 					optional($._placeholders),
 					choice(
 						$.inlineRoll,
 						$.parenthetical,
+						alias($._number_signed_decimal, $.number),
+						$.groupRoll,
+					),
+					optional($._placeholders),
+					optional($._macro_space),
+				),
+			),
+			repeat(
+				seq(
+					optional($._labels),
+					$.operator,
+					
+					optional($._labels),
+					optional($._placeholders),
+					choice(
+						$.inlineRoll,
+						$.parenthetical,
+						alias($._number_unsigned_decimal, $.number),
 						$.diceRoll,
 						$.tableRoll,
 						$.groupRoll,
-						alias($._number_unsigned_decimal, $.number),
 					),
 					optional($._placeholders),
+					optional($._macro_space),
 				),
 			),
-			optional($._macro_space),
 			optional($._labels),
-		)),
+		),
 		
 		_placeholders: $ => prec.right(repeat1(choice( $.attribute, $.ability ))),
 		
 		
-		/*** inline label ***/
+		/*┌──────────────────────────────
+		  │ Inline Label
+		  └┬─────────────────────────────
+		   │ 
+		   └─────────────────────────────*/
 		
 		_labels: $ => repeat1(choice( $.label, $._wsp )),
 		label: $ => seq(
