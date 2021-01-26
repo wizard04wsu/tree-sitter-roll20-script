@@ -54,35 +54,7 @@
           "named": true
         },
         {
-          "type": "invalid_1",
-          "named": true
-        },
-        {
-          "type": "invalid_2",
-          "named": true
-        },
-        {
-          "type": "invalid_3",
-          "named": true
-        },
-        {
-          "type": "invalid_4",
-          "named": true
-        },
-        {
-          "type": "invalid_5",
-          "named": true
-        },
-        {
-          "type": "invalid_6",
-          "named": true
-        },
-        {
-          "type": "invalid_empty",
-          "named": true
-        },
-        {
-          "type": "invalid_open",
+          "type": "invalid",
           "named": true
         },
         {
@@ -311,17 +283,7 @@
     }
   },
   {
-    "type": "invalid_1",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "invalid_3",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "invalid_5",
+    "type": "invalid",
     "named": true,
     "fields": {}
   },
@@ -466,35 +428,7 @@
           "named": true
         },
         {
-          "type": "invalid_1",
-          "named": true
-        },
-        {
-          "type": "invalid_2",
-          "named": true
-        },
-        {
-          "type": "invalid_3",
-          "named": true
-        },
-        {
-          "type": "invalid_4",
-          "named": true
-        },
-        {
-          "type": "invalid_5",
-          "named": true
-        },
-        {
-          "type": "invalid_6",
-          "named": true
-        },
-        {
-          "type": "invalid_empty",
-          "named": true
-        },
-        {
-          "type": "invalid_open",
+          "type": "invalid",
           "named": true
         },
         {
@@ -587,10 +521,6 @@
     "named": false
   },
   {
-    "type": "@{",
-    "named": false
-  },
-  {
     "type": "[[",
     "named": false
   },
@@ -635,31 +565,7 @@
     "named": true
   },
   {
-    "type": "invalid",
-    "named": true
-  },
-  {
-    "type": "invalid_2",
-    "named": true
-  },
-  {
-    "type": "invalid_4",
-    "named": true
-  },
-  {
-    "type": "invalid_6",
-    "named": true
-  },
-  {
-    "type": "invalid_empty",
-    "named": true
-  },
-  {
     "type": "invalid_formula1",
-    "named": true
-  },
-  {
-    "type": "invalid_open",
     "named": true
   },
   {

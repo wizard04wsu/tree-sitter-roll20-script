@@ -217,42 +217,28 @@
       "type": "CHOICE",
       "members": [
         {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_attribute_empty"
+          },
+          "named": true,
+          "value": "invalid"
+        },
+        {
           "type": "SEQ",
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_will_close_brace"
+              "name": "__attribute_start"
             },
             {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "STRING",
-                    "value": "@{}"
-                  },
-                  "named": true,
-                  "value": "invalid_empty"
-                },
-                {
-                  "type": "SEQ",
-                  "members": [
-                    {
-                      "type": "STRING",
-                      "value": "@{"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_attribute"
-                    },
-                    {
-                      "type": "STRING",
-                      "value": "}"
-                    }
-                  ]
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "_attribute"
+            },
+            {
+              "type": "STRING",
+              "value": "}"
             }
           ]
         },
@@ -263,7 +249,20 @@
             "value": "@{"
           },
           "named": true,
-          "value": "invalid_open"
+          "value": "invalid"
+        }
+      ]
+    },
+    "_attribute_empty": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__attribute_start"
+        },
+        {
+          "type": "STRING",
+          "value": "}"
         }
       ]
     },
@@ -337,7 +336,7 @@
                             "value": "max[^}]+"
                           },
                           "named": true,
-                          "value": "invalid_6"
+                          "value": "invalid"
                         },
                         {
                           "type": "ALIAS",
@@ -353,7 +352,7 @@
                             }
                           },
                           "named": true,
-                          "value": "invalid_5"
+                          "value": "invalid"
                         }
                       ]
                     }
@@ -378,7 +377,7 @@
                         "value": "|"
                       },
                       "named": true,
-                      "value": "invalid_4"
+                      "value": "invalid"
                     }
                   ]
                 },
@@ -396,7 +395,7 @@
                     }
                   },
                   "named": true,
-                  "value": "invalid_3"
+                  "value": "invalid"
                 }
               ]
             }
@@ -416,7 +415,7 @@
                 "value": "|"
               },
               "named": true,
-              "value": "invalid_2"
+              "value": "invalid"
             }
           ]
         },
@@ -434,7 +433,7 @@
             }
           },
           "named": true,
-          "value": "invalid_1"
+          "value": "invalid"
         }
       ]
     },
@@ -1808,7 +1807,7 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "_will_close_brace"
+      "name": "__attribute_start"
     }
   ],
   "inline": [],

@@ -50,7 +50,7 @@ module.exports = grammar({
 	
 	externals: $ => [
 		//$._EOF,	// (no content) determines if there are no more tokens
-		$._will_close_brace,
+		$.__attribute_start,
 	],
 	
 	extras: $ => [
@@ -191,18 +191,17 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		attribute: $ => choice(
+			alias($._attribute_empty, $.invalid),
 			seq(
-				$._will_close_brace,
-				choice(
-					alias("@{}", $.invalid_empty),
-					seq(
-						"@{",
-						$._attribute,
-						"}",
-					),
-				),
+				$.__attribute_start,
+				$._attribute,
+				"}",
 			),
-			alias("@{", $.invalid_open),
+			alias("@{", $.invalid),
+		),
+		_attribute_empty: $ => seq(
+			$.__attribute_start,
+			"}",
 		),
 		_attribute: $ => choice(
 			alias($._propertyNameWithMacros, $.attributeName),
@@ -216,22 +215,22 @@ module.exports = grammar({
 						"|",
 						choice(
 							alias("max", $.keyword),
-							alias(/max[^}]+/, $.invalid_6),
-							alias(stringOfChars(/[^}]/), $.invalid_5),
+							alias(/max[^}]+/, $.invalid),
+							alias(stringOfChars(/[^}]/), $.invalid),
 						),
 					),
 					seq(
 						alias($._propertyNameWithMacros, $.attributeName),
-						alias("|", $.invalid_4),
+						alias("|", $.invalid),
 					),
-					alias(stringOfChars(/[^}]/), $.invalid_3),
+					alias(stringOfChars(/[^}]/), $.invalid),
 				),
 			),
 			seq(
 				$._selectorWithMacros,
-				alias("|", $.invalid_2),
+				alias("|", $.invalid),
 			),
-			alias(stringOfChars(/[^}]/), $.invalid_1),
+			alias(stringOfChars(/[^}]/), $.invalid),
 		),
 		
 		

@@ -3,7 +3,7 @@
 
 enum TokenType {
 	//END,
-	WILL_CLOSE_BRACE,
+	ATTRIBUTE_START,
 };
 
 void * tree_sitter_roll20_script_external_scanner_create() { return NULL; }
@@ -11,8 +11,9 @@ void tree_sitter_roll20_script_external_scanner_destroy(void *payload) {}
 unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *buffer) { return 0; }
 void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {}
 
-static void advance(TSLexer *lexer) {
+char advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
+	return lexer->lookahead;
 }
 
 bool tree_sitter_roll20_script_external_scanner_scan(
@@ -26,16 +27,20 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 		lexer->result_symbol = END;
 		return true;
 	}*/
-	char c;
-	if (valid_symbols[WILL_CLOSE_BRACE]) {
-		c = lexer->lookahead;
-		while (c != 0 && c != '\n' && c != '}') {
-			advance(lexer),
-			c = lexer->lookahead;
-		}
-		if (c == '}') {
-			lexer->result_symbol = WILL_CLOSE_BRACE;
-			return true;
+	char c = lexer->lookahead;
+	if (c == '@' && valid_symbols[ATTRIBUTE_START]) {
+		c = advance(lexer);
+		if (c == '{') {
+			c = advance(lexer);
+			lexer->mark_end(lexer);	//"@{"
+			
+			while (c != 0 && c != '\n' && c != '}') {
+				c = advance(lexer);
+			}
+			if (c == '}') {
+				lexer->result_symbol = ATTRIBUTE_START;
+				return true;
+			}
 		}
 	}
 	

@@ -1,0 +1,190 @@
+==================
+Valid Attributes
+==================
+
+@{a}
+@{c|a}
+@{c|a|max}
+@{selected|a}
+@{selected|a|max}
+@{target|a}
+@{target|a|max}
+
+---
+
+(roll20_script
+ 	(attribute
+		(attributeName))
+	(attribute
+		(characterName)
+		(attributeName))
+	(attribute
+		(characterName)
+		(attributeName)
+		(keyword))
+	(attribute
+		(token)
+		(attributeName))
+	(attribute
+		(token)
+		(attributeName)
+		(keyword))
+	(attribute
+		(token)
+		(attributeName))
+	(attribute
+		(token)
+		(attributeName)
+		(keyword)))
+
+==================
+Valid Attributes: with Macros
+==================
+
+@{#a }
+@{a#a a}
+@{#c |#a }
+@{c#c c|a#a a}
+
+---
+
+(roll20_script
+ 	(attribute
+		(attributeName
+			(macro
+				(macroName))))
+ 	(attribute
+		(attributeName
+			(macro
+				(macroName))))
+	(attribute
+		(characterName
+			(macro
+				(macroName)))
+		(attributeName
+			(macro
+				(macroName))))
+	(attribute
+		(characterName
+			(macro
+				(macroName)))
+		(attributeName
+			(macro
+				(macroName)))))
+
+==================
+Invalid Attributes
+==================
+
+@{}
+@{|}
+@{||}
+@{|||}
+@{c|}
+@{|a}
+@{c||}
+@{|a|}
+@{||m}
+@{||max}
+@{||maxx}
+@{c|a|}
+@{|a|max}
+@{c||max}
+@{c|a|m}
+@{c|a|maxx}
+@{c||max|}
+@{c||max|x}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(characterName)
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(characterName)
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(characterName)
+		(attributeName)
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(characterName)
+		(invalid))
+	(attribute
+		(characterName)
+		(attributeName)
+		(invalid))
+	(attribute
+		(characterName)
+		(attributeName)
+		(invalid))
+	(attribute
+		(characterName)
+		(invalid))
+	(attribute
+		(characterName)
+		(invalid)))
+
+==================
+Invalid Attributes: no closing brace
+==================
+
+@{a
+@{c|
+@{c|a
+@{c|a|max
+
+---
+
+(roll20_script
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid))
+	(attribute
+		(invalid)))
+
+==================
+Invalid Attributes: illegal Attribute character sequence
+==================
+
+@{x@{y}
+@{x@{y}z
+@{x@{y}z}
+
+---
+
+(roll20_script
+	(attribute
+		(attributeName
+			(invalid)))
+	(attribute
+		(attributeName
+			(invalid)))
+	(attribute
+		(attributeName
+			(invalid))))
+
