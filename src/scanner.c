@@ -5,7 +5,8 @@ enum TokenType {
 	EOF,
 	ATTRIBUTE_START,
 	ABILITY_START,
-	INLINE_ROLL_START,
+	/*INLINE_ROLL_START,
+	LABEL_START,*/
 };
 
 void * tree_sitter_roll20_script_external_scanner_create() { return NULL; }
@@ -41,9 +42,9 @@ bool check_for_braces(
 	}
 	return false;
 }
-bool check_for_brackets(
+/*bool check_for_inline_roll(
 	TSLexer *lexer,
-	const bool *valid_symbols,
+	const bool *valid_symbols
 ) {
 	char c = lexer->lookahead;
 	if (c == '[' && valid_symbols[INLINE_ROLL_START]) {
@@ -56,19 +57,24 @@ bool check_for_brackets(
 				if (c == ']') {
 					c = advance(lexer);
 					if (c == ']') {
+						//closing brackets "]]"
 						lexer->result_symbol = INLINE_ROLL_START;
 						return true;
 					}
 					if (c == 0 || c == '\n') {
-						break;
+						//end of input; no closing brackets
+						return false;
 					}
+				}
+				else if (c == '[') {
+					check_for_inline_roll(lexer, valid_symbols);
 				}
 				c = advance(lexer);
 			}
 		}
 	}
 	return false;
-}
+}*/
 
 bool tree_sitter_roll20_script_external_scanner_scan(
 	void *payload,
@@ -83,11 +89,26 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 	}
 	
 	if (check_for_braces(lexer, valid_symbols, ATTRIBUTE_START, '@') ||
-		check_for_braces(lexer, valid_symbols, ABILITY_START, '%') ||
-		check_for_brackets(lexer, valid_symbols)
+		check_for_braces(lexer, valid_symbols, ABILITY_START, '%') /*||
+		check_for_inline_roll(lexer, valid_symbols)*/
 	) {
 		return true;
 	}
+	
+	/*if (lexer->lookahead == '[' && (valid_symbols[LABEL_START] || valid_symbols[INLINE_ROLL_START])) {
+		advance(lexer);
+		if (lexer->lookahead == '[' && valid_symbols[INLINE_ROLL_START]) {
+			advance(lexer);
+			lexer->mark_end(lexer);
+			lexer->result_symbol = INLINE_ROLL_START;
+			return true;
+		}
+		else if (valid_symbols[LABEL_START]) {
+			lexer->mark_end(lexer);
+			lexer->result_symbol = LABEL_START;
+			return true;
+		}
+	}*/
 	
 	return false;
 }

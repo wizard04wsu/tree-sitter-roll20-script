@@ -138,71 +138,15 @@
       "required": true,
       "types": [
         {
-          "type": "char",
-          "named": true
-        },
-        {
-          "type": "compounding",
-          "named": true
-        },
-        {
           "type": "count",
           "named": true
         },
         {
-          "type": "countMatches",
-          "named": true
-        },
-        {
-          "type": "criticalFailure",
-          "named": true
-        },
-        {
-          "type": "criticalSuccess",
-          "named": true
-        },
-        {
-          "type": "drop",
-          "named": true
-        },
-        {
-          "type": "exploding",
-          "named": true
-        },
-        {
-          "type": "keep",
-          "named": true
-        },
-        {
-          "type": "penetrating",
-          "named": true
-        },
-        {
-          "type": "reroll",
-          "named": true
-        },
-        {
-          "type": "reroll_once",
-          "named": true
-        },
-        {
-          "type": "showMatches",
+          "type": "modifiers",
           "named": true
         },
         {
           "type": "sides",
-          "named": true
-        },
-        {
-          "type": "sort",
-          "named": true
-        },
-        {
-          "type": "successes",
-          "named": true
-        },
-        {
-          "type": "successesMinusFailures",
           "named": true
         }
       ]
@@ -237,11 +181,7 @@
           "named": true
         },
         {
-          "type": "invalid_formula1",
-          "named": true
-        },
-        {
-          "type": "invalid_formula2",
+          "type": "invalid2",
           "named": true
         },
         {
@@ -296,7 +236,7 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "formula",
@@ -307,11 +247,6 @@
   },
   {
     "type": "invalid",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "invalid_formula2",
     "named": true,
     "fields": {}
   },
@@ -377,11 +312,51 @@
       "required": true,
       "types": [
         {
+          "type": "compounding",
+          "named": true
+        },
+        {
+          "type": "countMatches",
+          "named": true
+        },
+        {
+          "type": "criticalFailure",
+          "named": true
+        },
+        {
+          "type": "criticalSuccess",
+          "named": true
+        },
+        {
           "type": "drop",
           "named": true
         },
         {
+          "type": "exploding",
+          "named": true
+        },
+        {
           "type": "keep",
+          "named": true
+        },
+        {
+          "type": "penetrating",
+          "named": true
+        },
+        {
+          "type": "reroll",
+          "named": true
+        },
+        {
+          "type": "reroll_once",
+          "named": true
+        },
+        {
+          "type": "showMatches",
+          "named": true
+        },
+        {
+          "type": "sort",
           "named": true
         },
         {
@@ -405,11 +380,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
           "type": "formula",
+          "named": true
+        },
+        {
+          "type": "functionName",
           "named": true
         }
       ]
@@ -429,6 +408,10 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
           "named": true
         },
         {
@@ -516,10 +499,6 @@
     }
   },
   {
-    "type": "",
-    "named": false
-  },
-  {
     "type": " ",
     "named": false
   },
@@ -546,18 +525,6 @@
   {
     "type": "@",
     "named": false
-  },
-  {
-    "type": "[[",
-    "named": false
-  },
-  {
-    "type": "]]",
-    "named": false
-  },
-  {
-    "type": "char",
-    "named": true
   },
   {
     "type": "compounding",
@@ -588,7 +555,11 @@
     "named": true
   },
   {
-    "type": "invalid_formula1",
+    "type": "functionName",
+    "named": true
+  },
+  {
+    "type": "invalid2",
     "named": true
   },
   {
