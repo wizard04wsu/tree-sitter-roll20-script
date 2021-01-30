@@ -52,20 +52,13 @@ module.exports = grammar({
 		$._EOF,	// (no content) determines if there are no more tokens
 		$.__attribute_start,	// returns "@{" if there is also a closing brace
 		$.__ability_start,	// returns "%{" if there is also a closing brace
-		//$.__inlineRoll_start,	// returns "[["
-		//$.__label_start,	// returns "["
 	],
 	
 	extras: $ => [
 		//(manually handle whitespace)
 	],
 	
-	conflicts: $ => [
-		//[ $.formula, $.inlineRoll, ],
-		//[ $._inlineRoll_invalid_first, $._labels, $._labels_invalid_alias, ],
-		//[ $._labels, $._labels_invalid_alias, ],
-		//[ $._inlineRoll_invalid, $.formula, ],
-	],
+	conflicts: $ => [],
 	
 	inline: $ => [],
 	
@@ -88,7 +81,7 @@ module.exports = grammar({
 				$.attribute,
 				$.ability,
 				$._macro_spaceNL,
-				$.inlineRoll,
+				$._inlineRoll,
 				//TODO:
 				//query
 				//template
@@ -118,18 +111,18 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		_number_unsigned_integer: $ => /\d+/,
-		_number_unsigned_decimal: $ => prec(1, choice(	//valid:  5  5.5  .5  invalid:  5.
+		_number_unsigned_decimal: $ => prec.right(1, choice(	//valid:  5  5.5  .5  invalid:  5.
 			seq(
 				$._number_unsigned_integer,
 				optional(seq( ".", $._number_unsigned_integer )),
 			),
 			seq( ".", $._number_unsigned_integer ),
 		)),
-		_number_signed_decimal: $ => seq(	//valid:  (plus, minus, or neither) 5  5.5  invalid:  .5  5.
+		_number_signed_decimal: $ => prec.right(seq(	//valid:  (plus, minus, or neither) 5  5.5  invalid:  .5  5.
 			optional(/[+-]/),
 			$._number_unsigned_integer,
 			optional(seq( ".", $._number_unsigned_integer )),
-		),
+		)),
 		
 		
 		/*┌──────────────────────────────
@@ -143,7 +136,6 @@ module.exports = grammar({
 		_rightBracket: $ => unescapedAtDepthOrAbove("\\]", escapes.rightBracket),
 		_plus: $ => unescapedAtDepthOrAbove("\\+", escapes.plus),
 		_minus: $ => unescapedAtDepthOrAbove("\\-", escapes.minus),
-		//_digit: $ => unescapedAtDepthOrAbove("\\d", escapes.digit),
 		_leftParen: $ => unescapedAtDepthOrAbove("\\(", escapes.leftParen),
 		_rightParen: $ => unescapedAtDepthOrAbove("\\)", escapes.rightParen),
 		_tilde: $ => unescapedAtDepthOrAbove("~", escapes.tilde),
@@ -371,17 +363,18 @@ module.exports = grammar({
 		   │   only a number.
 		   └─────────────────────────────*/
 		
-		//_inlineRoll: $ => $.inlineRoll,
-		inlineRoll: $ => seq(
-			$._inlineRoll_start,
-			optional(choice(
-				$.formula,
-				$._wsp_inline,
-			)),
-			$._inlineRoll_end,
+		_inlineRoll: $ => choice(
+			$.inlineRoll,
+			alias(/\[\[(\s|\r?\n)*\]\]/, $.invalid),
 		),
-		_inlineRoll_start: $ => "[[",
-		_inlineRoll_end: $ => "]]",
+		inlineRoll: $ => seq(
+			"[[",
+			choice(
+				$.formula,
+				alias($._labels_and_wsp, $.invalid),
+			),
+			"]]",
+		),
 		
 		
 		/*┌──────────────────────────────
@@ -392,10 +385,17 @@ module.exports = grammar({
 		   │   like nested inline rolls are.
 		   └─────────────────────────────*/
 		
+		_parenthetical: $ => choice(
+			$.parenthetical,
+			alias(/(abs|ceil|floor|round)?\((\s|\r?\n)*\)/, $.invalid),
+		),
 		parenthetical: $ => seq(
 			optional(alias(/abs|ceil|floor|round/, $.functionName)),
 			"(",
-			$.formula,
+			choice(
+				$.formula,
+				alias($._labels_and_wsp, $.invalid),
+			),
 			")",
 		),
 		
@@ -418,107 +418,132 @@ module.exports = grammar({
 		   │ • A formula consisting of only whitespace and/or labels is invalid. 
 		   │   This implementation does not detect that.
 		   │ • Labels can only be the first items in a formula if the following
-		   │   item is a dice roll or table roll (or attribute/ability/macro).
+		   │   item is a dice roll or table roll (or attribute/ability/macro
+		   │   that evaluates to one of those).
 		   │   This implementation does not detect that.
 		   └─────────────────────────────*/
 		
-		formula: $ => choice(
+		formula: $ => $._expression_first,
+		
+		_expression_first: $ => prec.right(choice(
 			seq(
-				optional($._wsp_inline),
-				$.label,
-				repeat(prec.right(seq( optional($._wsp_inline), $.label ))),
-				optional($._wsp_inline),
+				optional($._labels_and_wsp),
+				$._element_first,
+				optional($._labels_and_wsp),
 			),
 			seq(
-				optional($._wsp_inline),
-				optional(seq(
-					$.label,
-					repeat(prec.right(seq( optional($._wsp_inline), $.label ))),
-					optional($._wsp_inline),
-				)),
-				
-				choice(
-					seq(
-						optional($._placeholders),
-						choice(
-							$.inlineRoll,
-							$.parenthetical,
-							alias($._number_signed_decimal, $.number),
-							$.diceRoll,
-							$.tableRoll,
-							$.groupRoll,
-							//TODO: query
-						),
-						optional($._placeholders),
-						optional($._macro_space),
-					),
-					seq(
-						$._placeholders,
-						optional($._macro_space),
-					),
-					$._macro_space,
+				optional($._labels_and_wsp),
+				$._element_first_pair,
+			),
+		)),
+		_expression_next: $ => prec.right(choice(
+			seq(
+				$._element_next,
+				optional($._labels_and_wsp),
+			),
+			$._element_next_pair,
+		)),
+		
+		_element_first_pair: $ => seq(
+			$._element_first,
+			choice(
+				seq(
+					optional($._labels_and_wsp),
+					$.operator,
+					optional($._labels_and_wsp),
+					$._expression_next,
 				),
-				
-				optional($._wsp_inline),
-				optional(seq(
-					$.label,
-					repeat(prec.right(seq( optional($._wsp_inline), $.label ))),
-					optional($._wsp_inline),
-				)),
-				
-				//optional(alias($._formula_invalidString, $.invalid1)),
-				
-				prec.right(repeat(
-					seq(
-						optional(alias("]", $.invalid2)),
-						
-						$.operator,
-						
-						optional($._wsp_inline),
-						optional(seq(
-							$.label,
-							repeat(prec.right(seq( optional($._wsp_inline), $.label ))),
-							optional($._wsp_inline),
-						)),
-						
-						choice(
-							seq(
-								optional($._placeholders),
-								choice(
-									$.inlineRoll,
-									$.parenthetical,
-									alias($._number_signed_decimal, $.number),
-									$.diceRoll,
-									$.tableRoll,
-									$.groupRoll,
-									//TODO: query
-								),
-								optional($._placeholders),
-								optional($._macro_space),
-							),
-							seq(
-								$._placeholders,
-								optional($._macro_space),
-							),
-							$._macro_space,
-						),
-						
-						optional($._wsp_inline),
-						optional(seq(
-							$.label,
-							repeat(prec.right(seq( optional($._wsp_inline), $.label ))),
-							optional($._wsp_inline),
-						)),
-						
-						//optional(alias($._formula_invalidString, $.invalid3)),
-					),
-				)),
+				seq(
+					$._labels_and_wsp,
+					alias($._expression_next, $.invalid),
+				),
 			),
+		),
+		_element_next_pair: $ => seq(
+			$._element_next,
+			choice(
+				seq(
+					optional($._labels_and_wsp),
+					$.operator,
+					optional($._labels_and_wsp),
+					$._expression_next,
+				),
+				seq(
+					$._labels_and_wsp,
+					alias($._expression_next, $.invalid),
+				),
+			),
+		),
+		
+		_element_first: $ => prec.right(choice(
+			seq(
+				optional($._placeholders),
+				$._element_options_first,
+				optional($._placeholders),
+				optional($._macro_space),
+			),
+			seq(
+				$._placeholders,
+				optional($._macro_space),
+			),
+			$._macro_space,
+		)),
+		_element_next: $ => prec.right(choice(
+			seq(
+				optional($._placeholders),
+				$._element_options_next,
+				optional($._placeholders),
+				optional($._macro_space),
+			),
+			seq(
+				$._placeholders,
+				optional($._macro_space),
+			),
+			$._macro_space,
+		)),
+		
+		_element_options_first: $ => choice(
+			$._inlineRoll,
+			$._parenthetical,
+			alias($._number_signed_decimal, $.number),
+			$.diceRoll,
+			$.tableRoll,
+			$.groupRoll,
+			//TODO: query
+			//alias(seq(
+			//	$._number_signed_decimal,
+			//	seq(
+			//		choice(
+			//			/[^dt\s@%#\[\]*/+\-]/,
+			//			/d[^\d\s@%#\[\]*/+\-]/,
+			//			/d\d+[^\s@%#\[\]*/+\-]/,
+			//			/t[^\s@%#\[\]*/+\-]/,
+			//		),
+			//		prec.right(repeat(/./)),
+			//	),
+			//), $.invalid),
+			alias(chainOf(/./), $.invalid),
+		),
+		_element_options_next: $ => choice(
+			$._inlineRoll,
+			$._parenthetical,
+			alias($._number_unsigned_decimal, $.number),
+			$.diceRoll,
+			$.tableRoll,
+			$.groupRoll,
+			//TODO: query
+			alias(chainOf(/./), $.invalid),
 		),
 		
 		_placeholders: $ => prec.right(repeat1(choice( $.attribute, $.ability ))),
 		
-		_formula_invalidString: $ => /([^*/+\-\[\]]+|\][^*/+\-\[\]])+/,
+		_labels_and_wsp: $ => prec.right(choice(
+			$._wsp_inline,
+			seq(
+				optional($._wsp_inline),
+				repeat1(seq( $.label, optional($._wsp_inline) )),
+			),
+		)),
 		
 		
 		/*┌──────────────────────────────
@@ -529,20 +554,6 @@ module.exports = grammar({
 		   │ • can include attributes, abilities, and macros.
 		   └─────────────────────────────*/
 		
-		/*_labels: $ => prec.right(seq(
-			$.label,
-			repeat(seq(
-				optional($._wsp_inline),
-				$.label,
-			)),
-		)),
-		_labels_invalid_alias: $ => prec.right(seq(
-			alias($.label, $.invalid),
-			repeat(seq(
-				optional($._wsp_inline),
-				alias($.label, $.invalid),
-			)),
-		)),*/
 		label: $ => seq(
 			$._leftBracket,
 			repeat(choice(

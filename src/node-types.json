@@ -181,7 +181,7 @@
           "named": true
         },
         {
-          "type": "invalid2",
+          "type": "invalid",
           "named": true
         },
         {
@@ -236,10 +236,14 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "formula",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         }
       ]
@@ -248,7 +252,61 @@
   {
     "type": "invalid",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "diceRoll",
+          "named": true
+        },
+        {
+          "type": "groupRoll",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        },
+        {
+          "type": "parenthetical",
+          "named": true
+        },
+        {
+          "type": "tableRoll",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "label",
@@ -390,6 +448,10 @@
         {
           "type": "functionName",
           "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
         }
       ]
     }
@@ -412,6 +474,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {
@@ -527,6 +593,14 @@
     "named": false
   },
   {
+    "type": "[[",
+    "named": false
+  },
+  {
+    "type": "]]",
+    "named": false
+  },
+  {
     "type": "compounding",
     "named": true
   },
@@ -556,10 +630,6 @@
   },
   {
     "type": "functionName",
-    "named": true
-  },
-  {
-    "type": "invalid2",
     "named": true
   },
   {
