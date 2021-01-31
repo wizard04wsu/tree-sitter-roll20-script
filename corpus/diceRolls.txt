@@ -1,0 +1,58 @@
+==================
+Dice Roll: Valid: [[d20]]
+==================
+
+[[d20]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(formula
+			(diceRoll
+				(sides)))))
+
+==================
+Dice Roll: Valid: [[ d20 ]]
+==================
+
+[[ d20 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(formula
+			(diceRoll
+				(sides)))))
+
+==================
+Dice Roll: Valid: [[10d20]]
+==================
+
+[[10d20]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(formula
+			(diceRoll
+				(count)
+				(sides)))))
+
+==================
+Dice Roll: Valid: [[ 10d20 ]]
+==================
+
+[[ 10d20 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(formula
+			(diceRoll
+				(count)
+				(sides)))))
+

@@ -325,8 +325,7 @@ Inline Roll: Invalid: [[x]]
 
 (roll20_script
  	(inlineRoll
-		(formula
- 			(invalid))))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[ x ]]
@@ -338,8 +337,7 @@ Inline Roll: Invalid: [[ x ]]
 
 (roll20_script
  	(inlineRoll
-		(formula
- 			(invalid))))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[ x]]
@@ -351,8 +349,7 @@ Inline Roll: Invalid: [[ x]]
 
 (roll20_script
  	(inlineRoll
-		(formula
- 			(invalid))))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[x ]]
@@ -364,8 +361,7 @@ Inline Roll: Invalid: [[x ]]
 
 (roll20_script
  	(inlineRoll
-		(formula
- 			(invalid))))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[5 x]]
@@ -378,9 +374,8 @@ Inline Roll: Invalid: [[5 x]]
 (roll20_script
  	(inlineRoll
  		(formula
-			(number)
-			(invalid
-				(invalid)))))
+			(number))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[x 5]]
@@ -392,10 +387,9 @@ Inline Roll: Invalid: [[x 5]]
 
 (roll20_script
  	(inlineRoll
+		(invalid)
 		(formula
- 			(invalid)
-			(invalid
-				(number)))))
+			(number))))
 
 ==================
 Inline Roll: Invalid: [[5x]]
@@ -408,8 +402,8 @@ Inline Roll: Invalid: [[5x]]
 (roll20_script
  	(inlineRoll
 		(formula
- 			(number)
-			(invalid))))
+			(number))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[ 5x ]]
@@ -422,8 +416,8 @@ Inline Roll: Invalid: [[ 5x ]]
 (roll20_script
  	(inlineRoll
 		(formula
- 			(number)
-			(invalid))))
+			(number))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[x5]]
@@ -435,8 +429,9 @@ Inline Roll: Invalid: [[x5]]
 
 (roll20_script
  	(inlineRoll
+		(invalid)
 		(formula
- 			(invalid))))
+			(number))))
 
 ==================
 Inline Roll: Invalid: [[ x5 ]]
@@ -448,8 +443,9 @@ Inline Roll: Invalid: [[ x5 ]]
 
 (roll20_script
  	(inlineRoll
+		(invalid)
 		(formula
- 			(invalid))))
+			(number))))
 
 ==================
 Inline Roll: Invalid: [[5d_]]
@@ -462,8 +458,8 @@ Inline Roll: Invalid: [[5d_]]
 (roll20_script
  	(inlineRoll
 		(formula
-			(number)
- 			(invalid))))
+			(number))
+ 		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[5d3_]]
@@ -478,6 +474,6 @@ Inline Roll: Invalid: [[5d3_]]
 		(formula
 			(diceRoll
  				(count)
-				(sides))
-			(invalid))))
+				(sides)))
+		(invalid)))
 

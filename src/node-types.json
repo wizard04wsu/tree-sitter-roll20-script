@@ -224,7 +224,7 @@
           "named": true
         },
         {
-          "type": "modifiers",
+          "type": "invalid",
           "named": true
         }
       ]
@@ -235,8 +235,8 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": true,
+      "multiple": true,
+      "required": false,
       "types": [
         {
           "type": "formula",
@@ -439,7 +439,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "formula",
@@ -577,27 +577,11 @@
     "named": false
   },
   {
-    "type": "(",
-    "named": false
-  },
-  {
-    "type": ")",
-    "named": false
-  },
-  {
     "type": ".",
     "named": false
   },
   {
     "type": "@",
-    "named": false
-  },
-  {
-    "type": "[[",
-    "named": false
-  },
-  {
-    "type": "]]",
     "named": false
   },
   {

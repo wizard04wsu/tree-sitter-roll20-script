@@ -365,15 +365,20 @@ module.exports = grammar({
 		
 		_inlineRoll: $ => choice(
 			$.inlineRoll,
-			alias(/\[\[(\s|\r?\n)*\]\]/, $.invalid),
+			//alias(/\[\[(\s|\r?\n)*\]\]/, $.invalid),
+			alias(/\[\[\s*\]\]/, $.invalid),
 		),
 		inlineRoll: $ => seq(
-			"[[",
-			choice(
-				$.formula,
-				alias($._labels_and_wsp, $.invalid),
-			),
-			"]]",
+			/\[\[\s*/,
+			optional(alias($._invalid_inline_elements, $.invalid)),
+			optional(seq(
+				choice(
+					$.formula,
+					alias($._labels_and_wsp, $.invalid),
+				),
+				optional(alias($._invalid_inline_elements, $.invalid)),
+			)),
+			/\s*\]\]/,
 		),
 		
 		
@@ -387,16 +392,21 @@ module.exports = grammar({
 		
 		_parenthetical: $ => choice(
 			$.parenthetical,
-			alias(/(abs|ceil|floor|round)?\((\s|\r?\n)*\)/, $.invalid),
+			//alias(/(abs|ceil|floor|round)?\((\s|\r?\n)*\)/, $.invalid),
+			alias(/(abs|ceil|floor|round)?\(\s*\)/, $.invalid),
 		),
 		parenthetical: $ => seq(
 			optional(alias(/abs|ceil|floor|round/, $.functionName)),
-			"(",
-			choice(
-				$.formula,
-				alias($._labels_and_wsp, $.invalid),
-			),
-			")",
+			/\(\s*/,
+			optional(alias($._invalid_paren_elements, $.invalid)),
+			optional(seq(
+				choice(
+					$.formula,
+					alias($._labels_and_wsp, $.invalid),
+				),
+				optional(alias($._invalid_paren_elements, $.invalid)),
+			)),
+			/\s*\)/,
 		),
 		
 		
@@ -416,7 +426,6 @@ module.exports = grammar({
 		  │ Formula
 		  └┬─────────────────────────────
 		   │ • A formula consisting of only whitespace and/or labels is invalid. 
-		   │   This implementation does not detect that.
 		   │ • Labels can only be the first items in a formula if the following
 		   │   item is a dice roll or table roll (or attribute/ability/macro
 		   │   that evaluates to one of those).
@@ -510,19 +519,9 @@ module.exports = grammar({
 			$.tableRoll,
 			$.groupRoll,
 			//TODO: query
-			//alias(seq(
-			//	$._number_signed_decimal,
-			//	seq(
-			//		choice(
-			//			/[^dt\s@%#\[\]*/+\-]/,
-			//			/d[^\d\s@%#\[\]*/+\-]/,
-			//			/d\d+[^\s@%#\[\]*/+\-]/,
-			//			/t[^\s@%#\[\]*/+\-]/,
-			//		),
-			//		prec.right(repeat(/./)),
-			//	),
-			//), $.invalid),
-			alias(chainOf(/./), $.invalid),
+			//alias(chainOf(/./), $.invalid),
+			//alias(/./, $.invalid),
+			///./,
 		),
 		_element_options_next: $ => choice(
 			$._inlineRoll,
@@ -532,7 +531,9 @@ module.exports = grammar({
 			$.tableRoll,
 			$.groupRoll,
 			//TODO: query
-			alias(chainOf(/./), $.invalid),
+			//alias(chainOf(/./), $.invalid),
+			//alias(/./, $.invalid),
+			///./,
 		),
 		
 		_placeholders: $ => prec.right(repeat1(choice( $.attribute, $.ability ))),
@@ -544,6 +545,42 @@ module.exports = grammar({
 				repeat1(seq( $.label, optional($._wsp_inline) )),
 			),
 		)),
+		
+		
+		/*┌──────────────────────────────
+		  │ Invalid Elements
+		  └┬─────────────────────────────
+		   │ 
+		   │ TODO: handle queries & escape sequences
+		   └─────────────────────────────*/
+		
+		_invalid_inline_elements: $ => seq(
+			choice(
+				/[^\ddt@%#\[{(]/i,
+				/d[^\d]/i,
+				/t[^\[]/i,
+				///\?[^{]/,
+			),
+			optional(/[^@%#\[\s*/+\-\]]+|/),
+		),
+		_invalid_paren_elements: $ => seq(
+			choice(
+				/[^\ddt@%#\[{(]/i,
+				/d[^\d]/i,
+				/t[^\[]/i,
+				///\?[^{]/,
+			),
+			optional(/[^@%#\[\s*/+\-)]+/),
+		),
+		_invalid_group_elements: $ => seq(
+			choice(
+				/[^\ddt@%#\[{(]/i,
+				/d[^\d]/i,
+				/t[^\[]/i,
+				///\?[^{]/,
+			),
+			optional(/[^@%#\[\s*/+\-,}]+/),
+		),
 		
 		
 		/*┌──────────────────────────────
@@ -576,7 +613,7 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		 
 		/*┌──────────────────────────────
-		  │ Roll Modifiers
+		  │ Roll Modifier
 		  └┬─────────────────────────────
 		   │ • Roll modifiers can include attributes and abilities. This
 		   │   implementation allows for that, but it also allows some
@@ -584,26 +621,17 @@ module.exports = grammar({
 		   │ TODO: make this more precise
 		   └─────────────────────────────*/
 		
-		_diceRoll_modifiers: $ => prec.right(repeat1(choice(
-			//prec(1, $._diceRoll_modifier),
-			$._diceRoll_modifier,
-			//$._roll_modifier_with_placeholders,
-		))),
-		_groupRoll_modifiers: $ => prec.right(repeat1(choice(
-			//prec(1, $._groupRoll_modifier),
-			$._groupRoll_modifier,
-			//$._roll_modifier_with_placeholders,
-		))),
 		_diceRoll_modifier: $ => choice(
 			alias(/r[<=>]?\d+/i, $.reroll),
 			alias(/ro[<=>]?\d+/i, $.reroll_once),
 			alias(/!([<=>]?\d+)?/i, $.exploding),
 			alias(/!!([<=>]?\d+)?/i, $.compounding),
 			alias(/!p([<=>]?\d+)?/i, $.penetrating),
-			alias(/k[hl]?\d+/i, $.keep),
-			alias(/d[hl]?\d+/i, $.drop),
-			alias(/[<=>]\d+/i, $.successes),
-			alias(/[<=>]\d+f[<=>]?\d+/i, $.successesMinusFailures),
+			//alias(/k[hl]?\d+/i, $.keep),
+			//alias(/d[hl]?\d+/i, $.drop),
+			//alias(/[<=>]\d+/i, $.successes),
+			//alias(/[<=>]\d+f[<=>]?\d+/i, $.successesMinusFailures),
+			$._groupRoll_modifier,
 			alias(/cs[<=>]?\d+/i, $.criticalSuccess),
 			alias(/cf[<=>]?\d+/i, $.criticalFailure),
 			alias(/m\d*([<=>]\d+)?/i, $.showMatches),
@@ -628,7 +656,7 @@ module.exports = grammar({
 		  │ Dice Roll
 		  └──────────────────────────────*/
 		
-		diceRoll: $ => prec.right(seq(
+		diceRoll: $ => seq(
 			optional(alias($._number_unsigned_integer, $.count)),
 			/d/i,
 			alias(choice(
@@ -636,8 +664,8 @@ module.exports = grammar({
 				$.attribute,
 				$.ability,
 			), $.sides),
-			optional(alias($._diceRoll_modifiers, $.modifiers)),
-		)),
+			optional(alias(prec.right(repeat1($._diceRoll_modifier)), $.modifiers)),
+		),
 		
 		
 		/*┌──────────────────────────────
@@ -671,10 +699,16 @@ module.exports = grammar({
 		
 		groupRoll: $ => prec.right(seq(
 			$._leftBrace,
+			optional(alias($._invalid_group_elements, $.invalid)),
 			$.formula,
-			repeat(seq( $._comma, $.formula )),
+			optional(alias($._invalid_group_elements, $.invalid)),
+			repeat(seq(
+				$._comma,
+				optional(alias($._invalid_group_elements, $.invalid)),
+				$.formula,
+				optional(alias($._invalid_group_elements, $.invalid)),
+			)),
 			$._rightBrace,
-			optional(alias($._groupRoll_modifiers, $.modifiers)),
 		)),
 		
 		
