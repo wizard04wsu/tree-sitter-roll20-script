@@ -454,6 +454,26 @@
         ]
       }
     },
+    "_placeholders": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "REPEAT1",
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "attribute"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "ability"
+            }
+          ]
+        }
+      }
+    },
     "attribute": {
       "type": "CHOICE",
       "members": [
@@ -1202,8 +1222,30 @@
       ]
     },
     "operator": {
-      "type": "PATTERN",
-      "value": "[*\\/+-]|\\+\\s*-|-\\s*\\+"
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[*\\/]|\\+-?|-\\+?"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "PATTERN",
+                "value": "[*\\/+-]+"
+              },
+              "named": true,
+              "value": "invalid"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        }
+      ]
     },
     "formula": {
       "type": "SYMBOL",
@@ -1670,80 +1712,6 @@
         }
       ]
     },
-    "_placeholders": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "attribute"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "ability"
-            }
-          ]
-        }
-      }
-    },
-    "_labels_and_wsp": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_wsp_inline"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "_wsp_inline"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
-                "type": "REPEAT1",
-                "content": {
-                  "type": "SEQ",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "label"
-                    },
-                    {
-                      "type": "CHOICE",
-                      "members": [
-                        {
-                          "type": "SYMBOL",
-                          "name": "_wsp_inline"
-                        },
-                        {
-                          "type": "BLANK"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
-    },
     "_invalid_inline_elements": {
       "type": "SEQ",
       "members": [
@@ -1752,15 +1720,15 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^\\ddt@%#\\[{(]"
+              "value": "[^\\ddDtT@%#\\[{(]"
             },
             {
               "type": "PATTERN",
-              "value": "d[^\\d]"
+              "value": "[dD][^\\dfF@%]"
             },
             {
               "type": "PATTERN",
-              "value": "t[^\\[]"
+              "value": "[tT][^\\[]"
             }
           ]
         },
@@ -1769,7 +1737,7 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^@%#\\[\\s*\\/+\\-\\]]+|"
+              "value": "[^@%#\\[\\s*\\/+\\-\\]]+"
             },
             {
               "type": "BLANK"
@@ -1786,15 +1754,15 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^\\ddt@%#\\[{(]"
+              "value": "[^\\ddDtT@%#\\[{(]"
             },
             {
               "type": "PATTERN",
-              "value": "d[^\\d]"
+              "value": "[dD][^\\dfF@%]"
             },
             {
               "type": "PATTERN",
-              "value": "t[^\\[]"
+              "value": "[tT][^\\[]"
             }
           ]
         },
@@ -1820,15 +1788,15 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^\\ddt@%#\\[{(]"
+              "value": "[^\\ddDtT@%#\\[{(]"
             },
             {
               "type": "PATTERN",
-              "value": "d[^\\d]"
+              "value": "[dD][^\\dfF@%]"
             },
             {
               "type": "PATTERN",
-              "value": "t[^\\[]"
+              "value": "[tT][^\\[]"
             }
           ]
         },
@@ -1903,217 +1871,405 @@
         }
       ]
     },
-    "_diceRoll_modifier": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "r[<=>]?\\d+"
+    "_labels_and_wsp": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_wsp_inline"
           },
-          "named": true,
-          "value": "reroll"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "ro[<=>]?\\d+"
-          },
-          "named": true,
-          "value": "reroll_once"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "!([<=>]?\\d+)?"
-          },
-          "named": true,
-          "value": "exploding"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "!!([<=>]?\\d+)?"
-          },
-          "named": true,
-          "value": "compounding"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "!p([<=>]?\\d+)?"
-          },
-          "named": true,
-          "value": "penetrating"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_groupRoll_modifier"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "cs[<=>]?\\d+"
-          },
-          "named": true,
-          "value": "criticalSuccess"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "cf[<=>]?\\d+"
-          },
-          "named": true,
-          "value": "criticalFailure"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "m\\d*([<=>]\\d+)?"
-          },
-          "named": true,
-          "value": "showMatches"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "mt\\d*([<=>]\\d+)?"
-          },
-          "named": true,
-          "value": "countMatches"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "s[ad]"
-          },
-          "named": true,
-          "value": "sort"
-        }
-      ]
-    },
-    "_groupRoll_modifier": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "k[hl]?\\d+"
-          },
-          "named": true,
-          "value": "keep"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "d[hl]?\\d+"
-          },
-          "named": true,
-          "value": "drop"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "[<=>]\\d+"
-          },
-          "named": true,
-          "value": "successes"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "[<=>]\\d+f[<=>]?\\d+"
-          },
-          "named": true,
-          "value": "successesMinusFailures"
-        }
-      ]
-    },
-    "diceRoll": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_number_unsigned_integer"
-              },
-              "named": true,
-              "value": "count"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "PATTERN",
-          "value": "d"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "CHOICE",
+          {
+            "type": "SEQ",
             "members": [
               {
-                "type": "PATTERN",
-                "value": "\\d+|f"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_wsp_inline"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
               },
               {
-                "type": "SYMBOL",
-                "name": "attribute"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "ability"
+                "type": "REPEAT1",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "label"
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_wsp_inline"
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    }
+                  ]
+                }
               }
             ]
-          },
-          "named": true,
-          "value": "sides"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
+          }
+        ]
+      }
+    },
+    "_modifier_chars": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "REPEAT1",
+        "content": {
+          "type": "PATTERN",
+          "value": "[acdfhklmoprstACDFHKLMOPRST<=>\\d!]"
+        }
+      }
+    },
+    "_groupRoll_modifiers": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
                 "type": "PREC_RIGHT",
                 "value": 0,
                 "content": {
                   "type": "REPEAT1",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "_diceRoll_modifier"
+                    "name": "_shared_modifier"
                   }
                 }
               },
-              "named": true,
-              "value": "modifiers"
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_roll_modifier_with_placeholders"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_roll_modifier_with_placeholders"
+          }
+        ]
+      }
+    },
+    "_shared_modifier": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[kK][hHlL]?\\d+"
+            },
+            "named": true,
+            "value": "keep"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[dD][hHlL]?\\d+"
+            },
+            "named": true,
+            "value": "drop"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[<=>]\\d+"
+            },
+            "named": true,
+            "value": "successes"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[<=>]\\d+[fF][<=>]?\\d+"
+            },
+            "named": true,
+            "value": "successesMinusFailures"
+          }
+        ]
+      }
+    },
+    "_diceRoll_modifier": {
+      "type": "PREC",
+      "value": 1,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[rR][<=>]?\\d+"
+            },
+            "named": true,
+            "value": "reroll"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[rR][oO][<=>]?\\d+"
+            },
+            "named": true,
+            "value": "reroll_once"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "!([<=>]?\\d+)?"
+            },
+            "named": true,
+            "value": "exploding"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "!!([<=>]?\\d+)?"
+            },
+            "named": true,
+            "value": "compounding"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "![pP]([<=>]?\\d+)?"
+            },
+            "named": true,
+            "value": "penetrating"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_shared_modifier"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[cC][Ss][<=>]?\\d+"
+            },
+            "named": true,
+            "value": "criticalSuccess"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[cC][fF][<=>]?\\d+"
+            },
+            "named": true,
+            "value": "criticalFailure"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[mM]\\d*([<=>]\\d+)?"
+            },
+            "named": true,
+            "value": "showMatches"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[mM][tT]\\d*([<=>]\\d+)?"
+            },
+            "named": true,
+            "value": "countMatches"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "PATTERN",
+              "value": "[sS][aAdD]"
+            },
+            "named": true,
+            "value": "sort"
+          }
+        ]
+      }
+    },
+    "_roll_modifier_with_placeholders": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_modifier_chars"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "PREC_RIGHT",
+            "value": 0,
+            "content": {
+              "type": "REPEAT1",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_placeholders"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_modifier_chars"
+                  }
+                ]
+              }
+            }
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_placeholders"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "diceRoll": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_number_unsigned_integer"
+                },
+                "named": true,
+                "value": "count"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "PATTERN",
+            "value": "[dD]"
+          },
+          {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_diceRoll_sides"
+            },
+            "named": true,
+            "value": "sides"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_diceRoll_modifiers"
+                },
+                "named": true,
+                "value": "modifiers"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "_diceRoll_sides": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "\\d+|[fF]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_placeholders"
+        }
+      ]
+    },
+    "_diceRoll_modifiers": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "REPEAT1",
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_diceRoll_modifier"
             },
             {
-              "type": "BLANK"
+              "type": "SYMBOL",
+              "name": "_placeholders"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_modifier_chars"
             }
           ]
         }
-      ]
+      }
     },
     "tableRoll": {
       "type": "SEQ",
@@ -2137,7 +2293,7 @@
         },
         {
           "type": "PATTERN",
-          "value": "t"
+          "value": "[tT]"
         },
         {
           "type": "SYMBOL",
@@ -2299,6 +2455,23 @@
           {
             "type": "SYMBOL",
             "name": "_rightBrace"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_groupRoll_modifiers"
+                },
+                "named": true,
+                "value": "modifiers"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
           }
         ]
       }
