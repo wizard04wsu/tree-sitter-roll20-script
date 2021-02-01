@@ -130,6 +130,25 @@
     }
   },
   {
+    "type": "count",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "diceRoll",
     "named": true,
     "fields": {},
@@ -138,7 +157,23 @@
       "required": true,
       "types": [
         {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
           "type": "count",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "macro",
           "named": true
         },
         {
@@ -153,7 +188,70 @@
     }
   },
   {
-    "type": "formula",
+    "type": "groupRoll",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "diceRoll",
+          "named": true
+        },
+        {
+          "type": "groupRoll",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        },
+        {
+          "type": "modifiers",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        },
+        {
+          "type": "parenthetical",
+          "named": true
+        },
+        {
+          "type": "tableRoll",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inlineRoll",
     "named": true,
     "fields": {},
     "children": {
@@ -206,48 +304,6 @@
         },
         {
           "type": "tableRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "groupRoll",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "formula",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "modifiers",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "inlineRoll",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "formula",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         }
       ]
@@ -406,6 +462,10 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "keep",
           "named": true
         },
@@ -443,7 +503,29 @@
   {
     "type": "number",
     "named": true,
-    "fields": {}
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "operator",
@@ -469,7 +551,15 @@
       "required": false,
       "types": [
         {
-          "type": "formula",
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "diceRoll",
           "named": true
         },
         {
@@ -477,7 +567,39 @@
           "named": true
         },
         {
+          "type": "groupRoll",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
           "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "macro",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        },
+        {
+          "type": "parenthetical",
+          "named": true
+        },
+        {
+          "type": "tableRoll",
           "named": true
         }
       ]
@@ -523,11 +645,27 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
+          "type": "abilityName",
           "named": true
         },
         {
-          "type": "attribute",
+          "type": "attributeName",
+          "named": true
+        },
+        {
+          "type": "characterName",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "keyword",
+          "named": true
+        },
+        {
+          "type": "token",
           "named": true
         }
       ]
@@ -600,10 +738,6 @@
     "named": true
   },
   {
-    "type": "count",
-    "named": true
-  },
-  {
     "type": "countMatches",
     "named": true
   },
@@ -661,6 +795,10 @@
   },
   {
     "type": "successesMinusFailures",
+    "named": true
+  },
+  {
+    "type": "test",
     "named": true
   },
   {

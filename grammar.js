@@ -49,9 +49,16 @@ module.exports = grammar({
 	name: 'roll20_script',
 	
 	externals: $ => [
-		$._EOF,	// (no content) determines if there are no more tokens
-		$.__attribute_start,	// returns "@{" if there is also a closing brace
-		$.__ability_start,	// returns "%{" if there is also a closing brace
+		$.__EOF,					// (no content) determines if there are no more tokens
+		$.__attribute_start,		// returns "@{" if there is also a closing brace
+		$.__not_attribute_start,	// returns "@{" if there is *not* a closing brace
+		$.__ability_start,			// returns "%{" if there is also a closing brace
+		$.__not_ability_start,		// returns "%{" if there is *not* a closing brace
+		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
+		$.__not_diceRoll_start,		// returns "d" or "D" if it does *not* begin a dice roll
+		//$.__unsigned_integer,		// returns an unsigned integer if it is *not* followed by /[dDtT]/
+		$.__is_not_roll_count,		// (no content) determines if the next character does not match /[dDtT]/
+		$.__is_table_roll_count,	// (no content) determines if the next character matches /[tT]/
 	],
 	
 	extras: $ => [
@@ -60,7 +67,9 @@ module.exports = grammar({
 	
 	conflicts: $ => [],
 	
-	inline: $ => [],
+	inline: $ => [
+		$.formula,
+	],
 	
 	rules: {
 		
@@ -93,7 +102,7 @@ module.exports = grammar({
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Strings, Numbers, and Special Characters
+		  ║ Strings and Special Characters
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		/*┌──────────────────────────────
@@ -104,25 +113,6 @@ module.exports = grammar({
 		_stringNL: $ => chainOf(/.|# |#?\r?\n/),
 		
 		_wsp_inline: $ => /\s+/,
-		
-		
-		/*┌──────────────────────────────
-		  │ Numbers
-		  └──────────────────────────────*/
-		
-		_number_unsigned_integer: $ => /\d+/,
-		_number_unsigned_decimal: $ => prec.right(1, choice(	//valid:  5  5.5  .5  invalid:  5.
-			seq(
-				$._number_unsigned_integer,
-				optional(seq( ".", $._number_unsigned_integer )),
-			),
-			seq( ".", $._number_unsigned_integer ),
-		)),
-		_number_signed_decimal: $ => prec.right(seq(	//valid:  (plus, minus, or neither) 5  5.5  invalid:  .5  5.
-			optional(/[+-]/),
-			$._number_unsigned_integer,
-			optional(seq( ".", $._number_unsigned_integer )),
-		)),
 		
 		
 		/*┌──────────────────────────────
@@ -339,8 +329,8 @@ module.exports = grammar({
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		_macro_space: $ => prec(1, seq( $.macro, choice( " ", $._EOF ) )),
-		_macro_spaceNL: $ => prec(1, seq( $.macro, choice( / |\r?\n/, $._EOF ) )),
+		_macro_space: $ => prec(1, seq( $.macro, choice( " ", $.__EOF ) )),
+		_macro_spaceNL: $ => prec(1, seq( $.macro, choice( / |\r?\n/, $.__EOF ) )),
 		macro: $ => seq( "#", $.macroName ),
 		macroName: $ => prec.right(repeat1(choice( $.attribute, /@|[^ \r\n@]+/ ))),
 		_macroInsideAttributeName: $ => seq( "#", alias($._macroNameInsideAttributeName, $.macroName) ),
@@ -357,76 +347,6 @@ module.exports = grammar({
 		  ║ Formulas
 		  ╚════════════════════════════════════════════════════════════*/
 		 
-		/*┌──────────────────────────────
-		  │ Inline Roll
-		  └┬─────────────────────────────
-		   │ • A nested inline roll is simplified for use in its parent formula.
-		   │   Labels are removed and the formula is evaluated, reducing it to
-		   │   only a number.
-		   └─────────────────────────────*/
-		
-		_inlineRoll: $ => choice(
-			$.inlineRoll,
-			//alias(/\[\[(\s|\r?\n)*\]\]/, $.invalid),
-			alias(/\[\[\s*\]\]/, $.invalid),
-		),
-		inlineRoll: $ => seq(
-			/\[\[\s*/,
-			optional(alias($._invalid_inline_elements, $.invalid)),
-			optional(seq(
-				choice(
-					$.formula,
-					alias($._labels_and_wsp, $.invalid),
-				),
-				optional(alias($._invalid_inline_elements, $.invalid)),
-			)),
-			/\s*\]\]/,
-		),
-		
-		
-		/*┌──────────────────────────────
-		  │ Parenthetical / Math Function
-		  └┬─────────────────────────────
-		   │ • Parentheticals may be used as elements inside an inline roll,
-		   │   containing their own formula. Parentheticals are not simplified
-		   │   like nested inline rolls are.
-		   └─────────────────────────────*/
-		
-		_parenthetical: $ => choice(
-			$.parenthetical,
-			//alias(/(abs|ceil|floor|round)?\((\s|\r?\n)*\)/, $.invalid),
-			alias(/(abs|ceil|floor|round)?\(\s*\)/, $.invalid),
-		),
-		parenthetical: $ => seq(
-			optional(alias(/abs|ceil|floor|round/, $.functionName)),
-			/\(\s*/,
-			optional(alias($._invalid_paren_elements, $.invalid)),
-			optional(seq(
-				choice(
-					$.formula,
-					alias($._labels_and_wsp, $.invalid),
-				),
-				optional(alias($._invalid_paren_elements, $.invalid)),
-			)),
-			/\s*\)/,
-		),
-		
-		
-		/*┌──────────────────────────────
-		  │ Operator
-		  └┬─────────────────────────────
-		   │ • `+-` and `-+` are evaluated as subtraction.
-		   │ • The only place a unary negative operator can be is as a prefix of
-		   │   a number that is the first element in an inline roll or
-		   │   parenthetical.
-		   └─────────────────────────────*/
-		
-		operator: $ => seq(
-			/[*/]|\+-?|-\+?/,
-			optional(alias(/[*/+-]+/, $.invalid)),
-		),
-		
-		
 		/*┌──────────────────────────────
 		  │ Formula
 		  └┬─────────────────────────────
@@ -447,7 +367,7 @@ module.exports = grammar({
 			),
 			seq(
 				optional($._labels_and_wsp),
-				$._element_first_pair,
+				$._expression_first_pair,
 			),
 		)),
 		_expression_next: $ => prec.right(choice(
@@ -455,10 +375,10 @@ module.exports = grammar({
 				$._element_next,
 				optional($._labels_and_wsp),
 			),
-			$._element_next_pair,
+			$._expression_next_pair,
 		)),
 		
-		_element_first_pair: $ => seq(
+		_expression_first_pair: $ => seq(
 			$._element_first,
 			choice(
 				seq(
@@ -473,7 +393,7 @@ module.exports = grammar({
 				),
 			),
 		),
-		_element_next_pair: $ => seq(
+		_expression_next_pair: $ => seq(
 			$._element_next,
 			choice(
 				seq(
@@ -489,26 +409,28 @@ module.exports = grammar({
 			),
 		),
 		
-		_element_first: $ => prec.right(choice(
-			seq(
-				optional($._placeholders),
-				$._element_options_first,
-				optional($._placeholders),
-				optional($._macro_space),
-			),
+		_element_first: $ => prec.right(2, choice(
+			$._element_inlineRoll,
+			$._element_parenthetical,
+			$._element_groupRoll,
+			$._element_diceRoll,
+			$._element_tableRoll,
+			alias($._element_number_signed, $.number),
+			//TODO: query
 			seq(
 				$._placeholders,
 				optional($._macro_space),
 			),
 			$._macro_space,
 		)),
-		_element_next: $ => prec.right(choice(
-			seq(
-				optional($._placeholders),
-				$._element_options_next,
-				optional($._placeholders),
-				optional($._macro_space),
-			),
+		_element_next: $ => prec.right(1, choice(
+			$._element_inlineRoll,
+			$._element_parenthetical,
+			$._element_groupRoll,
+			$._element_diceRoll,
+			$._element_tableRoll,
+			alias($._element_number_unsigned, $.number),
+			//TODO: query
 			seq(
 				$._placeholders,
 				optional($._macro_space),
@@ -516,51 +438,65 @@ module.exports = grammar({
 			$._macro_space,
 		)),
 		
-		_element_options_first: $ => choice(
-			$._inlineRoll,
-			$._parenthetical,
-			alias($._number_signed_decimal, $.number),
-			$.diceRoll,
-			$.tableRoll,
-			$.groupRoll,
-			//TODO: query
-		),
-		_element_options_next: $ => choice(
-			$._inlineRoll,
-			$._parenthetical,
-			alias($._number_unsigned_decimal, $.number),
-			$.diceRoll,
-			$.tableRoll,
-			$.groupRoll,
-			//TODO: query
-		),
+		_placeholders_and_invalid_chars_prefix: $ => prec.right(repeat1(choice(
+			$._placeholders,
+			alias(/[^@%#\s\[*/+\-\])}\ddDtT]+/, $.invalid),
+		))),
+		_placeholders_and_invalid_chars_suffix: $ => prec.right(repeat1(choice(
+			$._placeholders,
+			alias(/[^@%#\s\[*/+\-\])}]+/, $.invalid),
+		))),
 		
 		
-		/*┌──────────────────────────────
-		  │ Invalid Elements
-		  └┬─────────────────────────────
-		   │ 
-		   │ TODO: handle queries & escape sequences
-		   └─────────────────────────────*/
+		
+		
+		
+		
+		
+		
+/*		_element_prefix_within_inlineRoll: $ => repeat1(choice(
+			$._placeholders,
+			alias(/[^\[]+/, $.invalid),
+		)),*/
+/*		_inlineRoll_prefix_within_inlineRoll: $ => repeat1(choice(
+			$._placeholders,
+*///			alias(/[^@%#\s\[*/+\-\]({\ddDtT\?]+/, $.invalid),
+/*			alias(/[dD][^\dfF@%]/, $.invalid),
+			alias(/[tT][^\[]/, $.invalid),
+			alias(/\?[^{]/, $.invalid),	//TODO: query
+		)),
+		_invalid_chars_in_element_prefix_within_inlineRoll: $ => seq(
+			$._invalid_chars_in_element_prefix,
+*///			optional(/[^@%#\s\[*/+\-\]]+/),
+/*		),
+		_invalid_chars_in_element_prefix_within_parenthetical: $ => seq(
+			$._invalid_chars_in_element_prefix,
+*///			optional(/[^@%#\s\[*/+\-\)]+/),
+/*		),
+		_invalid_chars_in_element_prefix_within_groupRoll: $ => seq(
+			$._invalid_chars_in_element_prefix,
+*///			optional(/[^@%#\s\[*/+\-\,}]+/),
+/*		),*/
 		
 		_invalid_inline_elements: $ => seq(
+		//	choice(
+		//		/[^\ddDtT@%#\[{(]/,
+		//		/[dD][^\dfF@%]/,
+		//		/[tT][^\[]/,
+		//		///\?[^{]/,
+		//	),
+		//	optional(/[^@%#\[\s*/+\-\]]+/),
+			alias(/[^\ddDtT@%#\s\[*/+\-({\]]+/, $.test),
+		),
+/*		_invalid_paren_elements: $ => seq(
 			choice(
 				/[^\ddDtT@%#\[{(]/,
 				/[dD][^\dfF@%]/,
 				/[tT][^\[]/,
 				///\?[^{]/,
 			),
-			optional(/[^@%#\[\s*/+\-\]]+/),
-		),
-		_invalid_paren_elements: $ => seq(
-			choice(
-				/[^\ddDtT@%#\[{(]/,
-				/[dD][^\dfF@%]/,
-				/[tT][^\[]/,
-				///\?[^{]/,
-			),
-			optional(/[^@%#\[\s*/+\-)]+/),
-		),
+*///			optional(/[^@%#\[\s*/+\-)]+/),
+/*		),
 		_invalid_group_elements: $ => seq(
 			choice(
 				/[^\ddDtT@%#\[{(]/,
@@ -568,7 +504,86 @@ module.exports = grammar({
 				/[tT][^\[]/,
 				///\?[^{]/,
 			),
-			optional(/[^@%#\[\s*/+\-,}]+/),
+*///			optional(/[^@%#\[\s*/+\-,}]+/),
+/*		),*/
+		
+		
+		
+		_test_invalid_element: $ => repeat1(prec.right(choice(
+			$.__not_diceRoll_start,	//'d' or 'D'
+			/[^\s#dDtT\[({]/,
+			/[tT][^\[]/,
+		))),
+		
+		_test_dice_roll: $ => prec.right(seq(
+			/*//prefix (optional)
+			optional(seq(
+				repeat(prec.left(choice(
+					//$.attribute,
+					//$.ability,
+					$._placeholders,
+					/\d+/,
+					alias(choice(
+						$.__not_diceRoll_start,	//'d' or 'D'
+						/[^\s#dDtT\[({]/,
+						/[tT][^\[]/,
+					), $.invalid),
+				))),
+				alias(choice(
+					$.__not_diceRoll_start,
+					/[^#dD]/,
+				), $.invalid),
+			)),*/
+			//count: number of dice (optional)
+			alias(repeat(prec.right(1, choice(
+				//$.attribute,
+				//$.ability,
+				$._placeholders,
+				/\d+/,
+			))), $.count),
+			//keyword
+			//$.__diceRoll_start,
+			/[dD]/,
+			//sides: number of sides per die
+			alias(choice(
+				/\d+|[fF]/,
+				$.attribute,
+				$.ability,
+			), $.sides),
+			//modifiers (optional)
+			optional(alias($._diceRoll_modifiers, $.modifiers)),
+			//suffix (optional)
+			optional(seq(
+				alias(/[^\s#\[})\]]/, $.invalid),
+				repeat(choice(
+					//$.attribute,
+					//$.ability,
+					$._placeholders,
+					alias(/[^\s#\[})\]]/, $.invalid),
+				)),
+			)),
+			//macro (optional)
+			optional($._macro_space),
+		)),
+		
+		
+		
+		
+		
+		
+		
+		
+		/*┌──────────────────────────────
+		  │ Operator
+		  └┬─────────────────────────────
+		   │ • `+-` and `-+` are evaluated as subtraction.
+		   │ • The only place a unary negative operator can be is as a prefix of
+		   │   a number that is the first element in a formula.
+		   └─────────────────────────────*/
+		
+		operator: $ => seq(
+			/[*/]|\+-?|-\+?/,
+			optional(alias(/[*/+-]+/, $.invalid)),
 		),
 		
 		
@@ -605,35 +620,79 @@ module.exports = grammar({
 		)),
 		
 		
+		/*┌──────────────────────────────
+		  │ Inline Roll
+		  └┬─────────────────────────────
+		   │ • A nested inline roll is simplified for use in its parent formula.
+		   │   Labels are removed and the formula is evaluated, reducing it to
+		   │   only a number.
+		   └─────────────────────────────*/
+		
+		_element_inlineRoll: $ => seq(
+			optional($._placeholders_and_invalid_chars_prefix),
+			$._inlineRoll,
+			optional($._placeholders_and_invalid_chars_suffix),
+			optional($._macro_space),
+		),
+		
+		_inlineRoll: $ => choice(
+			$.inlineRoll,
+			alias(/\[\[\s*\]\]/, $.invalid),
+		),
+		inlineRoll: $ => seq(
+			/\[\[\s*/,
+			//optional(alias($._invalid_inline_elements, $.invalid)),
+			//optional(seq(
+				choice(
+					$.formula,
+					alias($._labels_and_wsp, $.invalid),
+				),
+			//	optional(alias($._invalid_inline_elements, $.invalid)),
+			//)),
+			/\s*\]\]/,
+		),
+		
+		
+		/*┌──────────────────────────────
+		  │ Parenthetical / Math Function
+		  └┬─────────────────────────────
+		   │ • Parentheticals may be used as elements inside an inline roll,
+		   │   containing their own formula. Parentheticals are not simplified
+		   │   like nested inline rolls are.
+		   └─────────────────────────────*/
+		
+		_element_parenthetical: $ => seq(
+			optional($._placeholders_and_invalid_chars_prefix),
+			$._parenthetical,
+			optional($._placeholders_and_invalid_chars_suffix),
+			optional($._macro_space),
+		),
+		
+		_parenthetical: $ => choice(
+			$.parenthetical,
+			alias(/(abs|ceil|floor|round)?\(\s*\)/, $.invalid),
+		),
+		parenthetical: $ => seq(
+			optional(alias(/abs|ceil|floor|round/, $.functionName)),
+			/\(\s*/,
+			optional(choice(
+				$.formula,
+				alias($._labels_and_wsp, $.invalid),
+			)),
+			/\s*\)/,
+		),
+		
+		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Rolls
 		  ╚════════════════════════════════════════════════════════════*/
 		 
 		/*┌──────────────────────────────
-		  │ Roll Modifier
+		  │ Roll Modifiers
 		  └┬─────────────────────────────
-		   │ • Roll modifiers can include attributes and abilities. This
-		   │   implementation allows for that, but it also allows some
-		   │   invalid modifiers.
-		   │ TODO: make this more precise
+		   │ • Roll modifiers can include attributes and abilities.
 		   └─────────────────────────────*/
 		
-		/*_diceRoll_modifiers: $ => prec.right(choice(
-			seq(
-				prec.right(repeat1($._diceRoll_modifier)),
-				optional($._roll_modifier_with_placeholders),
-			),
-			$._roll_modifier_with_placeholders,
-		)),*/
-		_modifier_chars: $ => chainOf(/[acdfhklmoprstACDFHKLMOPRST<=>\d!]/),
-		//_diceRoll_modifiers: $ => prec.right(repeat1($._diceRoll_modifier)),
-		_groupRoll_modifiers: $ => prec.right(choice(
-			seq(
-				prec.right(repeat1($._shared_modifier)),
-				optional($._roll_modifier_with_placeholders),
-			),
-			$._roll_modifier_with_placeholders,
-		)),
 		_shared_modifier: $ => prec(1, choice(
 			alias(/[kK][hHlL]?\d+/, $.keep),
 			alias(/[dD][hHlL]?\d+/, $.drop),
@@ -652,43 +711,77 @@ module.exports = grammar({
 			alias(/[mM]\d*([<=>]\d+)?/, $.showMatches),
 			alias(/[mM][tT]\d*([<=>]\d+)?/, $.countMatches),
 			alias(/[sS][aAdD]/, $.sort),
-			//$._placeholders,
-			//$._modifier_chars,
 		)),
-		_roll_modifier_with_placeholders: $ => prec.right(seq(
-			optional($._modifier_chars),
-			prec.right(repeat1(
-				seq(
-					$._placeholders,
-					$._modifier_chars,
-				),
+		
+		
+		/*┌──────────────────────────────
+		  │ Group Roll
+		  └──────────────────────────────*/
+		
+		_element_groupRoll: $ => seq(
+			optional($._placeholders_and_invalid_chars_prefix),
+			$._groupRoll,
+			optional($._macro_space),
+		),
+		
+		_groupRoll: $ => choice(
+			$.groupRoll,
+			alias($._groupRoll_invalid, $.invalid),
+		),
+		groupRoll: $ => prec.right(seq(
+			$._leftBrace,
+			optional(alias($._groupRoll_invalid_commas, $.invalid)),
+			$.formula,
+			repeat(seq(
+				$._comma,
+				optional(alias($._groupRoll_invalid_commas, $.invalid)),
+				$.formula,
 			)),
-			optional($._placeholders),
+			optional(alias($._groupRoll_invalid_commas, $.invalid)),
+			$._rightBrace,
+			optional(alias($._groupRoll_modifiers, $.modifiers)),
 		)),
+		_groupRoll_modifiers: $ => prec.right(repeat1(choice(
+				$._shared_modifier,
+				$._placeholders,
+				/[dfhklDFHKL<=>\d]+/,	//potentially valid
+				alias(/[^@%#\s\[*/+\-\])}dfhklDFHKL<=>\d]+/, $.invalid),
+		))),
+		_groupRoll_invalid: $ => seq(
+			$._leftBrace,
+			/\s*(,\s*)*/,
+			$._rightBrace,
+			optional($._placeholders_and_invalid_chars_suffix),
+		),
+		_groupRoll_invalid_commas: $ => prec.right(repeat1(prec.right(choice($._labels_and_wsp, $._comma)))),
 		
 		
 		/*┌──────────────────────────────
 		  │ Dice Roll
 		  └──────────────────────────────*/
 		
-		diceRoll: $ => prec.right(seq(
+		_element_diceRoll: $ => seq(
+			$.diceRoll,
+			optional($._macro_space),
+		),
+		
+		diceRoll: $ => $._test_dice_roll,
+		/*diceRoll: $ => prec.right(seq(
 			optional(alias($._number_unsigned_integer, $.count)),
-			/[dD]/,
+			$.__diceRoll_start,
 			alias($._diceRoll_sides, $.sides),
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
-			//alias($._diceRoll_modifiers, $.modifiers),
-		)),
+		)),*/
 		_diceRoll_sides: $ => choice(
 			/\d+|[fF]/,
-			$._placeholders,
+			$.attribute,
+			$.ability,
 		),
 		_diceRoll_modifiers: $ => prec.right(repeat1(choice(
-			//alias($._diceRoll_modifier, $.test_mods),
-			//alias($._placeholders, $.test_ph),
-			//alias($._modifier_chars, $.test_chars),
 			$._diceRoll_modifier,
 			$._placeholders,
-			$._modifier_chars,
+			/[acdfhklmoprstACDFHKLMOPRST<=>\d!]+/,	//potentially valid
+			alias(/[^@%#\s\[*/+\-\])}acdfhklmoprstACDFHKLMOPRST<=>\d!]+/, $.invalid),
 		))),
 		
 		
@@ -696,13 +789,20 @@ module.exports = grammar({
 		  │ Table Roll
 		  └──────────────────────────────*/
 		
+		_element_tableRoll: $ => seq(
+			$.tableRoll,
+			optional($._placeholders_and_invalid_chars_suffix),
+			optional($._macro_space),
+		),
+		
 		tableRoll: $ => seq(
-			optional(alias($._number_unsigned_integer, $.count)),
+			optional(alias($._tableRoll_count, $.count)),
 			/[tT]/,
 			$._leftBracket,
 			alias(repeat1(
 				choice(
-					/[^|}&@%#\r\n]+/,
+					///[^@%#|}&\r\n]+/,
+					/[^@%#|}&]+/,	//TODO: are these the correct characters to exclude?
 					$.attribute,
 					$.ability,
 					$._macro_space,
@@ -715,25 +815,72 @@ module.exports = grammar({
 			), $.tableName),
 			$._rightBracket,
 		),
+		_tableRoll_count: $ => seq(
+			$._number_unsigned_integer,
+			$.__is_table_roll_count,
+		),
 		
 		
-		/*┌──────────────────────────────
-		  │ Group Roll
-		  └──────────────────────────────*/
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Numbers
+		  ╚════════════════════════════════════════════════════════════*/
 		
-		groupRoll: $ => prec.right(seq(
-			$._leftBrace,
-			optional(alias($._invalid_group_elements, $.invalid)),
-			$.formula,
-			optional(alias($._invalid_group_elements, $.invalid)),
-			repeat(seq(
-				$._comma,
-				optional(alias($._invalid_group_elements, $.invalid)),
-				$.formula,
-				optional(alias($._invalid_group_elements, $.invalid)),
+		_element_number_signed: $ => seq(	// (plus or minus) 5  5.5  (unsigned) 5  5.5  .5
+			prec.right(choice(
+				$._number_signed_decimal,
+				$._number_signed_integer,
+				$._number_unsigned_decimal,
+				//$.__number_unsigned_integer,
+				seq(
+					$._number_unsigned_integer,
+					$.__is_not_roll_count,
+				),
 			)),
-			$._rightBrace,
-			optional(alias($._groupRoll_modifiers, $.modifiers)),
+			optional(seq(
+				alias($._not_a_number, $.invalid),
+				repeat(seq(
+					$._number_unsigned_integer,
+					alias($._not_a_number, $.invalid),
+				)),
+				optional($._number_unsigned_integer),
+			)),
+			optional($._macro_space),
+		),
+		_element_number_unsigned: $ => seq(	// (unsigned) 5  5.5  .5
+			prec.right(choice(
+				$._number_unsigned_decimal,
+				$._number_unsigned_integer,
+			)),
+			optional(seq(
+				alias($._not_a_number, $.invalid),
+				repeat(seq(
+					$._number_unsigned_integer,
+					alias($._not_a_number, $.invalid),
+				)),
+				optional($._number_unsigned_integer),
+			)),
+			optional($._macro_space),
+		),
+		
+		_not_a_number: $ => /[^@%#\s\[*/+\-\])}\d]+/,
+		
+		_number_unsigned_integer: $ => repeat1(prec(3, choice(	// (unsigned) 5
+			/\d+/,
+			$._placeholders,
+		))),
+		_number_signed_integer: $ => seq(	// (plus or minus) 5
+			/[+-]/,
+			$._number_unsigned_integer,
+		),
+		_number_unsigned_decimal: $ => seq(	// (unsigned) 5.5  .5
+			optional($._number_unsigned_integer),
+			".",
+			$._number_unsigned_integer,
+		),
+		_number_signed_decimal: $ => prec(1, seq(	// (plus or minus) 5.5
+			$._number_signed_integer,
+			".",
+			$._number_unsigned_integer,
 		)),
 		
 		

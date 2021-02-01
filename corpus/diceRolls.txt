@@ -8,9 +8,8 @@ Dice Roll: Valid: [[d20]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(sides)))))
+		(diceRoll
+			(sides))))
 
 ==================
 Dice Roll: Valid: [[ d20 ]]
@@ -22,9 +21,8 @@ Dice Roll: Valid: [[ d20 ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(sides)))))
+		(diceRoll
+			(sides))))
 
 ==================
 Dice Roll: Valid: [[ D20 ]]
@@ -36,9 +34,8 @@ Dice Roll: Valid: [[ D20 ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(sides)))))
+		(diceRoll
+			(sides))))
 
 ==================
 Dice Roll: Valid: [[10d20]]
@@ -50,10 +47,9 @@ Dice Roll: Valid: [[10d20]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(count)
-				(sides)))))
+		(diceRoll
+			(count)
+			(sides))))
 
 ==================
 Dice Roll: Valid: [[ 10d20 ]]
@@ -65,10 +61,9 @@ Dice Roll: Valid: [[ 10d20 ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(count)
-				(sides)))))
+		(diceRoll
+			(count)
+			(sides))))
 
 ==================
 Dice Roll: Valid: [[ df ]]
@@ -80,9 +75,8 @@ Dice Roll: Valid: [[ df ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(sides)))))
+		(diceRoll
+			(sides))))
 
 ==================
 Dice Roll: Valid: [[ @{a}d@{a} ]]
@@ -94,13 +88,13 @@ Dice Roll: Valid: [[ @{a}d@{a} ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(attribute
-				(attributeName))
-			(diceRoll
-				(sides
-					(attribute
-						(attributeName)))))))
+		(diceRoll
+			(count
+				(attribute
+					(attributeName)))
+			(sides
+				(attribute
+					(attributeName))))))
 
 ==================
 Dice Roll: Valid: [[ %{b|a}d%{b|a} ]]
@@ -112,15 +106,15 @@ Dice Roll: Valid: [[ %{b|a}d%{b|a} ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(ability
-				(characterName)
-				(abilityName))
-			(diceRoll
-				(sides
-					(ability
-						(characterName)
-						(abilityName)))))))
+		(diceRoll
+			(count
+				(ability
+					(characterName)
+					(abilityName)))
+			(sides
+				(ability
+					(characterName)
+					(abilityName))))))
 
 ==================
 Dice Roll: Valid: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
@@ -132,24 +126,24 @@ Dice Roll: Valid: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(attribute
-				(attributeName))
-			(ability
-				(characterName)
-				(abilityName))
-			(diceRoll
-				(sides
-					(attribute
-						(attributeName)))
-				(modifiers
-					(ability
-						(characterName)
-						(abilityName))
-					(attribute
-						(attributeName))
-					(attribute
-						(attributeName)))))))
+		(diceRoll
+			(count
+				(attribute
+					(attributeName))
+				(ability
+					(characterName)
+					(abilityName)))
+			(sides
+				(attribute
+					(attributeName)))
+			(modifiers
+				(ability
+					(characterName)
+					(abilityName))
+				(attribute
+					(attributeName))
+				(attribute
+					(attributeName))))))
 
 ==================
 Dice Roll: Valid: [[ d6c@{s}5 ]]
@@ -161,12 +155,11 @@ Dice Roll: Valid: [[ d6c@{s}5 ]]
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(sides)
-				(modifiers
-					(attribute
-						(attributeName)))))))
+		(diceRoll
+			(sides)
+			(modifiers
+				(attribute
+					(attributeName))))))
 
 ==================
 Dice Roll: Valid: long one, lower case
@@ -178,41 +171,40 @@ Dice Roll: Valid: long one, lower case
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(count)
-				(sides)
-				(modifiers
-					(reroll)
-					(reroll)
-					(reroll_once)
-					(reroll_once)
-					(exploding)
-					(exploding)
-					(compounding)
-					(compounding)
-					(penetrating)
-					(penetrating)
-					(penetrating)
-					(keep)
-					(keep)
-					(keep)
-					(drop)
-					(drop)
-					(drop)
-					(successes)
-					(successesMinusFailures)
-					(successesMinusFailures)
-					(criticalSuccess)
-					(criticalSuccess)
-					(criticalFailure)
-					(criticalFailure)
-					(showMatches)
-					(showMatches)
-					(countMatches)
-					(countMatches)
-					(sort)
-					(sort))))))
+		(diceRoll
+			(count)
+			(sides)
+			(modifiers
+				(reroll)
+				(reroll)
+				(reroll_once)
+				(reroll_once)
+				(exploding)
+				(exploding)
+				(compounding)
+				(compounding)
+				(penetrating)
+				(penetrating)
+				(penetrating)
+				(keep)
+				(keep)
+				(keep)
+				(drop)
+				(drop)
+				(drop)
+				(successes)
+				(successesMinusFailures)
+				(successesMinusFailures)
+				(criticalSuccess)
+				(criticalSuccess)
+				(criticalFailure)
+				(criticalFailure)
+				(showMatches)
+				(showMatches)
+				(countMatches)
+				(countMatches)
+				(sort)
+				(sort)))))
 
 ==================
 Dice Roll: Valid: long one, upper case
@@ -224,39 +216,38 @@ Dice Roll: Valid: long one, upper case
 
 (roll20_script
 	(inlineRoll
-		(formula
-			(diceRoll
-				(count)
-				(sides)
-				(modifiers
-					(reroll)
-					(reroll)
-					(reroll_once)
-					(reroll_once)
-					(exploding)
-					(exploding)
-					(compounding)
-					(compounding)
-					(penetrating)
-					(penetrating)
-					(penetrating)
-					(keep)
-					(keep)
-					(keep)
-					(drop)
-					(drop)
-					(drop)
-					(successes)
-					(successesMinusFailures)
-					(successesMinusFailures)
-					(criticalSuccess)
-					(criticalSuccess)
-					(criticalFailure)
-					(criticalFailure)
-					(showMatches)
-					(showMatches)
-					(countMatches)
-					(countMatches)
-					(sort)
-					(sort))))))
+		(diceRoll
+			(count)
+			(sides)
+			(modifiers
+				(reroll)
+				(reroll)
+				(reroll_once)
+				(reroll_once)
+				(exploding)
+				(exploding)
+				(compounding)
+				(compounding)
+				(penetrating)
+				(penetrating)
+				(penetrating)
+				(keep)
+				(keep)
+				(keep)
+				(drop)
+				(drop)
+				(drop)
+				(successes)
+				(successesMinusFailures)
+				(successesMinusFailures)
+				(criticalSuccess)
+				(criticalSuccess)
+				(criticalFailure)
+				(criticalFailure)
+				(showMatches)
+				(showMatches)
+				(countMatches)
+				(countMatches)
+				(sort)
+				(sort)))))
 
