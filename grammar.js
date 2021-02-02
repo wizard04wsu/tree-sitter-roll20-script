@@ -148,8 +148,8 @@ module.exports = grammar({
 		  │ helper rules
 		  └┬─────────────────────────────
 		   │ Note that the website sometimes allows special characters in
-		   │   names, even though it prevents the property from being accessed
-		   │   from within a script.
+		   │   names, even though it would prevent the property from being
+		   │   accessed from within a script.
 		   └─────────────────────────────*/
 		
 		_tokenSelector: $ => choice(
@@ -545,15 +545,15 @@ module.exports = grammar({
 		label: $ => seq(
 			$._leftBracket,
 			repeat(choice(
-				/[^\[\]&@%#\r\n]+/,	//TODO-RXP
+				/[^@%#\[\r\n\]&]+/,
 				$.attribute,
 				$.ability,
 				$._macro_space,
+				$._escapedCharacter,
 				$._ampersand,
 				$._at,
 				$._percent,
 				$._hash,
-				$._escapedCharacter,
 			)),
 			$._rightBracket,
 		),
@@ -701,7 +701,7 @@ module.exports = grammar({
 		),
 		_groupRoll_invalid_commas: $ => prec.right(repeat1(prec.right(choice($._labels_and_wsp, $._comma)))),
 		_groupRoll_invalid_remainder: $ => seq(
-			/[^@%#\s\[\])}dfhklDFHKL<=>\d]/,	//definitely invalid
+			/[^@%#\[({*/+\-\s})\]dfhklDFHKL<=>\d]/,	//definitely invalid
 			//treat the rest as invalid
 			optional($._element_invalid_remainder),
 		),
@@ -763,8 +763,7 @@ module.exports = grammar({
 			$._leftBracket,
 			alias(repeat1(
 				choice(
-					///[^@%#|}&\r\n]+/,
-					/[^@%#|}&]+/,	//TODO-RXP
+					/[^@%#|}&]+/,	//TODO-RXP   /[^@%#\[({*/+\-\s\r\n})\]&|]/,
 					$.attribute,
 					$.ability,
 					$._macro_space,
@@ -838,7 +837,7 @@ module.exports = grammar({
 			$._unsigned_integer_with_placeholders,
 			$.__is_not_roll_count,
 		),
-		_number_signed_integer: $ => prec(4, seq(	// (plus or minus) 5
+		_number_signed_integer: $ => prec(4, seq(	// (plus or minus) 5	//TODO: need prec 4 ?
 			/[+-]/,
 			$._unsigned_integer_with_placeholders,
 		)),
@@ -854,8 +853,6 @@ module.exports = grammar({
 			),
 		),
 		_number_signed_decimal: $ => seq(	// (plus or minus) 5.5
-			///[+-]/,
-			//$._unsigned_integer_with_placeholders,
 			$._number_signed_integer,
 			alias(".",$.c),
 			$._unsigned_integer_with_placeholders,
