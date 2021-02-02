@@ -1,24 +1,79 @@
 ==================
-Not a Macro
-==================
-
-#
-# #
-
----
-
-(roll20_script)
-
-==================
-Valid Macros
+Macro: Valid: ##
 ==================
 
 ##
+
+---
+
+(roll20_script
+	(macro
+		(macroName)))
+		
+==================
+Macro: Valid: #m
+==================
+
 #m
+
+---
+
+(roll20_script
+	(macro
+		(macroName)))
+		
+==================
+Macro: Valid: #m#
+==================
+
 #m#
+
+---
+
+(roll20_script
+	(macro
+		(macroName)))
+		
+==================
+Macro: Valid: #m#m
+==================
+
 #m#m
+
+---
+
+(roll20_script
+	(macro
+		(macroName)))
+		
+==================
+Macro: Valid: # #m
+==================
+
 # #m
+
+---
+
+(roll20_script
+	(macro
+		(macroName)))
+		
+==================
+Macro: Valid: #m #
+==================
+
 #m #
+
+---
+
+(roll20_script
+	(macro
+		(macroName)))
+		
+==================
+Macro: Valid: #m #m
+==================
+
 #m #m
 
 ---
@@ -27,27 +82,55 @@ Valid Macros
 	(macro
 		(macroName))
 	(macro
-		(macroName))
-	(macro
-		(macroName))
-	(macro
-		(macroName))
-	(macro
-		(macroName))
-	(macro
-		(macroName))
-	(macro
-		(macroName))
-	(macro
 		(macroName)))
-
+		
 ==================
-Valid Macros: with Attributes
+Macro: Valid with Attributes: #m@{a}
 ==================
 
 #m@{a}
+
+---
+
+(roll20_script
+	(macro
+		(macroName
+			(attribute
+				(attributeName)))))
+
+==================
+Macro: Valid with Attributes: #m@{a}m
+==================
+
 #m@{a}m
+
+---
+
+(roll20_script
+	(macro
+		(macroName
+			(attribute
+				(attributeName)))))
+
+==================
+Macro: Valid with Attributes: #m@{c|a}
+==================
+
 #m@{c|a}
+
+---
+
+(roll20_script
+	(macro
+		(macroName
+			(attribute
+				(characterName)
+				(attributeName)))))
+
+==================
+Macro: Valid with Attributes: #m@{c|a}m
+==================
+
 #m@{c|a}m
 
 ---
@@ -56,19 +139,26 @@ Valid Macros: with Attributes
 	(macro
 		(macroName
 			(attribute
-				(attributeName))))
-	(macro
-		(macroName
-			(attribute
-				(attributeName))))
-	(macro
-		(macroName
-			(attribute
-				(characterName)
-				(attributeName))))
-	(macro
-		(macroName
-			(attribute
 				(characterName)
 				(attributeName)))))
+
+==================
+Macro: Not a Macro: #
+==================
+
+#
+
+---
+
+(roll20_script)
+
+==================
+Macro: Not a Macro: # #
+==================
+
+# #
+
+---
+
+(roll20_script)
 

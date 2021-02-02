@@ -1,0 +1,198 @@
+==================
+Signed Number: Valid: [[5]]
+==================
+
+[[5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid: [[ 5 ]]
+==================
+
+[[ 5 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid: [[-5]]
+==================
+
+[[-5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid: [[ -5 ]]
+==================
+
+[[ -5 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid: [[+5]]
+==================
+
+[[+5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid: [[55]]
+==================
+
+[[55]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid with Invalid Remainder: [[5.]]
+==================
+
+[[5.]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Signed Number: Valid with Invalid Remainder: [[-5.]]
+==================
+
+[[-5.]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Signed Number: Valid: [[.5]]
+==================
+
+[[.5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Invalid: [[-.5]]
+==================
+
+[[-.5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(invalid)))
+
+==================
+Signed Number: Valid: [[5.5]]
+==================
+
+[[5.5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Valid: [[-5.5]]
+==================
+
+[[-5.5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Signed Number: Invalid: [[.]]
+==================
+
+[[.]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(invalid)))
+
+==================
+Signed Number: Valid with Invalid Remainder: [[5_]]
+==================
+
+[[5_]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Signed Number: Valid with Invalid Remainder: [[5d_]]
+==================
+
+[[5d_]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Signed Number: Not a Number: [[5d6]]
+==================
+
+[[5d6]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(diceRoll
+			(count)
+			(sides))))
+

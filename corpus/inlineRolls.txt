@@ -150,7 +150,7 @@ Inline Roll: Valid: [[ 5 + [[ 5 ]] ]]
 			(number))))
 
 ==================
-Inline Roll: Accepted: [[[a]5]]
+Inline Roll: Invalid but Accepted: [[[a]5]]
 ==================
 
 [[[a]5]]
@@ -163,7 +163,7 @@ Inline Roll: Accepted: [[[a]5]]
 		(number)))
 
 ==================
-Inline Roll: Accepted: [[ [a] 5 ]]
+Inline Roll: Invalid but Accepted: [[ [a] 5 ]]
 ==================
 
 [[ [a] 5 ]]
@@ -176,7 +176,7 @@ Inline Roll: Accepted: [[ [a] 5 ]]
 		(number)))
 
 ==================
-Inline Roll: Accepted: [[ [a] [[5]] ]]
+Inline Roll: Invalid but Accepted: [[ [a] [[5]] ]]
 ==================
 
 [[ [a] [[5]] ]]
@@ -378,8 +378,8 @@ Inline Roll: Invalid: [[5x]]
 
 (roll20_script
  	(inlineRoll
-		(number
-			(invalid))))
+		(number)
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[ 5x ]]
@@ -391,8 +391,8 @@ Inline Roll: Invalid: [[ 5x ]]
 
 (roll20_script
  	(inlineRoll
-		(number
-			(invalid))))
+		(number)
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[x5]]
@@ -428,8 +428,8 @@ Inline Roll: Invalid: [[5d_]]
 
 (roll20_script
  	(inlineRoll
-		(number
-			(invalid))))
+		(number)
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[5d3_]]

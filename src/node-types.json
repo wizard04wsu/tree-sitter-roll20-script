@@ -499,14 +499,6 @@
         {
           "type": "attribute",
           "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
         }
       ]
     }
@@ -702,6 +694,18 @@
     "named": false
   },
   {
+    "type": "a",
+    "named": true
+  },
+  {
+    "type": "b",
+    "named": true
+  },
+  {
+    "type": "c",
+    "named": true
+  },
+  {
     "type": "compounding",
     "named": true
   },
@@ -763,10 +767,6 @@
   },
   {
     "type": "successesMinusFailures",
-    "named": true
-  },
-  {
-    "type": "test",
     "named": true
   },
   {

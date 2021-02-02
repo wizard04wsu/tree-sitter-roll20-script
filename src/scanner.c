@@ -9,7 +9,6 @@ enum TokenType {
 	JUST_PERCENT,
 	DICE_ROLL_START,
 	JUST_D,
-	//UNSIGNED_INTEGER,
 	NOT_ROLL_COUNT,
 	TABLE_ROLL_COUNT,
 };
@@ -23,30 +22,6 @@ char advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
 	return lexer->lookahead;
 }
-/*bool check_for_braces(
-	TSLexer *lexer,
-	const bool *valid_symbols,
-	int symbol,
-	char start_char
-) {
-	char c = lexer->lookahead;
-	if (c == start_char && valid_symbols[symbol]) {
-		c = advance(lexer);
-		if (c == '{') {
-			c = advance(lexer);
-			lexer->mark_end(lexer);	//"@{"
-			
-			while (c != 0 && c != '\n' && c != '}') {
-				c = advance(lexer);
-			}
-			if (c == '}') {
-				lexer->result_symbol = symbol;
-				return true;
-			}
-		}
-	}
-	return false;
-}*/
 bool check_for_closure(
 	TSLexer *lexer,
 	char start_char,
@@ -103,16 +78,7 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 		lexer->result_symbol = EOF;
 		return vs[EOF];
 	}
-	
-	//char digit[] = "0123456789";
-	
-	/*if (check_for_braces(lexer, vs, ATTRIBUTE_START, '@') ||
-		check_for_braces(lexer, vs, ABILITY_START, '%')
-	) {
-		return true;
-	}*/
-	
-	if (c == '@') {
+	else if (c == '@') {
 		if (vs[ATTRIBUTE_START] || vs[JUST_AT]) {
 			advance(lexer);
 			lexer->mark_end(lexer);
@@ -177,22 +143,6 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 		lexer->result_symbol = NOT_ROLL_COUNT;
 		return true;
 	}
-	
-	/*else if (strchr(digit, lexer->lookahead) != NULL
-		&& vs[UNSIGNED_INTEGER]
-	) {
-		advance(lexer);
-		while (lexer->lookahead != 0 && strchr(digit, lexer->lookahead) != NULL) {
-			 advance(lexer);
-		}
-		
-		if (strchr("dDtT", lexer->lookahead) == NULL) {
-			lexer->mark_end(lexer);
-			lexer->result_symbol = UNSIGNED_INTEGER;
-			return true;
-		}
-	}*/
-	
 	
 	return false;
 }

@@ -270,3 +270,32 @@ Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 		(invalid
 			(attribute
 				(attributeName)))))
+
+==================
+Dice Roll: Invalid: [[5d_]]
+==================
+
+[[5d_]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Dice Roll: Valid with Invalid Remainder: [[5d3_]]
+==================
+
+[[5d3_]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(diceRoll
+			(count)
+			(sides))
+		(invalid)))
+
