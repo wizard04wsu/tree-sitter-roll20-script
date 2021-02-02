@@ -157,23 +157,7 @@
       "required": true,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
           "type": "count",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "macro",
           "named": true
         },
         {
@@ -350,6 +334,10 @@
           "named": true
         },
         {
+          "type": "modifiers",
+          "named": true
+        },
+        {
           "type": "number",
           "named": true
         },
@@ -459,10 +447,6 @@
         },
         {
           "type": "exploding",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -641,31 +625,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "abilityName",
+          "type": "ability",
           "named": true
         },
         {
-          "type": "attributeName",
-          "named": true
-        },
-        {
-          "type": "characterName",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "keyword",
-          "named": true
-        },
-        {
-          "type": "token",
+          "type": "attribute",
           "named": true
         }
       ]
@@ -804,6 +772,14 @@
   {
     "type": "token",
     "named": true
+  },
+  {
+    "type": "{",
+    "named": false
+  },
+  {
+    "type": "{}",
+    "named": false
   },
   {
     "type": "|",

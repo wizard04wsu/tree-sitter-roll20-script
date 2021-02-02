@@ -50,13 +50,11 @@ char advance(TSLexer *lexer) {
 bool check_for_closure(
 	TSLexer *lexer,
 	char start_char,
-	char end_char,
-	bool mark_at_entrance
+	char end_char
 ) {
 	char c = lexer->lookahead;
 	if (c == start_char) {
 		c = advance(lexer);
-		if (mark_at_entrance) lexer->mark_end(lexer);
 		while (c != 0 && c != '\n' && c != end_char) {
 			c = advance(lexer);
 		}
@@ -83,11 +81,11 @@ bool check_for_dice_roll_start(
 	}
 	else if (c == '@') {
 		advance(lexer);
-		if (check_for_closure(lexer, '{', '}', false)) return true;
+		if (check_for_closure(lexer, '{', '}')) return true;
 	}
 	else if (c == '%') {
 		advance(lexer);
-		if (check_for_closure(lexer, '{', '}', false)) return true;
+		if (check_for_closure(lexer, '{', '}')) return true;
 	}
 	return false;
 }
@@ -117,7 +115,8 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 	if (c == '@') {
 		if (vs[ATTRIBUTE_START] || vs[JUST_AT]) {
 			advance(lexer);
-			if (check_for_closure(lexer, '{', '}', true)) {
+			lexer->mark_end(lexer);
+			if (check_for_closure(lexer, '{', '}')) {
 				if (vs[ATTRIBUTE_START]) {
 					lexer->result_symbol = ATTRIBUTE_START;
 					return true;
@@ -132,7 +131,8 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 	else if (c == '%') {
 		if (vs[ABILITY_START] || vs[JUST_PERCENT]) {
 			advance(lexer);
-			if (check_for_closure(lexer, '{', '}', true)) {
+			lexer->mark_end(lexer);
+			if (check_for_closure(lexer, '{', '}')) {
 				if (vs[ABILITY_START]) {
 					lexer->result_symbol = ABILITY_START;
 					return true;

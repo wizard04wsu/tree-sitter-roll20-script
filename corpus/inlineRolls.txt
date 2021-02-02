@@ -378,8 +378,8 @@ Inline Roll: Invalid: [[5x]]
 
 (roll20_script
  	(inlineRoll
-		(number)
-		(invalid)))
+		(number
+			(invalid))))
 
 ==================
 Inline Roll: Invalid: [[ 5x ]]
@@ -391,8 +391,8 @@ Inline Roll: Invalid: [[ 5x ]]
 
 (roll20_script
  	(inlineRoll
-		(number)
-		(invalid)))
+		(number
+			(invalid))))
 
 ==================
 Inline Roll: Invalid: [[x5]]
@@ -428,8 +428,8 @@ Inline Roll: Invalid: [[5d_]]
 
 (roll20_script
  	(inlineRoll
-		(number)
-			(invalid)))
+		(number
+			(invalid))))
 
 ==================
 Inline Roll: Invalid: [[5d3_]]
@@ -442,8 +442,7 @@ Inline Roll: Invalid: [[5d3_]]
 (roll20_script
  	(inlineRoll
 		(diceRoll
-				(count)
-			(sides)
-			(modifiers
-				(invalid)))))
+			(count)
+			(sides))
+		(invalid)))
 

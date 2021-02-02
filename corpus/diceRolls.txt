@@ -251,3 +251,22 @@ Dice Roll: Valid: long one, upper case
 				(sort)
 				(sort)))))
 
+==================
+Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
+==================
+
+[[ d6c@{s}5cs>5s_c@{f}3 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(diceRoll
+			(sides)
+			(modifiers
+				(attribute
+					(attributeName))
+				(criticalSuccess)))
+		(invalid
+			(attribute
+				(attributeName)))))
