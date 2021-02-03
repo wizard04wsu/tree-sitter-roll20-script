@@ -1,0 +1,8 @@
+build
+node_modules
+/test
+package-lock.json
+/parser.*
+/scanner.*
+*.log
+.node-version

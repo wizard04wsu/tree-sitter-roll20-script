@@ -1,0 +1,496 @@
+==================
+Inline Roll: Valid: [[5]]
+==================
+
+[[5]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Inline Roll: Valid: [[ 5 ]]
+==================
+
+[[ 5 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)))
+
+==================
+Inline Roll: Valid: [[5[a]]]
+==================
+
+[[5[a]]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)
+		(label)))
+
+==================
+Inline Roll: Valid: [[ 5 [ a ] ]]
+==================
+
+[[ 5 [ a ] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(number)
+		(label)))
+
+==================
+Inline Roll: Valid: [[[a]5d6]]
+==================
+
+[[[a]5d6]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(label)
+		(diceRoll
+			(count)
+			(sides))))
+
+==================
+Inline Roll: Valid: [[ [a] 5d6 ]]
+==================
+
+[[ [a] 5d6 ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(label)
+		(diceRoll
+			(count)
+			(sides))))
+
+==================
+Inline Roll: Valid: [[ [[5]] ]]
+==================
+
+[[ [[5]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(inlineRoll
+			(number))))
+
+==================
+Inline Roll: Valid: [[5+5]]
+==================
+
+[[5+5]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(operator)
+		(number)))
+
+==================
+Inline Roll: Valid: [[ 5 + 5 ]]
+==================
+
+[[ 5 + 5 ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(operator)
+		(number)))
+
+==================
+Inline Roll: Valid: [[5+[[5]]]]
+==================
+
+[[5+[[5]]]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(operator)
+		(inlineRoll
+			(number))))
+
+==================
+Inline Roll: Valid: [[ 5 + [[ 5 ]] ]]
+==================
+
+[[ 5 + [[ 5 ]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(operator)
+		(inlineRoll
+			(number))))
+
+==================
+Inline Roll: Invalid but Accepted: [[[a]5]]
+==================
+
+[[[a]5]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(label)
+		(number)))
+
+==================
+Inline Roll: Invalid but Accepted: [[ [a] 5 ]]
+==================
+
+[[ [a] 5 ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(label)
+		(number)))
+
+==================
+Inline Roll: Invalid but Accepted: [[ [a] [[5]] ]]
+==================
+
+[[ [a] [[5]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(label)
+		(inlineRoll
+			(number))))
+
+==================
+Inline Roll: Invalid: [[]]
+==================
+
+[[]]
+
+---
+
+(roll20_script
+ 	(invalid))
+
+==================
+Inline Roll: Invalid: [[ ]]
+==================
+
+[[ ]]
+
+---
+
+(roll20_script
+ 	(invalid))
+
+==================
+Inline Roll: Invalid: [[[a]]]
+==================
+
+[[[a]]]
+
+---
+
+(roll20_script
+	(inlineRoll
+	 	(invalid
+			(label))))
+
+==================
+Inline Roll: Invalid: [[ [ a ] ]]
+==================
+
+[[ [ a ] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+	 	(invalid
+			(label))))
+
+==================
+Inline Roll: Invalid: [[ [[]] ]]
+==================
+
+[[ [[]] ]]
+
+---
+
+(roll20_script
+  	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ 5 [[5]] ]]
+==================
+
+[[ 5 [[5]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid
+			(inlineRoll
+				(number)))))
+
+==================
+Inline Roll: Invalid: [[ 5 [[]] ]]
+==================
+
+[[ 5 [[]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid
+			(invalid))))
+
+==================
+Inline Roll: Invalid: [[ 5 + [[]] ]]
+==================
+
+[[ 5 + [[]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(operator)
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[x]]
+==================
+
+[[x]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ x ]]
+==================
+
+[[ x ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ x]]
+==================
+
+[[ x]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[x ]]
+==================
+
+[[x ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[.]]
+==================
+
+[[.]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ . ]]
+==================
+
+[[ . ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ .]]
+==================
+
+[[ .]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[. ]]
+==================
+
+[[. ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[5 x]]
+==================
+
+[[5 x]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid
+			(invalid))))
+
+==================
+Inline Roll: Invalid: [[x 5]]
+==================
+
+[[x 5]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)
+		(invalid
+			(number))))
+
+==================
+Inline Roll: Invalid: [[5x]]
+==================
+
+[[5x]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ 5x ]]
+==================
+
+[[ 5x ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[x5]]
+==================
+
+[[x5]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ x5 ]]
+==================
+
+[[ x5 ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[5d_]]
+==================
+
+[[5d_]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[5d3_]]
+==================
+
+[[5d3_]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(diceRoll
+			(count)
+			(sides))
+		(invalid)))
+

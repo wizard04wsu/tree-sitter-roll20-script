@@ -1,9 +1,9 @@
 {
-	"name": "tree-sitter-roll20-macro",
+	"name": "tree-sitter-roll20-script",
 	"version": "0.0.0",
 	"description": "Tree-sitter grammar for macros on Roll20.net",
 	"main": "index.js",
-	"repository": "https://github.com/wizard04wsu/tree-sitter-roll20-macro",
+	"repository": "https://github.com/wizard04wsu/tree-sitter-roll20-script",
 	"keywords": [
 		"grammar",
 		"syntax"

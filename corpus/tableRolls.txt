@@ -1,0 +1,145 @@
+==================
+Table Roll: Valid: [[t[n]]]
+==================
+
+[[t[n]]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))))
+
+==================
+Table Roll: Valid: [[ t[n] ]]
+==================
+
+[[ t[n] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))))
+
+==================
+Table Roll: Valid: [[2t[n]]]
+==================
+
+[[t[n]]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))))
+
+==================
+Table Roll: Valid: [[ 2t[n] ]]
+==================
+
+[[ t[n] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))))
+
+==================
+Table Roll: Valid: [[ t[n@{a}n] ]]
+==================
+
+[[ t[n@{a}n] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName
+				(attribute
+					(attributeName))))))
+
+==================
+Table Roll: Valid: [[ t[@{a}] ]]
+==================
+
+[[ t[@{a}] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName
+				(attribute
+					(attributeName))))))
+
+==================
+Table Roll: Valid: [[ t[@{a]b}] ]]
+==================
+
+[[ t[@{a}] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName
+				(attribute
+					(attributeName))))))
+
+
+==================
+Table Roll: Valid: [[ t[@{ab] ]]
+==================
+
+[[ t[@{a}] ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))))
+
+==================
+Table Roll: Valid: [[ t[@{ab] + @{a} ] ]]
+==================
+
+[[ t[@{ab] + @{a} ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName
+				(attribute
+					(attributeName
+						(invalid)))))))
+
+==================
+Table Roll: Valid: [[ t[n]@{a}_#m ]]
+==================
+
+[[ t[n]@{a}_#m ]]
+
+---
+
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))
+		(attribute
+			(attributeName))
+		(invalid)
+		(macro
+			(macroName))))
+
