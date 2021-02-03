@@ -341,6 +341,54 @@ Inline Roll: Invalid: [[x ]]
 		(invalid)))
 
 ==================
+Inline Roll: Invalid: [[.]]
+==================
+
+[[.]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ . ]]
+==================
+
+[[ . ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[ .]]
+==================
+
+[[ .]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
+Inline Roll: Invalid: [[. ]]
+==================
+
+[[. ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(invalid)))
+
+==================
 Inline Roll: Invalid: [[5 x]]
 ==================
 

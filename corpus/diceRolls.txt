@@ -272,7 +272,7 @@ Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 				(attributeName)))))
 
 ==================
-Dice Roll: Invalid: [[5d_]]
+Number: Valid with Invalid Remainder: [[5d_]]
 ==================
 
 [[5d_]]

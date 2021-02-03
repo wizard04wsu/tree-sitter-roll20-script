@@ -694,18 +694,6 @@
     "named": false
   },
   {
-    "type": "a",
-    "named": true
-  },
-  {
-    "type": "b",
-    "named": true
-  },
-  {
-    "type": "c",
-    "named": true
-  },
-  {
     "type": "compounding",
     "named": true
   },

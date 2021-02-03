@@ -1192,10 +1192,6 @@
             "name": "_element_number_signed"
           },
           {
-            "type": "SYMBOL",
-            "name": "_element_number_invalid"
-          },
-          {
             "type": "SEQ",
             "members": [
               {
@@ -1256,10 +1252,6 @@
           {
             "type": "SYMBOL",
             "name": "_element_number_unsigned"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_element_number_invalid"
           },
           {
             "type": "SEQ",
@@ -1357,7 +1349,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[^@%#\\ddDtT\\[({*\\/+\\-\\s]"
+          "value": "[^@%#\\d.dDtT\\[({*\\/+\\-\\s]"
         },
         {
           "type": "SYMBOL",
@@ -1438,7 +1430,7 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[^\\[\\]&@%#\\r\\n]+"
+                "value": "[^@%#\\[\\r\\n\\]&]+"
               },
               {
                 "type": "SYMBOL",
@@ -1451,6 +1443,10 @@
               {
                 "type": "SYMBOL",
                 "name": "_macro_space"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_escapedCharacter"
               },
               {
                 "type": "SYMBOL",
@@ -1467,10 +1463,6 @@
               {
                 "type": "SYMBOL",
                 "name": "_hash"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_escapedCharacter"
               }
             ]
           }
@@ -2190,7 +2182,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[^@%#\\s\\[\\])}dfhklDFHKL<=>\\d]"
+          "value": "[^@%#\\[({*\\/+\\-\\s})\\]dfhklDFHKL<=>\\d]"
         },
         {
           "type": "CHOICE",
@@ -2505,43 +2497,172 @@
       ]
     },
     "_element_number_signed": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_element_number_unsigned"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_element_number_signed_integer"
+                          },
+                          "named": true,
+                          "value": "number"
+                        },
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_element_number_signed_decimal"
+                          },
+                          "named": true,
+                          "value": "number"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_number_invalid_remainder"
+                          },
+                          "named": true,
+                          "value": "invalid"
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_element_number_signed_integer"
+                      },
+                      "named": true,
+                      "value": "number"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_number_invalid_decimal"
+                      },
+                      "named": true,
+                      "value": "invalid"
+                    }
+                  ]
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_element_number_signed_invalid"
+                  },
+                  "named": true,
+                  "value": "invalid"
+                }
+              ]
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_macro_space"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_sign": {
+      "type": "PATTERN",
+      "value": "[+-]"
+    },
+    "_element_number_signed_integer": {
+      "type": "PREC_LEFT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_sign"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_unsigned_integer_with_placeholders"
+          }
+        ]
+      }
+    },
+    "_element_number_signed_decimal": {
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_element_number_signed_2"
-          },
-          "named": true,
-          "value": "number"
+          "type": "SYMBOL",
+          "name": "_element_number_signed_integer"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_number_invalid_remainder"
-              },
-              "named": true,
-              "value": "invalid"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "STRING",
+          "value": "."
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_unsigned_integer_with_placeholders"
+        }
+      ]
+    },
+    "_element_number_signed_invalid": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_sign"
         },
         {
           "type": "CHOICE",
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_macro_space"
+              "name": "_number_predicate"
             },
             {
-              "type": "BLANK"
+              "type": "SYMBOL",
+              "name": "_number_invalid_remainder"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_number_invalid_decimal"
             }
           ]
         }
@@ -2551,28 +2672,93 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_element_number_unsigned_2"
-          },
-          "named": true,
-          "value": "number"
-        },
-        {
           "type": "CHOICE",
           "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_unsigned_integer_with_placeholders"
+                      },
+                      "named": true,
+                      "value": "number"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_unsigned_decimal_with_placeholders"
+                      },
+                      "named": true,
+                      "value": "number"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_number_predicate"
+                      },
+                      "named": true,
+                      "value": "number"
+                    }
+                  ]
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_number_invalid_remainder"
+                      },
+                      "named": true,
+                      "value": "invalid"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_unsigned_integer_with_placeholders"
+                  },
+                  "named": true,
+                  "value": "number"
+                },
+                {
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "_number_invalid_decimal"
+                  },
+                  "named": true,
+                  "value": "invalid"
+                }
+              ]
+            },
             {
               "type": "ALIAS",
               "content": {
                 "type": "SYMBOL",
-                "name": "_number_invalid_remainder"
+                "name": "_number_invalid_decimal"
               },
               "named": true,
               "value": "invalid"
-            },
-            {
-              "type": "BLANK"
             }
           ]
         },
@@ -2590,41 +2776,19 @@
         }
       ]
     },
-    "_element_number_invalid": {
+    "_number_invalid_decimal": {
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_element_number_invalid_2"
-          },
-          "named": true,
-          "value": "invalid"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_number_invalid_remainder"
-              },
-              "named": true,
-              "value": "invalid"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+          "type": "STRING",
+          "value": "."
         },
         {
           "type": "CHOICE",
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_macro_space"
+              "name": "_number_invalid_remainder"
             },
             {
               "type": "BLANK"
@@ -2632,118 +2796,6 @@
           ]
         }
       ]
-    },
-    "_element_number_signed_2": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_unsigned_integer_with_placeholders"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_unsigned_integer_with_placeholders"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_number_predicate"
-              }
-            ]
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_number_predicate"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[+-]"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_unsigned_integer_with_placeholders"
-              }
-            ]
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[+-]"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_unsigned_integer_with_placeholders"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_number_predicate"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "_element_number_unsigned_2": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_unsigned_integer_with_placeholders"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "_unsigned_integer_with_placeholders"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_number_predicate"
-              }
-            ]
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_number_predicate"
-          }
-        ]
-      }
-    },
-    "_element_number_invalid_2": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[+-]"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_number_predicate"
-              }
-            ]
-          }
-        ]
-      }
     },
     "_number_invalid_remainder": {
       "type": "SEQ",
@@ -2795,102 +2847,22 @@
         }
       ]
     },
-    "_number_unsigned_integer": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_unsigned_integer_with_placeholders"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__is_not_roll_count"
-        }
-      ]
-    },
-    "_number_signed_integer": {
+    "_unsigned_decimal_with_placeholders": {
       "type": "PREC",
-      "value": 4,
+      "value": 1,
       "content": {
         "type": "SEQ",
         "members": [
           {
-            "type": "PATTERN",
-            "value": "[+-]"
+            "type": "SYMBOL",
+            "name": "_unsigned_integer_with_placeholders"
           },
           {
             "type": "SYMBOL",
-            "name": "_unsigned_integer_with_placeholders"
+            "name": "_number_predicate"
           }
         ]
       }
-    },
-    "_number_unsigned_decimal": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_unsigned_integer_with_placeholders"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "."
-              },
-              "named": true,
-              "value": "a"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_unsigned_integer_with_placeholders"
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "."
-              },
-              "named": true,
-              "value": "b"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_unsigned_integer_with_placeholders"
-            }
-          ]
-        }
-      ]
-    },
-    "_number_signed_decimal": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_number_signed_integer"
-        },
-        {
-          "type": "ALIAS",
-          "content": {
-            "type": "STRING",
-            "value": "."
-          },
-          "named": true,
-          "value": "c"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_unsigned_integer_with_placeholders"
-        }
-      ]
     }
   },
   "extras": [],
