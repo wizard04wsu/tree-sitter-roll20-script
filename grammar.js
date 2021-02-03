@@ -98,7 +98,7 @@ module.exports = grammar({
 				//query
 				//template
 				//property
-				//button
+				//button	//ability command button
 				//tracker
 			),
 		)),
@@ -403,7 +403,7 @@ module.exports = grammar({
 			choice(
 				seq(
 					optional($._labels_and_wsp),
-					$.operator,
+					$._operator,
 					optional($._labels_and_wsp),
 					$._expression_next,
 				),
@@ -418,7 +418,7 @@ module.exports = grammar({
 			choice(
 				seq(
 					optional($._labels_and_wsp),
-					$.operator,
+					$._operator,
 					optional($._labels_and_wsp),
 					$._expression_next,
 				),
@@ -530,14 +530,16 @@ module.exports = grammar({
 		  └┬─────────────────────────────
 		   │ `+-` and `-+` are evaluated as subtraction.
 		   │ 
-		   │ The only place a unary negative operator can be is as a prefix of
-		   │   a number that is the first element in a formula.
+		   │ The only place a unary negative/positive operator can be is as a
+		   │   prefix of a number that is the first element in a formula.
 		   └─────────────────────────────*/
 		
-		operator: $ => seq(
-			/[*/]|\+-?|-\+?/,
-			optional(alias(/[*/+-]+/, $.invalid)),
+		_operator: $ => seq(
+			$.operator,
+			optional(alias($._invalid_operators, $.invalid)),
 		),
+		operator: $ => seq( /[*/%]|\*\*|\+(\s*-)?|-(\s*\+)?/ ),
+		_invalid_operators: $ => repeat1(alias($.operator, "")),
 		
 		
 		/*┌──────────────────────────────

@@ -506,17 +506,7 @@
   {
     "type": "operator",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "invalid",
-          "named": true
-        }
-      ]
-    }
+    "fields": {}
   },
   {
     "type": "parenthetical",
