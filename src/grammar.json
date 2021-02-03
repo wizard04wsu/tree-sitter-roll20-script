@@ -1430,7 +1430,7 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[^@%#\\[\\r\\n\\]&]+"
+                "value": "[^@%#&\\[\\r\\n\\]]+"
               },
               {
                 "type": "SYMBOL",
@@ -1450,10 +1450,6 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "_ampersand"
-              },
-              {
-                "type": "SYMBOL",
                 "name": "_at"
               },
               {
@@ -1463,6 +1459,10 @@
               {
                 "type": "SYMBOL",
                 "name": "_hash"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_ampersand"
               }
             ]
           }
@@ -2410,7 +2410,7 @@
               "type": "ALIAS",
               "content": {
                 "type": "SYMBOL",
-                "name": "_tableRoll_count"
+                "name": "_unsigned_integer_with_placeholders"
               },
               "named": true,
               "value": "count"
@@ -2421,8 +2421,8 @@
           ]
         },
         {
-          "type": "PATTERN",
-          "value": "[tT]"
+          "type": "SYMBOL",
+          "name": "__tableRoll_start"
         },
         {
           "type": "SYMBOL",
@@ -2437,7 +2437,7 @@
               "members": [
                 {
                   "type": "PATTERN",
-                  "value": "[^@%#|}&]+"
+                  "value": "[^@%#&\\]]+"
                 },
                 {
                   "type": "SYMBOL",
@@ -2448,16 +2448,24 @@
                   "name": "ability"
                 },
                 {
+                  "type": "PREC",
+                  "value": 1,
+                  "content": {
+                    "type": "STRING",
+                    "value": "@{"
+                  }
+                },
+                {
+                  "type": "PREC",
+                  "value": 1,
+                  "content": {
+                    "type": "STRING",
+                    "value": "%{"
+                  }
+                },
+                {
                   "type": "SYMBOL",
                   "name": "_macro_space"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_escapedCharacter"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_ampersand"
                 },
                 {
                   "type": "SYMBOL",
@@ -2470,6 +2478,10 @@
                 {
                   "type": "SYMBOL",
                   "name": "_hash"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_ampersand"
                 }
               ]
             }
@@ -2480,19 +2492,6 @@
         {
           "type": "SYMBOL",
           "name": "_rightBracket"
-        }
-      ]
-    },
-    "_tableRoll_count": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_unsigned_integer_with_placeholders"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__is_table_roll_count"
         }
       ]
     },
@@ -2898,11 +2897,11 @@
     },
     {
       "type": "SYMBOL",
-      "name": "__is_not_roll_count"
+      "name": "__tableRoll_start"
     },
     {
       "type": "SYMBOL",
-      "name": "__is_table_roll_count"
+      "name": "__just_t"
     }
   ],
   "inline": [

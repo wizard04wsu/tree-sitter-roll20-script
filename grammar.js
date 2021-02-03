@@ -50,14 +50,18 @@ module.exports = grammar({
 	
 	externals: $ => [
 		$.__EOF,					// (no content) determines if there are no more tokens
+		
 		$.__attribute_start,		// returns "@" if it begins an attribute
 		$.__just_at,				// returns "@" if it does *not* begin an attribute
+		
 		$.__ability_start,			// returns "%" if it begins an ability
 		$.__just_percent,			// returns "%" if it does *not* begin an ability
+		
 		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
 		$.__just_d,					// returns "d" or "D" if it does *not* begin a dice roll
-		$.__is_not_roll_count,		// (no content) determines if the next character does not match /[dDtT]/
-		$.__is_table_roll_count,	// (no content) determines if the next character matches /[tT]/
+		
+		$.__tableRoll_start,		// returns "t" or "T" if it begins a table roll
+		$.__just_t,					// returns "t" or "T" if it does *not* begin a table roll
 	],
 	
 	extras: $ => [
@@ -547,15 +551,15 @@ module.exports = grammar({
 		label: $ => seq(
 			$._leftBracket,
 			repeat(choice(
-				/[^@%#\[\r\n\]&]+/,
+				/[^@%#&\[\r\n\]]+/,
 				$.attribute,
 				$.ability,
 				$._macro_space,
 				$._escapedCharacter,
-				$._ampersand,
 				$._at,
 				$._percent,
 				$._hash,
+				$._ampersand,
 			)),
 			$._rightBracket,
 		),
@@ -755,33 +759,36 @@ module.exports = grammar({
 		
 		_element_tableRoll: $ => seq(
 			$.tableRoll,
+			//attributes and abilities (optional)
 			optional($._placeholders),
+			//any invalid stuff on the end
 			optional(alias($._element_invalid_remainder, $.invalid)),
+			//macro (optional)
 			optional($._macro_space),
 		),
 		
 		tableRoll: $ => seq(
-			optional(alias($._tableRoll_count, $.count)),
-			/[tT]/,
+			//count: number of "dice" (optional)
+			optional(alias($._unsigned_integer_with_placeholders, $.count)),
+			//keyword (the letter 't')
+			$.__tableRoll_start,
 			$._leftBracket,
+			//table name
 			alias(repeat1(
 				choice(
-					/[^@%#|}&]+/,	//TODO-RXP   /[^@%#\[({*/+\-\s\r\n})\]&|]/,
+					/[^@%#&\]]+/,
 					$.attribute,
 					$.ability,
+					prec(1, "@{"),
+					prec(1, "%{"),
 					$._macro_space,
-					$._escapedCharacter,
-					$._ampersand,
 					$._at,
 					$._percent,
 					$._hash,
+					$._ampersand,
 				),
 			), $.tableName),
 			$._rightBracket,
-		),
-		_tableRoll_count: $ => seq(
-			$._unsigned_integer_with_placeholders,
-			$.__is_table_roll_count,	//TODO-EXT
 		),
 		
 		

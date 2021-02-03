@@ -3,14 +3,18 @@
 
 enum TokenType {
 	EOF,
+	
 	ATTRIBUTE_START,
 	JUST_AT,
+	
 	ABILITY_START,
 	JUST_PERCENT,
+	
 	DICE_ROLL_START,
 	JUST_D,
-	NOT_ROLL_COUNT,
-	TABLE_ROLL_COUNT,
+	
+	TABLE_ROLL_START,
+	JUST_T,
 };
 
 void * tree_sitter_roll20_script_external_scanner_create() { return NULL; }
@@ -22,6 +26,7 @@ char advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
 	return lexer->lookahead;
 }
+
 bool check_for_closure(
 	TSLexer *lexer,
 	char start_char,
@@ -65,11 +70,49 @@ bool check_for_dice_roll_start(
 	return false;
 }
 
+bool check_for_table_roll_start(
+	TSLexer *lexer,
+	const bool *valid_symbols
+) {
+	char c = lexer->lookahead;
+	bool rightBracketFound = false;
+	if (c == '[') {
+		c = advance(lexer);
+		while (c != 0 && c != '\n' && c != ']') {
+			if (c == '@' || c == '%') {
+				c = advance(lexer);
+				if (c = '{') {
+					while (c != 0 && c != '\n' && c != '}' && c != ']') {
+						c = advance(lexer);
+					}
+					if (c == '}') {
+						rightBracketFound = false;	//reset this; if it was found, it was just part of the attribute/ability name
+						c = advance(lexer);
+						continue;
+					}
+					else if (c == ']') {
+						rightBracketFound = true;
+					}
+					else {	//end of input
+						//if rightBracketFound == true, the "@{" or "%{" is interpreted as being part of the table name
+						return rightBracketFound;
+					}
+				}
+				else {
+					continue;
+				}
+			}
+			c = advance(lexer);
+		}
+		if (c == ']') return true;
+	}
+	return false;
+}
+
 bool tree_sitter_roll20_script_external_scanner_scan(
 	void *payload,
 	TSLexer *lexer,
-	//const bool *valid_symbols
-	const bool *vs
+	const bool *vs	//valid_symbols
 ) {
 	lexer->mark_end(lexer);
 	char c = lexer->lookahead;
@@ -82,6 +125,7 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 		if (vs[ATTRIBUTE_START] || vs[JUST_AT]) {
 			advance(lexer);
 			lexer->mark_end(lexer);
+			
 			if (check_for_closure(lexer, '{', '}')) {
 				if (vs[ATTRIBUTE_START]) {
 					lexer->result_symbol = ATTRIBUTE_START;
@@ -98,6 +142,7 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 		if (vs[ABILITY_START] || vs[JUST_PERCENT]) {
 			advance(lexer);
 			lexer->mark_end(lexer);
+			
 			if (check_for_closure(lexer, '{', '}')) {
 				if (vs[ABILITY_START]) {
 					lexer->result_symbol = ABILITY_START;
@@ -111,11 +156,9 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 		}
 	}
 	else if (c == 'd' || c == 'D') {
-		if (vs[DICE_ROLL_START] || vs[JUST_D] || vs[NOT_ROLL_COUNT]) {
+		if (vs[DICE_ROLL_START] || vs[JUST_D]) {
 			c = advance(lexer);
-			if (vs[DICE_ROLL_START] || vs[JUST_D]) {
-				lexer->mark_end(lexer);
-			}
+			lexer->mark_end(lexer);
 			
 			if (check_for_dice_roll_start(lexer, vs)) {
 				if (vs[DICE_ROLL_START]) {
@@ -127,21 +170,24 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 				lexer->result_symbol = JUST_D;
 				return true;
 			}
-			else if (vs[NOT_ROLL_COUNT]) {
-				lexer->result_symbol = NOT_ROLL_COUNT;
-				return true;
-			}
 		}
 	}
 	else if (c == 't' || c == 'T') {
-		if (vs[TABLE_ROLL_COUNT]) {
-			lexer->result_symbol = TABLE_ROLL_COUNT;
-			return true;
+		if (vs[TABLE_ROLL_START] || vs[JUST_T]) {
+			c = advance(lexer);
+			lexer->mark_end(lexer);
+			
+			if (check_for_table_roll_start(lexer, vs)) {
+				if (vs[TABLE_ROLL_START]) {
+					lexer->result_symbol = TABLE_ROLL_START;
+					return true;
+				}
+			}
+			else if (vs[JUST_T]) {
+				lexer->result_symbol = JUST_T;
+				return true;
+			}
 		}
-	}
-	else if (vs[NOT_ROLL_COUNT]) {
-		lexer->result_symbol = NOT_ROLL_COUNT;
-		return true;
 	}
 	
 	return false;
