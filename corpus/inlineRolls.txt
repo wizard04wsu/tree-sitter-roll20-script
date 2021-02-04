@@ -211,6 +211,26 @@ Inline Roll: Valid: [[ [a] [[5]]d6 ]]
 			(sides))))
 
 ==================
+Inline Roll: Valid: [[ -[[5]]+3-[[2]] ]]
+==================
+
+[[ -[[5]]+3-[[2]] ]]
+
+---
+
+(roll20_script
+ 	(inlineRoll
+		(number
+			(inlineRoll
+				(number)))
+		(operator)
+		(number)
+		(operator)
+		(number
+			(inlineRoll
+				(number)))))
+
+==================
 Inline Roll: Invalid: [[]]
 ==================
 

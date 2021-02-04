@@ -10,6 +10,9 @@ enum TokenType {
 	ABILITY_START,
 	JUST_PERCENT,
 	
+	QUERY_START,
+	JUST_QUESTIONMARK,
+	
 	DICE_ROLL_START,
 	JUST_D,
 	
@@ -43,10 +46,31 @@ bool check_for_closure(
 	return false;
 }
 
-bool check_for_dice_roll_start(
-	TSLexer *lexer,
-	const bool *valid_symbols
-) {
+bool check_for_roll_query_start(TSLexer *lexer) {
+	char c = lexer->lookahead;
+	if (c == '{') {
+		c = advance(lexer);
+		while (c != 0 && c != '\n' && c != '}') {
+			if (c == '@' || c == '%') {
+				c = advance(lexer);
+				if (c = '{') {
+					while (c != 0 && c != '\n' && c != '}') {
+						c = advance(lexer);
+					}
+					if (c != '}') {	//end of input; no closing tag
+						return false;
+					}
+					continue;
+				}
+			}
+			c = advance(lexer);
+		}
+		if (c == '}') return true;
+	}
+	return false;
+}
+
+bool check_for_dice_roll_start(TSLexer *lexer) {
 	char digit[] = "0123456789";
 	char c = lexer->lookahead;
 	if (strchr("fF", c) != NULL) {
@@ -70,10 +94,7 @@ bool check_for_dice_roll_start(
 	return false;
 }
 
-bool check_for_table_roll_start(
-	TSLexer *lexer,
-	const bool *valid_symbols
-) {
+bool check_for_table_roll_start(TSLexer *lexer) {
 	char c = lexer->lookahead;
 	bool rightBracketFound = false;
 	if (c == '[') {
@@ -155,12 +176,29 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 			}
 		}
 	}
+	else if (c == '?') {
+		if (vs[QUERY_START] || vs[JUST_QUESTIONMARK]) {
+			advance(lexer);
+			lexer->mark_end(lexer);
+			
+			if (check_for_closure(lexer, '{', '}')) {
+				if (vs[QUERY_START]) {
+					lexer->result_symbol = QUERY_START;
+					return true;
+				}
+			}
+			else if (vs[JUST_QUESTIONMARK]) {
+				lexer->result_symbol = JUST_QUESTIONMARK;
+				return true;
+			}
+		}
+	}
 	else if (c == 'd' || c == 'D') {
 		if (vs[DICE_ROLL_START] || vs[JUST_D]) {
 			c = advance(lexer);
 			lexer->mark_end(lexer);
 			
-			if (check_for_dice_roll_start(lexer, vs)) {
+			if (check_for_dice_roll_start(lexer)) {
 				if (vs[DICE_ROLL_START]) {
 					lexer->result_symbol = DICE_ROLL_START;
 					return true;
@@ -177,7 +215,7 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 			c = advance(lexer);
 			lexer->mark_end(lexer);
 			
-			if (check_for_table_roll_start(lexer, vs)) {
+			if (check_for_table_roll_start(lexer)) {
 				if (vs[TABLE_ROLL_START]) {
 					lexer->result_symbol = TABLE_ROLL_START;
 					return true;
@@ -185,6 +223,23 @@ bool tree_sitter_roll20_script_external_scanner_scan(
 			}
 			else if (vs[JUST_T]) {
 				lexer->result_symbol = JUST_T;
+				return true;
+			}
+		}
+	}
+	else if (c == '?') {
+		if (vs[QUERY_START] || vs[JUST_QUESTIONMARK]) {
+			c = advance(lexer);
+			lexer->mark_end(lexer);
+			
+			if (check_for_roll_query_start(lexer)) {
+				if (vs[QUERY_START]) {
+					lexer->result_symbol = QUERY_START;
+					return true;
+				}
+			}
+			else if (vs[JUST_QUESTIONMARK]) {
+				lexer->result_symbol = JUST_QUESTIONMARK;
 				return true;
 			}
 		}

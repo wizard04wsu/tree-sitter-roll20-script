@@ -23,14 +23,17 @@ let escapes = {
 	tilde: "#126|#[xX](00)?7[eE]",
 };
 
-const escapedAtDepth = (escapeString) => {
+const incrementDepth = () => { depth++; return /()/; };
+const decrementDepth = () => { depth--; return /()/; };
+
+const escapedAtSurface = (escapeString) => {
 	return RegExp("&(("+escapes.ampersand+");){" + (depth) + "}(" + escapeString + ");");
 };
-const unescapedAtDepth = (char, escapeString) => {
+const unescapedAtSurface = (char, escapeString) => {
 	if(!depth) return RegExp(char);
 	return RegExp("&(("+escapes.ampersand+");){" + (depth-1) + "}(" + escapeString + ");");
 };
-const unescapedAtDepthOrAbove = (char, escapeString) => {
+const unescapedAtSurfaceOrBelow = (char, escapeString) => {
 	if(!depth) return RegExp(char);
 	return RegExp(char + "|&(("+escapes.ampersand+");){0," + (depth-1) + "}(" + escapeString + ");");
 };
@@ -57,6 +60,9 @@ module.exports = grammar({
 		$.__ability_start,			// returns "%" if it begins an ability
 		$.__just_percent,			// returns "%" if it does *not* begin an ability
 		
+		$.__rollQuery_start,		// returns "?" if it begins a roll query
+		$.__just_questionmark,		// returns "?" if it does *not* begin a roll query
+		
 		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
 		$.__just_d,					// returns "d" or "D" if it does *not* begin a dice roll
 		
@@ -79,24 +85,38 @@ module.exports = grammar({
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Start rule
 		  ╚╤═══════════════════════════════════════════════════════════
-		   │ Roll20 evaluates script elements in this order:
+		   │ Roll20 appears to evaluate script elements in this order:
 		   │ 1. abilities
-		   │ 2. macros
+		   │ 2. macros (skip ones w/ an attribute in their name)
 		   │ 3. attributes
-		   │ 4. repeat steps 1 to 3 as needed, up to 99 times
+		   │ 4. macros (again)
 		   │ 5. roll queries
-		   │    a. query a value
-		   │    b. unescape HTML character entities (once)
-		   │    c. repeat step 5 as needed, up to 99 times
+		   │    a. prompt for a value or a choice from a dropdown box
+		   │    b. if a dropdown box was used, unescape HTML character entities
+		   │       in the option value (once)
+		   │    c. repeat step 5 if needed
 		   │ 6. inline rolls (most deeply nested first)
-		   │ 7. rolls (dice, table, group)
-		   │ 8. parenthesized formulas (most deeply nested first)
-		   │    a. math functions (floor/ceil/abs/round)
-		   │    b. exponentiation
-		   │    c. multiplication, division, modulus
-		   │    d. addition, subtraction
-		   │ 9. remaining formula
-		   │ 10. unescape HTML character entities (once more)
+		   │    a. group rolls (most deeply nested first)
+		   │       i. rolls (dice, table)
+		   │       ii. repeat step 6.a if needed
+		   │    b. remaining rolls (dice, table)
+		   │    c. math (order of operations is below)
+		   │    d. repeat step 6 if needed
+		   │ 7. remaining group rolls (most deeply nested first)
+		   │    a. rolls (dice, table)
+		   │    b. repeat step 7 if needed
+		   │ 8. remaining rolls (dice, table)
+		   │ 9. math
+		   │ 
+		   │ Order of math operations:
+		   │ 1. parentheses (most deeply nested first)
+		   │    a. floor/ceil/abs/round functions (most deeply nested first)
+		   │       i.   exponentiation
+		   │       ii.  multiplication, division, modulus
+		   │       iii. addition, subtraction
+		   │       iv.  repeat step 1.a as needed
+		   │    b. repeat step 1 as needed
+		   │ 3. unescape HTML character entities (again)
 		   └───────────────────────────────────────────────────────────*/
 		
 		roll20_script: $ => prec.right(repeat(
@@ -105,9 +125,9 @@ module.exports = grammar({
 				$.attribute,
 				$.ability,
 				$._macro_spaceNL,
+				$._rollQuery,
 				$._inlineRoll,
 				//TODO:
-				//query
 				//template
 				//property
 				//button	//ability command button
@@ -134,26 +154,26 @@ module.exports = grammar({
 		  │ Special Characters
 		  └──────────────────────────────*/
 		
-		_questionMark: $ => unescapedAtDepthOrAbove("\\?", escapes.questionMark),
-		_leftBrace: $ => unescapedAtDepthOrAbove("\\{", escapes.leftBrace),
-		_equals: $ => unescapedAtDepthOrAbove("=", escapes.equals),
-		_leftBracket: $ => unescapedAtDepthOrAbove("\\[", escapes.leftBracket),
-		_rightBracket: $ => unescapedAtDepthOrAbove("\\]", escapes.rightBracket),
-		_plus: $ => unescapedAtDepthOrAbove("\\+", escapes.plus),
-		_minus: $ => unescapedAtDepthOrAbove("\\-", escapes.minus),
-		_leftParen: $ => unescapedAtDepthOrAbove("\\(", escapes.leftParen),
-		_rightParen: $ => unescapedAtDepthOrAbove("\\)", escapes.rightParen),
-		_tilde: $ => unescapedAtDepthOrAbove("~", escapes.tilde),
+		_questionMark: $ => unescapedAtSurfaceOrBelow("\\?", escapes.questionMark),
+		_leftBrace: $ => unescapedAtSurfaceOrBelow("\\{", escapes.leftBrace),
+		_equals: $ => unescapedAtSurfaceOrBelow("=", escapes.equals),
+		_leftBracket: $ => unescapedAtSurfaceOrBelow("\\[", escapes.leftBracket),
+		_rightBracket: $ => unescapedAtSurfaceOrBelow("\\]", escapes.rightBracket),
+		_plus: $ => unescapedAtSurfaceOrBelow("\\+", escapes.plus),
+		_minus: $ => unescapedAtSurfaceOrBelow("\\-", escapes.minus),
+		_leftParen: $ => unescapedAtSurfaceOrBelow("\\(", escapes.leftParen),
+		_rightParen: $ => unescapedAtSurfaceOrBelow("\\)", escapes.rightParen),
+		_tilde: $ => unescapedAtSurfaceOrBelow("~", escapes.tilde),
 		
-		_rightBrace: $ => unescapedAtDepth("\\}", escapes.rightBrace),
-		_pipe: $ => unescapedAtDepth("\\|", escapes.pipe),
-		_comma: $ => unescapedAtDepth(",", escapes.comma),
-		_ampersand: $ => unescapedAtDepth("&", escapes.ampersand),
-		_at: $ => unescapedAtDepth("@", escapes.at),
-		_percent: $ => unescapedAtDepth("%", escapes.percent),
-		_hash: $ => unescapedAtDepth("#", escapes.hash),
+		_rightBrace: $ => unescapedAtSurface("\\}", escapes.rightBrace),
+		_pipe: $ => unescapedAtSurface("\\|", escapes.pipe),
+		_comma: $ => unescapedAtSurface(",", escapes.comma),
+		_ampersand: $ => unescapedAtSurface("&", escapes.ampersand),
+		_at: $ => unescapedAtSurface("@", escapes.at),
+		_percent: $ => unescapedAtSurface("%", escapes.percent),
+		_hash: $ => unescapedAtSurface("#", escapes.hash),
 		
-		_escapedCharacter: $ => escapedAtDepth(escapes.htmlCharacter),
+		_htmlCharacterEntity: $ => escapedAtSurface(escapes.htmlCharacter),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -218,11 +238,11 @@ module.exports = grammar({
 		   │ • can contain spaces and tabs.
 		   │ • cannot contain new lines, pipes, closing curly braces, or the
 		   │   character sequences "@{" and "%{".
-		   │ • cannot be injected with attributes or abilities.
-		   │ • can be injected with macros, but the space required after each
-		   │   macro name must also be part of the character/attribute
-		   │   name itself. (So the name has to have a space in it for each
-		   │   macro you want to inject.)
+		   │ • cannot include attributes or abilities.
+		   │ • can include macros, but the space required after each macro name
+		   │   must also be part of the character/attribute name itself. (So the
+		   │   name has to have a space in it for each macro you want to
+		   │   include.)
 		   │ • can contain hash characters that do not reference an existing
 		   │   macro.
 		   │ 
@@ -275,6 +295,10 @@ module.exports = grammar({
 			),
 			alias(chainOf(/[^}]/), $.invalid),
 		),
+		_attributeName: $ => repeat1(choice(
+			/[^@%#]/,
+			$._macro_space,
+		)),
 		
 		
 		/*┌──────────────────────────────
@@ -284,7 +308,7 @@ module.exports = grammar({
 		   │ • can contain spaces, tabs, and hash characters.
 		   │ • cannot contain new lines, pipes, closing curly braces, or the
 		   │   character sequences "@{" and "%{".
-		   │ • cannot be injected with attributes, abilities, or macros.
+		   │ • cannot include attributes, abilities, or macros.
 		   │ 
 		   │ %{selected|abilityName}
 		   │ %{target|abilityName}
@@ -330,8 +354,8 @@ module.exports = grammar({
 		   │ For a macro, the macro name:
 		   │ • cannot contain spaces, new lines, pipes, closing curly braces, or the
 		   │   character sequence "%{".
-		   │ • cannot be injected with macros.
-		   │ • can be injected with attributes and abilities.
+		   │ • cannot include macros.
+		   │ • can include attributes and abilities.
 		   │ 
 		   │ To call the macro, its name must be followed by either a space or
 		   │   a new line. Exception: the space or new line isn't required if it
@@ -351,6 +375,143 @@ module.exports = grammar({
 				prec.right(repeat1( /[^ \r\n@]+|@+[^ \r\n@{]/ )),
 				optional("@"),
 			),
+		),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Roll Queries
+		  ╚════════════════════════════════════════════════════════════*/
+		 
+		/*┌──────────────────────────────
+		  │ Roll Query
+		  └──────────────────────────────*/
+		
+		_rollQuery: $ => choice(
+			$.rollQuery,
+			alias("?{", $.invalid),
+		),
+		rollQuery: $ => choice(
+			alias($._rollQuery_empty, $.invalid),
+			seq(
+				$.__rollQuery_start,
+				"{",
+				$._rollQuery_content,
+				"}",
+			),
+		),
+		_rollQuery_empty: $ => seq( $.__rollQuery_start, "{}" ),
+		_rollQuery_content: $ => choice(
+			$.prompt,
+			prec.right(1, seq(
+				optional($.prompt),
+				$._pipe,
+				optional(choice(
+					$.defaultValue,
+					seq(
+						optional($.option),
+						$._pipe,
+						optional($.option),
+						repeat(
+							seq(
+								$._pipe,
+								optional($.option),
+							),
+						),
+					),
+				)),
+			)),
+		),
+		
+		prompt: $ => seq(
+			incrementDepth(),
+			repeat1(
+				choice(
+					/[^@%#&}|]+/,
+					$.attribute,
+					$.ability,
+					$._macro_space,
+					$._htmlCharacterEntity,
+					$._at,
+					$._percent,
+					$._hash,
+					$._ampersand,
+					$._rightBrace,
+					$._pipe,
+				),
+			),
+			decrementDepth(),
+		),
+		
+		defaultValue: $ => seq(
+			incrementDepth(),
+			repeat1(
+				choice(
+					/[^@%#}|]+/,
+					$.attribute,
+					$.ability,
+					$._macro_space,
+					$._at,
+					$._percent,
+					$._hash,
+				),
+			),
+			decrementDepth(),
+		),
+		
+		option: $ => choice(
+			alias(seq($.optionName), $.optionValue),
+			prec.right(1, seq(
+				$.optionName,
+				optional(seq(
+					$._comma,
+					optional($.optionValue),
+				)),
+			)),
+		),
+		optionName: $ => seq(
+			incrementDepth(),
+			repeat1(
+				prec(1, choice(
+					/[^@%#&}|,]+/,
+					$.attribute,
+					$.ability,
+					$._macro_space,
+					$._htmlCharacterEntity,
+					$._at,
+					$._percent,
+					$._hash,
+					$._ampersand,
+					$._rightBrace,
+					$._pipe,
+					$._comma,
+				)),
+			),
+			decrementDepth(),
+		),
+		optionValue: $ => seq(
+			incrementDepth(),
+			repeat1(
+				choice(
+					/[^@%#&}|,?{]+/,
+					$.attribute,
+					$.ability,
+					$._macro_space,
+					$._htmlCharacterEntity,
+					$.rollQuery,
+					//$.property,
+					//$.button,
+					$._at,
+					$._percent,
+					$._hash,
+					$._ampersand,
+					$._rightBrace,
+					$._pipe,
+					$._comma,
+					$._questionMark,
+					$._leftBrace,
+				),
+			),
+			decrementDepth(),
 		),
 		
 		
@@ -442,7 +603,6 @@ module.exports = grammar({
 		),
 		
 		_element_first: $ => prec.right(2, choice(
-			//$._element_inlineRoll,
 			$._element_parenthesized,
 			$._element_groupRoll,
 			$._element_diceRoll,
@@ -457,7 +617,6 @@ module.exports = grammar({
 			$._element_invalid,
 		)),
 		_element_next: $ => prec.right(1, choice(
-			//$._element_inlineRoll,
 			$._element_parenthesized,
 			$._element_groupRoll,
 			$._element_diceRoll,
@@ -569,7 +728,7 @@ module.exports = grammar({
 				$.attribute,
 				$.ability,
 				$._macro_space,
-				$._escapedCharacter,
+				$._htmlCharacterEntity,
 				$._at,
 				$._percent,
 				$._hash,
