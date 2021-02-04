@@ -83,13 +83,13 @@ module.exports = grammar({
 	rules: {
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Start rule
-		  ╚╤═══════════════════════════════════════════════════════════
-		   │ Roll20 appears to evaluate script elements in this order:
+		  ║ General Notes
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Roll20 appears to evaluate script elements in this order:
 		   │ 1. abilities
-		   │ 2. macros (skip ones w/ an attribute in their name)
+		   │ 2. macros (skip ones that have an attribute in their name)
 		   │ 3. attributes
-		   │ 4. macros (again)
+		   │ 4. repeat steps 1 to 3 if necessary
 		   │ 5. roll queries
 		   │    a. prompt for a value or a choice from a dropdown box
 		   │    b. if a dropdown box was used, unescape HTML character entities
@@ -118,6 +118,11 @@ module.exports = grammar({
 		   │    b. repeat step 1 as needed
 		   │ 3. unescape HTML character entities (again)
 		   └───────────────────────────────────────────────────────────*/
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Start rule
+		  ╚════════════════════════════════════════════════════════════*/
 		
 		roll20_script: $ => prec.right(repeat(
 			choice(
@@ -178,12 +183,12 @@ module.exports = grammar({
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Attributes, Abilities, and Macros
-		  ╚════════════════════════════════════════════════════════════
+		  ╚════════════════════════════════════════════════════════════*/
 		
 		/*┌──────────────────────────────
 		  │ helper rules
-		  └┬─────────────────────────────
-		   │ Note that the website sometimes allows special characters in
+		  └┬─────────────────────────────*/
+		 /*│ Note that the website sometimes allows special characters in
 		   │   names, even though it would prevent the property from being
 		   │   accessed from within a script.
 		   └─────────────────────────────*/
@@ -233,8 +238,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Attribute
-		  └┬─────────────────────────────
-		   │ For an attribute, the character name and/or attribute name:
+		  └┬─────────────────────────────*/
+		 /*│ For an attribute, the character name and/or attribute name:
 		   │ • can contain spaces and tabs.
 		   │ • cannot contain new lines, pipes, closing curly braces, or the
 		   │   character sequences "@{" and "%{".
@@ -303,8 +308,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Ability
-		  └┬─────────────────────────────
-		   │ For an ability, the character name and/or ability name:
+		  └┬─────────────────────────────*/
+		 /*│ For an ability, the character name and/or ability name:
 		   │ • can contain spaces, tabs, and hash characters.
 		   │ • cannot contain new lines, pipes, closing curly braces, or the
 		   │   character sequences "@{" and "%{".
@@ -350,8 +355,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Macro
-		  └┬─────────────────────────────
-		   │ For a macro, the macro name:
+		  └┬─────────────────────────────*/
+		 /*│ For a macro, the macro name:
 		   │ • cannot contain spaces, new lines, pipes, closing curly braces, or the
 		   │   character sequence "%{".
 		   │ • cannot include macros.
@@ -541,8 +546,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Formula
-		  └┬─────────────────────────────
-		   │ A formula consisting of only whitespace and/or labels is invalid. 
+		  └┬─────────────────────────────*/
+		 /*│ A formula consisting of only whitespace and/or labels is invalid. 
 		   │ 
 		   │ Labels can only be the first items in a formula if the following
 		   │   item is a dice roll or table roll (or attribute/ability/macro
@@ -698,8 +703,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Operator
-		  └┬─────────────────────────────
-		   │ `+-` and `-+` are evaluated as subtraction.
+		  └┬─────────────────────────────*/
+		 /*│ `+-` and `-+` are evaluated as subtraction.
 		   │ 
 		   │ The only place a unary negative/positive operator can be is as a
 		   │   prefix of a number that is the first element in a formula.
@@ -715,8 +720,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Inline Label
-		  └┬─────────────────────────────
-		   │ An inline label:
+		  └┬─────────────────────────────*/
+		 /*│ An inline label:
 		   │ • cannot contain new lines or closing square brackets.
 		   │ • can include attributes, abilities, and macros.
 		   └─────────────────────────────*/
@@ -748,8 +753,8 @@ module.exports = grammar({
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Numbers
-		  ╚╤═══════════════════════════════════════════════════════════
-		   │ • Numbers can be injected with attributes and abilities.
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ • Numbers can be injected with attributes and abilities.
 		   │ • Inline rolls can be used in place of numbers.
 		   └───────────────────────────────────────────────────────────*/
 		
@@ -855,8 +860,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Inline Roll
-		  └┬─────────────────────────────
-		   │ An inline roll may be used as a root element or in place of a
+		  └┬─────────────────────────────*/
+		 /*│ An inline roll may be used as a root element or in place of a
 		   │   number, and contains its own formula. When evaluated, it is
 		   │   reduced to a number.
 		   └─────────────────────────────*/
@@ -885,8 +890,8 @@ module.exports = grammar({
 		
 		/*┌──────────────────────────────
 		  │ Parenthesized Formula / Math Function
-		  └┬─────────────────────────────
-		   │ A nested formula, wrapped in parentheses, or a math function with a
+		  └┬─────────────────────────────*/
+		 /*│ A nested formula, wrapped in parentheses, or a math function with a
 		   │   formula as its argument.
 		   └─────────────────────────────*/
 		
@@ -919,8 +924,8 @@ module.exports = grammar({
 		 
 		/*┌──────────────────────────────
 		  │ Roll Modifiers
-		  └┬─────────────────────────────
-		   │ Roll modifiers can be injected with attributes and abilities.
+		  └┬─────────────────────────────*/
+		 /*│ Roll modifiers can be injected with attributes and abilities.
 		   └─────────────────────────────*/
 		
 		_shared_modifier: $ => prec(1, choice(
