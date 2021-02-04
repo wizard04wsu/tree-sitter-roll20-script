@@ -144,6 +144,14 @@
         {
           "type": "attribute",
           "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
         }
       ]
     }
@@ -196,10 +204,6 @@
           "named": true
         },
         {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
           "type": "invalid",
           "named": true
         },
@@ -224,7 +228,7 @@
           "named": true
         },
         {
-          "type": "parenthetical",
+          "type": "parenthesized",
           "named": true
         },
         {
@@ -259,10 +263,6 @@
           "named": true
         },
         {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
           "type": "invalid",
           "named": true
         },
@@ -283,7 +283,7 @@
           "named": true
         },
         {
-          "type": "parenthetical",
+          "type": "parenthesized",
           "named": true
         },
         {
@@ -346,7 +346,7 @@
           "named": true
         },
         {
-          "type": "parenthetical",
+          "type": "parenthesized",
           "named": true
         },
         {
@@ -499,6 +499,14 @@
         {
           "type": "attribute",
           "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
         }
       ]
     }
@@ -509,7 +517,7 @@
     "fields": {}
   },
   {
-    "type": "parenthetical",
+    "type": "parenthesized",
     "named": true,
     "fields": {},
     "children": {
@@ -537,10 +545,6 @@
           "named": true
         },
         {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
           "type": "invalid",
           "named": true
         },
@@ -561,7 +565,7 @@
           "named": true
         },
         {
-          "type": "parenthetical",
+          "type": "parenthesized",
           "named": true
         },
         {

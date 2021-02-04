@@ -1,50 +1,140 @@
 ==================
-Valid Attributes
+Attribute: Valid: @{a}
 ==================
 
 @{a}
-@{c|a}
-@{c|a|max}
-@{selected|a}
-@{selected|a|max}
-@{target|a}
-@{target|a|max}
 
 ---
 
 (roll20_script
  	(attribute
-		(attributeName))
-	(attribute
+		(attributeName)))
+
+==================
+Attribute: Valid: @{ a }
+==================
+
+@{ a }
+
+---
+
+(roll20_script
+ 	(attribute
+		(attributeName)))
+
+==================
+Attribute: Valid: @{c|a}
+==================
+
+@{c|a}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
-		(attributeName))
-	(attribute
+		(attributeName)))
+
+==================
+Attribute: Valid: @{ c | a }
+==================
+
+@{ c | a }
+
+---
+
+(roll20_script
+ 	(attribute
+		(characterName)
+		(attributeName)))
+
+==================
+Attribute: Valid: @{c|a|max}
+==================
+
+@{c|a|max}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
 		(attributeName)
-		(keyword))
-	(attribute
+		(keyword)))
+
+==================
+Attribute: Valid: @{ c | a |max}
+==================
+
+@{ c | a |max}
+
+---
+
+(roll20_script
+ 	(attribute
+		(characterName)
+		(attributeName)
+		(keyword)))
+
+==================
+Attribute: Valid: @{selected|a}
+==================
+
+@{selected|a}
+
+---
+
+(roll20_script
+ 	(attribute
 		(token)
-		(attributeName))
-	(attribute
+		(attributeName)))
+
+==================
+Attribute: Valid: @{selected|a|max}
+==================
+
+@{selected|a|max}
+
+---
+
+(roll20_script
+ 	(attribute
 		(token)
 		(attributeName)
-		(keyword))
-	(attribute
+		(keyword)))
+
+==================
+Attribute: Valid: @{target|a}
+==================
+
+@{target|a}
+
+---
+
+(roll20_script
+ 	(attribute
 		(token)
-		(attributeName))
+		(attributeName)))
+
+==================
+Attribute: Valid: @{target|a|max}
+==================
+
+@{target|a|max}
+
+---
+
+(roll20_script
 	(attribute
 		(token)
 		(attributeName)
 		(keyword)))
 
 ==================
-Valid Attributes: with Macros
+Attribute with Macro: Valid: @{#a }
 ==================
 
 @{#a }
-@{a#a a}
-@{#c |#a }
-@{c#c c|a#a a}
 
 ---
 
@@ -52,19 +142,32 @@ Valid Attributes: with Macros
  	(attribute
 		(attributeName
 			(macro
-				(macroName))))
+				(macroName)))))
+
+==================
+Attribute with Macro: Valid: @{a#a a}
+==================
+
+@{a#a a}
+
+---
+
+(roll20_script
  	(attribute
 		(attributeName
 			(macro
-				(macroName))))
-	(attribute
-		(characterName
-			(macro
-				(macroName)))
-		(attributeName
-			(macro
-				(macroName))))
-	(attribute
+				(macroName)))))
+
+==================
+Attribute with Macro: Valid: @{#c |#a }
+==================
+
+@{#c |#a }
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName
 			(macro
 				(macroName)))
@@ -73,122 +176,346 @@ Valid Attributes: with Macros
 				(macroName)))))
 
 ==================
-Invalid Attributes
+Attribute with Macro: Valid: @{c#c c|a#a a}
 ==================
 
-@{}
-@{|}
-@{||}
-@{|||}
-@{c|}
-@{|a}
-@{c||}
-@{|a|}
-@{||m}
-@{||max}
-@{||maxx}
-@{c|a|}
-@{|a|max}
-@{c||max}
-@{c|a|m}
-@{c|a|maxx}
-@{c|a|max|}
-@{c||max|}
-@{c||max|x}
+@{c#c c|a#a a}
 
 ---
 
 (roll20_script
  	(attribute
-		(invalid))
+		(characterName
+			(macro
+				(macroName)))
+		(attributeName
+			(macro
+				(macroName)))))
+
+==================
+Attribute: Invalid: @{}
+==================
+
+@{}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{|}
+==================
+
+@{|}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{||}
+==================
+
+@{||}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{|||}
+==================
+
+@{|||}
+
+---
+
+(roll20_script
 	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c|}
+==================
+
+@{c|}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{|a}
+==================
+
+@{|a}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c||}
+==================
+
+@{c||}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{|a|}
+==================
+
+@{|a|}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{||m}
+==================
+
+@{||m}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{||max}
+==================
+
+@{||max}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{||maxx}
+==================
+
+@{||maxx}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c|a|}
+==================
+
+@{c|a|}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
 		(attributeName)
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{|a|max}
+==================
+
+@{|a|max}
+
+---
+
+(roll20_script
+ 	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c||max}
+==================
+
+@{c||max}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c|a|m}
+==================
+
+@{c|a|m}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
 		(attributeName)
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c|a|maxx}
+==================
+
+@{c|a|maxx}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
 		(attributeName)
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c|a|max|}
+==================
+
+@{c|a|max|}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
 		(attributeName)
-		(invalid))
-	(attribute
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c||max|}
+==================
+
+@{c||max|}
+
+---
+
+(roll20_script
+ 	(attribute
 		(characterName)
-		(invalid))
+		(invalid)))
+
+==================
+Attribute: Invalid: @{c||max|x}
+==================
+
+@{c||max|x}
+
+---
+
+(roll20_script
 	(attribute
 		(characterName)
 		(invalid)))
 
 ==================
-Invalid Attributes: no closing brace
+Attribute w/o closing brace: Invalid: @{a
 ==================
 
 @{a
+
+---
+
+(roll20_script
+	(attribute
+		(invalid)))
+
+==================
+Attribute w/o closing brace: Invalid: @{c|
+==================
+
 @{c|
+
+---
+
+(roll20_script
+	(attribute
+		(invalid)))
+
+==================
+Attribute w/o closing brace: Invalid: @{c|a
+==================
+
 @{c|a
+
+---
+
+(roll20_script
+	(attribute
+		(invalid)))
+
+==================
+Attribute w/o closing brace: Invalid: @{c|a|max
+==================
+
 @{c|a|max
 
 ---
 
 (roll20_script
 	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
-		(invalid))
-	(attribute
 		(invalid)))
 
 ==================
-Invalid Attributes: illegal Attribute character sequence
+Attribute: Invalid: @{x@{y}
 ==================
 
 @{x@{y}
-@{x@{y}z
-@{x@{y}z}
 
 ---
 
 (roll20_script
 	(attribute
 		(attributeName
-			(invalid)))
+			(invalid))))
+
+==================
+Attribute: Invalid: @{x@{y}z
+==================
+
+@{x@{y}z
+
+---
+
+(roll20_script
 	(attribute
 		(attributeName
-			(invalid)))
+			(invalid))))
+
+==================
+Attribute: Invalid: @{x@{y}z}
+==================
+
+@{x@{y}z}
+
+---
+
+(roll20_script
 	(attribute
 		(attributeName
 			(invalid))))
