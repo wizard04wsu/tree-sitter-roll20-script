@@ -1,51 +1,187 @@
-let depth = 0;
-let escapes = {
-	htmlCharacter: "[a-zA-Z\\d]+|#\\d+|#[xX]([a-fA-F\\d]{2}){1,2}",
-	
-	questionMark: "quest|#63|#[xX](00)?3[fF]",
-	equals: "equals|#61|#[xX](00)?3[dD]",
-	leftBracket: "lsqb|lbrack|#91|#[xX](00)?5[bB]",
-	rightBracket: "rsqb|rbrack|#93|#[xX](00)?5[dD]?",
-	plus: "plus|#43|#[xX](00)?2[bB]",
-	minus: "hyphen|dash|#8208|#[xX]2010",
-	digit: "#4[89]|#5[0-7]|#[xX](00)?3[0-9]",
-	
-	leftBrace: "lbrace|lcub|#123|#[xX](00)?7[bB]",
-	rightBrace: "rbrace|rcub|#125|#[xX](00)?7[dD]",
-	pipe: "verbar|vert|VerticalLine|#124|#[xX](00)?7[cC]",
-	comma: "comma|#44|#[xX](00)?2[cC]",
-	ampersand: "amp|AMP|#38|#[xX](00)?26",
-	at: "commat|#64|#[xX](00)?40",
-	percent: "percnt|#37|#[xX](00)?25",
-	hash: "num|#35|#[xX](00)?23",
-	leftParen: "lpar|#40|#[xX](00)?28",
-	rightParen: "rpar|#41|#[xX](00)?29",
-	tilde: "#126|#[xX](00)?7[eE]",
-};
-
-const incrementDepth = () => { depth++; return /()/; };
-const decrementDepth = () => { depth--; return /()/; };
-
-const escapedAtSurface = (escapeString) => {
-	return RegExp("&(("+escapes.ampersand+");){" + (depth) + "}(" + escapeString + ");");
-};
-const unescapedAtSurface = (char, escapeString) => {
-	if(!depth) return RegExp(char);
-	return RegExp("&(("+escapes.ampersand+");){" + (depth-1) + "}(" + escapeString + ");");
-};
-const unescapedAtSurfaceOrBelow = (char, escapeString) => {
-	if(!depth) return RegExp(char);
-	return RegExp(char + "|&(("+escapes.ampersand+");){0," + (depth-1) + "}(" + escapeString + ");");
-};
-
 
 const chainOf = (rule) => prec.right(repeat1(rule));
 
 
-const queryBegin = () => {
-	if(!depth) return /\?\{/;
-	return RegExp("\\?\\{|&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.questionMark+");&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.leftBrace+");");
+/*╔════════════════════════════════════════════════════════════
+  ║ Roll Queries
+  ╚════════════════════════════════════════════════════════════*/
+
+/*┌──────────────────────────────
+  │ helper rules
+  └──────────────────────────────*/
+
+const escape = (char, depth = 0) => {
+	switch(char){
+		case "@": return unescapedAtSurface(depth, "\\"+char, "commat|#64|#[xX](00)?40");
+		case "%": return unescapedAtSurface(depth, "\\"+char, "percnt|#37|#[xX](00)?25");
+		case "#": return unescapedAtSurface(depth, "\\"+char, "num|#35|#[xX](00)?23");
+		case "&": return unescapedAtSurface(depth, "\\"+char, "amp|AMP|#38|#[xX](00)?26");
+		case "[": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "lsqb|lbrack|#91|#[xX](00)?5[bB]");
+		case "(": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "lpar|#40|#[xX](00)?28");
+		case "{": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "lbrace|lcub|#123|#[xX](00)?7[bB]");
+		case "+": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "plus|#43|#[xX](00)?2[bB]");
+		case "-": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "hyphen|dash|#8208|#[xX]2010");
+		case "}": return unescapedAtSurface(depth, "\\"+char, "rbrace|rcub|#125|#[xX](00)?7[dD]");
+		case ")": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "rpar|#41|#[xX](00)?29");
+		case "]": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "rsqb|rbrack|#93|#[xX](00)?5[dD]?");
+		case "|": return unescapedAtSurface(depth, "\\"+char, "verbar|vert|VerticalLine|#124|#[xX](00)?7[cC]");
+		case "?": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "quest|#63|#[xX](00)?3[fF]");
+		case ",": return unescapedAtSurface(depth, "\\"+char, "comma|#44|#[xX](00)?2[cC]");
+		case "=": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "equals|#61|#[xX](00)?3[dD]");
+		case "~": return unescapedAtSurfaceOrBelow(depth, "\\"+char, "#126|#[xX](00)?7[eE]");
+		default: return escapedAtSurface(depth, "[a-zA-Z\\d]+|#\\d+|#[xX]([a-fA-F\\d]{2}){1,2}");
+	}
 };
+
+const escapedAtSurface = (depth, escapeString) => {
+	return $ => RegExp("&((amp|AMP|#38|#[xX](00)?26);){" + (depth) + "}(" + escapeString + ");");
+};
+const unescapedAtSurface = (depth, char, escapeString) => {
+	if(!depth) return $ => RegExp(char);
+	return $ => RegExp("&((amp|AMP|#38|#[xX](00)?26);){" + (depth-1) + "}(" + escapeString + ");");
+};
+const unescapedAtSurfaceOrBelow = (depth, char, escapeString) => {
+	if(!depth) return $ => RegExp(char);
+	return $ => RegExp(char + "|&((amp|AMP|#38|#[xX](00)?26);){0," + (depth-1) + "}(" + escapeString + ");");
+};
+
+
+/*┌──────────────────────────────
+  │ Roll Query
+  └──────────────────────────────*/
+
+function _rollQuery(depth){
+	return $ => choice(
+		rollQuery(depth),
+		alias("?{", $.invalid),
+	);
+}
+function rollQuery(depth){
+	return $ => choice(
+		alias($._rollQuery_empty, $.invalid),
+		seq(
+			$.__rollQuery_start,
+			"{",
+			_rollQuery_content(depth),
+			"}",
+		),
+	);
+}
+function _rollQuery_content(depth){
+	return $ => choice(
+		prompt(depth),
+		prec.right(1, seq(
+			optional(prompt(depth)),
+			escape("|", depth),
+			optional(choice(
+				defaultValue(depth),
+				seq(
+					optional(option(depth)),
+					escape("|", depth),
+					optional(option(depth)),
+					repeat(
+						seq(
+							escape("|", depth),
+							optional(option(depth)),
+						),
+					),
+				),
+			)),
+		)),
+	);
+}
+function prompt(depth){
+	return $ => seq(
+		repeat1(
+			choice(
+				/[^@%#&}|]+/,
+				$.attribute,
+				$.ability,
+				$._macro_space,
+				escape("", depth+1),
+				escape("@", depth+1),
+				escape("%", depth+1),
+				escape("#", depth+1),
+				escape("&", depth+1),
+				escape("}", depth+1),
+				escape("|", depth+1),
+			),
+		),
+	);
+}
+function defaultValue(depth){
+	return $ => seq(
+		repeat1(
+			choice(
+				/[^@%#}|]+/,
+				$.attribute,
+				$.ability,
+				$._macro_space,
+				escape("@", depth+1),
+				escape("%", depth+1),
+				escape("#", depth+1),
+			),
+		),
+	);
+}
+function option(depth){
+	return $ => choice(
+		alias(seq(optionName(depth)), optionValue(depth)),
+		prec.right(1, seq(
+			optionName(depth),
+			optional(seq(
+				escape(",", depth+1),
+				optional(optionValue(depth)),
+			)),
+		)),
+	);
+}
+function optionName(depth){
+	return $ => seq(
+		repeat1(
+			prec(1, choice(
+				/[^@%#&}|,]+/,
+				$.attribute,
+				$.ability,
+				$._macro_space,
+				escape("", depth+1),
+				escape("@", depth+1),
+				escape("%", depth+1),
+				escape("#", depth+1),
+				escape("&", depth+1),
+				escape("}", depth+1),
+				escape("|", depth+1),
+				escape(",", depth+1),
+			)),
+		),
+	);
+}
+function optionValue(depth){
+	return $ => seq(
+		repeat1(
+			choice(
+				/[^@%#&}|,?{]+/,
+				$.attribute,
+				$.ability,
+				$._macro_space,
+				escape("", depth+1),
+				rollQuery(depth+1),
+				//$.property,
+				//$.button,
+				escape("@", depth+1),
+				escape("%", depth+1),
+				escape("#", depth+1),
+				escape("&", depth+1),
+				escape("{", depth+1),
+				escape("}", depth+1),
+				escape("|", depth+1),
+				escape("?", depth+1),
+				escape(",", depth+1),
+			),
+		),
+	);
+}
+
 
 
 module.exports = grammar({
@@ -130,7 +266,7 @@ module.exports = grammar({
 				$.attribute,
 				$.ability,
 				$._macro_spaceNL,
-				$._rollQuery,
+				_rollQuery(0),
 				$._inlineRoll,
 				//TODO:
 				//template
@@ -153,32 +289,6 @@ module.exports = grammar({
 		_stringNL: $ => chainOf(/.|# |#?\r?\n/),
 		
 		_wsp_inline: $ => /\s+/,
-		
-		
-		/*┌──────────────────────────────
-		  │ Special Characters
-		  └──────────────────────────────*/
-		
-		_questionMark: $ => unescapedAtSurfaceOrBelow("\\?", escapes.questionMark),
-		_leftBrace: $ => unescapedAtSurfaceOrBelow("\\{", escapes.leftBrace),
-		_equals: $ => unescapedAtSurfaceOrBelow("=", escapes.equals),
-		_leftBracket: $ => unescapedAtSurfaceOrBelow("\\[", escapes.leftBracket),
-		_rightBracket: $ => unescapedAtSurfaceOrBelow("\\]", escapes.rightBracket),
-		_plus: $ => unescapedAtSurfaceOrBelow("\\+", escapes.plus),
-		_minus: $ => unescapedAtSurfaceOrBelow("\\-", escapes.minus),
-		_leftParen: $ => unescapedAtSurfaceOrBelow("\\(", escapes.leftParen),
-		_rightParen: $ => unescapedAtSurfaceOrBelow("\\)", escapes.rightParen),
-		_tilde: $ => unescapedAtSurfaceOrBelow("~", escapes.tilde),
-		
-		_rightBrace: $ => unescapedAtSurface("\\}", escapes.rightBrace),
-		_pipe: $ => unescapedAtSurface("\\|", escapes.pipe),
-		_comma: $ => unescapedAtSurface(",", escapes.comma),
-		_ampersand: $ => unescapedAtSurface("&", escapes.ampersand),
-		_at: $ => unescapedAtSurface("@", escapes.at),
-		_percent: $ => unescapedAtSurface("%", escapes.percent),
-		_hash: $ => unescapedAtSurface("#", escapes.hash),
-		
-		_htmlCharacterEntity: $ => escapedAtSurface(escapes.htmlCharacter),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -380,143 +490,6 @@ module.exports = grammar({
 				prec.right(repeat1( /[^ \r\n@]+|@+[^ \r\n@{]/ )),
 				optional("@"),
 			),
-		),
-		
-		
-		/*╔════════════════════════════════════════════════════════════
-		  ║ Roll Queries
-		  ╚════════════════════════════════════════════════════════════*/
-		 
-		/*┌──────────────────────────────
-		  │ Roll Query
-		  └──────────────────────────────*/
-		
-		_rollQuery: $ => choice(
-			$.rollQuery,
-			alias("?{", $.invalid),
-		),
-		rollQuery: $ => choice(
-			alias($._rollQuery_empty, $.invalid),
-			seq(
-				$.__rollQuery_start,
-				"{",
-				$._rollQuery_content,
-				"}",
-			),
-		),
-		_rollQuery_empty: $ => seq( $.__rollQuery_start, "{}" ),
-		_rollQuery_content: $ => choice(
-			$.prompt,
-			prec.right(1, seq(
-				optional($.prompt),
-				$._pipe,
-				optional(choice(
-					$.defaultValue,
-					seq(
-						optional($.option),
-						$._pipe,
-						optional($.option),
-						repeat(
-							seq(
-								$._pipe,
-								optional($.option),
-							),
-						),
-					),
-				)),
-			)),
-		),
-		
-		prompt: $ => seq(
-			incrementDepth(),
-			repeat1(
-				choice(
-					/[^@%#&}|]+/,
-					$.attribute,
-					$.ability,
-					$._macro_space,
-					$._htmlCharacterEntity,
-					$._at,
-					$._percent,
-					$._hash,
-					$._ampersand,
-					$._rightBrace,
-					$._pipe,
-				),
-			),
-			decrementDepth(),
-		),
-		
-		defaultValue: $ => seq(
-			incrementDepth(),
-			repeat1(
-				choice(
-					/[^@%#}|]+/,
-					$.attribute,
-					$.ability,
-					$._macro_space,
-					$._at,
-					$._percent,
-					$._hash,
-				),
-			),
-			decrementDepth(),
-		),
-		
-		option: $ => choice(
-			alias(seq($.optionName), $.optionValue),
-			prec.right(1, seq(
-				$.optionName,
-				optional(seq(
-					$._comma,
-					optional($.optionValue),
-				)),
-			)),
-		),
-		optionName: $ => seq(
-			incrementDepth(),
-			repeat1(
-				prec(1, choice(
-					/[^@%#&}|,]+/,
-					$.attribute,
-					$.ability,
-					$._macro_space,
-					$._htmlCharacterEntity,
-					$._at,
-					$._percent,
-					$._hash,
-					$._ampersand,
-					$._rightBrace,
-					$._pipe,
-					$._comma,
-				)),
-			),
-			decrementDepth(),
-		),
-		optionValue: $ => seq(
-			incrementDepth(),
-			repeat1(
-				choice(
-					/[^@%#&}|,?{]+/,
-					$.attribute,
-					$.ability,
-					$._macro_space,
-					$._htmlCharacterEntity,
-					$.rollQuery,
-					//$.property,
-					//$.button,
-					$._at,
-					$._percent,
-					$._hash,
-					$._ampersand,
-					$._rightBrace,
-					$._pipe,
-					$._comma,
-					$._questionMark,
-					$._leftBrace,
-				),
-			),
-			decrementDepth(),
 		),
 		
 		
