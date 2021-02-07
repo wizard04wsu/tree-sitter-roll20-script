@@ -141,5 +141,6 @@ Table Roll: Valid: [[ t[n]@{a}_#m ]]
 			(attributeName))
 		(invalid)
 		(macro
+			(macroHash)
 			(macroName))))
 

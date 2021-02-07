@@ -141,8 +141,7 @@ Attribute with Macro: Valid: @{#a }
 (roll20_script
  	(attribute
 		(attributeName
-			(macro
-				(macroName)))))
+			(macroHash))))
 
 ==================
 Attribute with Macro: Valid: @{a#a a}
@@ -155,8 +154,7 @@ Attribute with Macro: Valid: @{a#a a}
 (roll20_script
  	(attribute
 		(attributeName
-			(macro
-				(macroName)))))
+			(macroHash))))
 
 ==================
 Attribute with Macro: Valid: @{#c |#a }
@@ -169,11 +167,9 @@ Attribute with Macro: Valid: @{#c |#a }
 (roll20_script
  	(attribute
 		(characterName
-			(macro
-				(macroName)))
+			(macroHash))
 		(attributeName
-			(macro
-				(macroName)))))
+			(macroHash))))
 
 ==================
 Attribute with Macro: Valid: @{c#c c|a#a a}
@@ -186,11 +182,9 @@ Attribute with Macro: Valid: @{c#c c|a#a a}
 (roll20_script
  	(attribute
 		(characterName
-			(macro
-				(macroName)))
+			(macroHash))
 		(attributeName
-			(macro
-				(macroName)))))
+			(macroHash))))
 
 ==================
 Attribute: Invalid: @{}

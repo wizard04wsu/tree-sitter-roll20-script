@@ -10,6 +10,17 @@ Roll Query: Valid: ?{|}
 	(rollQuery))
 
 ==================
+Roll Query: Valid: ?{||}
+==================
+
+?{||}
+
+---
+
+(roll20_script
+	(rollQuery))
+
+==================
 Roll Query: Valid: ?{p|}
 ==================
 
@@ -58,11 +69,9 @@ Roll Query: Valid: ?{p|a|b}
 	(rollQuery
 		(prompt)
 		(option
-			(optionValue
-				(optionName)))
+			(optionName))
 		(option
-			(optionValue
-				(optionName)))))
+			(optionName))))
 
 ==================
 Roll Query: Valid: ?{p|a,A|b,B}
@@ -86,15 +95,14 @@ Roll Query: Valid: ?{p|a,A|b,B}
 Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
 ==================
 
-?{|a?{p&#124;b&#125;c}
+?{|a|b,?{p&#124;b&#125;c}
 
 ---
 
 (roll20_script
 	(rollQuery
 		(option
-			(optionValue
-				(optionName)))
+			(optionName))
 		(option
 			(optionName)
 			(optionValue
