@@ -250,10 +250,6 @@
           "named": true
         },
         {
-          "type": "macro",
-          "named": true
-        },
-        {
           "type": "macroHash",
           "named": true
         },
@@ -310,10 +306,6 @@
         },
         {
           "type": "label",
-          "named": true
-        },
-        {
-          "type": "macro",
           "named": true
         },
         {
@@ -376,10 +368,6 @@
           "named": true
         },
         {
-          "type": "macro",
-          "named": true
-        },
-        {
           "type": "macroHash",
           "named": true
         },
@@ -424,49 +412,6 @@
         },
         {
           "type": "macroHash",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "macro",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "macroHash",
-          "named": true
-        },
-        {
-          "type": "macroName",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "macroHash",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "macroName",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
           "named": true
         }
       ]
@@ -685,10 +630,6 @@
           "named": true
         },
         {
-          "type": "macro",
-          "named": true
-        },
-        {
           "type": "macroHash",
           "named": true
         },
@@ -720,11 +661,7 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
+          "type": "invalid",
           "named": true
         },
         {
@@ -959,6 +896,10 @@
   },
   {
     "type": "keyword",
+    "named": true
+  },
+  {
+    "type": "macroHash",
     "named": true
   },
   {

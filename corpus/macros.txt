@@ -7,8 +7,7 @@ Macro: Valid: ##
 ---
 
 (roll20_script
-	(macro
-		(macroName)))
+	(macroHash))
 		
 ==================
 Macro: Valid: #m
@@ -19,8 +18,7 @@ Macro: Valid: #m
 ---
 
 (roll20_script
-	(macro
-		(macroName)))
+	(macroHash))
 		
 ==================
 Macro: Valid: #m#
@@ -31,8 +29,7 @@ Macro: Valid: #m#
 ---
 
 (roll20_script
-	(macro
-		(macroName)))
+	(macroHash))
 		
 ==================
 Macro: Valid: #m#m
@@ -43,8 +40,7 @@ Macro: Valid: #m#m
 ---
 
 (roll20_script
-	(macro
-		(macroName)))
+	(macroHash))
 		
 ==================
 Macro: Valid: # #m
@@ -55,8 +51,7 @@ Macro: Valid: # #m
 ---
 
 (roll20_script
-	(macro
-		(macroName)))
+	(macroHash))
 		
 ==================
 Macro: Valid: #m #
@@ -67,8 +62,7 @@ Macro: Valid: #m #
 ---
 
 (roll20_script
-	(macro
-		(macroName)))
+	(macroHash))
 		
 ==================
 Macro: Valid: #m #m
@@ -79,10 +73,8 @@ Macro: Valid: #m #m
 ---
 
 (roll20_script
-	(macro
-		(macroName))
-	(macro
-		(macroName)))
+	(macroHash)
+	(macroHash))
 		
 ==================
 Macro: Valid with Attributes: #m@{a}
@@ -93,10 +85,9 @@ Macro: Valid with Attributes: #m@{a}
 ---
 
 (roll20_script
-	(macro
-		(macroName
-			(attribute
-				(attributeName)))))
+	(macroHash
+		(attribute
+			(attributeName))))
 
 ==================
 Macro: Valid with Attributes: #m@{a}m
@@ -107,10 +98,9 @@ Macro: Valid with Attributes: #m@{a}m
 ---
 
 (roll20_script
-	(macro
-		(macroName
-			(attribute
-				(attributeName)))))
+	(macroHash
+		(attribute
+			(attributeName))))
 
 ==================
 Macro: Valid with Attributes: #m@{c|a}
@@ -121,11 +111,10 @@ Macro: Valid with Attributes: #m@{c|a}
 ---
 
 (roll20_script
-	(macro
-		(macroName
-			(attribute
-				(characterName)
-				(attributeName)))))
+	(macroHash
+		(attribute
+			(characterName)
+			(attributeName))))
 
 ==================
 Macro: Valid with Attributes: #m@{c|a}m
@@ -136,11 +125,10 @@ Macro: Valid with Attributes: #m@{c|a}m
 ---
 
 (roll20_script
-	(macro
-		(macroName
-			(attribute
-				(characterName)
-				(attributeName)))))
+	(macroHash
+		(attribute
+			(characterName)
+			(attributeName))))
 
 ==================
 String: #

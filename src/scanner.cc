@@ -3,49 +3,152 @@
 #include <stack>	//stack
 #include <map>		//map
 #include <utility>	//pair
-#include <regex>	//regext, regex_match
-//#include <iostream>
+#include <regex>	//regex, regex_match
+#include <iostream>
 
 namespace {
 
-using std::string;
+/*using std::string;
 using std::to_string;
 using std::stack;
 using std::map;
 using std::pair;
 using std::regex;
 using std::regex_match;
-
-enum TokenType {
-	_EOF,
-	
-	ATTRIBUTE_START,
-	JUST_AT,
-	
-	ABILITY_START,
-	JUST_PERCENT,
-	
-	DICE_ROLL_START,
-	JUST_D,
-	
-	TABLE_ROLL_START,
-	JUST_T,
-	
-	QUERY_START,
-	JUST_QUESTIONMARK,
-	QUERY_PIPE,
-	QUERY_COMMA,
-	QUERY_END,
-	QUERY_HASDEFAULT,
-	QUERY_HASOPTIONS,
-};
+using std::cout;*/
+using namespace std;
 
 struct Query;
 struct Scanner;
 
+enum TokenType {
+	_EOF,
+	
+	JUST_AT,
+	ATTRIBUTE_START,
+	
+	JUST_PERCENT,
+	ABILITY_START,
+	
+	JUST_HASH,
+	MACRO_START,
+	
+	JUST_D,
+	DICE_ROLL_START,
+	
+	JUST_T,
+	TABLE_ROLL_START,
+	
+	JUST_QUESTIONMARK,
+	QUERY_START,
+	QUERY_PIPE_HASDEFAULT,
+	QUERY_PIPE_HASOPTIONS,
+	QUERY_COMMA,
+	QUERY_END,
+};
+
+const bool doLog = true;
+void log(string str) {
+	if (doLog) cout << str;
+}
+
 char advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
 	return lexer->lookahead;
+}
+
+bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
+	log(">>>> check_for_closure\n");
+	char c = lexer->lookahead;
+	if (c == start_char) {
+		c = advance(lexer);
+		while (c != 0 && c != '\n' && c != end_char) {
+			c = advance(lexer);
+		}
+		if (c == end_char) {
+			advance(lexer);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool scan_macro_start(TSLexer *lexer, unsigned depth) {
+	log(">>>> scan_macro_start\n");
+	char c = lexer->lookahead;
+	
+	if (c == 0 || c == ' ' || c == '\n') return false;
+	if (depth > 0 && (c == '|' || c == '}')) return false;
+	
+	while (c != 0 && c != ' ' && c != '\n') {
+		if (depth > 0 && (c == '|' || c == '}')) break;
+		if (c == '@' || c == '%') {
+			c = advance(lexer);
+			if (c == '{' && !check_for_closure(lexer, '{', '}')) return false;
+		}
+		else {
+			c = advance(lexer);
+		}
+	}
+	
+	if (c == 0 || c == ' ' || c == '\n') return true;
+	
+	return false;
+}
+
+bool scan_diceRoll_start(TSLexer *lexer) {
+	log(">>>> scan_diceRoll_start\n");
+	char c = lexer->lookahead;
+	
+	if (c == 'f' || c == 'F') {
+		return true;
+	}
+	else if (regex_match((string()=c), regex("\\d"))) {	//c is a digit
+		return true;
+	}
+	else if (c == '@' || c == '%') {
+		advance(lexer);
+		if (check_for_closure(lexer, '{', '}')) return true;
+	}
+	return false;
+}
+
+bool scan_tableRoll_start(TSLexer *lexer) {
+	log(">>>> scan_tableRoll_start\n");
+	char c = lexer->lookahead;
+	
+	bool rightBracketFound = false;
+	if (c == '[') {
+		c = advance(lexer);
+		while (c != 0 && c != '\n' && c != ']') {
+			if (c == '@' || c == '%') {
+				c = advance(lexer);
+				if (c = '{') {
+					while (c != 0 && c != '\n' && c != '}' && c != ']') {
+						c = advance(lexer);
+					}
+					if (c == '}') {
+						rightBracketFound = false;	//reset this; if it was found, it was just part of the attribute/ability name
+						c = advance(lexer);
+						continue;
+					}
+					else if (c == ']') {
+						rightBracketFound = true;
+					}
+					else {	//end of input
+						//if rightBracketFound == true, the "@{" or "%{" is interpreted as being part of the table name
+						return rightBracketFound;
+					}
+				}
+				else {
+					continue;
+				}
+			}
+			c = advance(lexer);
+		}
+		if (c == ']') return true;
+	}
+	return false;
 }
 
 map<string, string> entitiesMap;
@@ -91,9 +194,6 @@ string get_entity(TSLexer *lexer, unsigned depth) {
 	
 	char c = lexer->lookahead;
 	
-	if (c != '&') return "";
-	c = advance(lexer);
-	
 	for (;;) {
 		if (c == 0 || !regex_match(string({c}), charsRxp)) return "";
 		if (c == ';') {
@@ -125,38 +225,43 @@ struct Query {
 	Query(Scanner *scanner, unsigned depth) : scanner(scanner), depth(depth) {}
 	
 	string serialize() {
-		return to_string(depth) + " " + to_string(option_count) + " " + to_string(at_part);
+		log(">>>> Query.serialize\n");
+		log("->>> Query serialized to \"" + to_string(depth)+" "+to_string(option_count)+" "+to_string(at_part) + "\"\n");
+		return to_string(depth)+" "+to_string(option_count)+" "+to_string(at_part);
 	}
 	
 	void deserialize(const char *buffer) {
 		string data = string(buffer);
+		log(">>>> Query.deserialize \""+data+"\"");
 		size_t p;
 		depth = stoul(data, &p);
 		option_count = stoul(data.substr(p+1), &p);
 		at_part = stoul(data.substr(p+1), &p);
 	}
 	
-	bool scan_query_start(TSLexer *lexer) {
+	bool scan_query_start(TSLexer *lexer, char firstChar) {
+		log(">>>> Query.scan_query_start\n");
 		char c = lexer->lookahead;
 		
-		if (c == '&') {
+		if (firstChar == '&') {
 			string entity = get_entity(lexer, depth);
 			if (entity == "") return false;
 			if (!matchDelimiter(entity, "?", depth, true)) return false;
 		}
-		else if (c != '?') return false;
+		else if (firstChar != '?') return false;
 		
-		c = advance(lexer);
 		if (c == '&') {
+			c = advance(lexer);
 			string entity = get_entity(lexer, depth);
 			if (entity == "") return false;
 			if (!matchDelimiter(entity, "{", depth, true)) return false;
 		}
 		else if (c != '{') return false;
 		
-		lexer->mark_end;
+		lexer->mark_end(lexer);
+		log("----------\n");
 		at_part = qpPrompt;
-		if (scan_query_prompt(lexer)) {
+		if (scan_query_full(lexer)) {
 			return true;
 		}
 		
@@ -178,144 +283,199 @@ struct Query {
 		return false;
 	}
 	
+	bool scan_query_full(TSLexer *lexer) {
+		//TODO
+		return true;
+		return false;
+	}
+	
 };
 
 struct Scanner {
-	stack<Query> *queries;
+	stack<Query*> queries;
 	
 	Scanner() {
 		populateEntitiesMap();
 	}
 	
 	unsigned serialize(char *buffer) {
-		string data;
-		while(queries->size() > 0) {
-			data += queries->top().serialize() + " ";
-			queries->pop();
+		log(">>>> Scanner.serialize\n");
+		string data = "";
+		while(queries.size() > 0) {
+			data += queries.top()->serialize() + " ";
+			queries.pop();
 		}
+		log("->>> Scanner serialized to \"" + data + "\"\n");
 		strcpy(buffer, data.c_str());	//convert from string to char*
-		if (strlen(buffer) >= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) return 0;
+		if (strlen(buffer) >= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) return 0;	//TODO: is there a better option?
 		return strlen(buffer);
 	}
 
 	void deserialize(const char *buffer, unsigned length) {
 		if (length == 0) {
 			//
+			log(">>>> Scanner.deserialize \"\"\n");
 		} else {
 			string data = string(buffer);
+			log(">>>> Scanner.deserialize \"" + data + "\"\n");
 			size_t p;
 			do {
 				p = data.find(" ");
 				p = data.find(" ", p+1);
 				p = data.find(" ", p+1);
 				if (p == string::npos) break;
-				Query *query = new Query(this, queries->size());
+				Query *query = new Query(this, queries.size());
 				char *temp = "";
 				strcpy(temp, data.substr(0, p).c_str());	//convert from string to char*
 				query->deserialize(temp);
-				queries->push(*query);
+				queries.push(query);
 				data = data.substr(p+1);
 			} while (data.length() > 0);
 		}
 	}
 	
-	void nestedQuery() {
+	void consume_query() {
 		//TODO: push a new Query to the stack and scan for the end of it (just to skip it), then pop it.
 	}
 	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
+		log(">>>> Scanner.scan '" + (string()=lexer->lookahead) + "' [ ");
+for(size_t i=0; i<17; i++){ log(to_string(valid_symbols[i]) + " "); }
+log("]\n");
 		lexer->mark_end(lexer);
+		log("----------\n");
 		char c = lexer->lookahead;
 		
 		if (c == 0) {
-			lexer->result_symbol = EOF;
-			return valid_symbols[EOF];
+			log("->>> _EOF\n");
+			lexer->result_symbol = _EOF;
+			return valid_symbols[_EOF];
 		}
-/*		else if (c == '@') {
+		else if (c == '@') {
+			log("->>> '@'\n");
 			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT]) {
 				advance(lexer);
 				lexer->mark_end(lexer);
+				log("----------\n");
 				
-				if (check_for_closure(lexer, '{', '}')) {
-					if (valid_symbols[ATTRIBUTE_START]) {
-						lexer->result_symbol = ATTRIBUTE_START;
-						return true;
-					}
+				if (valid_symbols[ATTRIBUTE_START] && check_for_closure(lexer, '{', '}')) {
+					log("-->> ATTRIBUTE_START\n");
+					lexer->result_symbol = ATTRIBUTE_START;
+					return true;
 				}
 				else if (valid_symbols[JUST_AT]) {
+					log("-->> JUST_AT\n");
 					lexer->result_symbol = JUST_AT;
 					return true;
 				}
 			}
 		}
 		else if (c == '%') {
+			log("->>> '%'\n");
 			if (valid_symbols[ABILITY_START] || valid_symbols[JUST_PERCENT]) {
 				advance(lexer);
 				lexer->mark_end(lexer);
+				log("----------\n");
 				
-				if (check_for_closure(lexer, '{', '}')) {
-					if (valid_symbols[ABILITY_START]) {
-						lexer->result_symbol = ABILITY_START;
-						return true;
-					}
+				if (valid_symbols[ABILITY_START] && check_for_closure(lexer, '{', '}')) {
+					log("-->> ABILITY_START\n");
+					lexer->result_symbol = ABILITY_START;
+					return true;
 				}
 				else if (valid_symbols[JUST_PERCENT]) {
+					log("-->> JUST_PERCENT\n");
 					lexer->result_symbol = JUST_PERCENT;
 					return true;
 				}
 			}
 		}
+		else if (c == '#') {
+			log("->>> '#'\n");
+			if (valid_symbols[MACRO_START] || valid_symbols[JUST_HASH]) {
+				advance(lexer);
+				lexer->mark_end(lexer);
+				log("----------\n");
+				
+				if (valid_symbols[MACRO_START] && scan_macro_start(lexer, queries.size())) {
+					log("-->> MACRO_START\n");
+					lexer->result_symbol = MACRO_START;
+					return true;
+				}
+				else if (valid_symbols[JUST_HASH]) {
+					log("-->> JUST_HASH\n");
+					lexer->result_symbol = JUST_HASH;
+					return true;
+				}
+			}
+		}
 		else if (c == 'd' || c == 'D') {
+			log("->>> '"+(string()=c)+"'\n");
 			if (valid_symbols[DICE_ROLL_START] || valid_symbols[JUST_D]) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
+				log("----------\n");
 				
-				if (check_for_dice_roll_start(lexer)) {
-					if (valid_symbols[DICE_ROLL_START]) {
-						lexer->result_symbol = DICE_ROLL_START;
-						return true;
-					}
+				if (valid_symbols[DICE_ROLL_START] && scan_diceRoll_start(lexer)) {
+					log("-->> DICE_ROLL_START\n");
+					lexer->result_symbol = DICE_ROLL_START;
+					return true;
 				}
-				else if (valid_symbols[JUST_D]) {
+				
+				if (valid_symbols[JUST_D]) {
+					log("-->> JUST_D\n");
 					lexer->result_symbol = JUST_D;
 					return true;
 				}
 			}
 		}
 		else if (c == 't' || c == 'T') {
+			log("->>> '"+(string()=c)+"'\n");
 			if (valid_symbols[TABLE_ROLL_START] || valid_symbols[JUST_T]) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
+				log("----------\n");
 				
-				if (check_for_table_roll_start(lexer)) {
-					if (valid_symbols[TABLE_ROLL_START]) {
-						lexer->result_symbol = TABLE_ROLL_START;
-						return true;
-					}
+				if (valid_symbols[TABLE_ROLL_START] && scan_tableRoll_start(lexer)) {
+					log("-->> TABLE_ROLL_START\n");
+					lexer->result_symbol = TABLE_ROLL_START;
+					return true;
 				}
 				else if (valid_symbols[JUST_T]) {
+					log("-->> JUST_T\n");
 					lexer->result_symbol = JUST_T;
 					return true;
 				}
 			}
-		}*/
+		}
 		else if (c == '?') {
+			log("->>> '?'\n");
 			if (valid_symbols[QUERY_START] || valid_symbols[JUST_QUESTIONMARK]) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
+				log("----------\n");
 				
-				if (queries->top().scan_query_start(lexer)) {
-					lexer->result_symbol = QUERY_START;
-					return true;
+				if (valid_symbols[QUERY_START]) {
+					log("-->> push a Query\n");
+					Query *query = new Query(this, queries.size());
+					queries.push(query);
+					
+					if (queries.top()->scan_query_start(lexer, '?')) {
+						log("---> QUERY_START\n");
+						lexer->result_symbol = QUERY_START;
+						return true;
+					}
+					log("-->> pop a Query\n");
 				}
-				else if (valid_symbols[JUST_QUESTIONMARK]) {
+				
+				if (valid_symbols[JUST_QUESTIONMARK]) {
+					log("-->> JUST_QUESTIONMARK\n");
 					lexer->result_symbol = JUST_QUESTIONMARK;
 					return true;
 				}
 			}
 		}
-/*		else if (c == '|') {
-			if (valid_symbols[QUERY_HASDEFAULT] || valid_symbols[QUERY_HASOPTIONS]) {
+		else if (c == '|') {
+/*			if (valid_symbols[QUERY_HASDEFAULT] || valid_symbols[QUERY_HASOPTIONS]) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
 				type = check_for_roll_query_options(lexer, 0);
@@ -327,11 +487,15 @@ struct Scanner {
 					lexer->result_symbol = QUERY_HASOPTIONS;
 					return true;
 				}
-			}
-		}*/
+			}*/
+		}
 		else if (c == '&') {
+			log("->>> '&'\n");
 			if (valid_symbols[QUERY_START]) {
-				if (queries->top().scan_query_start(lexer)) {
+				c = advance(lexer);
+				
+				if (queries.top()->scan_query_start(lexer, '&')) {
+					log("-->> QUERY_START\n");
 					lexer->result_symbol = QUERY_START;
 					return true;
 				}
@@ -352,314 +516,11 @@ struct Scanner {
 				}
 			}*/
 		}
-		
-		return false;
-	}
-
-/*	bool scan_heredoc_start(TSLexer *lexer) {
-		while (iswspace(lexer->lookahead)) skip(lexer);
-
-		lexer->result_symbol = HEREDOC_START;
-		heredoc_is_raw = lexer->lookahead == '\'';
-		started_heredoc = false;
-		heredoc_delimiter.clear();
-
-		if (lexer->lookahead == '\\') {
-			advance(lexer);
-		}
-
-		int32_t quote = 0;
-		if (heredoc_is_raw || lexer->lookahead == '"') {
-			quote = lexer->lookahead;
-			advance(lexer);
-		}
-
-		while (iswalpha(lexer->lookahead) || (quote != 0 && iswspace(lexer->lookahead))) {
-			heredoc_delimiter += lexer->lookahead;
-			advance(lexer);
-		}
-
-		if (lexer->lookahead == quote) {
-			advance(lexer);
-		}
-
-		return !heredoc_delimiter.empty();
-	}
-
-	bool scan_heredoc_end_identifier(TSLexer *lexer) {
-		current_leading_word.clear();
-		// Scan the first 'n' characters on this line, to see if they match the heredoc delimiter
-		while (
-			lexer->lookahead != '\0' &&
-			lexer->lookahead != '\n' &&
-			current_leading_word.length() < heredoc_delimiter.length()
-		) {
-			current_leading_word += lexer->lookahead;
-			advance(lexer);
-		}
-		return current_leading_word == heredoc_delimiter;
-	}
-
-	bool scan_heredoc_content(TSLexer *lexer, TokenType middle_type, TokenType end_type) {
-		bool did_advance = false;
-
-		for (;;) {
-			switch (lexer->lookahead) {
-				case '\0': {
-					if (did_advance) {
-						heredoc_is_raw = false;
-						started_heredoc = false;
-						heredoc_allows_indent = false;
-						heredoc_delimiter.clear();
-						lexer->result_symbol = end_type;
-						return true;
-					} else {
-						return false;
-					}
-				}
-
-				case '\\': {
-					did_advance = true;
-					advance(lexer);
-					advance(lexer);
-					break;
-				}
-
-				case '$': {
-					if (heredoc_is_raw) {
-						did_advance = true;
-						advance(lexer);
-						break;
-					} else if (did_advance) {
-						lexer->result_symbol = middle_type;
-						started_heredoc = true;
-						return true;
-					} else {
-						return false;
-					}
-				}
-
-				case '\n': {
-					did_advance = true;
-					advance(lexer);
-					if (heredoc_allows_indent) {
-						while (iswspace(lexer->lookahead)) {
-							advance(lexer);
-						}
-					}
-					if (scan_heredoc_end_identifier(lexer)) {
-						heredoc_is_raw = false;
-						started_heredoc = false;
-						heredoc_allows_indent = false;
-						heredoc_delimiter.clear();
-						lexer->result_symbol = end_type;
-						return true;
-					}
-					break;
-				}
-
-				default: {
-					did_advance = true;
-					advance(lexer);
-					break;
-				}
-			}
-		}
-	}
-
-	bool scan(TSLexer *lexer, const bool *valid_symbols) {
-		if (valid_symbols[CONCAT]) {
-			if (!(
-				lexer->lookahead == 0 ||
-				iswspace(lexer->lookahead) ||
-				lexer->lookahead == '>' ||
-				lexer->lookahead == '<' ||
-				lexer->lookahead == ')' ||
-				lexer->lookahead == '(' ||
-				lexer->lookahead == ';' ||
-				lexer->lookahead == '&' ||
-				lexer->lookahead == '|' ||
-				lexer->lookahead == '`' ||
-				lexer->lookahead == '#' ||
-				(lexer->lookahead == '}' && valid_symbols[CLOSING_BRACE]) ||
-				(lexer->lookahead == ']' && valid_symbols[CLOSING_BRACKET])
-			)) {
-				lexer->result_symbol = CONCAT;
-				return true;
-			}
-		}
-
-		if (valid_symbols[EMPTY_VALUE]) {
-			if (iswspace(lexer->lookahead)) {
-				lexer->result_symbol = EMPTY_VALUE;
-				return true;
-			}
-		}
-
-		if (valid_symbols[HEREDOC_BODY_BEGINNING] && !heredoc_delimiter.empty() && !started_heredoc) {
-			return scan_heredoc_content(lexer, HEREDOC_BODY_BEGINNING, SIMPLE_HEREDOC_BODY);
-		}
-
-		if (valid_symbols[HEREDOC_BODY_MIDDLE] && !heredoc_delimiter.empty() && started_heredoc) {
-			return scan_heredoc_content(lexer, HEREDOC_BODY_MIDDLE, HEREDOC_BODY_END);
-		}
-
-		if (valid_symbols[HEREDOC_START]) {
-			return scan_heredoc_start(lexer);
-		}
-
-		if (valid_symbols[VARIABLE_NAME] || valid_symbols[FILE_DESCRIPTOR] || valid_symbols[HEREDOC_ARROW]) {
-			for (;;) {
-				if (
-					lexer->lookahead == ' ' ||
-					lexer->lookahead == '\t' ||
-					lexer->lookahead == '\r' ||
-					(lexer->lookahead == '\n' && !valid_symbols[NEWLINE])
-				) {
-					skip(lexer);
-				} else if (lexer->lookahead == '\\') {
-					skip(lexer);
-					if (lexer->lookahead == '\n') {
-						skip(lexer);
-					} else {
-						return false;
-					}
-				} else {
-					break;
-				}
-			}
-
-			if (valid_symbols[HEREDOC_ARROW] && lexer->lookahead == '<') {
-				advance(lexer);
-				if (lexer->lookahead == '<') {
-					advance(lexer);
-					if (lexer->lookahead == '-') {
-						advance(lexer);
-						heredoc_allows_indent = true;
-						lexer->result_symbol = HEREDOC_ARROW_DASH;
-					} else if (lexer->lookahead == '<') {
-						return false;
-					} else {
-						heredoc_allows_indent = false;
-						lexer->result_symbol = HEREDOC_ARROW;
-					}
-					return true;
-				}
-				return false;
-			}
-
-			bool is_number = true;
-			if (iswdigit(lexer->lookahead)) {
-				advance(lexer);
-			} else if (iswalpha(lexer->lookahead) || lexer->lookahead == '_') {
-				is_number = false;
-				advance(lexer);
-			} else {
-				return false;
-			}
-
-			for (;;) {
-				if (iswdigit(lexer->lookahead)) {
-					advance(lexer);
-				} else if (iswalpha(lexer->lookahead) || lexer->lookahead == '_') {
-					is_number = false;
-					advance(lexer);
-				} else {
-					break;
-				}
-			}
-
-			if (is_number &&
-					valid_symbols[FILE_DESCRIPTOR] &&
-					(lexer->lookahead == '>' || lexer->lookahead == '<')) {
-				lexer->result_symbol = FILE_DESCRIPTOR;
-				return true;
-			}
-
-			if (valid_symbols[VARIABLE_NAME]) {
-				if (lexer->lookahead == '+') {
-					lexer->mark_end(lexer);
-					advance(lexer);
-					if (lexer->lookahead == '=') {
-						lexer->result_symbol = VARIABLE_NAME;
-						return true;
-					} else {
-						return false;
-					}
-				} else if (lexer->lookahead == '=' || lexer->lookahead == '[') {
-					lexer->result_symbol = VARIABLE_NAME;
-					return true;
-				}
-			}
-
+		else {
+			log("->>> (no match)\n");
 			return false;
 		}
-
-		if (valid_symbols[REGEX]) {
-			while (iswspace(lexer->lookahead)) skip(lexer);
-
-			if (
-				lexer->lookahead != '"' &&
-				lexer->lookahead != '\'' &&
-				lexer->lookahead != '$'
-			) {
-				struct State {
-					bool done;
-					uint32_t paren_depth;
-					uint32_t bracket_depth;
-					uint32_t brace_depth;
-				};
-
-				lexer->mark_end(lexer);
-
-				State state = {false, 0, 0, 0};
-				while (!state.done) {
-					switch (lexer->lookahead) {
-						case '\0':
-							return false;
-						case '(':
-							state.paren_depth++;
-							break;
-						case '[':
-							state.bracket_depth++;
-							break;
-						case '{':
-							state.brace_depth++;
-							break;
-						case ')':
-							if (state.paren_depth == 0) state.done = true;
-							state.paren_depth--;
-							break;
-						case ']':
-							if (state.bracket_depth == 0) state.done = true;
-							state.bracket_depth--;
-							break;
-						case '}':
-							if (state.brace_depth == 0) state.done = true;
-							state.brace_depth--;
-							break;
-					}
-
-					if (!state.done) {
-						bool was_space = iswspace(lexer->lookahead);
-						advance(lexer);
-						if (!was_space) lexer->mark_end(lexer);
-					}
-				}
-
-				lexer->result_symbol = REGEX;
-				return true;
-			}
-		}
-
-		return false;
 	}
-
-	string heredoc_delimiter;
-	bool heredoc_is_raw;
-	bool started_heredoc;
-	bool heredoc_allows_indent;
-	string current_leading_word;*/
 };
 
 }

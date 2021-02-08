@@ -11,10 +11,6 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "_stringNL"
-            },
-            {
-              "type": "SYMBOL",
               "name": "attribute"
             },
             {
@@ -23,7 +19,7 @@
             },
             {
               "type": "SYMBOL",
-              "name": "_macroHash"
+              "name": "_macro"
             },
             {
               "type": "SYMBOL",
@@ -37,26 +33,63 @@
         }
       }
     },
-    "_string": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "PATTERN",
-          "value": ".|# "
-        }
-      }
-    },
     "_stringNL": {
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "PATTERN",
-          "value": ".|# |#?\\r?\\n"
-        }
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "PREC_RIGHT",
+                "value": 0,
+                "content": {
+                  "type": "REPEAT1",
+                  "content": {
+                    "type": "PATTERN",
+                    "value": "[^#]|# |#?\\r?\\n"
+                  }
+                }
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SEQ",
+                    "members": [
+                      {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "__EOF"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "STRING",
+                "value": "#"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "__EOF"
+              }
+            ]
+          }
+        ]
       }
     },
     "_wsp_inline": {
@@ -85,8 +118,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -142,8 +180,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -199,8 +242,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -256,8 +304,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -320,8 +373,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -386,8 +444,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -452,8 +515,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -518,8 +586,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -584,8 +657,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -643,8 +721,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -707,8 +790,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -773,8 +861,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -832,8 +925,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -896,8 +994,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -955,8 +1058,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -1019,8 +1127,13 @@
                   "type": "SEQ",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "macroHash"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "#"
+                      },
+                      "named": true,
+                      "value": "macroHash"
                     },
                     {
                       "type": "CHOICE",
@@ -1078,8 +1191,13 @@
               "type": "SEQ",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "STRING",
+                    "value": "#"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "CHOICE",
@@ -1134,8 +1252,13 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "SYMBOL",
-                    "name": "macroHash"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "STRING",
+                      "value": "#"
+                    },
+                    "named": true,
+                    "value": "macroHash"
                   },
                   {
                     "type": "CHOICE",
@@ -1191,8 +1314,13 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "SYMBOL",
-                    "name": "macroHash"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "STRING",
+                      "value": "#"
+                    },
+                    "named": true,
+                    "value": "macroHash"
                   },
                   {
                     "type": "PATTERN",
@@ -1217,8 +1345,13 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "SYMBOL",
-                    "name": "macroHash"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "STRING",
+                      "value": "#"
+                    },
+                    "named": true,
+                    "value": "macroHash"
                   },
                   {
                     "type": "PATTERN",
@@ -1243,8 +1376,13 @@
                 "type": "SEQ",
                 "members": [
                   {
-                    "type": "SYMBOL",
-                    "name": "macroHash"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "STRING",
+                      "value": "#"
+                    },
+                    "named": true,
+                    "value": "macroHash"
                   },
                   {
                     "type": "CHOICE",
@@ -1306,51 +1444,89 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "PATTERN",
-          "value": "[@%]"
+          "type": "SYMBOL",
+          "name": "_propertyName_notMacroName"
         },
         {
           "type": "SEQ",
           "members": [
             {
-              "type": "PREC_RIGHT",
-              "value": 0,
-              "content": {
-                "type": "REPEAT1",
-                "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "PATTERN",
-                      "value": "[^|}\\r\\n@%#]+"
-                    },
-                    {
-                      "type": "PATTERN",
-                      "value": "[@%]+[^|}\\r\\n@%{#]"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "_macroHash"
-                    },
-                    {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "PATTERN",
-                        "value": "[@%]\\{"
-                      },
-                      "named": true,
-                      "value": "invalid"
-                    }
-                  ]
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_propertyName_notMacroName"
+                },
+                {
+                  "type": "BLANK"
                 }
+              ]
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "__macro_start"
+              },
+              "named": true,
+              "value": "macroHash"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_propertyName_macroName"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": " |\\r?\\n"
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_propertyName_notMacroName"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "__macro_start"
+                    },
+                    "named": true,
+                    "value": "macroHash"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_propertyName_macroName"
+                  }
+                ]
               }
             },
             {
               "type": "CHOICE",
               "members": [
                 {
-                  "type": "PATTERN",
-                  "value": "[@%#]"
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": " |\\r?\\n"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_propertyName_notMacroName"
+                    }
+                  ]
                 },
                 {
                   "type": "BLANK"
@@ -1360,6 +1536,72 @@
           ]
         }
       ]
+    },
+    "_propertyName_notMacroName": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "REPEAT1",
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "[^@%#}|\\r\\n]+"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "__just_at"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "__just_percent"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "PATTERN",
+                "value": "[@%]\\{"
+              },
+              "named": true,
+              "value": "invalid"
+            }
+          ]
+        }
+      }
+    },
+    "_propertyName_macroName": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "REPEAT1",
+        "content": {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "[^@%}| \\r\\n]+"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "__just_at"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "__just_percent"
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "PATTERN",
+                "value": "[@%]\\{"
+              },
+              "named": true,
+              "value": "invalid"
+            }
+          ]
+        }
+      }
     },
     "_selector": {
       "type": "CHOICE",
@@ -1805,123 +2047,49 @@
         }
       ]
     },
-    "macroHash": {
-      "type": "STRING",
-      "value": "#"
-    },
-    "_macroHash": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "macroHash"
-        },
-        {
-          "type": "PATTERN",
-          "value": "#( |\\r?\\n)"
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "STRING",
-              "value": "#"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "__EOF"
-            }
-          ]
-        }
-      ]
-    },
     "_macro": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
             "type": "SYMBOL",
-            "name": "_macroHash"
+            "name": "__macro_start"
           },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "macro"
-              },
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "PATTERN",
-                    "value": " |\\r?\\n"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "__EOF"
-                  }
-                ]
-              }
-            ]
+          "named": true,
+          "value": "macroHash"
+        },
+        {
+          "type": "PREC_RIGHT",
+          "value": 0,
+          "content": {
+            "type": "REPEAT1",
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "PATTERN",
+                  "value": "[^@% \\r\\n]"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "attribute"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "ability"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "__just_at"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "__just_percent"
+                }
+              ]
+            }
           }
-        ]
-      }
-    },
-    "macro": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "macroHash"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "macroName"
-        }
-      ]
-    },
-    "macroName": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[@%]"
-            },
-            {
-              "type": "REPEAT1",
-              "content": {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "PATTERN",
-                    "value": "[^ \\r\\n|}@%]+|[@%]+[^\\{]"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_placeholders"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[@%]"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
         }
       ]
     },
@@ -2164,32 +2332,8 @@
       ]
     },
     "prompt": {
-      "type": "PREC_RIGHT",
-      "value": 0,
-      "content": {
-        "type": "REPEAT1",
-        "content": {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[^}|]+"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "attribute"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "ability"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_macroHash"
-            }
-          ]
-        }
-      }
+      "type": "SYMBOL",
+      "name": "_propertyName"
     },
     "defaultValue": {
       "type": "SEQ",
@@ -2285,8 +2429,13 @@
                     "name": "ability"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "_macroHash"
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "__macro_start"
+                    },
+                    "named": true,
+                    "value": "macroHash"
                   },
                   {
                     "type": "SYMBOL",
@@ -2331,8 +2480,13 @@
                   "name": "ability"
                 },
                 {
-                  "type": "SYMBOL",
-                  "name": "_macroHash"
+                  "type": "ALIAS",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "__macro_start"
+                  },
+                  "named": true,
+                  "value": "macroHash"
                 },
                 {
                   "type": "SEQ",
@@ -2884,46 +3038,179 @@
           "name": "_leftBracket"
         },
         {
-          "type": "REPEAT",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[^@%#&\\[\\r\\n\\]]+"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "attribute"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "ability"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_macroHash"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_at"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_percent"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_ampersand"
-              }
-            ]
-          }
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_label_notMacroName"
+                },
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "_label_notMacroName"
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "__macro_start"
+                      },
+                      "named": true,
+                      "value": "macroHash"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_label_macroName"
+                    },
+                    {
+                      "type": "REPEAT",
+                      "content": {
+                        "type": "SEQ",
+                        "members": [
+                          {
+                            "type": "PATTERN",
+                            "value": " |\\r?\\n"
+                          },
+                          {
+                            "type": "CHOICE",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "_label_notMacroName"
+                              },
+                              {
+                                "type": "BLANK"
+                              }
+                            ]
+                          },
+                          {
+                            "type": "ALIAS",
+                            "content": {
+                              "type": "SYMBOL",
+                              "name": "__macro_start"
+                            },
+                            "named": true,
+                            "value": "macroHash"
+                          },
+                          {
+                            "type": "SYMBOL",
+                            "name": "_label_macroName"
+                          }
+                        ]
+                      }
+                    },
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SEQ",
+                          "members": [
+                            {
+                              "type": "PATTERN",
+                              "value": " |\\r?\\n"
+                            },
+                            {
+                              "type": "SYMBOL",
+                              "name": "_label_notMacroName"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "BLANK"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
           "name": "_rightBracket"
         }
       ]
+    },
+    "_label_notMacroName": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^@%#&\\[\\r\\n\\]]+"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "attribute"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ability"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_at"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_percent"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_ampersand"
+          }
+        ]
+      }
+    },
+    "_label_macroName": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^@%&\\[ \\r\\n\\]]+"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "attribute"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ability"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_at"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_percent"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_ampersand"
+          }
+        ]
+      }
     },
     "_labels_and_wsp": {
       "type": "PREC_RIGHT",
@@ -4253,67 +4540,207 @@
           "name": "_leftBracket"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "REPEAT1",
-            "content": {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "[^@%#&\\]]+"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "attribute"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "ability"
-                },
-                {
-                  "type": "PREC",
-                  "value": 1,
-                  "content": {
-                    "type": "STRING",
-                    "value": "@{"
-                  }
-                },
-                {
-                  "type": "PREC",
-                  "value": 1,
-                  "content": {
-                    "type": "STRING",
-                    "value": "%{"
-                  }
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_macroHash"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_at"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_percent"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_ampersand"
-                }
-              ]
-            }
-          },
-          "named": true,
-          "value": "tableName"
+          "type": "SYMBOL",
+          "name": "tableName"
         },
         {
           "type": "SYMBOL",
           "name": "_rightBracket"
         }
       ]
+    },
+    "tableName": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_tableRoll_notMacroName"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_tableRoll_notMacroName"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "__macro_start"
+              },
+              "named": true,
+              "value": "macroHash"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_tableRoll_macroName"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": " |\\r?\\n"
+                  },
+                  {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "SYMBOL",
+                        "name": "_tableRoll_notMacroName"
+                      },
+                      {
+                        "type": "BLANK"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "__macro_start"
+                    },
+                    "named": true,
+                    "value": "macroHash"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_tableRoll_macroName"
+                  }
+                ]
+              }
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "PATTERN",
+                      "value": " |\\r?\\n"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_tableRoll_notMacroName"
+                    }
+                  ]
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_tableRoll_notMacroName": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^@%#&\\r\\n\\]]+"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "attribute"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ability"
+          },
+          {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "@{"
+            }
+          },
+          {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "%{"
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_at"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_percent"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_ampersand"
+          }
+        ]
+      }
+    },
+    "_tableRoll_macroName": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^@%& \\r\\n\\]]+"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "attribute"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "ability"
+          },
+          {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "@{"
+            }
+          },
+          {
+            "type": "PREC",
+            "value": 1,
+            "content": {
+              "type": "STRING",
+              "value": "%{"
+            }
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_at"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_percent"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_ampersand"
+          }
+        ]
+      }
     }
   },
   "extras": [],
@@ -4325,15 +4752,11 @@
     },
     {
       "type": "SYMBOL",
-      "name": "__attribute_start"
-    },
-    {
-      "type": "SYMBOL",
       "name": "__just_at"
     },
     {
       "type": "SYMBOL",
-      "name": "__ability_start"
+      "name": "__attribute_start"
     },
     {
       "type": "SYMBOL",
@@ -4341,11 +4764,39 @@
     },
     {
       "type": "SYMBOL",
-      "name": "__rollQuery_start"
+      "name": "__ability_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_hash"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__macro_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_d"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__diceRoll_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_t"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__tableRoll_start"
     },
     {
       "type": "SYMBOL",
       "name": "__just_questionmark"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__rollQuery_start"
     },
     {
       "type": "SYMBOL",
@@ -4354,22 +4805,6 @@
     {
       "type": "SYMBOL",
       "name": "__rollQuery_pipe_hasOptions"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__diceRoll_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_d"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__tableRoll_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_t"
     }
   ],
   "inline": [

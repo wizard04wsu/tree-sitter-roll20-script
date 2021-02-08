@@ -30,7 +30,7 @@ const escapedAtSurface = (depth, strRxp, decNumRxp, hexNumRxp) => {
 		while(depth-- > 0){
 			args.push(choice(
 				/amp|AMP/,
-				seq( $.macroHash, /38|[xX](00)?26/ ),
+				seq( alias("#", $.macroHash), /38|[xX](00)?26/ ),
 			));
 			args.push(";");
 		}
@@ -38,7 +38,7 @@ const escapedAtSurface = (depth, strRxp, decNumRxp, hexNumRxp) => {
 			args.push(choice(
 				RegExp(strRxp),
 				seq(
-					$.macroHash,
+					alias("#", $.macroHash),
 					choice(
 						RegExp(decNumRxp),
 						seq( /[xX]/, RegExp(hexNumRxp) ),
@@ -48,7 +48,7 @@ const escapedAtSurface = (depth, strRxp, decNumRxp, hexNumRxp) => {
 		}
 		else{
 			args.push(seq(
-				$.macroHash,
+				alias("#", $.macroHash),
 				choice(
 					RegExp(decNumRxp),
 					seq( /[xX]/, RegExp(hexNumRxp) ),
@@ -82,22 +82,25 @@ module.exports = grammar({
 	externals: $ => [
 		$.__EOF,					// (no content) determines if there are no more tokens
 		
-		$.__attribute_start,		// returns "@" if it begins an attribute
 		$.__just_at,				// returns "@" if it does *not* begin an attribute
+		$.__attribute_start,		// returns "@" if it begins an attribute
 		
-		$.__ability_start,			// returns "%" if it begins an ability
 		$.__just_percent,			// returns "%" if it does *not* begin an ability
+		$.__ability_start,			// returns "%" if it begins an ability
 		
-		$.__rollQuery_start,		// returns "?" (or equivalent HTML entity) if it begins a roll query
+		$.__just_hash,				// returns "#" if it does *not* reference a macro
+		$.__macro_start,			// returns "#" if it could be refrencing a macro
+		
+		$.__just_d,					// returns "d" or "D" if it does *not* begin a dice roll
+		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
+		
+		$.__just_t,					// returns "t" or "T" if it does *not* begin a table roll
+		$.__tableRoll_start,		// returns "t" or "T" if it begins a table roll
+		
 		$.__just_questionmark,		// returns "?" if it does *not* begin a roll query
+		$.__rollQuery_start,		// returns "?" (or equivalent HTML entity) if it begins a roll query
 		$.__rollQuery_pipe_hasDefault,	// returns "|" (or equivalent HTML entity) if it has a default value (i.e., only one option)
 		$.__rollQuery_pipe_hasOptions,	// returns "|" (or equivalent HTML entity) if it has multiple options
-		
-		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
-		$.__just_d,					// returns "d" or "D" if it does *not* begin a dice roll
-		
-		$.__tableRoll_start,		// returns "t" or "T" if it begins a table roll
-		$.__just_t,					// returns "t" or "T" if it does *not* begin a table roll
 	],
 	
 	extras: $ => [
@@ -156,10 +159,9 @@ module.exports = grammar({
 		
 		roll20_script: $ => prec.right(repeat(
 			choice(
-				$._stringNL,
 				$.attribute,
 				$.ability,
-				$._macroHash,
+				$._macro,
 				$._rollQuery,
 				$._inlineRoll,
 				//TODO:
@@ -167,6 +169,7 @@ module.exports = grammar({
 				//property
 				//button	//ability command button
 				//tracker
+				$._stringNL,
 			),
 		)),
 		
@@ -179,8 +182,17 @@ module.exports = grammar({
 		  │ Strings
 		  └──────────────────────────────*/
 		
-		_string: $ => chainOf(/.|# /),
-		_stringNL: $ => chainOf(/.|# |#?\r?\n/),
+		/*_string: $ => prec.right(seq(
+			chainOf(/[^#]|# /),
+			optional(seq( "#", $.__EOF )),
+		)),*/
+		_stringNL: $ => prec.right(choice(
+			seq(
+				chainOf(/[^#]|# |#?\r?\n/),
+				optional(seq( "#", $.__EOF )),
+			),
+			seq( "#", $.__EOF ),
+		)),
 		
 		_wsp_inline: $ => /\s+/,
 		
@@ -248,17 +260,39 @@ module.exports = grammar({
 			alias("target", $.token),
 		),
 		_propertyName: $ => choice(
-			/[@%]/,
+			$._propertyName_notMacroName,
 			seq(
-				prec.right(repeat1(choice(
-					/[^|}\r\n@%#]+/,
-					/[@%]+[^|}\r\n@%{#]/,
-					$._macroHash,
-					alias(/[@%]\{/, $.invalid),
-				))),
-				optional(/[@%#]/),
+				optional($._propertyName_notMacroName),
+				alias($.__macro_start, $.macroHash),
+				$._propertyName_macroName,
+				repeat(seq(
+					/ |\r?\n/,
+					optional($._propertyName_notMacroName),
+					alias($.__macro_start, $.macroHash),
+					$._propertyName_macroName,
+				)),
+				optional(seq(
+					/ |\r?\n/,
+					$._propertyName_notMacroName
+				)),
 			),
 		),
+		_propertyName_notMacroName: $ => prec.right(repeat1(choice(
+			/[^@%#}|\r\n]+/,
+			//$.htmlEntity,
+			$.__just_at,
+			$.__just_percent,
+			//$._ampersand,
+			alias(/[@%]\{/, $.invalid),
+		))),
+		_propertyName_macroName: $ => prec.right(repeat1(choice(
+			/[^@%}| \r\n]+/,
+			//$.htmlEntity,
+			$.__just_at,
+			$.__just_percent,
+			//$._ampersand,
+			alias(/[@%]\{/, $.invalid),
+		))),
 		_selector: $ => choice(
 			$._tokenSelector,
 			alias($._propertyName, $.characterName),
@@ -384,48 +418,40 @@ module.exports = grammar({
 		  │ Macro
 		  └┬─────────────────────────────*/
 		 /*│ This grammar will just pick out the hash characters that could
-		   │   refer to a macro. It's impossible to know whether they are or not
-		   │   without having the list of actual macro names.
+		   │   refer to a macro. It's impossible to know whether they actually
+		   │   do, since we can't check a name against the list of defined
+		   │   macros.
 		   │ 
-		   │ For a macro, the macro name:
-		   │ • cannot contain spaces, new lines, pipes, closing curly braces, or
-		   │   the character sequences "@{" and "%{".
+		   │ For example, "&#124;_" could refer to:
+		   │ • an ampersand followed by a macro named "124;_".
+		   │ • a HTML entity of a pipe, followed by an underscore.
+		   │ If the macro is defined, Roll20 will go with the first option.
+		   │   Otherwise, Roll20 sticks with the second option.
+		   │ 
+		   │ The macro name:
+		   │ • cannot contain spaces, new lines, or  the character sequences
+		   │  "@{" and "%{".
+		   │ • if inside a roll query, cannot contain pipes or closing curly
+		   │   braces.
 		   │ • cannot include macros.
 		   │ • can include attributes and abilities.
 		   │ 
 		   │ To call the macro, its name must be followed by either a space or
-		   │   a new line. Exception: the space or new line isn't required if it
-		   │   would be the last character in the script.
+		   │   a new line, or be at the end of the script.
 		   │ 
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		macroHash: $ => "#",
-		_macroHash: $ => choice(
-			$.macroHash,
-			/#( |\r?\n)/,
-			seq( "#", $.__EOF ),
-		),
-		_macro: $ => prec.right(choice(
-			$._macroHash,
-			seq(
-				$.macro,
-				choice( / |\r?\n/, $.__EOF ),
-			),
-		)),
-		macro: $ => seq(
-			$.macroHash,
-			$.macroName,
-		),
-		macroName: $ => seq(
-			choice(
-				/[@%]/,
-				repeat1(choice(
-					/[^ \r\n|}@%]+|[@%]+[^\{]/,
-					$._placeholders,
-				)),
-			),
-			optional(/[@%]/),
+		
+		_macro: $ => seq(
+			alias($.__macro_start, $.macroHash),
+			prec.right(repeat1(choice(
+				/[^@% \r\n]/,
+				$.attribute,
+				$.ability,
+				$.__just_at,
+				$.__just_percent,
+			))),
 		),
 		
 		
@@ -486,17 +512,18 @@ module.exports = grammar({
 			),
 		),
 		
-		prompt: $ => prec.right(repeat1(choice(
+		/*prompt: $ => prec.right(repeat1(choice(
 			///[^@%#&}|]+/,
 			/[^}|]+/,
 			$.attribute,
 			$.ability,
-			$._macroHash,
+			$.__macro_start,
 			//$.htmlEntity,
 			//$._at,
 			//$._percent,
 			//$._ampersand,
-		))),
+		))),*/
+		prompt: $ => $._propertyName,
 		
 		defaultValue: $ => seq(
 			repeat1(
@@ -522,7 +549,7 @@ module.exports = grammar({
 					/[^@%#&}|,]+/,
 					$.attribute,
 					$.ability,
-					$._macroHash,
+					alias($.__macro_start, $.macroHash),
 					//$.htmlEntity,
 					$._at,
 					$._percent,
@@ -536,7 +563,7 @@ module.exports = grammar({
 					/[^@%#&}|,?{]+/,
 					$.attribute,
 					$.ability,
-					$._macroHash,
+					alias($.__macro_start, $.macroHash),
 					//$.htmlEntity,
 					seq(
 						//$.__increaseDepth,
@@ -743,18 +770,44 @@ module.exports = grammar({
 		
 		label: $ => seq(
 			$._leftBracket,
-			repeat(choice(
-				/[^@%#&\[\r\n\]]+/,
-				$.attribute,
-				$.ability,
-				$._macroHash,
-				//$.htmlEntity,
-				$._at,
-				$._percent,
-				$._ampersand,
+			optional(choice(
+				$._label_notMacroName,
+				seq(
+					optional($._label_notMacroName),
+					alias($.__macro_start, $.macroHash),
+					$._label_macroName,
+					repeat(seq(
+						/ |\r?\n/,
+						optional($._label_notMacroName),
+						alias($.__macro_start, $.macroHash),
+						$._label_macroName,
+					)),
+					optional(seq(
+						/ |\r?\n/,
+						$._label_notMacroName
+					)),
+				),
 			)),
 			$._rightBracket,
 		),
+		_label_notMacroName: $ => repeat1(choice(
+			/[^@%#&\[\r\n\]]+/,
+			$.attribute,
+			$.ability,
+			//$.htmlEntity,
+			$.__just_at,
+			$.__just_percent,
+			$._ampersand,
+		)),
+		_label_macroName: $ => repeat1(choice(
+			/[^@%&\[ \r\n\]]+/,
+			$.attribute,
+			$.ability,
+			//$.htmlEntity,
+			$.__just_at,
+			$.__just_percent,
+			$._ampersand,
+		)),
 		
 		_labels_and_wsp: $ => prec.right(choice(
 			$._wsp_inline,
@@ -1071,21 +1124,47 @@ module.exports = grammar({
 			$.__tableRoll_start,
 			$._leftBracket,
 			//table name
-			alias(repeat1(
-				choice(
-					/[^@%#&\]]+/,
-					$.attribute,
-					$.ability,
-					prec(1, "@{"),
-					prec(1, "%{"),
-					$._macroHash,
-					$._at,
-					$._percent,
-					$._ampersand,
-				),
-			), $.tableName),
+			$.tableName,
 			$._rightBracket,
 		),
+		tableName: $ => choice(
+			$._tableRoll_notMacroName,
+			seq(
+				optional($._tableRoll_notMacroName),
+				alias($.__macro_start, $.macroHash),
+				$._tableRoll_macroName,
+				repeat(seq(
+					/ |\r?\n/,
+					optional($._tableRoll_notMacroName),
+					alias($.__macro_start, $.macroHash),
+					$._tableRoll_macroName,
+				)),
+				optional(seq(
+					/ |\r?\n/,
+					$._tableRoll_notMacroName
+				)),
+			),
+		),
+		_tableRoll_notMacroName: $ => repeat1(choice(
+			/[^@%#&\r\n\]]+/,
+			$.attribute,
+			$.ability,
+			prec(1, "@{"),
+			prec(1, "%{"),
+			$.__just_at,
+			$.__just_percent,
+			$._ampersand,
+		)),
+		_tableRoll_macroName: $ => repeat1(choice(
+			/[^@%& \r\n\]]+/,
+			$.attribute,
+			$.ability,
+			prec(1, "@{"),
+			prec(1, "%{"),
+			$.__just_at,
+			$.__just_percent,
+			$._ampersand,
+		)),
 		
 		
 	},
