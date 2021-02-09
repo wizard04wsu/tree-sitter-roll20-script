@@ -93,7 +93,6 @@ Roll Query: Valid: ?{p|a,A|b,B}
 
 ==================
 Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
-==================
 
 ?{|a|b,?{p&#124;b&#125;c}
 
@@ -110,3 +109,4 @@ Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
 					(prompt)
 					(defaultValue))))))
 
+==================

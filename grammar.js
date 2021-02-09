@@ -177,7 +177,7 @@ module.exports = grammar({
 		  │ Special Characters
 		  └──────────────────────────────*/
 		
-		//TODO
+		//TODO: get these from the scanner so they're properly escaped
 		__just_ampersand: $ => "&",
 		__leftBracket: $ => "[",
 		__leftBrace: $ => "{",
@@ -204,6 +204,7 @@ module.exports = grammar({
 			alias("target", $.token),
 		),
 		_propertyName: $ => name(choice(
+			///[^@%#&}| \r\n]+/,
 			/[^@%#}| \r\n]+/,
 			//$.htmlEntity,
 			$.__just_at,
@@ -385,71 +386,41 @@ module.exports = grammar({
 			$.rollQuery,
 			alias($._rollQuery_invalid_start, $.invalid),
 		),
-		/*rollQuery: $ => {
-			depth++;
-			let result = choice(
-				alias($._rollQuery_empty, $.invalid),
-				seq(
-					$.__rollQuery_start,
-					$.__leftBrace,
-					$._rollQuery_content,
-					$.__rightBrace,
-				),
-			);
-			depth--;
-			return result;
-		},*/
 		rollQuery: $ => choice(
-			alias($._rollQuery_empty, $.invalid),
+			alias($._rollQuery_empty, $.invalid),	//?{}
 			seq(
-				$.__rollQuery_start,
-				$.__leftBrace,
+				$.__rollQuery_start,	//?{
 				$._rollQuery_content,
-				$.__rightBrace,
+				$.__rollQuery_end,	//}
 			),
 		),
-		_rollQuery_empty: $ => seq( $.__rollQuery_start, $.__leftBrace, $.__rightBrace ),
-		_rollQuery_invalid_start: $ => seq( $.__just_questionmark, $.__leftBrace ),
-		_rollQuery_content: $ => seq(
-			choice(
-				$.prompt,
-				prec.right(1, seq(
-					optional($.prompt),
-					choice(
-						seq(
-							$.__rollQuery_pipe_hasDefault,
-							optional($.defaultValue),
-						),
-						seq(
-							$.__rollQuery_pipe_hasOptions,
-							optional(seq(
-								optional($.option),
+		_rollQuery_empty: $ => seq( $.__rollQuery_start, $.__rollQuery_end ),	//?{}
+		_rollQuery_invalid_start: $ => seq( $.__just_questionmark, $.__leftBrace ),	//?{
+		_rollQuery_content: $ => prec.right(choice(
+			$.prompt,
+			seq(
+				optional($.prompt),
+				choice(
+					seq(
+						$.__rollQuery_pipe_hasDefault,
+						optional($.defaultValue),
+					),
+					seq(
+						$.__rollQuery_pipe_hasOptions,
+						optional($.option),
+						$.__pipe,
+						optional($.option),
+						repeat(
+							seq(
 								$.__pipe,
 								optional($.option),
-								repeat(
-									seq(
-										$.__pipe,
-										optional($.option),
-									),
-								),
-							)),
+							),
 						),
 					),
-				)),
+				),
 			),
-		),
+		)),
 		
-		/*prompt: $ => prec.right(repeat1(choice(
-			///[^@%#&}|]+/,
-			/[^}|]+/,
-			$.attribute,
-			$.ability,
-			$.__macro_start,
-			//$.htmlEntity,
-			//$.__just_at,
-			//$.__just_percent,
-			//$.__just_ampersand,
-		))),*/
 		prompt: $ => $._propertyName,
 		
 		defaultValue: $ => seq(
@@ -470,43 +441,32 @@ module.exports = grammar({
 				optional($.optionValue),
 			)),
 		)),
-		optionName: $ => seq(
-			prec.right(repeat1(
-				prec(1, choice(
-					/[^@%#&}|,]+/,
-					$.attribute,
-					$.ability,
-					alias($.__macro_start, $.macroHash),
-					//$.htmlEntity,
-					$.__just_at,
-					$.__just_percent,
-					$.__just_ampersand,
-				)),
-			)),
-		),
-		optionValue: $ => seq(
-			prec.right(repeat1(
-				choice(
-					/[^@%#&}|,?{]+/,
-					$.attribute,
-					$.ability,
-					alias($.__macro_start, $.macroHash),
-					//$.htmlEntity,
-					seq(
-						//$.__increaseDepth,
-						$.rollQuery,
-						//$.__decreaseDepth,
-					),
-					//$.property,
-					//$.button,
-					$.__just_at,
-					$.__just_percent,
-					$.__just_ampersand,
-					$.__just_questionmark,
-					$.__leftBrace,
-				),
-			)),
-		),
+		optionName: $ => name(prec.right(choice(
+			///[^@%#&}|,\r\n]+/,
+			/[^@%#}|,\r\n]+/,
+			$.attribute,
+			$.ability,
+			alias($.__macro_start, $.macroHash),
+			//$.htmlEntity,
+			$.__just_at,
+			$.__just_percent,
+			//$.__just_ampersand,
+		)))($),
+		optionValue: $ => name(prec.right(choice(
+			///[^@%#&}|,?\r\n]+/,
+			/[^@%#}|,?\r\n]+/,
+			$.attribute,
+			$.ability,
+			alias($.__macro_start, $.macroHash),
+			//$.htmlEntity,
+			$.rollQuery,
+			//$.property,
+			//$.button,
+			$.__just_at,
+			$.__just_percent,
+			//$.__just_ampersand,
+			$.__just_questionmark,
+		)))($),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
