@@ -1,9 +1,4 @@
-let depth = 0;
-//const increaseDepth = $ => { ++depth; return /()/; };
-//const decreaseDepth = $ => { --depth; return /()/; };
-const matchChar = (char, depth = 0) => {
-	switch(char){
-		case "@": return unescapedAtSurface(depth, char, /commat/, 64, /[xX](00)?40/);
+/*		case "@": return unescapedAtSurface(depth, char, /commat/, 64, /[xX](00)?40/);
 		case "%": return unescapedAtSurface(depth, char, /percnt/, 37, /[xX](00)?25/);
 		case "#": return unescapedAtSurface(depth, char, /num/, 35, /[xX](00)?23/);
 		case "&": return unescapedAtSurface(depth, char, /amp|AMP/, 38, /[xX](00)?26/);
@@ -20,60 +15,36 @@ const matchChar = (char, depth = 0) => {
 		case ",": return unescapedAtSurface(depth, char, /comma/, 44, /[xX](00)?2[cC]/);
 		case "=": return unescapedAtSurfaceOrBelow(depth, char, /equals/, 61, /[xX](00)?3[dD]/);
 		case "~": return unescapedAtSurfaceOrBelow(depth, char, null, 126, /[xX](00)?7[eE]/);
-		default: return escapedAtSurface(depth, /[a-zA-Z\d]+/, /\d+/, /([a-fA-F\d]{2}){1,2}/);
-	}
-};
-const escapedAtSurface = (depth, strRxp, decNumRxp, hexNumRxp) => {
-	return $ => {
-		let args = ["&"];
-		
-		while(depth-- > 0){
-			args.push(choice(
-				/amp|AMP/,
-				seq( alias("#", $.macroHash), /38|[xX](00)?26/ ),
-			));
-			args.push(";");
-		}
-		if(strRxp !== null){
-			args.push(choice(
-				RegExp(strRxp),
-				seq(
-					alias("#", $.macroHash),
-					choice(
-						RegExp(decNumRxp),
-						seq( /[xX]/, RegExp(hexNumRxp) ),
-					),
-				),
-			));
-		}
-		else{
-			args.push(seq(
-				alias("#", $.macroHash),
-				choice(
-					RegExp(decNumRxp),
-					seq( /[xX]/, RegExp(hexNumRxp) ),
-				),
-			));
-		}
-		args.push(";");
-		
-		return seq.apply(null, args);
-	};
-};
-const unescapedAtSurface = (depth, char, strRxp, decNumRxp, hexNumRxp) => {
-	if(!depth) return $ => char;
-	return escapedAtSurface(depth-1, strRxp, decNumRxp, hexNumRxp);
-};
-const unescapedAtSurfaceOrBelow = (depth, char, strRxp, decNumRxp, hexNumRxp) => {
-	if(!depth) return $ => char;
-	return $ => choice(
-		char,
-		unescapedAtSurface(depth, char, strRxp, decNumRxp, hexNumRxp)($)
-	);
-};
+		default: return escapedAtSurface(depth, /[a-zA-Z\d]+/, /\d+/, /([a-fA-F\d]{2}){1,2}/);*/
 
 
 const chainOf = (rule) => prec.right(repeat1(rule));
+
+
+const name = (charsRule) => {
+	let forMacroName = prec.right(repeat1(choice( charsRule, "#" )));
+	let notForMacroName = prec.right(repeat1(choice( charsRule, " " )));
+	return $ => choice(
+		notForMacroName,
+		seq(
+			optional(notForMacroName),
+			seq(
+				alias($.__macro_start, $.macroHash),
+				forMacroName,
+				repeat(seq(
+					/ |\r?\n/,
+					optional(notForMacroName),
+					alias($.__macro_start, $.macroHash),
+					forMacroName,
+				)),
+				optional(seq(
+					/ |\r?\n/,
+					optional(notForMacroName),
+				)),
+			),
+		),
+	);
+};
 
 
 module.exports = grammar({
@@ -81,6 +52,9 @@ module.exports = grammar({
 	
 	externals: $ => [
 		$.__EOF,					// (no content) determines if there are no more tokens
+		$.__just_ampersand,
+		
+		$.__invalid,
 		
 		$.__just_at,				// returns "@" if it does *not* begin an attribute
 		$.__attribute_start,		// returns "@" if it begins an attribute
@@ -101,6 +75,9 @@ module.exports = grammar({
 		$.__rollQuery_start,		// returns "?" (or equivalent HTML entity) if it begins a roll query
 		$.__rollQuery_pipe_hasDefault,	// returns "|" (or equivalent HTML entity) if it has a default value (i.e., only one option)
 		$.__rollQuery_pipe_hasOptions,	// returns "|" (or equivalent HTML entity) if it has multiple options
+		$.__rollQuery_end,
+		
+		//$.__html_entity,
 	],
 	
 	extras: $ => [
@@ -182,17 +159,16 @@ module.exports = grammar({
 		  │ Strings
 		  └──────────────────────────────*/
 		
-		/*_string: $ => prec.right(seq(
-			chainOf(/[^#]|# /),
-			optional(seq( "#", $.__EOF )),
-		)),*/
-		_stringNL: $ => prec.right(choice(
+		_stringNL: $ => prec.right(repeat1(choice(
+			/[^#]/,
 			seq(
-				chainOf(/[^#]|# |#?\r?\n/),
-				optional(seq( "#", $.__EOF )),
+				$.__just_hash,
+				choice(
+					/ |\r?\n/,
+					$.__EOF,
+				),
 			),
-			seq( "#", $.__EOF ),
-		)),
+		))),
 		
 		_wsp_inline: $ => /\s+/,
 		
@@ -201,46 +177,14 @@ module.exports = grammar({
 		  │ Special Characters
 		  └──────────────────────────────*/
 		
-		//__increaseDepth: increaseDepth,
-		//__decreaseDepth: increaseDepth,
-		
-		_at: matchChar("@", depth),
-		_at1: matchChar("@", depth+1),
-		_percent: matchChar("%", depth),
-		_percent1: matchChar("%", depth+1),
-		_hash: matchChar("#", depth),
-		_hash1: matchChar("#", depth+1),
-		_ampersand: matchChar("&", depth),
-		_ampersand1: matchChar("&", depth+1),
-		_leftBracket: matchChar("[", depth),
-		_leftBracket1: matchChar("[", depth+1),
-		_leftParen: matchChar("(", depth),
-		_leftParen1: matchChar("(", depth+1),
-		_leftBrace: matchChar("{", depth),
-		_leftBrace1: matchChar("{", depth+1),
-		_plus: matchChar("+", depth),
-		_plus1: matchChar("+", depth+1),
-		_minus: matchChar("-", depth),
-		_minus1: matchChar("-", depth+1),
-		_rightBrace: matchChar("}", depth),
-		_rightBrace1: matchChar("}", depth+1),
-		_rightParen: matchChar(")", depth),
-		_rightParen1: matchChar(")", depth+1),
-		_rightBracket: matchChar("]", depth),
-		_rightBracket1: matchChar("]", depth+1),
-		_pipe: matchChar("|", depth),
-		_pipe1: matchChar("|", depth+1),
-		_questionMark: matchChar("?", depth),
-		_questionMark1: matchChar("?", depth+1),
-		_comma: matchChar(",", depth),
-		_comma1: matchChar(",", depth+1),
-		_equals: matchChar("=", depth),
-		_equals1: matchChar("=", depth+1),
-		_tilde: matchChar("~", depth),
-		_tilde1: matchChar("~", depth+1),
-		
-		htmlEntity: $ => prec(1, matchChar()($)),
-		_escapedHtmlEntity: $ => prec(1, matchChar(void 0, depth+2)($)),
+		//TODO
+		__just_ampersand: $ => "&",
+		__leftBracket: $ => "[",
+		__leftBrace: $ => "{",
+		__rightBrace: $ => "}",
+		__rightBracket: $ => "]",
+		__pipe: $ => "|",
+		__comma: $ => ",",
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -259,40 +203,14 @@ module.exports = grammar({
 			alias("selected", $.token),
 			alias("target", $.token),
 		),
-		_propertyName: $ => choice(
-			$._propertyName_notMacroName,
-			seq(
-				optional($._propertyName_notMacroName),
-				alias($.__macro_start, $.macroHash),
-				$._propertyName_macroName,
-				repeat(seq(
-					/ |\r?\n/,
-					optional($._propertyName_notMacroName),
-					alias($.__macro_start, $.macroHash),
-					$._propertyName_macroName,
-				)),
-				optional(seq(
-					/ |\r?\n/,
-					$._propertyName_notMacroName
-				)),
-			),
-		),
-		_propertyName_notMacroName: $ => prec.right(repeat1(choice(
-			/[^@%#}|\r\n]+/,
+		_propertyName: $ => name(choice(
+			/[^@%#}| \r\n]+/,
 			//$.htmlEntity,
 			$.__just_at,
 			$.__just_percent,
-			//$._ampersand,
-			alias(/[@%]\{/, $.invalid),
-		))),
-		_propertyName_macroName: $ => prec.right(repeat1(choice(
-			/[^@%}| \r\n]+/,
-			//$.htmlEntity,
-			$.__just_at,
-			$.__just_percent,
-			//$._ampersand,
-			alias(/[@%]\{/, $.invalid),
-		))),
+			//$.__just_ampersand,
+			alias($.__invalid, $.invalid),	// @{ or %{
+		))($),
 		_selector: $ => choice(
 			$._tokenSelector,
 			alias($._propertyName, $.characterName),
@@ -326,13 +244,13 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		attribute: $ => choice(
-			alias($._attribute_empty, $.invalid),
 			seq(
 				$.__attribute_start,
 				"{",
 				$._attribute,
 				"}",
 			),
+			alias($._attribute_empty, $.invalid),
 			alias("@{", $.invalid),
 		),
 		_attribute_empty: $ => seq( $.__attribute_start, "{}" ),
@@ -446,7 +364,7 @@ module.exports = grammar({
 		_macro: $ => seq(
 			alias($.__macro_start, $.macroHash),
 			prec.right(repeat1(choice(
-				/[^@% \r\n]/,
+				/[^@% \r\n]+/,
 				$.attribute,
 				$.ability,
 				$.__just_at,
@@ -467,22 +385,31 @@ module.exports = grammar({
 			$.rollQuery,
 			alias($._rollQuery_invalid_start, $.invalid),
 		),
-		rollQuery: $ => {
+		/*rollQuery: $ => {
 			depth++;
 			let result = choice(
 				alias($._rollQuery_empty, $.invalid),
 				seq(
 					$.__rollQuery_start,
-					alias($._leftBrace, $.LEFT),
+					$.__leftBrace,
 					$._rollQuery_content,
-					alias($._rightBrace, $.RIGHT),
+					$.__rightBrace,
 				),
 			);
 			depth--;
 			return result;
-		},
-		_rollQuery_empty: $ => seq( $.__rollQuery_start, $._leftBrace, $._rightBrace ),
-		_rollQuery_invalid_start: $ => seq( $._questionMark, $._leftBrace ),
+		},*/
+		rollQuery: $ => choice(
+			alias($._rollQuery_empty, $.invalid),
+			seq(
+				$.__rollQuery_start,
+				$.__leftBrace,
+				$._rollQuery_content,
+				$.__rightBrace,
+			),
+		),
+		_rollQuery_empty: $ => seq( $.__rollQuery_start, $.__leftBrace, $.__rightBrace ),
+		_rollQuery_invalid_start: $ => seq( $.__just_questionmark, $.__leftBrace ),
 		_rollQuery_content: $ => seq(
 			choice(
 				$.prompt,
@@ -497,11 +424,11 @@ module.exports = grammar({
 							$.__rollQuery_pipe_hasOptions,
 							optional(seq(
 								optional($.option),
-								alias($._pipe, $.PIPE),
+								$.__pipe,
 								optional($.option),
 								repeat(
 									seq(
-										alias($._pipe, $.PIPE),
+										$.__pipe,
 										optional($.option),
 									),
 								),
@@ -519,9 +446,9 @@ module.exports = grammar({
 			$.ability,
 			$.__macro_start,
 			//$.htmlEntity,
-			//$._at,
-			//$._percent,
-			//$._ampersand,
+			//$.__just_at,
+			//$.__just_percent,
+			//$.__just_ampersand,
 		))),*/
 		prompt: $ => $._propertyName,
 		
@@ -539,7 +466,7 @@ module.exports = grammar({
 		option: $ => prec.right(seq(
 			$.optionName,
 			optional(seq(
-				$._comma,
+				$.__comma,
 				optional($.optionValue),
 			)),
 		)),
@@ -551,9 +478,9 @@ module.exports = grammar({
 					$.ability,
 					alias($.__macro_start, $.macroHash),
 					//$.htmlEntity,
-					$._at,
-					$._percent,
-					$._ampersand,
+					$.__just_at,
+					$.__just_percent,
+					$.__just_ampersand,
 				)),
 			)),
 		),
@@ -572,11 +499,11 @@ module.exports = grammar({
 					),
 					//$.property,
 					//$.button,
-					$._at,
-					$._percent,
-					$._ampersand,
-					$._questionMark,
-					$._leftBrace,
+					$.__just_at,
+					$.__just_percent,
+					$.__just_ampersand,
+					$.__just_questionmark,
+					$.__leftBrace,
 				),
 			)),
 		),
@@ -769,45 +696,18 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		label: $ => seq(
-			$._leftBracket,
-			optional(choice(
-				$._label_notMacroName,
-				seq(
-					optional($._label_notMacroName),
-					alias($.__macro_start, $.macroHash),
-					$._label_macroName,
-					repeat(seq(
-						/ |\r?\n/,
-						optional($._label_notMacroName),
-						alias($.__macro_start, $.macroHash),
-						$._label_macroName,
-					)),
-					optional(seq(
-						/ |\r?\n/,
-						$._label_notMacroName
-					)),
-				),
-			)),
-			$._rightBracket,
+			$.__leftBracket,
+			optional(name(choice(
+				/[^@%#&\[ \r\n\]]+/,
+				$.attribute,
+				$.ability,
+				//$.htmlEntity,
+				$.__just_at,
+				$.__just_percent,
+				$.__just_ampersand,
+			))($)),
+			$.__rightBracket,
 		),
-		_label_notMacroName: $ => repeat1(choice(
-			/[^@%#&\[\r\n\]]+/,
-			$.attribute,
-			$.ability,
-			//$.htmlEntity,
-			$.__just_at,
-			$.__just_percent,
-			$._ampersand,
-		)),
-		_label_macroName: $ => repeat1(choice(
-			/[^@%&\[ \r\n\]]+/,
-			$.attribute,
-			$.ability,
-			//$.htmlEntity,
-			$.__just_at,
-			$.__just_percent,
-			$._ampersand,
-		)),
 		
 		_labels_and_wsp: $ => prec.right(choice(
 			$._wsp_inline,
@@ -1031,16 +931,16 @@ module.exports = grammar({
 			alias($._groupRoll_invalid, $.invalid),
 		),
 		groupRoll: $ => prec.right(seq(
-			$._leftBrace,
+			$.__leftBrace,
 			optional(alias($._groupRoll_invalid_commas, $.invalid)),
 			$.formula,
 			repeat(seq(
-				$._comma,
+				$.__comma,
 				optional(alias($._groupRoll_invalid_commas, $.invalid)),
 				$.formula,
 			)),
 			optional(alias($._groupRoll_invalid_commas, $.invalid)),
-			$._rightBrace,
+			$.__rightBrace,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 			optional(alias($._element_invalid_remainder, $.invalid)),
 		)),
@@ -1050,13 +950,13 @@ module.exports = grammar({
 				/[dfhklDFHKL<=>\d]/,	//potentially valid
 		)),
 		_groupRoll_invalid: $ => seq(
-			$._leftBrace,
+			$.__leftBrace,
 			/\s*(,\s*)*/,
-			$._rightBrace,
+			$.__rightBrace,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 			optional($._groupRoll_invalid_remainder),
 		),
-		_groupRoll_invalid_commas: $ => prec.right(repeat1(prec.right(choice($._labels_and_wsp, $._comma)))),
+		_groupRoll_invalid_commas: $ => prec.right(repeat1(prec.right(choice($._labels_and_wsp, $.__comma)))),
 		_groupRoll_invalid_remainder: $ => seq(
 			/[^@%#\[({*/+\-\s})\]dfhklDFHKL<=>\d]/,	//definitely invalid
 			//treat the rest as invalid
@@ -1122,49 +1022,21 @@ module.exports = grammar({
 			optional(alias($._unsigned_integer_with_placeholders, $.count)),
 			//keyword (the letter 't')
 			$.__tableRoll_start,
-			$._leftBracket,
+			$.__leftBracket,
 			//table name
 			$.tableName,
-			$._rightBracket,
+			$.__rightBracket,
 		),
-		tableName: $ => choice(
-			$._tableRoll_notMacroName,
-			seq(
-				optional($._tableRoll_notMacroName),
-				alias($.__macro_start, $.macroHash),
-				$._tableRoll_macroName,
-				repeat(seq(
-					/ |\r?\n/,
-					optional($._tableRoll_notMacroName),
-					alias($.__macro_start, $.macroHash),
-					$._tableRoll_macroName,
-				)),
-				optional(seq(
-					/ |\r?\n/,
-					$._tableRoll_notMacroName
-				)),
-			),
-		),
-		_tableRoll_notMacroName: $ => repeat1(choice(
-			/[^@%#&\r\n\]]+/,
+		tableName: $ => name(choice(
+			/[^@%#& \r\n\]]+/,
 			$.attribute,
 			$.ability,
 			prec(1, "@{"),
 			prec(1, "%{"),
 			$.__just_at,
 			$.__just_percent,
-			$._ampersand,
-		)),
-		_tableRoll_macroName: $ => repeat1(choice(
-			/[^@%& \r\n\]]+/,
-			$.attribute,
-			$.ability,
-			prec(1, "@{"),
-			prec(1, "%{"),
-			$.__just_at,
-			$.__just_percent,
-			$._ampersand,
-		)),
+			$.__just_ampersand,
+		))($),
 		
 		
 	},

@@ -514,3 +514,29 @@ Attribute: Invalid: @{x@{y}z}
 		(attributeName
 			(invalid))))
 
+==================
+Attribute: Valid but Not Accepted: @{ab] + @{a}
+==================
+
+@{ab] + @{a}
+
+---
+
+(roll20_script
+	(attribute
+		(attributeName
+			(invalid))))
+
+==================
+Attribute: Invalid: @{ab] + %{a}
+==================
+
+@{ab] + %{a}
+
+---
+
+(roll20_script
+	(attribute
+		(attributeName
+			(invalid))))
+

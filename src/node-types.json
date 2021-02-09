@@ -19,21 +19,6 @@
     }
   },
   {
-    "type": "LEFT",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "PIPE",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "RIGHT",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "ability",
     "named": true,
     "fields": {},
@@ -712,20 +697,8 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
-        {
-          "type": "LEFT",
-          "named": true
-        },
-        {
-          "type": "PIPE",
-          "named": true
-        },
-        {
-          "type": "RIGHT",
-          "named": true
-        },
         {
           "type": "defaultValue",
           "named": true
@@ -807,6 +780,10 @@
     }
   },
   {
+    "type": " ",
+    "named": false
+  },
+  {
     "type": "#",
     "named": false
   },
@@ -815,51 +792,11 @@
     "named": false
   },
   {
-    "type": "&",
-    "named": false
-  },
-  {
-    "type": "(",
-    "named": false
-  },
-  {
-    "type": ")",
-    "named": false
-  },
-  {
-    "type": "+",
-    "named": false
-  },
-  {
-    "type": "-",
-    "named": false
-  },
-  {
     "type": ".",
     "named": false
   },
   {
-    "type": ";",
-    "named": false
-  },
-  {
-    "type": "=",
-    "named": false
-  },
-  {
-    "type": "?",
-    "named": false
-  },
-  {
     "type": "@{",
-    "named": false
-  },
-  {
-    "type": "[",
-    "named": false
-  },
-  {
-    "type": "]",
     "named": false
   },
   {
@@ -948,10 +885,6 @@
   },
   {
     "type": "}",
-    "named": false
-  },
-  {
-    "type": "~",
     "named": false
   }
 ]

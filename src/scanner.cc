@@ -23,6 +23,9 @@ struct Scanner;
 
 enum TokenType {
 	_EOF,
+	JUST_AMPERSAND,
+	
+	_INVALID,
 	
 	JUST_AT,
 	ATTRIBUTE_START,
@@ -43,11 +46,20 @@ enum TokenType {
 	QUERY_START,
 	QUERY_PIPE_HASDEFAULT,
 	QUERY_PIPE_HASOPTIONS,
-	QUERY_COMMA,
 	QUERY_END,
+	//QUERY_COMMA,
+	//QUERY_END,
 };
 
-const bool doLog = true;
+enum QueryType {
+	QT_INVALID_EMPTY,
+	QT_INVALID_UNCLOSED,
+	QT_PROMPT_ONLY,
+	QT_DEFAULT_VALUE,
+	QT_OPTIONS,
+};
+
+const bool doLog = false;
 void log(string str) {
 	if (doLog) cout << str;
 }
@@ -56,6 +68,7 @@ char advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
 	return lexer->lookahead;
 }
+
 
 bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
 	log(">>>> check_for_closure\n");
@@ -103,7 +116,7 @@ bool scan_diceRoll_start(TSLexer *lexer) {
 	if (c == 'f' || c == 'F') {
 		return true;
 	}
-	else if (regex_match((string()=c), regex("\\d"))) {	//c is a digit
+	else if (regex_match(string({c}), regex("\\d"))) {	//c is a digit
 		return true;
 	}
 	else if (c == '@' || c == '%') {
@@ -150,6 +163,7 @@ bool scan_tableRoll_start(TSLexer *lexer) {
 	}
 	return false;
 }
+
 
 map<string, string> entitiesMap;
 
@@ -215,19 +229,20 @@ string get_entity(TSLexer *lexer, unsigned depth) {
 	}
 }
 
+
 struct Query {
 	Scanner *scanner;
 	unsigned depth = 0;
 	unsigned option_count = 0;
 	enum QueryPart : unsigned { qpStart, qpPrompt, qpDefault, qpName, qpValue };
-	unsigned at_part = qpStart;
+	int type = 0;
 	
 	Query(Scanner *scanner, unsigned depth) : scanner(scanner), depth(depth) {}
 	
 	string serialize() {
 		log(">>>> Query.serialize\n");
-		log("->>> Query serialized to \"" + to_string(depth)+" "+to_string(option_count)+" "+to_string(at_part) + "\"\n");
-		return to_string(depth)+" "+to_string(option_count)+" "+to_string(at_part);
+		log("->>> Query serialized to \"" + to_string(depth)+" "+to_string(option_count)+" "+to_string(type) + "\"\n");
+		return to_string(depth)+" "+to_string(option_count)+" "+to_string(type);
 	}
 	
 	void deserialize(const char *buffer) {
@@ -236,7 +251,7 @@ struct Query {
 		size_t p;
 		depth = stoul(data, &p);
 		option_count = stoul(data.substr(p+1), &p);
-		at_part = stoul(data.substr(p+1), &p);
+		type = stoi(data.substr(p+1), &p);
 	}
 	
 	bool scan_query_start(TSLexer *lexer, char firstChar) {
@@ -258,35 +273,115 @@ struct Query {
 		}
 		else if (c != '{') return false;
 		
-		lexer->mark_end(lexer);
-		log("----------\n");
-		at_part = qpPrompt;
-		if (scan_query_full(lexer)) {
+		return true;
+	}
+	
+	bool scan_query_prompt(TSLexer *lexer, int *type) {
+		log(">>>> Query.scan_query_prompt\n");
+		char c = lexer->lookahead;
+		bool promptHasLength = false;
+		string entity = "";
+		
+		while (c !=0) {
+			if (c == '}') {
+				if (!promptHasLength) {
+					*type = this->type |= QT_INVALID_EMPTY;
+				}
+				else {
+					*type = this->type |= QT_PROMPT_ONLY;
+				}
+				advance(lexer);
+				return promptHasLength;
+			}
+			else if (c == '|') {
+				advance(lexer);
+				return true;
+			}
+			else if (c == '&') {
+				entity = get_entity(lexer, depth);
+				if (entity != "") {
+					if (matchDelimiter(entity, "}", depth, false)){
+						if (!promptHasLength) {
+							*type = this->type |= QT_INVALID_EMPTY;
+						}
+						return promptHasLength;
+					}
+					if (matchDelimiter(entity, "|", depth, false)){
+						return true;
+					}
+				}
+				promptHasLength = true;
+			}
+			else {
+				promptHasLength = true;
+				c = advance(lexer);
+			}
+		}
+		
+		*type = this->type |= QT_INVALID_UNCLOSED;
+		return false;
+	}
+	
+	bool scan_query_values(TSLexer *lexer, int *type) {
+		log(">>>> Query.scan_query_values\n");
+		char c = lexer->lookahead;
+		string entity = "";
+		
+		while (c != 0) {
+			if ((c == '}' || c == '|') && depth > 0) {
+				*type = this->type |= QT_INVALID_UNCLOSED;
+				return false;
+			}
+			if (c == '}'){
+				if (*type & !QT_OPTIONS) *type = this->type |= QT_DEFAULT_VALUE;
+				return true;
+			}
+			if (c == '|') {
+				*type = this->type |= QT_OPTIONS;
+			}
+			else if (c == '&') {
+				entity = get_entity(lexer, depth);
+				if (entity != "") {
+					if (matchDelimiter(entity, "}", depth, false)){
+						if (*type & !QT_OPTIONS) *type = this->type |= QT_DEFAULT_VALUE;
+						return true;
+					}
+					else if (matchDelimiter(entity, "|", depth, false)){
+						*type = this->type |= QT_OPTIONS;
+					}
+				}
+				continue;
+			}
+			c = advance(lexer);
+		}
+		
+		*type = this->type |= QT_INVALID_UNCLOSED;
+		return false;
+	}
+	
+	bool scan_query_end(TSLexer *lexer) {
+		log(">>>> Query.scan_query_end\n");
+		char c = lexer->lookahead;
+		
+		if (c == '}' && depth == 0) {
+			advance(lexer);
 			return true;
+		}
+		if (c == '&' && depth > 0) {
+			string entity = get_entity(lexer, depth);
+			if (entity == "") return false;
+			if (!matchDelimiter(entity, "}", depth, false)) return false;
 		}
 		
 		return false;
 	}
 	
-	bool scan_query_prompt(TSLexer *lexer) {
-		//TODO
-		return false;
-	}
-	
-	bool scan_query_pipe(TSLexer *lexer) {
-		//TODO
-		return false;
-	}
-	
-	bool scan_query_end(TSLexer *lexer) {
-		//TODO
-		return false;
-	}
-	
-	bool scan_query_full(TSLexer *lexer) {
-		//TODO
-		return true;
-		return false;
+	bool scan_query_full(TSLexer *lexer, char firstChar/*, int *type*/) {
+		/**type = 0;*/
+		int type = 0;
+		if (!scan_query_start(lexer, firstChar)) return false;
+		if (!scan_query_prompt(lexer, &type)) return false;
+		return scan_query_values(lexer, &type);
 	}
 	
 };
@@ -340,11 +435,27 @@ struct Scanner {
 	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
 		log(">>>> Scanner.scan '" + (string()=lexer->lookahead) + "' [ ");
-for(size_t i=0; i<17; i++){ log(to_string(valid_symbols[i]) + " "); }
+//for(size_t i=0; i<15; i++){ log(to_string(valid_symbols[i]) + " "); }
+if(valid_symbols[_EOF])log("_EOF,");
+if(valid_symbols[JUST_AT])log("JUST_AT,");
+if(valid_symbols[ATTRIBUTE_START])log("ATTRIBUTE_START,");
+if(valid_symbols[JUST_PERCENT])log("JUST_PERCENT,");
+if(valid_symbols[ABILITY_START])log("ABILITY_START,");
+if(valid_symbols[JUST_HASH])log("JUST_HASH,");
+if(valid_symbols[MACRO_START])log("MACRO_START,");
+if(valid_symbols[JUST_D])log("JUST_D,");
+if(valid_symbols[DICE_ROLL_START])log("DICE_ROLL_START,");
+if(valid_symbols[JUST_T])log("JUST_T,");
+if(valid_symbols[TABLE_ROLL_START])log("TABLE_ROLL_START,");
+if(valid_symbols[JUST_QUESTIONMARK])log("JUST_QUESTIONMARK,");
+if(valid_symbols[QUERY_START])log("QUERY_START,");
+if(valid_symbols[QUERY_PIPE_HASDEFAULT])log("QUERY_PIPE_HASDEFAULT,");
+if(valid_symbols[QUERY_PIPE_HASOPTIONS])log("QUERY_PIPE_HASOPTIONS,");
 log("]\n");
 		lexer->mark_end(lexer);
 		log("----------\n");
 		char c = lexer->lookahead;
+		int queryType = 0;
 		
 		if (c == 0) {
 			log("->>> _EOF\n");
@@ -353,14 +464,20 @@ log("]\n");
 		}
 		else if (c == '@') {
 			log("->>> '@'\n");
-			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT]) {
-				advance(lexer);
+			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT] || valid_symbols[_INVALID]) {
+				c = advance(lexer);
 				lexer->mark_end(lexer);
 				log("----------\n");
 				
 				if (valid_symbols[ATTRIBUTE_START] && check_for_closure(lexer, '{', '}')) {
 					log("-->> ATTRIBUTE_START\n");
 					lexer->result_symbol = ATTRIBUTE_START;
+					return true;
+				}
+				else if (valid_symbols[_INVALID] && c == '{') {
+					lexer->mark_end(lexer);
+					log("-->> _INVALID\n");
+					lexer->result_symbol = _INVALID;
 					return true;
 				}
 				else if (valid_symbols[JUST_AT]) {
@@ -372,14 +489,20 @@ log("]\n");
 		}
 		else if (c == '%') {
 			log("->>> '%'\n");
-			if (valid_symbols[ABILITY_START] || valid_symbols[JUST_PERCENT]) {
-				advance(lexer);
+			if (valid_symbols[ABILITY_START] || valid_symbols[JUST_PERCENT] || valid_symbols[_INVALID]) {
+				c = advance(lexer);
 				lexer->mark_end(lexer);
 				log("----------\n");
 				
 				if (valid_symbols[ABILITY_START] && check_for_closure(lexer, '{', '}')) {
 					log("-->> ABILITY_START\n");
 					lexer->result_symbol = ABILITY_START;
+					return true;
+				}
+				else if (valid_symbols[_INVALID] && c == '{') {
+					lexer->mark_end(lexer);
+					log("-->> _INVALID\n");
+					lexer->result_symbol = _INVALID;
 					return true;
 				}
 				else if (valid_symbols[JUST_PERCENT]) {
@@ -409,7 +532,7 @@ log("]\n");
 			}
 		}
 		else if (c == 'd' || c == 'D') {
-			log("->>> '"+(string()=c)+"'\n");
+			log("->>> '"+string({c})+"'\n");
 			if (valid_symbols[DICE_ROLL_START] || valid_symbols[JUST_D]) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
@@ -429,7 +552,7 @@ log("]\n");
 			}
 		}
 		else if (c == 't' || c == 'T') {
-			log("->>> '"+(string()=c)+"'\n");
+			log("->>> '"+string({c})+"'\n");
 			if (valid_symbols[TABLE_ROLL_START] || valid_symbols[JUST_T]) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
@@ -459,12 +582,16 @@ log("]\n");
 					Query *query = new Query(this, queries.size());
 					queries.push(query);
 					
-					if (queries.top()->scan_query_start(lexer, '?')) {
+					if (queries.top()->scan_query_full(lexer, '?'/*, &queryType*/)) {
 						log("---> QUERY_START\n");
 						lexer->result_symbol = QUERY_START;
 						return true;
 					}
-					log("-->> pop a Query\n");
+					else {
+						log("-->> pop a Query\n");
+						queries.pop();
+						return false;
+					}
 				}
 				
 				if (valid_symbols[JUST_QUESTIONMARK]) {
@@ -475,51 +602,108 @@ log("]\n");
 			}
 		}
 		else if (c == '|') {
-/*			if (valid_symbols[QUERY_HASDEFAULT] || valid_symbols[QUERY_HASOPTIONS]) {
+			log("->>> '|'\n");
+			if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() == 0) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
-				type = check_for_roll_query_options(lexer, 0);
-				if (type == 1 && valid_symbols[QUERY_HASDEFAULT]) {
-					lexer->result_symbol = QUERY_HASDEFAULT;
-					return true;
-				}
-				else if (type == 2 && valid_symbols[QUERY_HASOPTIONS]) {
-					lexer->result_symbol = QUERY_HASOPTIONS;
-					return true;
-				}
-			}*/
-		}
-		else if (c == '&') {
-			log("->>> '&'\n");
-			if (valid_symbols[QUERY_START]) {
-				c = advance(lexer);
+				log("----------\n");
 				
-				if (queries.top()->scan_query_start(lexer, '&')) {
-					log("-->> QUERY_START\n");
-					lexer->result_symbol = QUERY_START;
+				if (queries.top()->scan_query_values(lexer, &queryType)) {
+					if (queryType & QT_DEFAULT_VALUE) {
+						log("---> QUERY_PIPE_HASDEFAULT\n");
+						lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
+					}
+					else if (queryType & QT_OPTIONS) {
+						log("---> QUERY_PIPE_HASOPTIONS\n");
+						lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
+					}
 					return true;
 				}
 			}
-/*			else if (valid_symbols[QUERY_HASDEFAULT] || valid_symbols[QUERY_HASOPTIONS]) {
-				get_character_depth_and_type(lexer, &depth, &type);
-				if (type == 3) {	//pipe
+		}
+		else if (c == '}') {
+			log("->>> '}'\n");
+			if (valid_symbols[QUERY_END] && queries.size() == 0) {
+				
+				if (queries.top()->scan_query_end(lexer)) {
 					lexer->mark_end(lexer);
-					type = check_for_roll_query_options(lexer, depth);
-					if (type == 1 && valid_symbols[QUERY_HASDEFAULT]) {
-						lexer->result_symbol = QUERY_HASDEFAULT;
+					log("----------\n");
+					
+					lexer->result_symbol = QUERY_END;
+					queries.pop();
+					return true;
+				}
+			}
+		}
+		else if (c == '&') {
+			log("->>> '&'\n");
+			string entity = get_entity(lexer, queries.size());
+			
+			if (entity == "") {
+				if (valid_symbols[JUST_AMPERSAND]) {
+					log("-->> JUST_AMPERSAND\n");
+					lexer->result_symbol = JUST_AMPERSAND;
+					return true;
+				}
+			}
+			if (valid_symbols[QUERY_START]) {
+				if (matchDelimiter(entity, "?", queries.size(), false)) {
+					log("-->> '?'\n");
+					lexer->mark_end(lexer);
+					log("----------\n");
+					
+					log("-->> push a Query\n");
+					Query *query = new Query(this, queries.size());
+					queries.push(query);
+					
+					if (queries.top()->scan_query_full(lexer, '&'/*, &queryType*/)) {
+						log("---> QUERY_START\n");
+						lexer->result_symbol = QUERY_START;
 						return true;
 					}
-					else if (type == 2 && valid_symbols[QUERY_HASOPTIONS]) {
-						lexer->result_symbol = QUERY_HASOPTIONS;
+					else {
+						log("-->> pop a Query\n");
+						queries.pop();
+						return false;
+					}
+				}
+			}
+			else if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() > 0) {
+				if (matchDelimiter(entity, "|", queries.size(), false)) {
+					log("-->> '|'\n");
+					lexer->mark_end(lexer);
+					log("----------\n");
+					
+					if (queries.top()->scan_query_values(lexer, &queryType)) {
+						if (queryType & QT_DEFAULT_VALUE) {
+							log("---> QUERY_PIPE_HASDEFAULT\n");
+							lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
+						}
+						else if (queryType & QT_OPTIONS) {
+							log("---> QUERY_PIPE_HASOPTIONS\n");
+							lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
+						}
 						return true;
 					}
 				}
-			}*/
+			}
+			if (valid_symbols[QUERY_END] && queries.size() == 0) {
+				if (queries.top()->scan_query_end(lexer)) {
+					log("-->> '}'\n");
+					lexer->mark_end(lexer);
+					log("----------\n");
+					
+					lexer->result_symbol = QUERY_END;
+					queries.pop();
+					return true;
+				}
+			}
 		}
 		else {
 			log("->>> (no match)\n");
 			return false;
 		}
+		return false;
 	}
 };
 

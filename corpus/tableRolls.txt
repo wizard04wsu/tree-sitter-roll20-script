@@ -84,7 +84,7 @@ Table Roll: Valid: [[ t[@{a}] ]]
 Table Roll: Valid: [[ t[@{a]b}] ]]
 ==================
 
-[[ t[@{a}] ]]
+[[ t[@{a]b}] ]]
 
 ---
 
@@ -100,7 +100,7 @@ Table Roll: Valid: [[ t[@{a]b}] ]]
 Table Roll: Valid: [[ t[@{ab] ]]
 ==================
 
-[[ t[@{a}] ]]
+[[ t[@{ab] ]]
 
 ---
 
@@ -110,10 +110,35 @@ Table Roll: Valid: [[ t[@{ab] ]]
 			(tableName))))
 
 ==================
-Table Roll: Valid: [[ t[@{ab] + @{a} ] ]]
+Table Roll w/o closing bracket: Invalid: [[ t[@{ab]} ]]
+==================
+
+[[ t[@{ab]} ]]
+
+---
+
+(roll20_script
+	(attribute
+		(attributeName)))
+
+==================
+Table Roll w/o closing bracket, Attribute bad: Invalid: [[ t[@{ab] + @{a} ]]
 ==================
 
 [[ t[@{ab] + @{a} ]]
+
+---
+
+(roll20_script
+	(attribute
+		(attributeName
+			(invalid))))
+
+==================
+Table Roll good, Attribute not accepted: [[ t[@{ab] + @{a} ] ]]
+==================
+
+[[ t[@{ab] + @{a} ] ]]
 
 ---
 
@@ -126,7 +151,7 @@ Table Roll: Valid: [[ t[@{ab] + @{a} ] ]]
 						(invalid)))))))
 
 ==================
-Table Roll: Valid: [[ t[n]@{a}_#m ]]
+Table Roll valid, remainder not accepted: [[ t[n]@{a}_#m ]]
 ==================
 
 [[ t[n]@{a}_#m ]]
@@ -140,7 +165,5 @@ Table Roll: Valid: [[ t[n]@{a}_#m ]]
 		(attribute
 			(attributeName))
 		(invalid)
-		(macro
-			(macroHash)
-			(macroName))))
+		(macroHash)))
 
