@@ -1,25 +1,5 @@
-/*		case "@": return unescapedAtSurface(depth, char, /commat/, 64, /[xX](00)?40/);
-		case "%": return unescapedAtSurface(depth, char, /percnt/, 37, /[xX](00)?25/);
-		case "#": return unescapedAtSurface(depth, char, /num/, 35, /[xX](00)?23/);
-		case "&": return unescapedAtSurface(depth, char, /amp|AMP/, 38, /[xX](00)?26/);
-		case "[": return unescapedAtSurfaceOrBelow(depth, char, /lsqb|lbrack/, 91, /[xX](00)?5[bB]/);
-		case "(": return unescapedAtSurfaceOrBelow(depth, char, /lpar/, 40, /[xX](00)?28/);
-		case "{": return unescapedAtSurfaceOrBelow(depth, char, /lbrace|lcub/, 123, /[xX](00)?7[bB]/);
-		case "+": return unescapedAtSurfaceOrBelow(depth, char, /plus/, 43, /[xX](00)?2[bB]/);
-		case "-": return unescapedAtSurfaceOrBelow(depth, char, /hyphen|dash/, 45, /(00)?2[dD]/);
-		case "}": return unescapedAtSurface(depth, char, /rbrace|rcub/, 125, /[xX](00)?7[dD]/);
-		case ")": return unescapedAtSurfaceOrBelow(depth, char, /rpar/, 41, /[xX](00)?29/);
-		case "]": return unescapedAtSurfaceOrBelow(depth, char, /rsqb|rbrack/, 93, /[xX](00)?5[dD]?/);
-		case "|": return unescapedAtSurface(depth, char, /verbar|vert|VerticalLine/, 124, /[xX](00)?7[cC]/);
-		case "?": return unescapedAtSurfaceOrBelow(depth, char, /quest/, 63, /[xX](00)?3[fF]/);
-		case ",": return unescapedAtSurface(depth, char, /comma/, 44, /[xX](00)?2[cC]/);
-		case "=": return unescapedAtSurfaceOrBelow(depth, char, /equals/, 61, /[xX](00)?3[dD]/);
-		case "~": return unescapedAtSurfaceOrBelow(depth, char, null, 126, /[xX](00)?7[eE]/);
-		default: return escapedAtSurface(depth, /[a-zA-Z\d]+/, /\d+/, /([a-fA-F\d]{2}){1,2}/);*/
-
 
 const chainOf = (rule) => prec.right(repeat1(rule));
-
 
 const name = (charsRule) => {
 	let forMacroName = prec.right(repeat1(choice( charsRule, "#" )));
@@ -51,33 +31,38 @@ module.exports = grammar({
 	name: 'roll20_script',
 	
 	externals: $ => [
-		$.__EOF,					// (no content) determines if there are no more tokens
-		$.__just_ampersand,
+		$.__attribute_start,			// @
+		$.__ability_start,				// %
+		$.__macro_start,				// #
+		//$.__html_entity,				// HTML entity
+		$.__diceRoll_start,				// d or D  or equivalent HTML entity
+		$.__tableRoll_start,			// t or T  or equivalent HTML entity
 		
-		$.__invalid,
+		$.__rollQuery_start,			// ?{  or equivalent HTML entity(ies)
+		$.__rollQuery_pipe_hasDefault,	// |  or equivalent HTML entity
+		$.__rollQuery_pipe_hasOptions,	// |  or equivalent HTML entity
+		$.__rollQuery_end,				// }  or equivalent HTML entity
 		
-		$.__just_at,				// returns "@" if it does *not* begin an attribute
-		$.__attribute_start,		// returns "@" if it begins an attribute
 		
-		$.__just_percent,			// returns "%" if it does *not* begin an ability
-		$.__ability_start,			// returns "%" if it begins an ability
+		$.__just_at,					// @
+		$.__just_percent,				// %
+		$.__just_hash,					// #
+		$.__just_ampersand,				// &
+		$.__just_d,						// d or D
+		$.__just_t,						// t or T
+		$.__just_questionmark,			// ?
+		$.__pipe,						// |
+		//$.__comma,					// ,
+		//$.__leftBrace,				// {
+		//$.__rightBrace,				// }
+		//$.__leftBracket,				// [
+		//$.__rightBracket,				// ]
 		
-		$.__just_hash,				// returns "#" if it does *not* reference a macro
-		$.__macro_start,			// returns "#" if it could be refrencing a macro
 		
-		$.__just_d,					// returns "d" or "D" if it does *not* begin a dice roll
-		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
+		$.__EOF,						// no content
 		
-		$.__just_t,					// returns "t" or "T" if it does *not* begin a table roll
-		$.__tableRoll_start,		// returns "t" or "T" if it begins a table roll
-		
-		$.__just_questionmark,		// returns "?" if it does *not* begin a roll query
-		$.__rollQuery_start,		// returns "?" (or equivalent HTML entity) if it begins a roll query
-		$.__rollQuery_pipe_hasDefault,	// returns "|" (or equivalent HTML entity) if it has a default value (i.e., only one option)
-		$.__rollQuery_pipe_hasOptions,	// returns "|" (or equivalent HTML entity) if it has multiple options
-		$.__rollQuery_end,
-		
-		//$.__html_entity,
+		// when there are invalid opening braces on attributes and abilities
+		$.__invalid,					// @ or %
 	],
 	
 	extras: $ => [
@@ -183,7 +168,6 @@ module.exports = grammar({
 		__leftBrace: $ => "{",
 		__rightBrace: $ => "}",
 		__rightBracket: $ => "]",
-		__pipe: $ => "|",
 		__comma: $ => ",",
 		
 		
@@ -658,13 +642,14 @@ module.exports = grammar({
 		label: $ => seq(
 			$.__leftBracket,
 			optional(name(choice(
-				/[^@%#&\[ \r\n\]]+/,
+				///[^@%#&\[ \r\n\]]+/,
+				/[^@%#\[ \r\n\]]+/,
 				$.attribute,
 				$.ability,
 				//$.htmlEntity,
 				$.__just_at,
 				$.__just_percent,
-				$.__just_ampersand,
+				//$.__just_ampersand,
 			))($)),
 			$.__rightBracket,
 		),
@@ -988,14 +973,15 @@ module.exports = grammar({
 			$.__rightBracket,
 		),
 		tableName: $ => name(choice(
-			/[^@%#& \r\n\]]+/,
+			///[^@%#& \r\n\]]+/,
+			/[^@%# \r\n\]]+/,
 			$.attribute,
 			$.ability,
 			prec(1, "@{"),
 			prec(1, "%{"),
 			$.__just_at,
 			$.__just_percent,
-			$.__just_ampersand,
+			//$.__just_ampersand,
 		))($),
 		
 		

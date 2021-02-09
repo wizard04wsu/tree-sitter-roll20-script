@@ -99,10 +99,6 @@
       "type": "STRING",
       "value": "]"
     },
-    "__pipe": {
-      "type": "STRING",
-      "value": "|"
-    },
     "__comma": {
       "type": "STRING",
       "value": ","
@@ -2622,7 +2618,7 @@
                           "members": [
                             {
                               "type": "PATTERN",
-                              "value": "[^@%#&\\[ \\r\\n\\]]+"
+                              "value": "[^@%#\\[ \\r\\n\\]]+"
                             },
                             {
                               "type": "SYMBOL",
@@ -2639,10 +2635,6 @@
                             {
                               "type": "SYMBOL",
                               "name": "__just_percent"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "__just_ampersand"
                             }
                           ]
                         },
@@ -2673,7 +2665,7 @@
                                   "members": [
                                     {
                                       "type": "PATTERN",
-                                      "value": "[^@%#&\\[ \\r\\n\\]]+"
+                                      "value": "[^@%#\\[ \\r\\n\\]]+"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -2690,10 +2682,6 @@
                                     {
                                       "type": "SYMBOL",
                                       "name": "__just_percent"
-                                    },
-                                    {
-                                      "type": "SYMBOL",
-                                      "name": "__just_ampersand"
                                     }
                                   ]
                                 },
@@ -2735,7 +2723,7 @@
                                   "members": [
                                     {
                                       "type": "PATTERN",
-                                      "value": "[^@%#&\\[ \\r\\n\\]]+"
+                                      "value": "[^@%#\\[ \\r\\n\\]]+"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -2752,10 +2740,6 @@
                                     {
                                       "type": "SYMBOL",
                                       "name": "__just_percent"
-                                    },
-                                    {
-                                      "type": "SYMBOL",
-                                      "name": "__just_ampersand"
                                     }
                                   ]
                                 },
@@ -2792,7 +2776,7 @@
                                             "members": [
                                               {
                                                 "type": "PATTERN",
-                                                "value": "[^@%#&\\[ \\r\\n\\]]+"
+                                                "value": "[^@%#\\[ \\r\\n\\]]+"
                                               },
                                               {
                                                 "type": "SYMBOL",
@@ -2809,10 +2793,6 @@
                                               {
                                                 "type": "SYMBOL",
                                                 "name": "__just_percent"
-                                              },
-                                              {
-                                                "type": "SYMBOL",
-                                                "name": "__just_ampersand"
                                               }
                                             ]
                                           },
@@ -2851,7 +2831,7 @@
                                         "members": [
                                           {
                                             "type": "PATTERN",
-                                            "value": "[^@%#&\\[ \\r\\n\\]]+"
+                                            "value": "[^@%#\\[ \\r\\n\\]]+"
                                           },
                                           {
                                             "type": "SYMBOL",
@@ -2868,10 +2848,6 @@
                                           {
                                             "type": "SYMBOL",
                                             "name": "__just_percent"
-                                          },
-                                          {
-                                            "type": "SYMBOL",
-                                            "name": "__just_ampersand"
                                           }
                                         ]
                                       },
@@ -2912,7 +2888,7 @@
                                               "members": [
                                                 {
                                                   "type": "PATTERN",
-                                                  "value": "[^@%#&\\[ \\r\\n\\]]+"
+                                                  "value": "[^@%#\\[ \\r\\n\\]]+"
                                                 },
                                                 {
                                                   "type": "SYMBOL",
@@ -2929,10 +2905,6 @@
                                                 {
                                                   "type": "SYMBOL",
                                                   "name": "__just_percent"
-                                                },
-                                                {
-                                                  "type": "SYMBOL",
-                                                  "name": "__just_ampersand"
                                                 }
                                               ]
                                             },
@@ -4326,7 +4298,7 @@
                   "members": [
                     {
                       "type": "PATTERN",
-                      "value": "[^@%#& \\r\\n\\]]+"
+                      "value": "[^@%# \\r\\n\\]]+"
                     },
                     {
                       "type": "SYMBOL",
@@ -4359,10 +4331,6 @@
                     {
                       "type": "SYMBOL",
                       "name": "__just_percent"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "__just_ampersand"
                     }
                   ]
                 },
@@ -4393,7 +4361,7 @@
                           "members": [
                             {
                               "type": "PATTERN",
-                              "value": "[^@%#& \\r\\n\\]]+"
+                              "value": "[^@%# \\r\\n\\]]+"
                             },
                             {
                               "type": "SYMBOL",
@@ -4426,10 +4394,6 @@
                             {
                               "type": "SYMBOL",
                               "name": "__just_percent"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "__just_ampersand"
                             }
                           ]
                         },
@@ -4471,7 +4435,7 @@
                           "members": [
                             {
                               "type": "PATTERN",
-                              "value": "[^@%#& \\r\\n\\]]+"
+                              "value": "[^@%# \\r\\n\\]]+"
                             },
                             {
                               "type": "SYMBOL",
@@ -4504,10 +4468,6 @@
                             {
                               "type": "SYMBOL",
                               "name": "__just_percent"
-                            },
-                            {
-                              "type": "SYMBOL",
-                              "name": "__just_ampersand"
                             }
                           ]
                         },
@@ -4544,7 +4504,7 @@
                                     "members": [
                                       {
                                         "type": "PATTERN",
-                                        "value": "[^@%#& \\r\\n\\]]+"
+                                        "value": "[^@%# \\r\\n\\]]+"
                                       },
                                       {
                                         "type": "SYMBOL",
@@ -4577,10 +4537,6 @@
                                       {
                                         "type": "SYMBOL",
                                         "name": "__just_percent"
-                                      },
-                                      {
-                                        "type": "SYMBOL",
-                                        "name": "__just_ampersand"
                                       }
                                     ]
                                   },
@@ -4619,7 +4575,7 @@
                                 "members": [
                                   {
                                     "type": "PATTERN",
-                                    "value": "[^@%#& \\r\\n\\]]+"
+                                    "value": "[^@%# \\r\\n\\]]+"
                                   },
                                   {
                                     "type": "SYMBOL",
@@ -4652,10 +4608,6 @@
                                   {
                                     "type": "SYMBOL",
                                     "name": "__just_percent"
-                                  },
-                                  {
-                                    "type": "SYMBOL",
-                                    "name": "__just_ampersand"
                                   }
                                 ]
                               },
@@ -4696,7 +4648,7 @@
                                       "members": [
                                         {
                                           "type": "PATTERN",
-                                          "value": "[^@%#& \\r\\n\\]]+"
+                                          "value": "[^@%# \\r\\n\\]]+"
                                         },
                                         {
                                           "type": "SYMBOL",
@@ -4729,10 +4681,6 @@
                                         {
                                           "type": "SYMBOL",
                                           "name": "__just_percent"
-                                        },
-                                        {
-                                          "type": "SYMBOL",
-                                          "name": "__just_ampersand"
                                         }
                                       ]
                                     },
@@ -4768,27 +4716,7 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "__EOF"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_ampersand"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__invalid"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_at"
-    },
-    {
-      "type": "SYMBOL",
       "name": "__attribute_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_percent"
     },
     {
       "type": "SYMBOL",
@@ -4796,15 +4724,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "__just_hash"
-    },
-    {
-      "type": "SYMBOL",
       "name": "__macro_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_d"
     },
     {
       "type": "SYMBOL",
@@ -4812,15 +4732,7 @@
     },
     {
       "type": "SYMBOL",
-      "name": "__just_t"
-    },
-    {
-      "type": "SYMBOL",
       "name": "__tableRoll_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__just_questionmark"
     },
     {
       "type": "SYMBOL",
@@ -4837,6 +4749,46 @@
     {
       "type": "SYMBOL",
       "name": "__rollQuery_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_at"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_percent"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_hash"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_ampersand"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_d"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_t"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__just_questionmark"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__pipe"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__EOF"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__invalid"
     }
   ],
   "inline": [
