@@ -23,16 +23,34 @@ struct Scanner;
 
 enum TokenType {
 	ATTRIBUTE_START,
+	
 	ABILITY_START,
+	
 	MACRO_START,
+	
 	//HTML_ENTITY,
-	DICE_ROLL_START,
-	TABLE_ROLL_START,
 	
 	QUERY_START,
 	QUERY_PIPE_HASDEFAULT,
 	QUERY_PIPE_HASOPTIONS,
 	QUERY_END,
+	
+	//LABEL_START,
+	//LABEL_END,
+	
+	//INLINE_ROLL_START,
+	//INLINE_ROLL_END,
+	
+	//PARENTHESIZED_START,
+	//PARENTHESIZED_END,
+	
+	//GROUP_ROLL_START,
+	//GROUP_ROLL_END,
+	
+	DICE_ROLL_START,
+	
+	TABLE_ROLL_START,
+	//TABLE_ROLL_END,
 	
 	
 	JUST_AT,
@@ -50,8 +68,6 @@ enum TokenType {
 	//JUST_RIGHTBRACKET,
 	
 	
-	_EOF,
-	
 	_INVALID,
 };
 
@@ -63,7 +79,7 @@ enum QueryType {
 	QT_OPTIONS = 16,
 };
 
-const bool doLog = true;
+const bool doLog = false;
 void log(string str) { if (doLog) cout << str; }
 void logln(string str) { if (doLog) { cout << str; cout << "\n"; } }
 
@@ -137,6 +153,10 @@ bool scan_tableRoll_start(TSLexer *lexer) {
 	if (c == '[') {
 		c = advance(lexer);
 		while (c != 0 && c != '\n' && c != ']') {
+			if (c == '\r'){
+				c = advance(lexer);
+				continue;
+			}
 			if (c == '@' || c == '%') {
 				c = advance(lexer);
 				if (c = '{') {
@@ -184,7 +204,7 @@ void populateEntitiesMap() {
 	entitiesMap.insert(pair<string, string>("}", "#125|#[xX](00)?7[dD]|rcub|rbrace"));
 	entitiesMap.insert(pair<string, string>(")", "#41|#[xX](00)?29|rpar"));
 	entitiesMap.insert(pair<string, string>("]", "#93|#[xX](00)?5[dD]|rsqb|rbrack"));
-	entitiesMap.insert(pair<string, string>("|", "#123|#[xX](00)?7[cC]|vert|verbar|VerticalLine"));
+	entitiesMap.insert(pair<string, string>("|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"));
 	entitiesMap.insert(pair<string, string>("?", "#63|#[xX](00)?3[fF]|quest"));
 	entitiesMap.insert(pair<string, string>(",", "#44|#[xX](00)?2[cC]|comma"));
 	entitiesMap.insert(pair<string, string>("=", "#61|#[xX](00)?3[dD]|equals"));
@@ -196,6 +216,7 @@ void populateEntitiesMap() {
 }
 
 bool matchDelimiter(string entity, string delimiter, unsigned depth, bool shallowerIsOkay = false) {
+	logln(">>>> matchDelimiter");
 	if (depth == 0) return entity.compare(delimiter) == 0;
 	if (shallowerIsOkay && entity.compare(delimiter) == 0) return true;
 	string rxpStr = "&(amp;){";
@@ -203,7 +224,8 @@ bool matchDelimiter(string entity, string delimiter, unsigned depth, bool shallo
 	rxpStr.append(to_string(depth-1));
 	rxpStr.append("}(");
 	rxpStr.append(entitiesMap[delimiter]);
-	rxpStr.append(")");
+	rxpStr.append(");");
+	logln("->>> comparing \""+entity+"\" to regex \""+rxpStr+"\"");
 	return regex_match(entity, regex(rxpStr));
 }
 
@@ -247,7 +269,7 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 					logln("->>> entity name too short: \""+code+"\"");
 					return "";
 				}
-				logln("->>> found \""+entity+"\"");
+				logln("->>> found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
 				return entity;
 			}
 			else if (code.compare("amp") == 0) {
@@ -256,7 +278,7 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 			}
 			else if (shallowerIsOkay) {
 				advance(lexer);
-				logln("->>> found \""+entity+"\"");
+				logln("->>> found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
 				return entity;
 			}
 			else{
@@ -282,9 +304,9 @@ bool get_entity_delimiter(TSLexer *lexer, string toMatch, unsigned depth, bool s
 	if (entity == "") return "";
 	return matchDelimiter(entity, toMatch, depth, shallowerIsOkay);
 }
-bool get_entity_value(TSLexer *lexer, unsigned depth) {
+bool get_entity_value(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
 	logln(">>>> get_entity_value");
-	return get_entity(lexer, depth+1, false) != "";
+	return get_entity(lexer, depth+1, shallowerIsOkay) != "";
 }
 
 
@@ -311,15 +333,17 @@ struct Query {
 		optionCount = stoul(data.substr(p+1), &p);
 	}*/
 	
-	bool scan_query_start(TSLexer *lexer) {
+	bool scan_query_start(TSLexer *lexer, unsigned depth) {
 		logln(">>>> Query.scan_query_start");
 		char c = lexer->lookahead;
+		logln("========================> depth: "+to_string(depth));
 		
 		if (c == '{') {
 			advance(lexer);
 			return true;
 		}
 		else if (c == '&') {
+			advance(lexer);
 			return get_entity_delimiter(lexer, "{", depth, true);
 		}
 		else {
@@ -327,7 +351,7 @@ struct Query {
 		}
 	}
 	
-	bool scan_query_prompt(TSLexer *lexer, int *type) {
+	bool scan_query_prompt(TSLexer *lexer, int *type, unsigned depth) {
 		logln(">>>> Query.scan_query_prompt");
 		char c = lexer->lookahead;
 		bool hasLength = false;
@@ -348,16 +372,19 @@ struct Query {
 				advance(lexer);
 				return true;
 			}
-			if (c == '&') {
+			if (c == '&' && depth > 0) {
 				entity = get_entity(lexer, depth, false);
+				logln("===============================> entity: "+entity);
 				if (entity != "") {
 					if (matchDelimiter(entity, "}", depth, false)){
+						logln("->>> '}' at depth "+to_string(depth));
 						if (!hasLength) {
 							*type = this->type |= QT_INVALID_EMPTY;
 						}
 						return hasLength;
 					}
 					if (matchDelimiter(entity, "|", depth, false)){
+						logln("->>> '|' at depth "+to_string(depth));
 						return true;
 					}
 				}
@@ -370,44 +397,59 @@ struct Query {
 		return false;
 	}
 	
-	bool scan_query_values(TSLexer *lexer, int *type) {
-		logln(">>>> Query.scan_query_values");
+	bool scan_query_options(TSLexer *lexer, int *type, unsigned depth) {
+		logln(">>>> Query.scan_query_options");
 		char c = lexer->lookahead;
 		string entity = "";
 		
 		while (c != 0) {
-			if ((c == '}' || c == '|') && depth > 0) {
-				*type = this->type |= QT_INVALID_UNCLOSED;
-				return false;
-			}
-			if (c == '}'){
-				if (!(this->type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
-				return true;
-			}
-			if (c == '|') {
-				*type = this->type |= QT_OPTIONS;
-			}
-			if (c == ',' && this->type & QT_OPTIONS) {
+			if (depth == 0) {
+				if (c == '}'){
+					if (!(this->type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
+					return true;
+				}
+				else if (c == '|') {
+					*type = this->type |= QT_OPTIONS;
+					c = advance(lexer);
+					continue;
+				}
 			}
 			else if (c == '&') {
-				entity = get_entity(lexer, depth, false);
+				entity = get_entity(lexer, depth, true);
+				c = lexer->lookahead;
 				if (entity != "") {
-					if (matchDelimiter(entity, "}", depth, false)){
-						if (!(*type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
+					if (matchDelimiter(entity, "}", depth, false)) {
+						logln("->>> '}' at depth "+to_string(depth)+" of "+to_string(this->depth));
+						if (!(this->type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
 						return true;
 					}
-					else if (matchDelimiter(entity, "|", depth, false)){
+					else if (matchDelimiter(entity, "|", depth, false)) {
+						logln("->>> '|' at depth "+to_string(depth)+" of "+to_string(this->depth));
 						*type = this->type |= QT_OPTIONS;
+						c = advance(lexer);
+						continue;
+					}
+					else if (matchDelimiter(entity, "{", depth, true)) {
+						logln("->>> '}' at depth "+to_string(depth)+" of "+to_string(this->depth));
+						*type = this->type |= QT_INVALID_UNCLOSED;
+						return false;
+					}
+					else if (matchDelimiter(entity, "[", depth, true)) {
+						logln("->>> '|' at depth "+to_string(depth)+" of "+to_string(this->depth));
+						*type = this->type |= QT_INVALID_UNCLOSED;
+						return false;
 					}
 				}
 			}
+			else if (c == '}' || c == '|') {
+				*type = this->type |= QT_INVALID_UNCLOSED;
+				return false;
+			}
 			c = advance(lexer);
 		}
-		
 		*type = this->type |= QT_INVALID_UNCLOSED;
 		return false;
 	}
-	
 };
 
 struct Scanner {
@@ -465,14 +507,9 @@ struct Scanner {
 		}*/
 	}
 	
-	void consume_query() {
-		//TODO: push a new Query to the stack and scan for the end of it (just to skip it), then pop it.
-	}
-	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
 		logln(">>>> Scanner.scan");
-/*if(valid_symbols[_EOF])log("_EOF,");
-if(valid_symbols[JUST_AT])log("JUST_AT,");
+/*if(valid_symbols[JUST_AT])log("JUST_AT,");
 if(valid_symbols[ATTRIBUTE_START])log("ATTRIBUTE_START,");
 if(valid_symbols[JUST_PERCENT])log("JUST_PERCENT,");
 if(valid_symbols[ABILITY_START])log("ABILITY_START,");
@@ -487,19 +524,17 @@ if(valid_symbols[QUERY_START])log("QUERY_START,");
 if(valid_symbols[QUERY_PIPE_HASDEFAULT])log("QUERY_PIPE_HASDEFAULT,");
 if(valid_symbols[QUERY_PIPE_HASOPTIONS])log("QUERY_PIPE_HASOPTIONS,");
 logln("]");*/
+		char c = lexer->lookahead;
+		while (c == '\r') { c = advance(lexer); }
 		lexer->mark_end(lexer);
 		logln("----------");
-		char c = lexer->lookahead;
+		
 		int queryType = 0;
+		if (queries.size() > 0) queryType = queries.top()->type;
 		
 		logln("->>> start character: '"+string({c})+"'");
 		
-		if (c == 0) {
-			logln("->>> _EOF");
-			lexer->result_symbol = _EOF;
-			return valid_symbols[_EOF];
-		}
-		else if (c == '@') {
+		if (c == '@') {
 			logln("->>> '@'");
 			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT] || valid_symbols[_INVALID]) {
 				c = advance(lexer);
@@ -512,6 +547,7 @@ logln("]");*/
 					return true;
 				}
 				else if (valid_symbols[_INVALID] && c == '{') {
+					advance(lexer);
 					lexer->mark_end(lexer);
 					logln("-->> _INVALID");
 					lexer->result_symbol = _INVALID;
@@ -537,6 +573,7 @@ logln("]");*/
 					return true;
 				}
 				else if (valid_symbols[_INVALID] && c == '{') {
+					advance(lexer);
 					lexer->mark_end(lexer);
 					logln("-->> _INVALID");
 					lexer->result_symbol = _INVALID;
@@ -552,16 +589,24 @@ logln("]");*/
 		else if (c == '#') {
 			logln("->>> '#'");
 			if (valid_symbols[MACRO_START] || valid_symbols[JUST_HASH]) {
-				advance(lexer);
+				c = advance(lexer);
 				lexer->mark_end(lexer);
 				logln("----------");
+				
+				if (valid_symbols[JUST_HASH] && (c == 0 || c == '\r' || c == '\n' || c == ' ')) {
+					while (c == '\r') { c = advance(lexer); }
+					logln("-->> JUST_HASH");
+					lexer->result_symbol = JUST_HASH;
+					return true;
+				}
 				
 				if (valid_symbols[MACRO_START] && scan_macro_start(lexer, queries.size())) {
 					logln("-->> MACRO_START");
 					lexer->result_symbol = MACRO_START;
 					return true;
 				}
-				else if (valid_symbols[JUST_HASH]) {
+				
+				if (valid_symbols[JUST_HASH]) {
 					logln("-->> JUST_HASH");
 					lexer->result_symbol = JUST_HASH;
 					return true;
@@ -573,20 +618,21 @@ logln("]");*/
 			
 			if (valid_symbols[QUERY_START]) {
 				if (get_entity_delimiter(lexer, "?", queries.size(), true)) {
-					logln("-->> '?'");
+					logln("-->> entity '?'");
 					lexer->mark_end(lexer);
 					logln("----------");
 					
 					Query *query = new Query(this, queries.size());
 					queries.push(query);
+					queryType = 0;
 					logln("-->> push a Query: "+to_string(queries.size()));
 					
-					if (queries.top()->scan_query_start(lexer)) {
+					if (queries.top()->scan_query_start(lexer, queries.top()->depth)) {
 						lexer->mark_end(lexer);
 						logln("----------");
 						
-						if (queries.top()->scan_query_prompt(lexer, &queryType)) {
-							if (queries.top()->scan_query_values(lexer, &queryType)) {
+						if (queries.top()->scan_query_prompt(lexer, &queryType, queries.top()->depth)) {
+							if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
 								logln("---> QUERY_START");
 								lexer->result_symbol = QUERY_START;
 								return true;
@@ -600,12 +646,12 @@ logln("]");*/
 				}
 			}
 			else if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() > 1) {
-				if (get_entity_delimiter(lexer, "|", queries.size(), false)) {
-					logln("-->> '|'");
+				if (get_entity_delimiter(lexer, "|", queries.top()->depth, false)) {
+					logln("-->> entity '|'");
 					lexer->mark_end(lexer);
 					logln("----------");
 					
-					if (queries.top()->scan_query_values(lexer, &queryType)) {
+					if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
 						if (queryType & QT_DEFAULT_VALUE) {
 							logln("---> QUERY_PIPE_HASDEFAULT");
 							lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
@@ -617,10 +663,11 @@ logln("]");*/
 						return true;
 					}
 				}
+				return false;
 			}
-			else if (valid_symbols[QUERY_END] && queries.size() == 1) {
-				if (get_entity_delimiter(lexer, "}", queries.size(), false)) {
-					logln("-->> '}'");
+			else if (valid_symbols[QUERY_END] && queries.size() > 0) {
+				if (get_entity_delimiter(lexer, "}", queries.top()->depth, false)) {
+					logln("-->> entity '}'");
 					lexer->mark_end(lexer);
 					logln("----------");
 					
@@ -633,7 +680,7 @@ logln("]");*/
 			}
 			else if (valid_symbols[JUST_PIPE] && queries.size() > 0) {
 				if (get_entity_delimiter(lexer, "|", queries.size(), true)) {
-					logln("-->> '|'");
+					logln("-->> entity '|'");
 					lexer->mark_end(lexer);
 					logln("----------");
 					
@@ -701,14 +748,15 @@ logln("]");*/
 				if (valid_symbols[QUERY_START]) {
 					Query *query = new Query(this, queries.size());
 					queries.push(query);
+					queryType = 0;
 					logln("-->> push a Query: "+to_string(queries.size()));
 					
-					if (queries.top()->scan_query_start(lexer)) {
+					if (queries.top()->scan_query_start(lexer, queries.top()->depth)) {
 						lexer->mark_end(lexer);
 						logln("----------");
 						
-						if (queries.top()->scan_query_prompt(lexer, &queryType)) {
-							if (queries.top()->scan_query_values(lexer, &queryType)) {
+						if (queries.top()->scan_query_prompt(lexer, &queryType, queries.top()->depth)) {
+							if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
 								logln("---> QUERY_START");
 								lexer->result_symbol = QUERY_START;
 								return true;
@@ -735,18 +783,19 @@ logln("]");*/
 				lexer->mark_end(lexer);
 				logln("----------");
 				
-				logln("-->> get first pipe");
-				if (queries.top()->scan_query_values(lexer, &queryType)) {
+				//logln("-->> get first pipe");
+				//if (queries.top()->scan_query_options(lexer, &queryType)) {
 					if (queryType & QT_DEFAULT_VALUE) {
 						logln("---> QUERY_PIPE_HASDEFAULT");
 						lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
+						return true;
 					}
 					else if (queryType & QT_OPTIONS) {
 						logln("---> QUERY_PIPE_HASOPTIONS");
 						lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
+						return true;
 					}
-					return true;
-				}
+				//}
 			}
 			else if (valid_symbols[JUST_PIPE]) {
 				advance(lexer);
@@ -760,7 +809,7 @@ logln("]");*/
 		}
 		else if (c == '}') {
 			logln("->>> '}'");
-			if (valid_symbols[QUERY_END] && queries.size() == 1) {
+			if (valid_symbols[QUERY_END] && queries.size() > 0) {
 				c = advance(lexer);
 				lexer->mark_end(lexer);
 				logln("----------");

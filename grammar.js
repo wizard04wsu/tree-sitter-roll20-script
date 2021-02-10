@@ -32,16 +32,34 @@ module.exports = grammar({
 	
 	externals: $ => [
 		$.__attribute_start,			// @
+		
 		$.__ability_start,				// %
+		
 		$.__macro_start,				// #
+		
 		//$.__html_entity,				// HTML entity
-		$.__diceRoll_start,				// d or D  or equivalent HTML entity
-		$.__tableRoll_start,			// t or T  or equivalent HTML entity
 		
 		$.__rollQuery_start,			// ?{  or equivalent HTML entity(ies)
 		$.__rollQuery_pipe_hasDefault,	// |  or equivalent HTML entity
 		$.__rollQuery_pipe_hasOptions,	// |  or equivalent HTML entity
 		$.__rollQuery_end,				// }  or equivalent HTML entity
+		
+		//$.__label_start,
+		//$.__label_end,
+		
+		//$.__inlineRoll_start,
+		//$.__inlineRoll_end,
+		
+		//$.__parenthesized_start,
+		//$.__parenthesized_end,
+		
+		//$.__groupRoll_start,
+		//$.__groupRoll_end,
+		
+		$.__diceRoll_start,				// d or D  or equivalent HTML entity
+		
+		$.__tableRoll_start,			// t or T  or equivalent HTML entity
+		//$.__tableRoll_end,
 		
 		
 		$.__just_at,					// @
@@ -58,8 +76,6 @@ module.exports = grammar({
 		//$.__leftBracket,				// [
 		//$.__rightBracket,				// ]
 		
-		
-		$.__EOF,						// no content
 		
 		// when there are invalid opening braces on attributes and abilities
 		$.__invalid,					// @ or %
@@ -144,16 +160,7 @@ module.exports = grammar({
 		  │ Strings
 		  └──────────────────────────────*/
 		
-		_stringNL: $ => prec.right(repeat1(choice(
-			/[^#]/,
-			seq(
-				$.__just_hash,
-				choice(
-					/ |\r?\n/,
-					$.__EOF,
-				),
-			),
-		))),
+		_stringNL: $ => chainOf(choice( /[^#]/, $.__just_hash )),
 		
 		_wsp_inline: $ => /\s+/,
 		
@@ -189,11 +196,11 @@ module.exports = grammar({
 		),
 		_propertyName: $ => name(choice(
 			///[^@%#&}| \r\n]+/,
-			/[^@%#}| \r\n]+/,
+			/[^@%#&}| \r\n]+/,
 			//$.htmlEntity,
 			$.__just_at,
 			$.__just_percent,
-			//$.__just_ampersand,
+			$.__just_ampersand,
 			alias($.__invalid, $.invalid),	// @{ or %{
 		))($),
 		_selector: $ => choice(
@@ -410,10 +417,11 @@ module.exports = grammar({
 		defaultValue: $ => seq(
 			repeat1(
 				choice(
-					/[^@%}|]+|[@%]/,
+					/[^@%&}|]+|[@%]/,
 					$.attribute,
 					$.ability,
 					//alias($._escapedHtmlEntity, $.htmlEntity),
+					$.__just_ampersand,
 				),
 			),
 		),
@@ -426,19 +434,17 @@ module.exports = grammar({
 			)),
 		)),
 		optionName: $ => name(prec.right(choice(
-			///[^@%#&}|,\r\n]+/,
-			/[^@%#}|,\r\n]+/,
+			/[^@%#&}|,\r\n]+/,
 			$.attribute,
 			$.ability,
 			alias($.__macro_start, $.macroHash),
 			//$.htmlEntity,
 			$.__just_at,
 			$.__just_percent,
-			//$.__just_ampersand,
+			$.__just_ampersand,
 		)))($),
 		optionValue: $ => name(prec.right(choice(
-			///[^@%#&}|,?\r\n]+/,
-			/[^@%#}|,?\r\n]+/,
+			/[^@%#&}|,?\r\n]+/,
 			$.attribute,
 			$.ability,
 			alias($.__macro_start, $.macroHash),
@@ -448,7 +454,7 @@ module.exports = grammar({
 			//$.button,
 			$.__just_at,
 			$.__just_percent,
-			//$.__just_ampersand,
+			$.__just_ampersand,
 			$.__just_questionmark,
 		)))($),
 		

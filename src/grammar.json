@@ -50,26 +50,8 @@
               "value": "[^#]"
             },
             {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "__just_hash"
-                },
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "PATTERN",
-                      "value": " |\\r?\\n"
-                    },
-                    {
-                      "type": "SYMBOL",
-                      "name": "__EOF"
-                    }
-                  ]
-                }
-              ]
+              "type": "SYMBOL",
+              "name": "__just_hash"
             }
           ]
         }
@@ -142,7 +124,7 @@
                   "members": [
                     {
                       "type": "PATTERN",
-                      "value": "[^@%#}| \\r\\n]+"
+                      "value": "[^@%#&}| \\r\\n]+"
                     },
                     {
                       "type": "SYMBOL",
@@ -151,6 +133,10 @@
                     {
                       "type": "SYMBOL",
                       "name": "__just_percent"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "__just_ampersand"
                     },
                     {
                       "type": "ALIAS",
@@ -190,7 +176,7 @@
                           "members": [
                             {
                               "type": "PATTERN",
-                              "value": "[^@%#}| \\r\\n]+"
+                              "value": "[^@%#&}| \\r\\n]+"
                             },
                             {
                               "type": "SYMBOL",
@@ -199,6 +185,10 @@
                             {
                               "type": "SYMBOL",
                               "name": "__just_percent"
+                            },
+                            {
+                              "type": "SYMBOL",
+                              "name": "__just_ampersand"
                             },
                             {
                               "type": "ALIAS",
@@ -249,7 +239,7 @@
                           "members": [
                             {
                               "type": "PATTERN",
-                              "value": "[^@%#}| \\r\\n]+"
+                              "value": "[^@%#&}| \\r\\n]+"
                             },
                             {
                               "type": "SYMBOL",
@@ -258,6 +248,10 @@
                             {
                               "type": "SYMBOL",
                               "name": "__just_percent"
+                            },
+                            {
+                              "type": "SYMBOL",
+                              "name": "__just_ampersand"
                             },
                             {
                               "type": "ALIAS",
@@ -303,7 +297,7 @@
                                     "members": [
                                       {
                                         "type": "PATTERN",
-                                        "value": "[^@%#}| \\r\\n]+"
+                                        "value": "[^@%#&}| \\r\\n]+"
                                       },
                                       {
                                         "type": "SYMBOL",
@@ -312,6 +306,10 @@
                                       {
                                         "type": "SYMBOL",
                                         "name": "__just_percent"
+                                      },
+                                      {
+                                        "type": "SYMBOL",
+                                        "name": "__just_ampersand"
                                       },
                                       {
                                         "type": "ALIAS",
@@ -359,7 +357,7 @@
                                 "members": [
                                   {
                                     "type": "PATTERN",
-                                    "value": "[^@%#}| \\r\\n]+"
+                                    "value": "[^@%#&}| \\r\\n]+"
                                   },
                                   {
                                     "type": "SYMBOL",
@@ -368,6 +366,10 @@
                                   {
                                     "type": "SYMBOL",
                                     "name": "__just_percent"
+                                  },
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "__just_ampersand"
                                   },
                                   {
                                     "type": "ALIAS",
@@ -417,7 +419,7 @@
                                       "members": [
                                         {
                                           "type": "PATTERN",
-                                          "value": "[^@%#}| \\r\\n]+"
+                                          "value": "[^@%#&}| \\r\\n]+"
                                         },
                                         {
                                           "type": "SYMBOL",
@@ -426,6 +428,10 @@
                                         {
                                           "type": "SYMBOL",
                                           "name": "__just_percent"
+                                        },
+                                        {
+                                          "type": "SYMBOL",
+                                          "name": "__just_ampersand"
                                         },
                                         {
                                           "type": "ALIAS",
@@ -1160,7 +1166,7 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[^@%}|]+|[@%]"
+                "value": "[^@%&}|]+|[@%]"
               },
               {
                 "type": "SYMBOL",
@@ -1169,6 +1175,10 @@
               {
                 "type": "SYMBOL",
                 "name": "ability"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "__just_ampersand"
               }
             ]
           }
@@ -1236,7 +1246,7 @@
                     "members": [
                       {
                         "type": "PATTERN",
-                        "value": "[^@%#}|,\\r\\n]+"
+                        "value": "[^@%#&}|,\\r\\n]+"
                       },
                       {
                         "type": "SYMBOL",
@@ -1262,6 +1272,10 @@
                       {
                         "type": "SYMBOL",
                         "name": "__just_percent"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "__just_ampersand"
                       }
                     ]
                   }
@@ -1296,7 +1310,7 @@
                             "members": [
                               {
                                 "type": "PATTERN",
-                                "value": "[^@%#}|,\\r\\n]+"
+                                "value": "[^@%#&}|,\\r\\n]+"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1322,6 +1336,10 @@
                               {
                                 "type": "SYMBOL",
                                 "name": "__just_percent"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "__just_ampersand"
                               }
                             ]
                           }
@@ -1367,7 +1385,7 @@
                             "members": [
                               {
                                 "type": "PATTERN",
-                                "value": "[^@%#}|,\\r\\n]+"
+                                "value": "[^@%#&}|,\\r\\n]+"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1393,6 +1411,10 @@
                               {
                                 "type": "SYMBOL",
                                 "name": "__just_percent"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "__just_ampersand"
                               }
                             ]
                           }
@@ -1433,7 +1455,7 @@
                                       "members": [
                                         {
                                           "type": "PATTERN",
-                                          "value": "[^@%#}|,\\r\\n]+"
+                                          "value": "[^@%#&}|,\\r\\n]+"
                                         },
                                         {
                                           "type": "SYMBOL",
@@ -1459,6 +1481,10 @@
                                         {
                                           "type": "SYMBOL",
                                           "name": "__just_percent"
+                                        },
+                                        {
+                                          "type": "SYMBOL",
+                                          "name": "__just_ampersand"
                                         }
                                       ]
                                     }
@@ -1501,7 +1527,7 @@
                                   "members": [
                                     {
                                       "type": "PATTERN",
-                                      "value": "[^@%#}|,\\r\\n]+"
+                                      "value": "[^@%#&}|,\\r\\n]+"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -1527,6 +1553,10 @@
                                     {
                                       "type": "SYMBOL",
                                       "name": "__just_percent"
+                                    },
+                                    {
+                                      "type": "SYMBOL",
+                                      "name": "__just_ampersand"
                                     }
                                   ]
                                 }
@@ -1571,7 +1601,7 @@
                                         "members": [
                                           {
                                             "type": "PATTERN",
-                                            "value": "[^@%#}|,\\r\\n]+"
+                                            "value": "[^@%#&}|,\\r\\n]+"
                                           },
                                           {
                                             "type": "SYMBOL",
@@ -1597,6 +1627,10 @@
                                           {
                                             "type": "SYMBOL",
                                             "name": "__just_percent"
+                                          },
+                                          {
+                                            "type": "SYMBOL",
+                                            "name": "__just_ampersand"
                                           }
                                         ]
                                       }
@@ -1646,7 +1680,7 @@
                     "members": [
                       {
                         "type": "PATTERN",
-                        "value": "[^@%#}|,?\\r\\n]+"
+                        "value": "[^@%#&}|,?\\r\\n]+"
                       },
                       {
                         "type": "SYMBOL",
@@ -1676,6 +1710,10 @@
                       {
                         "type": "SYMBOL",
                         "name": "__just_percent"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "__just_ampersand"
                       },
                       {
                         "type": "SYMBOL",
@@ -1714,7 +1752,7 @@
                             "members": [
                               {
                                 "type": "PATTERN",
-                                "value": "[^@%#}|,?\\r\\n]+"
+                                "value": "[^@%#&}|,?\\r\\n]+"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1744,6 +1782,10 @@
                               {
                                 "type": "SYMBOL",
                                 "name": "__just_percent"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "__just_ampersand"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1793,7 +1835,7 @@
                             "members": [
                               {
                                 "type": "PATTERN",
-                                "value": "[^@%#}|,?\\r\\n]+"
+                                "value": "[^@%#&}|,?\\r\\n]+"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1823,6 +1865,10 @@
                               {
                                 "type": "SYMBOL",
                                 "name": "__just_percent"
+                              },
+                              {
+                                "type": "SYMBOL",
+                                "name": "__just_ampersand"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1867,7 +1913,7 @@
                                       "members": [
                                         {
                                           "type": "PATTERN",
-                                          "value": "[^@%#}|,?\\r\\n]+"
+                                          "value": "[^@%#&}|,?\\r\\n]+"
                                         },
                                         {
                                           "type": "SYMBOL",
@@ -1897,6 +1943,10 @@
                                         {
                                           "type": "SYMBOL",
                                           "name": "__just_percent"
+                                        },
+                                        {
+                                          "type": "SYMBOL",
+                                          "name": "__just_ampersand"
                                         },
                                         {
                                           "type": "SYMBOL",
@@ -1943,7 +1993,7 @@
                                   "members": [
                                     {
                                       "type": "PATTERN",
-                                      "value": "[^@%#}|,?\\r\\n]+"
+                                      "value": "[^@%#&}|,?\\r\\n]+"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -1973,6 +2023,10 @@
                                     {
                                       "type": "SYMBOL",
                                       "name": "__just_percent"
+                                    },
+                                    {
+                                      "type": "SYMBOL",
+                                      "name": "__just_ampersand"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -2021,7 +2075,7 @@
                                         "members": [
                                           {
                                             "type": "PATTERN",
-                                            "value": "[^@%#}|,?\\r\\n]+"
+                                            "value": "[^@%#&}|,?\\r\\n]+"
                                           },
                                           {
                                             "type": "SYMBOL",
@@ -2051,6 +2105,10 @@
                                           {
                                             "type": "SYMBOL",
                                             "name": "__just_percent"
+                                          },
+                                          {
+                                            "type": "SYMBOL",
+                                            "name": "__just_ampersand"
                                           },
                                           {
                                             "type": "SYMBOL",
@@ -4728,14 +4786,6 @@
     },
     {
       "type": "SYMBOL",
-      "name": "__diceRoll_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__tableRoll_start"
-    },
-    {
-      "type": "SYMBOL",
       "name": "__rollQuery_start"
     },
     {
@@ -4749,6 +4799,14 @@
     {
       "type": "SYMBOL",
       "name": "__rollQuery_end"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__diceRoll_start"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__tableRoll_start"
     },
     {
       "type": "SYMBOL",
@@ -4781,10 +4839,6 @@
     {
       "type": "SYMBOL",
       "name": "__pipe"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__EOF"
     },
     {
       "type": "SYMBOL",
