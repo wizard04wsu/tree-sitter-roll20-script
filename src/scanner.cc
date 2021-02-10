@@ -215,18 +215,28 @@ void populateEntitiesMap() {
 	entitiesMap.insert(pair<string, string>("T", "#84|#[xX](00)?54"));
 }
 
-bool matchDelimiter(string entity, string delimiter, unsigned depth, bool shallowerIsOkay = false) {
-	logln(">>>> matchDelimiter");
-	if (depth == 0) return entity.compare(delimiter) == 0;
-	if (shallowerIsOkay && entity.compare(delimiter) == 0) return true;
-	string rxpStr = "&(amp;){";
-	rxpStr.append(shallowerIsOkay?"0,":"");
-	rxpStr.append(to_string(depth-1));
-	rxpStr.append("}(");
-	rxpStr.append(entitiesMap[delimiter]);
-	rxpStr.append(");");
-	logln("->>> comparing \""+entity+"\" to regex \""+rxpStr+"\"");
-	return regex_match(entity, regex(rxpStr));
+string matchDelimiters(string entity, string delimiters, unsigned depth, bool shallowerIsOkay = false) {
+	logln(">>>> matchDelimiters");
+	for (unsigned i=0; i<delimiters.length(); i++) {
+		string delimiter = string({delimiters[i]});
+		
+		if (depth == 0) {
+			if (entity.compare(delimiter) == 0) return delimiter;
+			continue;
+		}
+		
+		if (shallowerIsOkay && entity.compare(delimiter) == 0) return delimiter;
+		
+		string rxpStr = "&(amp;){";
+		rxpStr.append(shallowerIsOkay?"0,":"");
+		rxpStr.append(to_string(depth-1));
+		rxpStr.append("}(");
+		rxpStr.append(entitiesMap[delimiter]);
+		rxpStr.append(");");
+		logln("->>> comparing \""+entity+"\" to regex \""+rxpStr+"\"");
+		if (regex_match(entity, regex(rxpStr))) return delimiter;
+	}
+	return "";
 }
 
 string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
@@ -298,15 +308,11 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 	logln("->>> eof");
 	return "";
 }
-bool get_entity_delimiter(TSLexer *lexer, string toMatch, unsigned depth, bool shallowerIsOkay = false) {
+string get_entity_delimiter(TSLexer *lexer, string toMatch, unsigned depth, bool shallowerIsOkay = false) {
 	logln(">>>> get_entity_delimiter");
 	string entity = get_entity(lexer, depth, shallowerIsOkay);
 	if (entity == "") return "";
-	return matchDelimiter(entity, toMatch, depth, shallowerIsOkay);
-}
-bool get_entity_value(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
-	logln(">>>> get_entity_value");
-	return get_entity(lexer, depth+1, shallowerIsOkay) != "";
+	return matchDelimiters(entity, toMatch, depth, shallowerIsOkay);
 }
 
 
@@ -344,7 +350,7 @@ struct Query {
 		}
 		else if (c == '&') {
 			advance(lexer);
-			return get_entity_delimiter(lexer, "{", depth, true);
+			return get_entity_delimiter(lexer, "{", depth, true) != "";
 		}
 		else {
 			return false;
@@ -356,6 +362,7 @@ struct Query {
 		char c = lexer->lookahead;
 		bool hasLength = false;
 		string entity = "";
+		string delimiter = "";
 		
 		while (c != 0) {
 			if (c == '}') {
@@ -373,20 +380,32 @@ struct Query {
 				return true;
 			}
 			if (c == '&' && depth > 0) {
-				entity = get_entity(lexer, depth, false);
+				/*entity = get_entity(lexer, depth, false);
 				logln("===============================> entity: "+entity);
 				if (entity != "") {
-					if (matchDelimiter(entity, "}", depth, false)){
+					if (matchDelimiters(entity, "}", depth, false)){
 						logln("->>> '}' at depth "+to_string(depth));
 						if (!hasLength) {
 							*type = this->type |= QT_INVALID_EMPTY;
 						}
 						return hasLength;
 					}
-					if (matchDelimiter(entity, "|", depth, false)){
+					if (matchDelimiters(entity, "|", depth, false)){
 						logln("->>> '|' at depth "+to_string(depth));
 						return true;
 					}
+				}*/
+				delimiter = get_entity_delimiter(lexer, "}|", depth, false);
+				if (delimiter == "}") {
+					logln("->>> '}' at depth "+to_string(depth));
+					if (!hasLength) {
+						*type = this->type |= QT_INVALID_EMPTY;
+					}
+					return hasLength;
+				}
+				else if (delimiter == "|") {
+					logln("->>> '|' at depth "+to_string(depth));
+					return true;
 				}
 			}
 			hasLength = true;
@@ -401,6 +420,7 @@ struct Query {
 		logln(">>>> Query.scan_query_options");
 		char c = lexer->lookahead;
 		string entity = "";
+		string delimiter = "";
 		
 		while (c != 0) {
 			if (depth == 0) {
@@ -418,23 +438,26 @@ struct Query {
 				entity = get_entity(lexer, depth, true);
 				c = lexer->lookahead;
 				if (entity != "") {
-					if (matchDelimiter(entity, "}", depth, false)) {
+					delimiter = matchDelimiters(entity, "}|", depth, false);
+					if (delimiter == "}") {
 						logln("->>> '}' at depth "+to_string(depth)+" of "+to_string(this->depth));
 						if (!(this->type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
 						return true;
 					}
-					else if (matchDelimiter(entity, "|", depth, false)) {
+					else if (delimiter == "|") {
 						logln("->>> '|' at depth "+to_string(depth)+" of "+to_string(this->depth));
 						*type = this->type |= QT_OPTIONS;
 						c = advance(lexer);
 						continue;
 					}
-					else if (matchDelimiter(entity, "{", depth, true)) {
+					
+					delimiter = matchDelimiters(entity, "}|", depth, true);
+					if (delimiter == "}") {
 						logln("->>> '}' at depth "+to_string(depth)+" of "+to_string(this->depth));
 						*type = this->type |= QT_INVALID_UNCLOSED;
 						return false;
 					}
-					else if (matchDelimiter(entity, "[", depth, true)) {
+					else if (delimiter == "|") {
 						logln("->>> '|' at depth "+to_string(depth)+" of "+to_string(this->depth));
 						*type = this->type |= QT_INVALID_UNCLOSED;
 						return false;
@@ -617,7 +640,7 @@ logln("]");*/
 			logln("->>> '&'");
 			
 			if (valid_symbols[QUERY_START]) {
-				if (get_entity_delimiter(lexer, "?", queries.size(), true)) {
+				if (get_entity_delimiter(lexer, "?", queries.size(), true) != "") {
 					logln("-->> entity '?'");
 					lexer->mark_end(lexer);
 					logln("----------");
@@ -646,7 +669,7 @@ logln("]");*/
 				}
 			}
 			else if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() > 1) {
-				if (get_entity_delimiter(lexer, "|", queries.top()->depth, false)) {
+				if (get_entity_delimiter(lexer, "|", queries.top()->depth, false) != "") {
 					logln("-->> entity '|'");
 					lexer->mark_end(lexer);
 					logln("----------");
@@ -666,7 +689,7 @@ logln("]");*/
 				return false;
 			}
 			else if (valid_symbols[QUERY_END] && queries.size() > 0) {
-				if (get_entity_delimiter(lexer, "}", queries.top()->depth, false)) {
+				if (get_entity_delimiter(lexer, "}", queries.top()->depth, false) != "") {
 					logln("-->> entity '}'");
 					lexer->mark_end(lexer);
 					logln("----------");
@@ -679,7 +702,7 @@ logln("]");*/
 				}
 			}
 			else if (valid_symbols[JUST_PIPE] && queries.size() > 0) {
-				if (get_entity_delimiter(lexer, "|", queries.size(), true)) {
+				if (get_entity_delimiter(lexer, "|", queries.size(), true) != "") {
 					logln("-->> entity '|'");
 					lexer->mark_end(lexer);
 					logln("----------");
