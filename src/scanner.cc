@@ -4,18 +4,10 @@
 #include <map>		//map
 #include <utility>	//pair
 #include <regex>	//regex, regex_match
-#include <iostream>
+#include <iostream>	//cout
 
 namespace {
 
-/*using std::string;
-using std::to_string;
-using std::stack;
-using std::map;
-using std::pair;
-using std::regex;
-using std::regex_match;
-using std::cout;*/
 using namespace std;
 
 struct Query;
@@ -79,7 +71,7 @@ enum QueryType {
 	QT_OPTIONS = 16,
 };
 
-const bool doLog = false;
+const bool doLog = true;
 void log(string str) { if (doLog) cout << str; }
 void logln(string str) { if (doLog) { cout << str; cout << "\n"; } }
 
@@ -324,21 +316,6 @@ struct Query {
 	
 	Query(Scanner *scanner, unsigned depth) : scanner(scanner), depth(depth) {}
 	
-	/*string serialize() {
-		logln(">>>> Query.serialize");
-		log("->>> Query serialized to \"" + to_string(depth)+" "+to_string(type)+" "+to_string(optionCount) + " \"\n");
-		return to_string(depth)+" "+to_string(type)+" "+to_string(optionCount)+" ";
-	}*/
-	
-	/*void deserialize(const char *buffer) {
-		string data = string(buffer);
-		logln(">>>> Query.deserialize \""+data+"\"");
-		size_t p;
-		depth = stoul(data, &p);
-		type = stoi(data.substr(p+1), &p);
-		optionCount = stoul(data.substr(p+1), &p);
-	}*/
-	
 	bool scan_query_start(TSLexer *lexer, unsigned depth) {
 		logln(">>>> Query.scan_query_start");
 		char c = lexer->lookahead;
@@ -366,6 +343,10 @@ struct Query {
 		
 		while (c != 0) {
 			if (c == '}') {
+				if (depth > 0) {
+					*type = this->type |= QT_INVALID_UNCLOSED;
+					return false;
+				}
 				if (!hasLength) {
 					*type = this->type |= QT_INVALID_EMPTY;
 				}
@@ -376,25 +357,14 @@ struct Query {
 				return hasLength;
 			}
 			if (c == '|') {
+				if (depth > 0) {
+					*type = this->type |= QT_INVALID_UNCLOSED;
+					return false;
+				}
 				advance(lexer);
 				return true;
 			}
 			if (c == '&' && depth > 0) {
-				/*entity = get_entity(lexer, depth, false);
-				logln("===============================> entity: "+entity);
-				if (entity != "") {
-					if (matchDelimiters(entity, "}", depth, false)){
-						logln("->>> '}' at depth "+to_string(depth));
-						if (!hasLength) {
-							*type = this->type |= QT_INVALID_EMPTY;
-						}
-						return hasLength;
-					}
-					if (matchDelimiters(entity, "|", depth, false)){
-						logln("->>> '|' at depth "+to_string(depth));
-						return true;
-					}
-				}*/
 				delimiter = get_entity_delimiter(lexer, "}|", depth, false);
 				if (delimiter == "}") {
 					logln("->>> '}' at depth "+to_string(depth));
@@ -482,71 +452,8 @@ struct Scanner {
 		populateEntitiesMap();
 	}
 	
-	unsigned serialize(char *buffer) {
-		return 0;
-		/*logln(">>>> Scanner.serialize");
-		string data = "";
-		while(queries.size() > 0) {
-			data += queries.top()->serialize();
-			queries.pop();
-			logln("-->> pop a Query: "+to_string(queries.size()));
-		}
-		logln("->>> Scanner serialized to \"" + data + "\"");
-		strcpy(buffer, data.c_str());	//convert from string to char*
-		if (strlen(buffer) >= TREE_SITTER_SERIALIZATION_BUFFER_SIZE) return 0;	//TODO: is there a better option?
-		return strlen(buffer);*/
-	}
-
-	void deserialize(const char *buffer, unsigned length) {
-		/*while (queries.size() > 0) {
-			queries.pop();
-		}
-		
-		if (length == 0) {
-			//
-			logln(">>>> Scanner.deserialize \"\"");
-		} else {
-			logln(">>>> Scanner.deserialize \"" + string(buffer) + "\"");
-			string data = string(buffer)+" ";
-			size_t p;
-			do {
-				p = data.find(" ");
-				p = data.find(" ", p+1);
-				p = data.find(" ", p+1);
-				if (p == string::npos) break;
-				Query *query = new Query(this, queries.size());
-				
-				//for some reason, I can't just do
-				// `const char *temp = data.substr(0,p).c_str();`
-				// or `const char *temp = (data.substr(0,p)).c_str();`
-				string queryData = data.substr(0,p+1);
-				const char *temp = queryData.c_str();
-				
-				query->deserialize(temp);
-				queries.push(query);
-				logln("->>> push a Query: "+to_string(queries.size()));
-				data = data.substr(p+1);
-			} while (data.length() > 1);
-		}*/
-	}
-	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
 		logln(">>>> Scanner.scan");
-/*if(valid_symbols[JUST_AT])log("JUST_AT,");
-if(valid_symbols[ATTRIBUTE_START])log("ATTRIBUTE_START,");
-if(valid_symbols[JUST_PERCENT])log("JUST_PERCENT,");
-if(valid_symbols[ABILITY_START])log("ABILITY_START,");
-if(valid_symbols[JUST_HASH])log("JUST_HASH,");
-if(valid_symbols[MACRO_START])log("MACRO_START,");
-if(valid_symbols[JUST_D])log("JUST_D,");
-if(valid_symbols[DICE_ROLL_START])log("DICE_ROLL_START,");
-if(valid_symbols[JUST_T])log("JUST_T,");
-if(valid_symbols[TABLE_ROLL_START])log("TABLE_ROLL_START,");
-if(valid_symbols[JUST_QUESTIONMARK])log("JUST_QUESTIONMARK,");
-if(valid_symbols[QUERY_START])log("QUERY_START,");
-if(valid_symbols[QUERY_PIPE_HASDEFAULT])log("QUERY_PIPE_HASDEFAULT,");
-if(valid_symbols[QUERY_PIPE_HASOPTIONS])log("QUERY_PIPE_HASOPTIONS,");
-logln("]");*/
 		char c = lexer->lookahead;
 		while (c == '\r') { c = advance(lexer); }
 		lexer->mark_end(lexer);
@@ -640,19 +547,22 @@ logln("]");*/
 			logln("->>> '&'");
 			
 			if (valid_symbols[QUERY_START]) {
-				if (get_entity_delimiter(lexer, "?", queries.size(), true) != "") {
+				if (get_entity_delimiter(lexer, "?", queries.top()->depth, true) != "") {
 					logln("-->> entity '?'");
+					c = lexer->lookahead;
 					lexer->mark_end(lexer);
 					logln("----------");
 					
-					Query *query = new Query(this, queries.size());
-					queries.push(query);
-					queryType = 0;
-					logln("-->> push a Query: "+to_string(queries.size()));
-					
-					if (queries.top()->scan_query_start(lexer, queries.top()->depth)) {
+					if (c == '{' || get_entity_delimiter(lexer, "{", queries.top()->depth, true) != "") {
+						if (c == '{') advance(lexer);
+						logln("---> '{'");
 						lexer->mark_end(lexer);
 						logln("----------");
+						
+						Query *query = new Query(this, queries.size());
+						queries.push(query);
+						queryType = 0;
+						logln("---> push a Query: "+to_string(queries.size()));
 						
 						if (queries.top()->scan_query_prompt(lexer, &queryType, queries.top()->depth)) {
 							if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
@@ -661,11 +571,17 @@ logln("]");*/
 								return true;
 							}
 						}
+						
+						queries.pop();
+						logln("---> pop a Query: "+to_string(queries.size()));
+						return false;
 					}
 					
-					queries.pop();
-					logln("-->> pop a Query: "+to_string(queries.size()));
-					return false;
+					if (valid_symbols[JUST_QUESTIONMARK]) {
+						logln("---> JUST_QUESTIONMARK");
+						lexer->result_symbol = JUST_QUESTIONMARK;
+						return true;
+					}
 				}
 			}
 			else if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() > 1) {
@@ -709,6 +625,17 @@ logln("]");*/
 					
 					logln("---> JUST_PIPE");
 					lexer->result_symbol = JUST_PIPE;
+					return true;
+				}
+			}
+			else if (valid_symbols[JUST_QUESTIONMARK] && queries.size() > 0) {
+				if (get_entity_delimiter(lexer, "?", queries.size(), true) != "") {
+					logln("-->> entity '?'");
+					lexer->mark_end(lexer);
+					logln("----------");
+					
+					logln("---> JUST_QUESTIONMARK");
+					lexer->result_symbol = JUST_QUESTIONMARK;
 					return true;
 				}
 			}
@@ -769,14 +696,16 @@ logln("]");*/
 				logln("----------");
 				
 				if (valid_symbols[QUERY_START]) {
-					Query *query = new Query(this, queries.size());
-					queries.push(query);
-					queryType = 0;
-					logln("-->> push a Query: "+to_string(queries.size()));
-					
-					if (queries.top()->scan_query_start(lexer, queries.top()->depth)) {
+					if (c == '{' || get_entity_delimiter(lexer, "{", queries.top()->depth, true) != "") {
+						if (c == '{') advance(lexer);
+						logln("---> '{'");
 						lexer->mark_end(lexer);
 						logln("----------");
+						
+						Query *query = new Query(this, queries.size());
+						queries.push(query);
+						queryType = 0;
+						logln("-->> push a Query: "+to_string(queries.size()));
 						
 						if (queries.top()->scan_query_prompt(lexer, &queryType, queries.top()->depth)) {
 							if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
@@ -785,11 +714,20 @@ logln("]");*/
 								return true;
 							}
 						}
+						else if (valid_symbols[_INVALID] && queries.top()->type & QT_INVALID_UNCLOSED) {
+							advance(lexer);
+							lexer->mark_end(lexer);
+							logln("---> _INVALID \"?{\"");
+							lexer->result_symbol = _INVALID;
+							queries.pop();
+							logln("-->> pop a Query: "+to_string(queries.size()));
+							return true;
+						}
+						
+						queries.pop();
+						logln("-->> pop a Query: "+to_string(queries.size()));
+						return false;
 					}
-					
-					queries.pop();
-					logln("-->> pop a Query: "+to_string(queries.size()));
-					return false;
 				}
 				
 				if (valid_symbols[JUST_QUESTIONMARK]) {
@@ -866,14 +804,10 @@ bool tree_sitter_roll20_script_external_scanner_scan(void *payload, TSLexer *lex
 }
 
 unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *state) {
-	Scanner *scanner = static_cast<Scanner *>(payload);
-	return scanner->serialize(state);
+	return 0;
 }
 
-void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *state, unsigned length) {
-	Scanner *scanner = static_cast<Scanner *>(payload);
-	scanner->deserialize(state, length);
-}
+void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *state, unsigned length) {}
 
 void tree_sitter_roll20_script_external_scanner_destroy(void *payload) {
 	Scanner *scanner = static_cast<Scanner *>(payload);

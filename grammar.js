@@ -426,13 +426,14 @@ module.exports = grammar({
 			),
 		),
 		
-		option: $ => prec.right(seq(
+		option: $ => choice(
 			$.optionName,
-			optional(seq(
+			prec.right(seq(
+				optional($.optionName),
 				$.__comma,
 				optional($.optionValue),
 			)),
-		)),
+		),
 		optionName: $ => name(prec.right(choice(
 			/[^@%#&}|,\r\n]+/,
 			$.attribute,

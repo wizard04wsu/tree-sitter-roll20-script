@@ -110,3 +110,148 @@ Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
 					(prompt)
 					(defaultValue))))))
 
+==================
+Roll Query: Valid: ?{ Pr@%&mpt | default value }
+==================
+
+?{ Pr@%&mpt | default value }
+
+---
+
+(roll20_script
+	(rollQuery
+		(prompt)
+		(defaultValue)))
+
+==================
+Roll Query: Valid: ?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
+==================
+
+?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
+
+---
+
+(roll20_script
+	(rollQuery
+		(prompt)
+		(defaultValue
+			(attribute
+				(attributeName))
+			(ability
+				(characterName)
+				(abilityName)))))
+
+==================
+Roll Query: Valid: ?{|a|b,c|d|}
+==================
+
+?{|a|b,c|d|}
+
+---
+
+(roll20_script
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName))))
+
+==================
+Roll Query: Valid: ?{|a,b|c||d|e,f}
+==================
+
+?{|a,b|c||d|e,f}
+
+---
+
+(roll20_script
+	(rollQuery
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue))))
+
+==================
+Roll Query: Valid: ?{|a,|,|,b}
+==================
+
+?{|a,|,|,b}
+
+---
+
+(roll20_script
+	(rollQuery
+		(option
+			(optionName))
+		(option)
+		(option
+			(optionValue))))
+
+==================
+Roll Query: Valid: ?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}
+==================
+
+?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}
+
+---
+
+(roll20_script
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName))))
+
+==================
+Roll Query: Valid: 
+==================
+
+?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f&vert;g&rcub;|,}
+
+---
+
+(roll20_script
+	(rollQuery
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option)))
+
