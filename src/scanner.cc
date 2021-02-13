@@ -10,6 +10,8 @@ namespace {
 
 using namespace std;
 
+const bool doLog = true;
+
 struct Query;
 struct Scanner;
 
@@ -67,22 +69,61 @@ enum QueryType {
 	QT_INVALID_EMPTY = 1,
 	QT_INVALID_UNCLOSED = 2,
 	QT_PROMPT_ONLY = 4,
-	QT_DEFAULT_VALUE = 8,
+	QT_TEXTBOX = 8,
 	QT_OPTIONS = 16,
 };
 
-const bool doLog = true;
-void log(string str) { if (doLog) cout << str; }
-void logln(string str) { if (doLog) { cout << str; cout << "\n"; } }
+enum ANSI_Color {
+	//https://stackoverflow.com/a/45300654/15788
+	default=39,
+	black=30,darkGray=97,gray=37,white=97,
+	red=31,yellow=33,green=32,cyan=36,blue=34,magenta=35,
+};
+string dim(int color, bool background = false) {
+	return "\033["+to_string(
+		(
+			color==default?default:
+			color==gray?darkGray:
+			color
+		)
+		+(background?10:0)
+	)+"m";
+}
+string bright(int color, bool background = false) {
+	return "\033["+to_string(
+		(
+			color==default?default:
+			color==white?white:
+			color==gray?gray:
+			color==black?black:
+			color+60
+		)
+		+(background?10:0)
+	)+"m";
+}
+
+void log(string str) {
+	if (doLog) cout << "\033[0m" << str << "\033[0m" << endl;
+}
+void logLookahead(TSLexer *lexer) {
+	char c = lexer->lookahead;
+	log(dim(green)+"  Lookahead '"+bright(green)+""+string({c})+dim(green)+"'");
+}
 
 char advance(TSLexer *lexer) {
 	lexer->advance(lexer, false);
+	logLookahead(lexer);
 	return lexer->lookahead;
+}
+void mark_end(TSLexer *lexer) {
+	lexer->mark_end(lexer);
+	char c = lexer->lookahead;
+	log(dim(cyan)+"  Mark end before '"+bright(cyan)+string({c})+dim(cyan)+"'");
 }
 
 
 bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
-	logln(">>>> check_for_closure");
+	log(dim(magenta)+"  check_for_closure");
 	char c = lexer->lookahead;
 	if (c == start_char) {
 		c = advance(lexer);
@@ -98,7 +139,7 @@ bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
 }
 
 bool scan_macro_start(TSLexer *lexer, unsigned depth) {
-	logln(">>>> scan_macro_start");
+	log(dim(magenta)+"  scan_macro_start");
 	char c = lexer->lookahead;
 	
 	if (c == 0 || c == ' ' || c == '\n') return false;
@@ -121,7 +162,7 @@ bool scan_macro_start(TSLexer *lexer, unsigned depth) {
 }
 
 bool scan_diceRoll_start(TSLexer *lexer) {
-	logln(">>>> scan_diceRoll_start");
+	log(dim(magenta)+"  scan_diceRoll_start");
 	char c = lexer->lookahead;
 	
 	if (c == 'f' || c == 'F') {
@@ -138,7 +179,7 @@ bool scan_diceRoll_start(TSLexer *lexer) {
 }
 
 bool scan_tableRoll_start(TSLexer *lexer) {
-	logln(">>>> scan_tableRoll_start");
+	log(dim(magenta)+"  scan_tableRoll_start");
 	char c = lexer->lookahead;
 	
 	bool rightBracketFound = false;
@@ -208,7 +249,11 @@ void populateEntitiesMap() {
 }
 
 string matchDelimiters(string entity, string delimiters, unsigned depth, bool shallowerIsOkay = false) {
-	logln(">>>> matchDelimiters");
+	log(dim(magenta)+"  matchDelimiters");
+	
+	//if no delimiters were passed, check this list by default
+	if (delimiters == "") delimiters = "@%#&[({+-})]|?,=~dDtT";
+	
 	for (unsigned i=0; i<delimiters.length(); i++) {
 		string delimiter = string({delimiters[i]});
 		
@@ -225,14 +270,13 @@ string matchDelimiters(string entity, string delimiters, unsigned depth, bool sh
 		rxpStr.append("}(");
 		rxpStr.append(entitiesMap[delimiter]);
 		rxpStr.append(");");
-		logln("->>> comparing \""+entity+"\" to regex \""+rxpStr+"\"");
 		if (regex_match(entity, regex(rxpStr))) return delimiter;
 	}
 	return "";
 }
 
 string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
-	logln(">>>> get_entity");
+	log(dim(magenta)+"  get_entity");
 	regex charsRxp = regex("[a-zA-Z0-9]");
 	string code = "";
 	string entity = "&";
@@ -241,7 +285,7 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 	char c = lexer->lookahead;
 	
 	if (c != '&') {
-		logln("->>> not an ampersand '"+string({c})+"'");
+		log(dim(cyan)+"  not an ampersand '"+bright(cyan)+string({c})+dim(cyan)+"'");
 		return "";
 	}
 	c = advance(lexer);
@@ -268,10 +312,10 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 			if (depth == 0 || amps == depth-1) {
 				advance(lexer);
 				if (code.length() < 2){
-					logln("->>> entity name too short: \""+code+"\"");
+					log(dim(cyan)+"  entity name too short: \""+code+"\"");
 					return "";
 				}
-				logln("->>> found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
+				log(dim(cyan)+"  found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
 				return entity;
 			}
 			else if (code.compare("amp") == 0) {
@@ -280,28 +324,28 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 			}
 			else if (shallowerIsOkay) {
 				advance(lexer);
-				logln("->>> found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
+				log(dim(cyan)+"  found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
 				return entity;
 			}
 			else{
 				advance(lexer);
-				logln("->>> depth != "+to_string(depth)+" for \""+entity+"\"");
+				log(dim(cyan)+"  depth != "+to_string(depth)+" for \""+entity+"\"");
 				return "";
 			}
 		}
 		else if (!regex_match(string({c}), charsRxp)){
 			c = advance(lexer);
-			logln("->>> invalid character '"+string({c})+"'");
+			log(dim(cyan)+"  invalid character '"+bright(cyan)+string({c})+dim(cyan)+"'");
 			return "";
 		}
 		code += c;
 		c = advance(lexer);
 	}
-	logln("->>> eof");
+	log(dim(cyan)+"  eof");
 	return "";
 }
 string get_entity_delimiter(TSLexer *lexer, string toMatch, unsigned depth, bool shallowerIsOkay = false) {
-	logln(">>>> get_entity_delimiter");
+	log(dim(magenta)+"  get_entity_delimiter");
 	string entity = get_entity(lexer, depth, shallowerIsOkay);
 	if (entity == "") return "";
 	return matchDelimiters(entity, toMatch, depth, shallowerIsOkay);
@@ -311,137 +355,120 @@ string get_entity_delimiter(TSLexer *lexer, string toMatch, unsigned depth, bool
 struct Query {
 	Scanner *scanner;
 	unsigned depth = 0;
-	enum QueryPart : unsigned { qpStart, qpPrompt, qpDefault, qpName, qpValue };
 	int type = 0;
 	
 	Query(Scanner *scanner, unsigned depth) : scanner(scanner), depth(depth) {}
 	
-	bool scan_query_start(TSLexer *lexer, unsigned depth) {
-		logln(">>>> Query.scan_query_start");
-		char c = lexer->lookahead;
-		logln("========================> depth: "+to_string(depth));
+	//consumes the part after "?{"
+	bool scan_query(TSLexer *lexer, int *type, unsigned depth) {
+		log(dim(magenta)+"  Query.scan_query");
+		logLookahead(lexer);
 		
-		if (c == '{') {
-			advance(lexer);
-			return true;
-		}
-		else if (c == '&') {
-			advance(lexer);
-			return get_entity_delimiter(lexer, "{", depth, true) != "";
-		}
-		else {
+		char c = lexer->lookahead;
+		char lastChar;
+		int optionCount = -1;
+		bool isEmpty = true;
+		
+		do {
+			optionCount++;
+			lastChar = scan_query_part(lexer, type, depth, &isEmpty);
+		} while (lastChar == '|');
+		
+		if (lastChar == 0) {
+			log(bright(red)+"  Query missing closing delimiter");
+			*type = this->type |= QT_INVALID_UNCLOSED;
 			return false;
 		}
+		else if (isEmpty) {
+			log(bright(red)+"  Query has no content");
+			*type = this->type |= QT_INVALID_EMPTY;
+			return false;
+		}
+		
+		if (optionCount == 0) {
+			log(dim(green)+"  Query prompts for text, no default");
+			*type = this->type |= QT_PROMPT_ONLY;
+		}
+		else if (optionCount == 1) {
+			log(dim(green)+"  Query prompts for text");
+			*type = this->type |= QT_TEXTBOX;
+		}
+		else {
+			log(dim(green)+"  Query prompts for selection");
+			*type = this->type |= QT_OPTIONS;
+		}
+		return true;
 	}
 	
-	bool scan_query_prompt(TSLexer *lexer, int *type, unsigned depth) {
-		logln(">>>> Query.scan_query_prompt");
+	//consumes the part after "{" or "|", up to and including the next "|" or
+	//   closing "}"
+	//sets `isEmpty` to false if it finds content
+	//returns the last consumed character (or the unescaped HTML entity)
+	char scan_query_part(TSLexer *lexer, int *type, unsigned depth, bool *isEmpty) {
+		log(dim(magenta)+"  Query.scan_query_part");
+		logLookahead(lexer);
+		
 		char c = lexer->lookahead;
-		bool hasLength = false;
-		string entity = "";
 		string delimiter = "";
+		bool prevCharIsForPlaceholder = false;
+		bool inPlaceholder = false;
+		bool skipNextAdvance = false;
 		
 		while (c != 0) {
-			if (c == '}') {
-				if (depth > 0) {
-					*type = this->type |= QT_INVALID_UNCLOSED;
-					return false;
+			if (inPlaceholder) {
+			//inside an attribute or ability
+				if (c == '}') {
+				//ends the attribute or ability
+					log(dim(cyan)+"  End @{} or %{}");
+					inPlaceholder = false;
 				}
-				if (!hasLength) {
-					*type = this->type |= QT_INVALID_EMPTY;
+			}
+			else {
+				if (c == '&' && depth > 0) {
+				//unescape the HTML entity
+					delimiter = get_entity_delimiter(lexer, "|}", depth, false);
+					if (delimiter == "") delimiter = get_entity_delimiter(lexer, "@%{", depth, true);
+					if (delimiter != "") {
+					//set unescaped delimiter as the character we're processing
+						c = delimiter.c_str()[0];
+						skipNextAdvance = true;
+					}
+				}
+				
+				if (c == '|' || c == '}') {
+				//ends the roll query option
+					if (!skipNextAdvance) advance(lexer);
+					return c;
+				}
+				
+				if (c == '{' && prevCharIsForPlaceholder) {
+				//begins an attribute or ability: @{ or %{
+					log(dim(cyan)+"  Begin @{} or %{}");
+					prevCharIsForPlaceholder = false;
+					inPlaceholder = true;
+				}
+				else if (c == '@' || c == '%') {
+				//might begin an attribute or ability
+					prevCharIsForPlaceholder = true;
 				}
 				else {
-					*type = this->type |= QT_PROMPT_ONLY;
-				}
-				advance(lexer);
-				return hasLength;
-			}
-			if (c == '|') {
-				if (depth > 0) {
-					*type = this->type |= QT_INVALID_UNCLOSED;
-					return false;
-				}
-				advance(lexer);
-				return true;
-			}
-			if (c == '&' && depth > 0) {
-				delimiter = get_entity_delimiter(lexer, "}|", depth, false);
-				if (delimiter == "}") {
-					logln("->>> '}' at depth "+to_string(depth));
-					if (!hasLength) {
-						*type = this->type |= QT_INVALID_EMPTY;
-					}
-					return hasLength;
-				}
-				else if (delimiter == "|") {
-					logln("->>> '|' at depth "+to_string(depth));
-					return true;
+					prevCharIsForPlaceholder = false;
 				}
 			}
-			hasLength = true;
-			c = advance(lexer);
-		}
-		
-		*type = this->type |= QT_INVALID_UNCLOSED;
-		return false;
-	}
-	
-	bool scan_query_options(TSLexer *lexer, int *type, unsigned depth) {
-		logln(">>>> Query.scan_query_options");
-		char c = lexer->lookahead;
-		string entity = "";
-		string delimiter = "";
-		
-		while (c != 0) {
-			if (depth == 0) {
-				if (c == '}'){
-					if (!(this->type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
-					return true;
-				}
-				else if (c == '|') {
-					*type = this->type |= QT_OPTIONS;
-					c = advance(lexer);
-					continue;
-				}
-			}
-			else if (c == '&') {
-				entity = get_entity(lexer, depth, true);
+			
+			*isEmpty = false;
+			if (skipNextAdvance) {
+				skipNextAdvance = false;
+				logLookahead(lexer);
 				c = lexer->lookahead;
-				if (entity != "") {
-					delimiter = matchDelimiters(entity, "}|", depth, false);
-					if (delimiter == "}") {
-						logln("->>> '}' at depth "+to_string(depth)+" of "+to_string(this->depth));
-						if (!(this->type & QT_OPTIONS)) *type = this->type |= QT_DEFAULT_VALUE;
-						return true;
-					}
-					else if (delimiter == "|") {
-						logln("->>> '|' at depth "+to_string(depth)+" of "+to_string(this->depth));
-						*type = this->type |= QT_OPTIONS;
-						c = advance(lexer);
-						continue;
-					}
-					
-					delimiter = matchDelimiters(entity, "}|", depth, true);
-					if (delimiter == "}") {
-						logln("->>> '}' at depth "+to_string(depth)+" of "+to_string(this->depth));
-						*type = this->type |= QT_INVALID_UNCLOSED;
-						return false;
-					}
-					else if (delimiter == "|") {
-						logln("->>> '|' at depth "+to_string(depth)+" of "+to_string(this->depth));
-						*type = this->type |= QT_INVALID_UNCLOSED;
-						return false;
-					}
-				}
 			}
-			else if (c == '}' || c == '|') {
-				*type = this->type |= QT_INVALID_UNCLOSED;
-				return false;
+			else {
+				c = advance(lexer);
 			}
-			c = advance(lexer);
 		}
-		*type = this->type |= QT_INVALID_UNCLOSED;
-		return false;
+		
+		//EOF; the roll query was never closed
+		return 0;
 	}
 };
 
@@ -453,132 +480,131 @@ struct Scanner {
 	}
 	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
-		logln(">>>> Scanner.scan");
+		log(bright(magenta)+"  Scanner.scan");
+		logLookahead(lexer);
 		char c = lexer->lookahead;
 		while (c == '\r') { c = advance(lexer); }
-		lexer->mark_end(lexer);
-		logln("----------");
+		mark_end(lexer);
 		
 		int queryType = 0;
 		if (queries.size() > 0) queryType = queries.top()->type;
 		
-		logln("->>> start character: '"+string({c})+"'");
+		
+		
+		
+		if (regex_match(string({c}), "[@%#&[({+-})]|?,=~dDtT]") && depth == 0;) {
+			
+		}
+		
+		
+		
+		
 		
 		if (c == '@') {
-			logln("->>> '@'");
 			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT] || valid_symbols[_INVALID]) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
 				if (valid_symbols[ATTRIBUTE_START] && check_for_closure(lexer, '{', '}')) {
-					logln("-->> ATTRIBUTE_START");
+					log(bright(yellow)+"  ATTRIBUTE_START");
 					lexer->result_symbol = ATTRIBUTE_START;
 					return true;
 				}
 				else if (valid_symbols[_INVALID] && c == '{') {
 					advance(lexer);
 					lexer->mark_end(lexer);
-					logln("-->> _INVALID");
+					log(bright(yellow)+"  _INVALID");
 					lexer->result_symbol = _INVALID;
 					return true;
 				}
 				else if (valid_symbols[JUST_AT]) {
-					logln("-->> JUST_AT");
+					log(bright(yellow)+"  JUST_AT");
 					lexer->result_symbol = JUST_AT;
 					return true;
 				}
 			}
 		}
 		else if (c == '%') {
-			logln("->>> '%'");
 			if (valid_symbols[ABILITY_START] || valid_symbols[JUST_PERCENT] || valid_symbols[_INVALID]) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
 				if (valid_symbols[ABILITY_START] && check_for_closure(lexer, '{', '}')) {
-					logln("-->> ABILITY_START");
+					log(bright(yellow)+"  ABILITY_START");
 					lexer->result_symbol = ABILITY_START;
 					return true;
 				}
 				else if (valid_symbols[_INVALID] && c == '{') {
 					advance(lexer);
 					lexer->mark_end(lexer);
-					logln("-->> _INVALID");
+					log(bright(yellow)+"  _INVALID");
 					lexer->result_symbol = _INVALID;
 					return true;
 				}
 				else if (valid_symbols[JUST_PERCENT]) {
-					logln("-->> JUST_PERCENT");
+					log(bright(yellow)+"  JUST_PERCENT");
 					lexer->result_symbol = JUST_PERCENT;
 					return true;
 				}
 			}
 		}
 		else if (c == '#') {
-			logln("->>> '#'");
 			if (valid_symbols[MACRO_START] || valid_symbols[JUST_HASH]) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
 				if (valid_symbols[JUST_HASH] && (c == 0 || c == '\r' || c == '\n' || c == ' ')) {
 					while (c == '\r') { c = advance(lexer); }
-					logln("-->> JUST_HASH");
+					log(bright(yellow)+"  JUST_HASH");
 					lexer->result_symbol = JUST_HASH;
 					return true;
 				}
 				
 				if (valid_symbols[MACRO_START] && scan_macro_start(lexer, queries.size())) {
-					logln("-->> MACRO_START");
+					log(bright(yellow)+"  MACRO_START");
 					lexer->result_symbol = MACRO_START;
 					return true;
 				}
 				
 				if (valid_symbols[JUST_HASH]) {
-					logln("-->> JUST_HASH");
+					log(bright(yellow)+"  JUST_HASH");
 					lexer->result_symbol = JUST_HASH;
 					return true;
 				}
 			}
 		}
 		else if (c == '&') {
-			logln("->>> '&'");
 			
 			if (valid_symbols[QUERY_START]) {
 				if (get_entity_delimiter(lexer, "?", queries.top()->depth, true) != "") {
-					logln("-->> entity '?'");
+					log(dim(blue)+"  entity of '?'");
 					c = lexer->lookahead;
-					lexer->mark_end(lexer);
-					logln("----------");
+					mark_end(lexer);
 					
 					if (c == '{' || get_entity_delimiter(lexer, "{", queries.top()->depth, true) != "") {
 						if (c == '{') advance(lexer);
-						logln("---> '{'");
-						lexer->mark_end(lexer);
-						logln("----------");
+						mark_end(lexer);
 						
 						Query *query = new Query(this, queries.size());
 						queries.push(query);
 						queryType = 0;
-						logln("---> push a Query: "+to_string(queries.size()));
+						log(bright(cyan)+"  push "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 						
-						if (queries.top()->scan_query_prompt(lexer, &queryType, queries.top()->depth)) {
-							if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
-								logln("---> QUERY_START");
+						if (queries.top()->scan_query(lexer, &queryType, queries.top()->depth)) {
+							//if (queries.top()->scan_query_part(lexer, &queryType, queries.top()->depth)) {
+								log(bright(yellow)+"  QUERY_START");
 								lexer->result_symbol = QUERY_START;
 								return true;
-							}
+							//}
 						}
 						
 						queries.pop();
-						logln("---> pop a Query: "+to_string(queries.size()));
+						log(bright(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 						return false;
 					}
 					
 					if (valid_symbols[JUST_QUESTIONMARK]) {
-						logln("---> JUST_QUESTIONMARK");
+						log(bright(yellow)+"  JUST_QUESTIONMARK");
 						lexer->result_symbol = JUST_QUESTIONMARK;
 						return true;
 					}
@@ -586,173 +612,159 @@ struct Scanner {
 			}
 			else if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() > 1) {
 				if (get_entity_delimiter(lexer, "|", queries.top()->depth, false) != "") {
-					logln("-->> entity '|'");
-					lexer->mark_end(lexer);
-					logln("----------");
+					log(dim(blue)+"  entity of '|'");
+					mark_end(lexer);
 					
-					if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
-						if (queryType & QT_DEFAULT_VALUE) {
-							logln("---> QUERY_PIPE_HASDEFAULT");
+					//if (queries.top()->scan_query_part(lexer, &queryType, queries.top()->depth)) {
+						if (queryType & QT_TEXTBOX) {
+							log(bright(yellow)+"  QUERY_PIPE_HASDEFAULT");
 							lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
 						}
 						else if (queryType & QT_OPTIONS) {
-							logln("---> QUERY_PIPE_HASOPTIONS");
+							log(bright(yellow)+"  QUERY_PIPE_HASOPTIONS");
 							lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
 						}
 						return true;
-					}
+					//}
 				}
 				return false;
 			}
 			else if (valid_symbols[QUERY_END] && queries.size() > 0) {
+				log(bright(green)+"  >>> QUERY_END <<<");
 				if (get_entity_delimiter(lexer, "}", queries.top()->depth, false) != "") {
-					logln("-->> entity '}'");
-					lexer->mark_end(lexer);
-					logln("----------");
+					log(dim(blue)+"  entity of '}'");
+					mark_end(lexer);
 					
-					logln("---> QUERY_END");
+					log(bright(yellow)+"  QUERY_END");
 					lexer->result_symbol = QUERY_END;
 					queries.pop();
-					logln("-->> pop a Query: "+to_string(queries.size()));
+					log(dim(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 					return true;
 				}
 			}
 			else if (valid_symbols[JUST_PIPE] && queries.size() > 0) {
 				if (get_entity_delimiter(lexer, "|", queries.size(), true) != "") {
-					logln("-->> entity '|'");
-					lexer->mark_end(lexer);
-					logln("----------");
+					log(dim(blue)+"  entity of '|'");
+					mark_end(lexer);
 					
-					logln("---> JUST_PIPE");
+					log(bright(yellow)+"  JUST_PIPE");
 					lexer->result_symbol = JUST_PIPE;
 					return true;
 				}
 			}
 			else if (valid_symbols[JUST_QUESTIONMARK] && queries.size() > 0) {
 				if (get_entity_delimiter(lexer, "?", queries.size(), true) != "") {
-					logln("-->> entity '?'");
-					lexer->mark_end(lexer);
-					logln("----------");
+					log(dim(blue)+"  entity of '?'");
+					mark_end(lexer);
 					
-					logln("---> JUST_QUESTIONMARK");
+					log(bright(yellow)+"  JUST_QUESTIONMARK");
 					lexer->result_symbol = JUST_QUESTIONMARK;
 					return true;
 				}
 			}
 			else {
 				advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
-				logln("---> JUST_AMPERSAND");
+				log(bright(yellow)+"  JUST_AMPERSAND");
 				lexer->result_symbol = JUST_AMPERSAND;
 				return true;
 			}
 		}
 		else if (c == 'd' || c == 'D') {
-			log("->>> '"+string({c})+"'\n");
 			if (valid_symbols[DICE_ROLL_START] || valid_symbols[JUST_D]) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
 				if (valid_symbols[DICE_ROLL_START] && scan_diceRoll_start(lexer)) {
-					logln("-->> DICE_ROLL_START");
+					log(bright(yellow)+"  DICE_ROLL_START");
 					lexer->result_symbol = DICE_ROLL_START;
 					return true;
 				}
 				
 				if (valid_symbols[JUST_D]) {
-					logln("-->> JUST_D");
+					log(bright(yellow)+"  JUST_D");
 					lexer->result_symbol = JUST_D;
 					return true;
 				}
 			}
 		}
 		else if (c == 't' || c == 'T') {
-			log("->>> '"+string({c})+"'\n");
 			if (valid_symbols[TABLE_ROLL_START] || valid_symbols[JUST_T]) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
 				if (valid_symbols[TABLE_ROLL_START] && scan_tableRoll_start(lexer)) {
-					logln("-->> TABLE_ROLL_START");
+					log(bright(yellow)+"  TABLE_ROLL_START");
 					lexer->result_symbol = TABLE_ROLL_START;
 					return true;
 				}
 				else if (valid_symbols[JUST_T]) {
-					logln("-->> JUST_T");
+					log(bright(yellow)+"  JUST_T");
 					lexer->result_symbol = JUST_T;
 					return true;
 				}
 			}
 		}
 		else if (c == '?') {
-			logln("->>> '?'");
 			if (valid_symbols[QUERY_START] || valid_symbols[JUST_QUESTIONMARK]) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
 				if (valid_symbols[QUERY_START]) {
 					if (c == '{' || get_entity_delimiter(lexer, "{", queries.top()->depth, true) != "") {
 						if (c == '{') advance(lexer);
-						logln("---> '{'");
-						lexer->mark_end(lexer);
-						logln("----------");
+						mark_end(lexer);
 						
 						Query *query = new Query(this, queries.size());
 						queries.push(query);
 						queryType = 0;
-						logln("-->> push a Query: "+to_string(queries.size()));
+						log(bright(cyan)+"  push "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 						
-						if (queries.top()->scan_query_prompt(lexer, &queryType, queries.top()->depth)) {
-							if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
-								logln("---> QUERY_START");
+						if (queries.top()->scan_query(lexer, &queryType, queries.top()->depth)) {
+							//if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
+								log(bright(yellow)+"  QUERY_START");
 								lexer->result_symbol = QUERY_START;
 								return true;
-							}
+							//}
 						}
 						else if (valid_symbols[_INVALID] && queries.top()->type & QT_INVALID_UNCLOSED) {
 							advance(lexer);
-							lexer->mark_end(lexer);
-							logln("---> _INVALID \"?{\"");
+							mark_end(lexer);
+							log(bright(red)+"  _INVALID \"?{\"");
 							lexer->result_symbol = _INVALID;
 							queries.pop();
-							logln("-->> pop a Query: "+to_string(queries.size()));
+							log(dim(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 							return true;
 						}
 						
 						queries.pop();
-						logln("-->> pop a Query: "+to_string(queries.size()));
+						log(dim(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 						return false;
 					}
 				}
 				
 				if (valid_symbols[JUST_QUESTIONMARK]) {
-					logln("-->> JUST_QUESTIONMARK");
+					log(bright(yellow)+"  JUST_QUESTIONMARK");
 					lexer->result_symbol = JUST_QUESTIONMARK;
 					return true;
 				}
 			}
 		}
 		else if (c == '|') {
-			logln("->>> '|'");
 			if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() == 1) {
 				advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
-				//logln("-->> get first pipe");
+				//log(bright(cyan)+"  get first pipe");
 				//if (queries.top()->scan_query_options(lexer, &queryType)) {
-					if (queryType & QT_DEFAULT_VALUE) {
-						logln("---> QUERY_PIPE_HASDEFAULT");
+					if (queryType & QT_TEXTBOX) {
+						log("  QUERY_PIPE_HASDEFAULT");
 						lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
 						return true;
 					}
 					else if (queryType & QT_OPTIONS) {
-						logln("---> QUERY_PIPE_HASOPTIONS");
+						log(bright(yellow)+"  QUERY_PIPE_HASOPTIONS");
 						lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
 						return true;
 					}
@@ -760,30 +772,27 @@ struct Scanner {
 			}
 			else if (valid_symbols[JUST_PIPE]) {
 				advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
-				logln("---> JUST_PIPE");
+				log(bright(yellow)+"  JUST_PIPE");
 				lexer->result_symbol = JUST_PIPE;
 				return true;
 			}
 		}
-		else if (c == '}') {
-			logln("->>> '}'");
+		else if (c == '}' && queries.top()->depth == 0) {
 			if (valid_symbols[QUERY_END] && queries.size() > 0) {
 				c = advance(lexer);
-				lexer->mark_end(lexer);
-				logln("----------");
+				mark_end(lexer);
 				
-				logln("---> QUERY_END");
+				log(bright(yellow)+"  QUERY_END");
 				lexer->result_symbol = QUERY_END;
 				queries.pop();
-				logln("-->> pop a Query: "+to_string(queries.size()));
+				log(bright(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
 				return true;
 			}
 		}
 		else {
-			log("->>> (no match)\n");
+			log(bright(yellow)+"  (no match)");
 			return false;
 		}
 		return false;
@@ -795,6 +804,7 @@ struct Scanner {
 extern "C" {
 
 void *tree_sitter_roll20_script_external_scanner_create() {
+	log(bright(magenta, true)+"                                        ");
 	return new Scanner();
 }
 
