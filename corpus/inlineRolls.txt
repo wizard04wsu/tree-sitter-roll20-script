@@ -1,11 +1,8 @@
 ==================
 Inline Roll: Valid: [[5]]
 ==================
-
 [[5]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -13,11 +10,8 @@ Inline Roll: Valid: [[5]]
 ==================
 Inline Roll: Valid: [[ 5 ]]
 ==================
-
 [[ 5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -25,11 +19,8 @@ Inline Roll: Valid: [[ 5 ]]
 ==================
 Inline Roll: Valid: [[5[a]]]
 ==================
-
 [[5[a]]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -38,11 +29,8 @@ Inline Roll: Valid: [[5[a]]]
 ==================
 Inline Roll: Valid: [[ 5 [ a ] ]]
 ==================
-
 [[ 5 [ a ] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -51,11 +39,8 @@ Inline Roll: Valid: [[ 5 [ a ] ]]
 ==================
 Inline Roll: Valid: [[[a]5d6]]
 ==================
-
 [[[a]5d6]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(label)
@@ -66,11 +51,8 @@ Inline Roll: Valid: [[[a]5d6]]
 ==================
 Inline Roll: Valid: [[ [a] 5d6 ]]
 ==================
-
 [[ [a] 5d6 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(label)
@@ -81,11 +63,8 @@ Inline Roll: Valid: [[ [a] 5d6 ]]
 ==================
 Inline Roll: Valid: [[ [[5]] ]]
 ==================
-
 [[ [[5]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number
@@ -95,11 +74,8 @@ Inline Roll: Valid: [[ [[5]] ]]
 ==================
 Inline Roll: Valid: [[5+5]]
 ==================
-
 [[5+5]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -109,11 +85,8 @@ Inline Roll: Valid: [[5+5]]
 ==================
 Inline Roll: Valid: [[ 5 + 5 ]]
 ==================
-
 [[ 5 + 5 ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -123,11 +96,8 @@ Inline Roll: Valid: [[ 5 + 5 ]]
 ==================
 Inline Roll: Valid: [[5+[[5]]]]
 ==================
-
 [[5+[[5]]]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -139,11 +109,8 @@ Inline Roll: Valid: [[5+[[5]]]]
 ==================
 Inline Roll: Valid: [[ 5 + [[ 5 ]] ]]
 ==================
-
 [[ 5 + [[ 5 ]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -155,11 +122,8 @@ Inline Roll: Valid: [[ 5 + [[ 5 ]] ]]
 ==================
 Inline Roll: Invalid but Accepted: [[[a]5]]
 ==================
-
 [[[a]5]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(label)
@@ -168,11 +132,8 @@ Inline Roll: Invalid but Accepted: [[[a]5]]
 ==================
 Inline Roll: Invalid but Accepted: [[ [a] 5 ]]
 ==================
-
 [[ [a] 5 ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(label)
@@ -181,11 +142,8 @@ Inline Roll: Invalid but Accepted: [[ [a] 5 ]]
 ==================
 Inline Roll: Invalid but Accepted: [[ [a] [[5]] ]]
 ==================
-
 [[ [a] [[5]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(label)
@@ -196,11 +154,8 @@ Inline Roll: Invalid but Accepted: [[ [a] [[5]] ]]
 ==================
 Inline Roll: Valid: [[ [a] [[5]]d6 ]]
 ==================
-
 [[ [a] [[5]]d6 ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(label)
@@ -213,11 +168,8 @@ Inline Roll: Valid: [[ [a] [[5]]d6 ]]
 ==================
 Inline Roll: Valid: [[ -[[5]]+3-[[2]] ]]
 ==================
-
 [[ -[[5]]+3-[[2]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number
@@ -233,33 +185,24 @@ Inline Roll: Valid: [[ -[[5]]+3-[[2]] ]]
 ==================
 Inline Roll: Invalid: [[]]
 ==================
-
 [[]]
-
 ---
-
 (roll20_script
  	(invalid))
 
 ==================
 Inline Roll: Invalid: [[ ]]
 ==================
-
 [[ ]]
-
 ---
-
 (roll20_script
  	(invalid))
 
 ==================
 Inline Roll: Invalid: [[[a]]]
 ==================
-
 [[[a]]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 	 	(invalid
@@ -268,11 +211,8 @@ Inline Roll: Invalid: [[[a]]]
 ==================
 Inline Roll: Invalid: [[ [ a ] ]]
 ==================
-
 [[ [ a ] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 	 	(invalid
@@ -281,11 +221,8 @@ Inline Roll: Invalid: [[ [ a ] ]]
 ==================
 Inline Roll: Invalid: [[ [[]] ]]
 ==================
-
 [[ [[]] ]]
-
 ---
-
 (roll20_script
   	(inlineRoll
 		(number
@@ -294,11 +231,8 @@ Inline Roll: Invalid: [[ [[]] ]]
 ==================
 Inline Roll: Invalid: [[ 5 [[5]] ]]
 ==================
-
 [[ 5 [[5]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -310,11 +244,8 @@ Inline Roll: Invalid: [[ 5 [[5]] ]]
 ==================
 Inline Roll: Invalid: [[ 5 [[]] ]]
 ==================
-
 [[ 5 [[]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -325,11 +256,8 @@ Inline Roll: Invalid: [[ 5 [[]] ]]
 ==================
 Inline Roll: Invalid: [[ 5 + [[]] ]]
 ==================
-
 [[ 5 + [[]] ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -340,11 +268,8 @@ Inline Roll: Invalid: [[ 5 + [[]] ]]
 ==================
 Inline Roll: Invalid: [[x]]
 ==================
-
 [[x]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -352,11 +277,8 @@ Inline Roll: Invalid: [[x]]
 ==================
 Inline Roll: Invalid: [[ x ]]
 ==================
-
 [[ x ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -364,11 +286,8 @@ Inline Roll: Invalid: [[ x ]]
 ==================
 Inline Roll: Invalid: [[ x]]
 ==================
-
 [[ x]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -376,11 +295,8 @@ Inline Roll: Invalid: [[ x]]
 ==================
 Inline Roll: Invalid: [[x ]]
 ==================
-
 [[x ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -388,11 +304,8 @@ Inline Roll: Invalid: [[x ]]
 ==================
 Inline Roll: Invalid: [[.]]
 ==================
-
 [[.]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -400,11 +313,8 @@ Inline Roll: Invalid: [[.]]
 ==================
 Inline Roll: Invalid: [[ . ]]
 ==================
-
 [[ . ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -412,11 +322,8 @@ Inline Roll: Invalid: [[ . ]]
 ==================
 Inline Roll: Invalid: [[ .]]
 ==================
-
 [[ .]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -424,11 +331,8 @@ Inline Roll: Invalid: [[ .]]
 ==================
 Inline Roll: Invalid: [[. ]]
 ==================
-
 [[. ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -436,11 +340,8 @@ Inline Roll: Invalid: [[. ]]
 ==================
 Inline Roll: Invalid: [[5 x]]
 ==================
-
 [[5 x]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -450,11 +351,8 @@ Inline Roll: Invalid: [[5 x]]
 ==================
 Inline Roll: Invalid: [[x 5]]
 ==================
-
 [[x 5]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)
@@ -464,11 +362,8 @@ Inline Roll: Invalid: [[x 5]]
 ==================
 Inline Roll: Invalid: [[5x]]
 ==================
-
 [[5x]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -477,11 +372,8 @@ Inline Roll: Invalid: [[5x]]
 ==================
 Inline Roll: Invalid: [[ 5x ]]
 ==================
-
 [[ 5x ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -490,11 +382,8 @@ Inline Roll: Invalid: [[ 5x ]]
 ==================
 Inline Roll: Invalid: [[x5]]
 ==================
-
 [[x5]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -502,11 +391,8 @@ Inline Roll: Invalid: [[x5]]
 ==================
 Inline Roll: Invalid: [[ x5 ]]
 ==================
-
 [[ x5 ]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(invalid)))
@@ -514,11 +400,8 @@ Inline Roll: Invalid: [[ x5 ]]
 ==================
 Inline Roll: Invalid: [[5d_]]
 ==================
-
 [[5d_]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -527,11 +410,8 @@ Inline Roll: Invalid: [[5d_]]
 ==================
 Inline Roll: Invalid: [[5d3_]]
 ==================
-
 [[5d3_]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(diceRoll

@@ -175,6 +175,10 @@
         {
           "type": "attribute",
           "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
         }
       ]
     }
@@ -333,14 +337,6 @@
           "named": true
         },
         {
-          "type": "diceRoll",
-          "named": true
-        },
-        {
-          "type": "groupRoll",
-          "named": true
-        },
-        {
           "type": "inlineRoll",
           "named": true
         },
@@ -353,27 +349,7 @@
           "named": true
         },
         {
-          "type": "macroHash",
-          "named": true
-        },
-        {
           "type": "modifiers",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "operator",
-          "named": true
-        },
-        {
-          "type": "parenthesized",
-          "named": true
-        },
-        {
-          "type": "tableRoll",
           "named": true
         }
       ]
@@ -393,6 +369,10 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {
@@ -440,6 +420,10 @@
         },
         {
           "type": "exploding",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {
@@ -545,6 +529,10 @@
           "named": true
         },
         {
+          "type": "invalid",
+          "named": true
+        },
+        {
           "type": "macroHash",
           "named": true
         }
@@ -565,6 +553,10 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {
@@ -704,10 +696,6 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
           "type": "option",
           "named": true
         },
@@ -733,6 +721,10 @@
         {
           "type": "attribute",
           "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
         }
       ]
     }
@@ -751,6 +743,10 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {

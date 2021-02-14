@@ -1,11 +1,8 @@
 ==================
 Table Roll: Valid: [[t[n]]]
 ==================
-
 [[t[n]]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -14,11 +11,8 @@ Table Roll: Valid: [[t[n]]]
 ==================
 Table Roll: Valid: [[ t[n] ]]
 ==================
-
 [[ t[n] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -27,11 +21,8 @@ Table Roll: Valid: [[ t[n] ]]
 ==================
 Table Roll: Valid: [[2t[n]]]
 ==================
-
 [[t[n]]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -40,11 +31,8 @@ Table Roll: Valid: [[2t[n]]]
 ==================
 Table Roll: Valid: [[ 2t[n] ]]
 ==================
-
 [[ t[n] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -53,11 +41,8 @@ Table Roll: Valid: [[ 2t[n] ]]
 ==================
 Table Roll: Valid: [[ t[n@{a}n] ]]
 ==================
-
 [[ t[n@{a}n] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -68,11 +53,8 @@ Table Roll: Valid: [[ t[n@{a}n] ]]
 ==================
 Table Roll: Valid: [[ t[@{a}] ]]
 ==================
-
 [[ t[@{a}] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -83,11 +65,8 @@ Table Roll: Valid: [[ t[@{a}] ]]
 ==================
 Table Roll: Valid: [[ t[@{a]b}] ]]
 ==================
-
 [[ t[@{a]b}] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
@@ -99,65 +78,54 @@ Table Roll: Valid: [[ t[@{a]b}] ]]
 ==================
 Table Roll: Valid: [[ t[@{ab] ]]
 ==================
-
 [[ t[@{ab] ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
 			(tableName))))
 
 ==================
-Table Roll w/o closing bracket: Invalid: [[ t[@{ab]} ]]
+Table Roll, missing bracket: Invalid: [[ t[@{ab]} ]]
 ==================
-
 [[ t[@{ab]} ]]
-
 ---
-
 (roll20_script
 	(attribute
 		(attributeName)))
 
 ==================
-Table Roll w/o closing bracket, Attribute bad: Invalid: [[ t[@{ab] + @{a} ]]
+Table Roll & Attribute: Valid: [[ t[@{ab] + @{a} ]]
 ==================
-
 [[ t[@{ab] + @{a} ]]
-
 ---
-
-(roll20_script
-	(attribute
-		(attributeName
-			(invalid))))
-
-==================
-Table Roll good, Attribute not accepted: [[ t[@{ab] + @{a} ] ]]
-==================
-
-[[ t[@{ab] + @{a} ] ]]
-
----
-
 (roll20_script
 	(inlineRoll
 		(tableRoll
-			(tableName
-				(attribute
-					(attributeName
-						(invalid)))))))
+			(tableName))
+		(operator)
+		(attribute
+			(attributeName))))
 
 ==================
-Table Roll valid, remainder not accepted: [[ t[n]@{a}_#m ]]
+Table Roll & Attribute valid, extra bracket invalid: [[ t[@{ab] + @{a} ] ]]
 ==================
-
-[[ t[n]@{a}_#m ]]
-
+[[ t[@{ab] + @{a} ] ]]
 ---
+(roll20_script
+	(inlineRoll
+		(tableRoll
+			(tableName))
+		(operator)
+		(attribute
+			(attributeName))
+		(invalid)))
 
+==================
+Table Roll & Attribute valid, remainder not accepted: [[ t[n]@{a}_#m ]]
+==================
+[[ t[n]@{a}_#m ]]
+---
 (roll20_script
 	(inlineRoll
 		(tableRoll

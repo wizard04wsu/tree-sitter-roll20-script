@@ -75,10 +75,6 @@ module.exports = grammar({
 		//$.__rightBrace,				// }
 		//$.__leftBracket,				// [
 		//$.__rightBracket,				// ]
-		
-		
-		// when there are invalid opening braces on attributes and abilities
-		$.__invalid,					// @ or %
 	],
 	
 	extras: $ => [
@@ -137,8 +133,8 @@ module.exports = grammar({
 		
 		roll20_script: $ => prec.right(repeat(
 			choice(
-				$.attribute,
-				$.ability,
+				$._attribute,
+				$._ability,
 				$._macro,
 				$._rollQuery,
 				$._inlineRoll,
@@ -201,14 +197,15 @@ module.exports = grammar({
 			$.__just_at,
 			$.__just_percent,
 			$.__just_ampersand,
-			alias($.__invalid, $.invalid),	// @{ or %{
+			alias("@{", $.invalid),
+			alias("%{", $.invalid),
 		))($),
 		_selector: $ => choice(
 			$._tokenSelector,
 			alias($._propertyName, $.characterName),
 		),
 		
-		_placeholders: $ => prec.right(repeat1(choice( $.attribute, $.ability ))),
+		_placeholders: $ => prec.right(repeat1(choice( $._attribute, $._ability ))),
 		
 		
 		/*┌──────────────────────────────
@@ -235,18 +232,19 @@ module.exports = grammar({
 		   │ @{characterName|attributeName|max}
 		   └─────────────────────────────*/
 		
-		attribute: $ => choice(
-			seq(
-				$.__attribute_start,
-				"{",
-				$._attribute,
-				"}",
-			),
-			alias($._attribute_empty, $.invalid),
+		_attribute: $ => choice(
+			$.attribute,
+			alias($._attribute_empty, $.invalid),	//@{}
 			alias("@{", $.invalid),
 		),
+		attribute: $ => seq(
+			$.__attribute_start,
+			"{",
+			$._attribute_content,
+			"}",
+		),
 		_attribute_empty: $ => seq( $.__attribute_start, "{}" ),
-		_attribute: $ => choice(
+		_attribute_content: $ => choice(
 			alias($._propertyName, $.attributeName),
 			seq(
 				$._selector,
@@ -291,18 +289,19 @@ module.exports = grammar({
 		   │ %{characterName|abilityName}
 		   └─────────────────────────────*/
 		
-		ability: $ => choice(
-			alias($._ability_empty, $.invalid),
-			seq(
-				$.__ability_start,
-				"{",
-				$._ability,
-				"}",
-			),
+		_ability: $ => choice(
+			$.ability,
+			alias($._ability_empty, $.invalid),	//%{}
 			alias("%{", $.invalid),
 		),
+		ability: $ => seq(
+			$.__ability_start,
+			"{",
+			$._ability_content,
+			"}",
+		),
 		_ability_empty: $ => seq( $.__ability_start, "{}" ),
-		_ability: $ => choice(
+		_ability_content: $ => choice(
 			alias($._propertyName, $.abilityName),
 			seq(
 				$._selector,
@@ -357,8 +356,8 @@ module.exports = grammar({
 			alias($.__macro_start, $.macroHash),
 			prec.right(repeat1(choice(
 				/[^@% \r\n]+/,
-				$.attribute,
-				$.ability,
+				$._attribute,
+				$._ability,
 				$.__just_at,
 				$.__just_percent,
 			))),
@@ -375,12 +374,13 @@ module.exports = grammar({
 		
 		_rollQuery: $ => choice(
 			$.rollQuery,
-			alias($.__invalid, $.invalid),	//?{
+			alias($._rollQuery_empty, $.invalid),	//?{}
+			alias("?{", $.invalid),
 		),
 		rollQuery: $ => choice(
-			alias($._rollQuery_empty, $.invalid),	//?{}
 			seq(
-				$.__rollQuery_start,	//?{
+				$.__rollQuery_start,	//?
+				"{",
 				$._rollQuery_content,
 				$.__rollQuery_end,	//}
 			),
@@ -413,17 +413,13 @@ module.exports = grammar({
 		
 		prompt: $ => $._propertyName,
 		
-		defaultValue: $ => seq(
-			repeat1(
-				choice(
-					/[^@%&}|]+|[@%]/,
-					$.attribute,
-					$.ability,
-					//alias($._escapedHtmlEntity, $.htmlEntity),
-					$.__just_ampersand,
-				),
-			),
-		),
+		defaultValue: $ => repeat1(choice(
+			/[^@%&}|]+|[@%]/,
+			$._attribute,
+			$._ability,
+			//alias($._escapedHtmlEntity, $.htmlEntity),
+			$.__just_ampersand,
+		)),
 		
 		option: $ => choice(
 			$.optionName,
@@ -435,8 +431,8 @@ module.exports = grammar({
 		),
 		optionName: $ => name(prec.right(choice(
 			/[^@%#&}|,\r\n]+/,
-			$.attribute,
-			$.ability,
+			$._attribute,
+			$._ability,
 			alias($.__macro_start, $.macroHash),
 			//$.htmlEntity,
 			$.__just_at,
@@ -445,11 +441,11 @@ module.exports = grammar({
 		)))($),
 		optionValue: $ => name(prec.right(choice(
 			/[^@%#&}|,?\r\n]+/,
-			$.attribute,
-			$.ability,
+			$._attribute,
+			$._ability,
 			alias($.__macro_start, $.macroHash),
 			//$.htmlEntity,
-			$.rollQuery,
+			$._rollQuery,
 			//$.property,
 			//$.button,
 			$.__just_at,
@@ -484,7 +480,10 @@ module.exports = grammar({
 			),
 			seq(
 				optional($._labels_and_wsp),
-				$._expression_first_pair,
+				choice(
+					$._expression_first_pair,
+					$._expression_invalid,
+				),
 			),
 		)),
 		_expression_next: $ => prec.right(choice(
@@ -493,6 +492,14 @@ module.exports = grammar({
 				optional($._labels_and_wsp),
 			),
 			$._expression_next_pair,
+			$._expression_invalid,
+		)),
+		_expression_invalid: $ => prec.right(choice(
+			seq(
+				$._element_invalid,
+				optional($._labels_and_wsp),
+			),
+			$._expression_invalid_pair,
 		)),
 		
 		_expression_first_pair: $ => seq(
@@ -506,7 +513,7 @@ module.exports = grammar({
 				),
 				seq(
 					$._labels_and_wsp,
-					alias($._expression_next, $.invalid),
+					$._expression_invalid,
 				),
 			),
 		),
@@ -521,7 +528,22 @@ module.exports = grammar({
 				),
 				seq(
 					$._labels_and_wsp,
-					alias($._expression_next, $.invalid),
+					$._expression_invalid,
+				),
+			),
+		),
+		_expression_invalid_pair: $ => seq(
+			$._element_invalid,
+			choice(
+				seq(
+					optional($._labels_and_wsp),
+					$._operator,
+					optional($._labels_and_wsp),
+					$._expression_next,
+				),
+				seq(
+					$._labels_and_wsp,
+					$._expression_invalid,
 				),
 			),
 		),
@@ -538,7 +560,6 @@ module.exports = grammar({
 				optional($._macro),
 			),
 			$._macro,
-			$._element_invalid,
 		)),
 		_element_next: $ => prec.right(1, choice(
 			$._element_parenthesized,
@@ -552,7 +573,6 @@ module.exports = grammar({
 				optional($._macro),
 			),
 			$._macro,
-			$._element_invalid,
 		)),
 		
 		_element_invalid: $ => seq(
@@ -650,8 +670,8 @@ module.exports = grammar({
 			optional(name(choice(
 				///[^@%#&\[ \r\n\]]+/,
 				/[^@%#\[ \r\n\]]+/,
-				$.attribute,
-				$.ability,
+				$._attribute,
+				$._ability,
 				//$.htmlEntity,
 				$.__just_at,
 				$.__just_percent,
@@ -939,8 +959,8 @@ module.exports = grammar({
 		)),
 		_diceRoll_sides: $ => choice(
 			/\d+|[fF]/,
-			$.attribute,
-			$.ability,
+			$._attribute,
+			$._ability,
 		),
 		_diceRoll_modifiers: $ => repeat1(choice(
 			$._diceRoll_modifier,
@@ -981,8 +1001,8 @@ module.exports = grammar({
 		tableName: $ => name(choice(
 			///[^@%#& \r\n\]]+/,
 			/[^@%# \r\n\]]+/,
-			$.attribute,
-			$.ability,
+			$._attribute,
+			$._ability,
 			prec(1, "@{"),
 			prec(1, "%{"),
 			$.__just_at,

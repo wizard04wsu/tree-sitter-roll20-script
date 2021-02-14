@@ -1,11 +1,8 @@
 ==================
 Signed Number: Valid: [[55.55]]
 ==================
-
 [[55.55]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -13,11 +10,8 @@ Signed Number: Valid: [[55.55]]
 ==================
 Signed Number: Valid: [[5.5]]
 ==================
-
 [[5.5]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -25,11 +19,8 @@ Signed Number: Valid: [[5.5]]
 ==================
 Signed Number: Valid: [[ 5.5 ]]
 ==================
-
 [[ 5.5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -37,11 +28,8 @@ Signed Number: Valid: [[ 5.5 ]]
 ==================
 Signed Number: Valid: [[-5.5]]
 ==================
-
 [[-5.5]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -49,11 +37,8 @@ Signed Number: Valid: [[-5.5]]
 ==================
 Signed Number: Valid: [[ -5.5 ]]
 ==================
-
 [[ -5.5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -61,11 +46,8 @@ Signed Number: Valid: [[ -5.5 ]]
 ==================
 Signed Number: Valid: [[+5]]
 ==================
-
 [[+5]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -73,11 +55,8 @@ Signed Number: Valid: [[+5]]
 ==================
 Signed Number: Valid: [[ +5 ]]
 ==================
-
 [[ +5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -85,11 +64,8 @@ Signed Number: Valid: [[ +5 ]]
 ==================
 Signed Number: Valid: [[.5]]
 ==================
-
 [[.5]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -97,11 +73,8 @@ Signed Number: Valid: [[.5]]
 ==================
 Signed Number: Valid: [[ .5 ]]
 ==================
-
 [[ .5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)))
@@ -109,11 +82,8 @@ Signed Number: Valid: [[ .5 ]]
 ==================
 Signed Number: Invalid: [[-.5]]
 ==================
-
 [[-.5]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -121,11 +91,8 @@ Signed Number: Invalid: [[-.5]]
 ==================
 Signed Number: Invalid: [[ -.5 ]]
 ==================
-
 [[ -.5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -133,11 +100,8 @@ Signed Number: Invalid: [[ -.5 ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5_]]
 ==================
-
 [[5_]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -146,11 +110,8 @@ Signed Number: Valid with Invalid Remainder: [[5_]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[ 5_ ]]
 ==================
-
 [[ 5_ ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -159,11 +120,8 @@ Signed Number: Valid with Invalid Remainder: [[ 5_ ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[-5_]]
 ==================
-
 [[-5_]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -172,11 +130,8 @@ Signed Number: Valid with Invalid Remainder: [[-5_]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[ -5_ ]]
 ==================
-
 [[ -5_ ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -185,11 +140,8 @@ Signed Number: Valid with Invalid Remainder: [[ -5_ ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5.]]
 ==================
-
 [[5.]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -198,11 +150,8 @@ Signed Number: Valid with Invalid Remainder: [[5.]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[ 5. ]]
 ==================
-
 [[ 5. ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -211,11 +160,8 @@ Signed Number: Valid with Invalid Remainder: [[ 5. ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[-5.]]
 ==================
-
 [[-5.]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -224,11 +170,8 @@ Signed Number: Valid with Invalid Remainder: [[-5.]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[ -5. ]]
 ==================
-
 [[ -5. ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -237,11 +180,8 @@ Signed Number: Valid with Invalid Remainder: [[ -5. ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5._]]
 ==================
-
 [[5._]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -250,11 +190,8 @@ Signed Number: Valid with Invalid Remainder: [[5._]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[ 5._ ]]
 ==================
-
 [[ 5._ ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -263,11 +200,8 @@ Signed Number: Valid with Invalid Remainder: [[ 5._ ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[-5._]]
 ==================
-
 [[-5._]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -276,11 +210,8 @@ Signed Number: Valid with Invalid Remainder: [[-5._]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[ -5._ ]]
 ==================
-
 [[ -5._ ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -289,11 +220,8 @@ Signed Number: Valid with Invalid Remainder: [[ -5._ ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5.5.]]
 ==================
-
 [[5.5.]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -302,11 +230,8 @@ Signed Number: Valid with Invalid Remainder: [[5.5.]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5.5_]]
 ==================
-
 [[5.5_]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -315,11 +240,8 @@ Signed Number: Valid with Invalid Remainder: [[5.5_]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[-5.5.]]
 ==================
-
 [[-5.5.]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -328,11 +250,8 @@ Signed Number: Valid with Invalid Remainder: [[-5.5.]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[-5.5_]]
 ==================
-
 [[-5.5_]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(number)
@@ -341,11 +260,8 @@ Signed Number: Valid with Invalid Remainder: [[-5.5_]]
 ==================
 Signed Number: Invalid: [[.]]
 ==================
-
 [[.]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -353,11 +269,8 @@ Signed Number: Invalid: [[.]]
 ==================
 Signed Number: Invalid: [[ . ]]
 ==================
-
 [[ . ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -365,11 +278,8 @@ Signed Number: Invalid: [[ . ]]
 ==================
 Signed Number: Invalid: [[-.]]
 ==================
-
 [[-.]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -377,11 +287,8 @@ Signed Number: Invalid: [[-.]]
 ==================
 Signed Number: Invalid: [[ -. ]]
 ==================
-
 [[ -. ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -389,11 +296,8 @@ Signed Number: Invalid: [[ -. ]]
 ==================
 Signed Number: Invalid: [[._]]
 ==================
-
 [[._]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -401,11 +305,8 @@ Signed Number: Invalid: [[._]]
 ==================
 Signed Number: Invalid: [[ ._ ]]
 ==================
-
 [[ ._ ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -413,11 +314,8 @@ Signed Number: Invalid: [[ ._ ]]
 ==================
 Signed Number: Invalid: [[-._]]
 ==================
-
 [[-._]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -425,11 +323,8 @@ Signed Number: Invalid: [[-._]]
 ==================
 Signed Number: Invalid: [[ -._ ]]
 ==================
-
 [[ -._ ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(invalid)))
@@ -437,11 +332,8 @@ Signed Number: Invalid: [[ -._ ]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5d]]
 ==================
-
 [[5d]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -450,11 +342,8 @@ Signed Number: Valid with Invalid Remainder: [[5d]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[5d_]]
 ==================
-
 [[5d_]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -463,11 +352,8 @@ Signed Number: Valid with Invalid Remainder: [[5d_]]
 ==================
 Signed Number: Valid with Invalid Remainder: [[-5d6]]
 ==================
-
 [[-5d6]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -476,11 +362,8 @@ Signed Number: Valid with Invalid Remainder: [[-5d6]]
 ==================
 Inline Roll: Valid: [[5d6]]
 ==================
-
 [[5d6]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(diceRoll

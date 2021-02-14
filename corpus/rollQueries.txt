@@ -1,33 +1,24 @@
 ==================
 Roll Query: Valid: ?{|}
 ==================
-
 ?{|}
-
 ---
-
 (roll20_script
 	(rollQuery))
 
 ==================
 Roll Query: Valid: ?{||}
 ==================
-
 ?{||}
-
 ---
-
 (roll20_script
 	(rollQuery))
 
 ==================
 Roll Query: Valid: ?{p|}
 ==================
-
 ?{p|}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(prompt)))
@@ -35,11 +26,8 @@ Roll Query: Valid: ?{p|}
 ==================
 Roll Query: Valid: ?{|d}
 ==================
-
 ?{|d}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(defaultValue)))
@@ -47,11 +35,8 @@ Roll Query: Valid: ?{|d}
 ==================
 Roll Query: Valid: ?{p|d}
 ==================
-
 ?{p|d}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(prompt)
@@ -60,11 +45,8 @@ Roll Query: Valid: ?{p|d}
 ==================
 Roll Query: Valid: ?{p|a|b}
 ==================
-
 ?{p|a|b}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(prompt)
@@ -76,11 +58,8 @@ Roll Query: Valid: ?{p|a|b}
 ==================
 Roll Query: Valid: ?{p|a,A|b,B}
 ==================
-
 ?{p|a,A|b,B}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(prompt)
@@ -94,11 +73,8 @@ Roll Query: Valid: ?{p|a,A|b,B}
 ==================
 Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
 ==================
-
 ?{|a|b,?{p&#124;b&#125;c}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(option
@@ -113,11 +89,8 @@ Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
 ==================
 Roll Query: Valid: ?{ Pr@%&mpt | default value }
 ==================
-
 ?{ Pr@%&mpt | default value }
-
 ---
-
 (roll20_script
 	(rollQuery
 		(prompt)
@@ -126,11 +99,8 @@ Roll Query: Valid: ?{ Pr@%&mpt | default value }
 ==================
 Roll Query: Valid: ?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
 ==================
-
 ?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
-
 ---
-
 (roll20_script
 	(rollQuery
 		(prompt)
@@ -144,11 +114,8 @@ Roll Query: Valid: ?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
 ==================
 Roll Query: Valid: ?{|a|b,c|d|}
 ==================
-
 ?{|a|b,c|d|}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(option
@@ -162,11 +129,8 @@ Roll Query: Valid: ?{|a|b,c|d|}
 ==================
 Roll Query: Valid: ?{|a,b|c||d|e,f}
 ==================
-
 ?{|a,b|c||d|e,f}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(option
@@ -183,11 +147,8 @@ Roll Query: Valid: ?{|a,b|c||d|e,f}
 ==================
 Roll Query: Valid: ?{|a,|,|,b}
 ==================
-
 ?{|a,|,|,b}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(option
@@ -199,11 +160,8 @@ Roll Query: Valid: ?{|a,|,|,b}
 ==================
 Roll Query: Valid: ?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}
 ==================
-
 ?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(option
@@ -217,12 +175,8 @@ Roll Query: Valid: ?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;
 
 ==================
 Roll Query: Valid: 
-==================
-
 ?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f&vert;g&rcub;|,}
-
 ---
-
 (roll20_script
 	(rollQuery
 		(option
@@ -254,4 +208,5 @@ Roll Query: Valid:
 						(optionName)
 						(optionValue)))))
 		(option)))
+==================
 

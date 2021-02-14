@@ -1,77 +1,56 @@
 ==================
 Macro: Valid: ##
 ==================
-
 ##
-
 ---
-
 (roll20_script
 	(macroHash))
 		
 ==================
 Macro: Valid: #m
 ==================
-
 #m
-
 ---
-
 (roll20_script
 	(macroHash))
 		
 ==================
 Macro: Valid: #m#
 ==================
-
 #m#
-
 ---
-
 (roll20_script
 	(macroHash))
 		
 ==================
 Macro: Valid: #m#m
 ==================
-
 #m#m
-
 ---
-
 (roll20_script
 	(macroHash))
 		
 ==================
 Macro: Valid: # #m
 ==================
-
 # #m
-
 ---
-
 (roll20_script
 	(macroHash))
 		
 ==================
 Macro: Valid: #m #
 ==================
-
 #m #
-
 ---
-
 (roll20_script
 	(macroHash))
 		
 ==================
 Macro: Valid: #m #m
 ==================
-
 #m #m
-
 ---
-
 (roll20_script
 	(macroHash)
 	(macroHash))
@@ -79,11 +58,8 @@ Macro: Valid: #m #m
 ==================
 Macro: Valid with Attributes: #m@{a}
 ==================
-
 #m@{a}
-
 ---
-
 (roll20_script
 	(macroHash)
 	(attribute
@@ -92,11 +68,8 @@ Macro: Valid with Attributes: #m@{a}
 ==================
 Macro: Valid with Attributes: #m@{a}m
 ==================
-
 #m@{a}m
-
 ---
-
 (roll20_script
 	(macroHash)
 	(attribute
@@ -105,11 +78,8 @@ Macro: Valid with Attributes: #m@{a}m
 ==================
 Macro: Valid with Attributes: #m@{c|a}
 ==================
-
 #m@{c|a}
-
 ---
-
 (roll20_script
 	(macroHash)
 	(attribute
@@ -119,11 +89,8 @@ Macro: Valid with Attributes: #m@{c|a}
 ==================
 Macro: Valid with Attributes: #m@{c|a}m
 ==================
-
 #m@{c|a}m
-
 ---
-
 (roll20_script
 	(macroHash)
 	(attribute
@@ -133,20 +100,14 @@ Macro: Valid with Attributes: #m@{c|a}m
 ==================
 String: #
 ==================
-
 #
-
 ---
-
 (roll20_script)
 
 ==================
 String: # #
 ==================
-
 # #
-
 ---
-
 (roll20_script)
 

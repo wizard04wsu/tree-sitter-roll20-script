@@ -11,11 +11,11 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "attribute"
+              "name": "_attribute"
             },
             {
               "type": "SYMBOL",
-              "name": "ability"
+              "name": "_ability"
             },
             {
               "type": "SYMBOL",
@@ -141,8 +141,17 @@
                     {
                       "type": "ALIAS",
                       "content": {
-                        "type": "SYMBOL",
-                        "name": "__invalid"
+                        "type": "STRING",
+                        "value": "@{"
+                      },
+                      "named": true,
+                      "value": "invalid"
+                    },
+                    {
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "STRING",
+                        "value": "%{"
                       },
                       "named": true,
                       "value": "invalid"
@@ -193,8 +202,17 @@
                             {
                               "type": "ALIAS",
                               "content": {
-                                "type": "SYMBOL",
-                                "name": "__invalid"
+                                "type": "STRING",
+                                "value": "@{"
+                              },
+                              "named": true,
+                              "value": "invalid"
+                            },
+                            {
+                              "type": "ALIAS",
+                              "content": {
+                                "type": "STRING",
+                                "value": "%{"
                               },
                               "named": true,
                               "value": "invalid"
@@ -256,8 +274,17 @@
                             {
                               "type": "ALIAS",
                               "content": {
-                                "type": "SYMBOL",
-                                "name": "__invalid"
+                                "type": "STRING",
+                                "value": "@{"
+                              },
+                              "named": true,
+                              "value": "invalid"
+                            },
+                            {
+                              "type": "ALIAS",
+                              "content": {
+                                "type": "STRING",
+                                "value": "%{"
                               },
                               "named": true,
                               "value": "invalid"
@@ -314,8 +341,17 @@
                                       {
                                         "type": "ALIAS",
                                         "content": {
-                                          "type": "SYMBOL",
-                                          "name": "__invalid"
+                                          "type": "STRING",
+                                          "value": "@{"
+                                        },
+                                        "named": true,
+                                        "value": "invalid"
+                                      },
+                                      {
+                                        "type": "ALIAS",
+                                        "content": {
+                                          "type": "STRING",
+                                          "value": "%{"
                                         },
                                         "named": true,
                                         "value": "invalid"
@@ -374,8 +410,17 @@
                                   {
                                     "type": "ALIAS",
                                     "content": {
-                                      "type": "SYMBOL",
-                                      "name": "__invalid"
+                                      "type": "STRING",
+                                      "value": "@{"
+                                    },
+                                    "named": true,
+                                    "value": "invalid"
+                                  },
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "STRING",
+                                      "value": "%{"
                                     },
                                     "named": true,
                                     "value": "invalid"
@@ -436,8 +481,17 @@
                                         {
                                           "type": "ALIAS",
                                           "content": {
-                                            "type": "SYMBOL",
-                                            "name": "__invalid"
+                                            "type": "STRING",
+                                            "value": "@{"
+                                          },
+                                          "named": true,
+                                          "value": "invalid"
+                                        },
+                                        {
+                                          "type": "ALIAS",
+                                          "content": {
+                                            "type": "STRING",
+                                            "value": "%{"
                                           },
                                           "named": true,
                                           "value": "invalid"
@@ -498,39 +552,22 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "attribute"
+              "name": "_attribute"
             },
             {
               "type": "SYMBOL",
-              "name": "ability"
+              "name": "_ability"
             }
           ]
         }
       }
     },
-    "attribute": {
+    "_attribute": {
       "type": "CHOICE",
       "members": [
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "__attribute_start"
-            },
-            {
-              "type": "STRING",
-              "value": "{"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_attribute"
-            },
-            {
-              "type": "STRING",
-              "value": "}"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "attribute"
         },
         {
           "type": "ALIAS",
@@ -552,6 +589,27 @@
         }
       ]
     },
+    "attribute": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__attribute_start"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_attribute_content"
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
     "_attribute_empty": {
       "type": "SEQ",
       "members": [
@@ -565,7 +623,7 @@
         }
       ]
     },
-    "_attribute": {
+    "_attribute_content": {
       "type": "CHOICE",
       "members": [
         {
@@ -736,9 +794,13 @@
         }
       ]
     },
-    "ability": {
+    "_ability": {
       "type": "CHOICE",
       "members": [
+        {
+          "type": "SYMBOL",
+          "name": "ability"
+        },
         {
           "type": "ALIAS",
           "content": {
@@ -749,27 +811,6 @@
           "value": "invalid"
         },
         {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "__ability_start"
-            },
-            {
-              "type": "STRING",
-              "value": "{"
-            },
-            {
-              "type": "SYMBOL",
-              "name": "_ability"
-            },
-            {
-              "type": "STRING",
-              "value": "}"
-            }
-          ]
-        },
-        {
           "type": "ALIAS",
           "content": {
             "type": "STRING",
@@ -777,6 +818,27 @@
           },
           "named": true,
           "value": "invalid"
+        }
+      ]
+    },
+    "ability": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__ability_start"
+        },
+        {
+          "type": "STRING",
+          "value": "{"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_ability_content"
+        },
+        {
+          "type": "STRING",
+          "value": "}"
         }
       ]
     },
@@ -793,7 +855,7 @@
         }
       ]
     },
-    "_ability": {
+    "_ability_content": {
       "type": "CHOICE",
       "members": [
         {
@@ -940,11 +1002,11 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "attribute"
+                  "name": "_attribute"
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "ability"
+                  "name": "_ability"
                 },
                 {
                   "type": "SYMBOL",
@@ -971,7 +1033,16 @@
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
-            "name": "_rollQuery_invalid_start"
+            "name": "_rollQuery_empty"
+          },
+          "named": true,
+          "value": "invalid"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "STRING",
+            "value": "?{"
           },
           "named": true,
           "value": "invalid"
@@ -982,20 +1053,15 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_rollQuery_empty"
-          },
-          "named": true,
-          "value": "invalid"
-        },
-        {
           "type": "SEQ",
           "members": [
             {
               "type": "SYMBOL",
               "name": "__rollQuery_start"
+            },
+            {
+              "type": "STRING",
+              "value": "{"
             },
             {
               "type": "SYMBOL",
@@ -1019,19 +1085,6 @@
         {
           "type": "SYMBOL",
           "name": "__rollQuery_end"
-        }
-      ]
-    },
-    "_rollQuery_invalid_start": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "__just_questionmark"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__leftBrace"
         }
       ]
     },
@@ -1157,33 +1210,28 @@
       "name": "_propertyName"
     },
     "defaultValue": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "REPEAT1",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[^@%&}|]+|[@%]"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "attribute"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "ability"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "__just_ampersand"
-              }
-            ]
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^@%&}|]+|[@%]"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_attribute"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_ability"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "__just_ampersand"
           }
-        }
-      ]
+        ]
+      }
     },
     "option": {
       "type": "CHOICE",
@@ -1254,11 +1302,11 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "attribute"
+                        "name": "_attribute"
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "ability"
+                        "name": "_ability"
                       },
                       {
                         "type": "ALIAS",
@@ -1318,11 +1366,11 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "attribute"
+                                "name": "_attribute"
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "ability"
+                                "name": "_ability"
                               },
                               {
                                 "type": "ALIAS",
@@ -1393,11 +1441,11 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "attribute"
+                                "name": "_attribute"
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "ability"
+                                "name": "_ability"
                               },
                               {
                                 "type": "ALIAS",
@@ -1463,11 +1511,11 @@
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "attribute"
+                                          "name": "_attribute"
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "ability"
+                                          "name": "_ability"
                                         },
                                         {
                                           "type": "ALIAS",
@@ -1535,11 +1583,11 @@
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "attribute"
+                                      "name": "_attribute"
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "ability"
+                                      "name": "_ability"
                                     },
                                     {
                                       "type": "ALIAS",
@@ -1609,11 +1657,11 @@
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "attribute"
+                                            "name": "_attribute"
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "ability"
+                                            "name": "_ability"
                                           },
                                           {
                                             "type": "ALIAS",
@@ -1688,11 +1736,11 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "attribute"
+                        "name": "_attribute"
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "ability"
+                        "name": "_ability"
                       },
                       {
                         "type": "ALIAS",
@@ -1705,7 +1753,7 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "rollQuery"
+                        "name": "_rollQuery"
                       },
                       {
                         "type": "SYMBOL",
@@ -1760,11 +1808,11 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "attribute"
+                                "name": "_attribute"
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "ability"
+                                "name": "_ability"
                               },
                               {
                                 "type": "ALIAS",
@@ -1777,7 +1825,7 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "rollQuery"
+                                "name": "_rollQuery"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1843,11 +1891,11 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "attribute"
+                                "name": "_attribute"
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "ability"
+                                "name": "_ability"
                               },
                               {
                                 "type": "ALIAS",
@@ -1860,7 +1908,7 @@
                               },
                               {
                                 "type": "SYMBOL",
-                                "name": "rollQuery"
+                                "name": "_rollQuery"
                               },
                               {
                                 "type": "SYMBOL",
@@ -1921,11 +1969,11 @@
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "attribute"
+                                          "name": "_attribute"
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "ability"
+                                          "name": "_ability"
                                         },
                                         {
                                           "type": "ALIAS",
@@ -1938,7 +1986,7 @@
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "rollQuery"
+                                          "name": "_rollQuery"
                                         },
                                         {
                                           "type": "SYMBOL",
@@ -2001,11 +2049,11 @@
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "attribute"
+                                      "name": "_attribute"
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "ability"
+                                      "name": "_ability"
                                     },
                                     {
                                       "type": "ALIAS",
@@ -2018,7 +2066,7 @@
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "rollQuery"
+                                      "name": "_rollQuery"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -2083,11 +2131,11 @@
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "attribute"
+                                            "name": "_attribute"
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "ability"
+                                            "name": "_ability"
                                           },
                                           {
                                             "type": "ALIAS",
@@ -2100,7 +2148,7 @@
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "rollQuery"
+                                            "name": "_rollQuery"
                                           },
                                           {
                                             "type": "SYMBOL",
@@ -2206,8 +2254,17 @@
                 ]
               },
               {
-                "type": "SYMBOL",
-                "name": "_expression_first_pair"
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_expression_first_pair"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_expression_invalid"
+                  }
+                ]
               }
             ]
           }
@@ -2244,6 +2301,44 @@
           {
             "type": "SYMBOL",
             "name": "_expression_next_pair"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_expression_invalid"
+          }
+        ]
+      }
+    },
+    "_expression_invalid": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_element_invalid"
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_labels_and_wsp"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_expression_invalid_pair"
           }
         ]
       }
@@ -2303,13 +2398,8 @@
                   "name": "_labels_and_wsp"
                 },
                 {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "_expression_next"
-                  },
-                  "named": true,
-                  "value": "invalid"
+                  "type": "SYMBOL",
+                  "name": "_expression_invalid"
                 }
               ]
             }
@@ -2372,13 +2462,72 @@
                   "name": "_labels_and_wsp"
                 },
                 {
-                  "type": "ALIAS",
-                  "content": {
-                    "type": "SYMBOL",
-                    "name": "_expression_next"
-                  },
-                  "named": true,
-                  "value": "invalid"
+                  "type": "SYMBOL",
+                  "name": "_expression_invalid"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_expression_invalid_pair": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_element_invalid"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_labels_and_wsp"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_operator"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_labels_and_wsp"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_expression_next"
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_labels_and_wsp"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "_expression_invalid"
                 }
               ]
             }
@@ -2436,10 +2585,6 @@
           {
             "type": "SYMBOL",
             "name": "_macro"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_element_invalid"
           }
         ]
       }
@@ -2494,10 +2639,6 @@
           {
             "type": "SYMBOL",
             "name": "_macro"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_element_invalid"
           }
         ]
       }
@@ -2684,11 +2825,11 @@
                             },
                             {
                               "type": "SYMBOL",
-                              "name": "attribute"
+                              "name": "_attribute"
                             },
                             {
                               "type": "SYMBOL",
-                              "name": "ability"
+                              "name": "_ability"
                             },
                             {
                               "type": "SYMBOL",
@@ -2731,11 +2872,11 @@
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "attribute"
+                                      "name": "_attribute"
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "ability"
+                                      "name": "_ability"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -2789,11 +2930,11 @@
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "attribute"
+                                      "name": "_attribute"
                                     },
                                     {
                                       "type": "SYMBOL",
-                                      "name": "ability"
+                                      "name": "_ability"
                                     },
                                     {
                                       "type": "SYMBOL",
@@ -2842,11 +2983,11 @@
                                               },
                                               {
                                                 "type": "SYMBOL",
-                                                "name": "attribute"
+                                                "name": "_attribute"
                                               },
                                               {
                                                 "type": "SYMBOL",
-                                                "name": "ability"
+                                                "name": "_ability"
                                               },
                                               {
                                                 "type": "SYMBOL",
@@ -2897,11 +3038,11 @@
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "attribute"
+                                            "name": "_attribute"
                                           },
                                           {
                                             "type": "SYMBOL",
-                                            "name": "ability"
+                                            "name": "_ability"
                                           },
                                           {
                                             "type": "SYMBOL",
@@ -2954,11 +3095,11 @@
                                                 },
                                                 {
                                                   "type": "SYMBOL",
-                                                  "name": "attribute"
+                                                  "name": "_attribute"
                                                 },
                                                 {
                                                   "type": "SYMBOL",
-                                                  "name": "ability"
+                                                  "name": "_ability"
                                                 },
                                                 {
                                                   "type": "SYMBOL",
@@ -4207,11 +4348,11 @@
         },
         {
           "type": "SYMBOL",
-          "name": "attribute"
+          "name": "_attribute"
         },
         {
           "type": "SYMBOL",
-          "name": "ability"
+          "name": "_ability"
         }
       ]
     },
@@ -4364,11 +4505,11 @@
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "attribute"
+                      "name": "_attribute"
                     },
                     {
                       "type": "SYMBOL",
-                      "name": "ability"
+                      "name": "_ability"
                     },
                     {
                       "type": "PREC",
@@ -4427,11 +4568,11 @@
                             },
                             {
                               "type": "SYMBOL",
-                              "name": "attribute"
+                              "name": "_attribute"
                             },
                             {
                               "type": "SYMBOL",
-                              "name": "ability"
+                              "name": "_ability"
                             },
                             {
                               "type": "PREC",
@@ -4501,11 +4642,11 @@
                             },
                             {
                               "type": "SYMBOL",
-                              "name": "attribute"
+                              "name": "_attribute"
                             },
                             {
                               "type": "SYMBOL",
-                              "name": "ability"
+                              "name": "_ability"
                             },
                             {
                               "type": "PREC",
@@ -4570,11 +4711,11 @@
                                       },
                                       {
                                         "type": "SYMBOL",
-                                        "name": "attribute"
+                                        "name": "_attribute"
                                       },
                                       {
                                         "type": "SYMBOL",
-                                        "name": "ability"
+                                        "name": "_ability"
                                       },
                                       {
                                         "type": "PREC",
@@ -4641,11 +4782,11 @@
                                   },
                                   {
                                     "type": "SYMBOL",
-                                    "name": "attribute"
+                                    "name": "_attribute"
                                   },
                                   {
                                     "type": "SYMBOL",
-                                    "name": "ability"
+                                    "name": "_ability"
                                   },
                                   {
                                     "type": "PREC",
@@ -4714,11 +4855,11 @@
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "attribute"
+                                          "name": "_attribute"
                                         },
                                         {
                                           "type": "SYMBOL",
-                                          "name": "ability"
+                                          "name": "_ability"
                                         },
                                         {
                                           "type": "PREC",
@@ -4843,10 +4984,6 @@
     {
       "type": "SYMBOL",
       "name": "__pipe"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__invalid"
     }
   ],
   "inline": [

@@ -12,7 +12,7 @@ using namespace std;
 
 
 //For debugging:
-const bool debugging = true;
+const bool debugging = false;
 enum ANSI_Color {
 	//https://stackoverflow.com/a/45300654/15788
 	default=39,
@@ -54,7 +54,7 @@ void logLookahead(TSLexer *lexer) {
 	log(color(darkCyan)+"  Lookahead '"+color(lightCyan)+str+color(darkCyan)+"'");
 	
 }
-void logEntity(string character) { log(color(blue)+"  Entity of '"+character+"'"); }
+void logEntity(string character) { log(color(cyan)+"  Entity of '"+character+"'"); }
 void logFunction(string functionName) { log(color(magenta)+functionName); }
 
 
@@ -106,9 +106,6 @@ enum TokenType {
 	//JUST_RIGHTBRACE,
 	//JUST_LEFTBRACKET,
 	//JUST_RIGHTBRACKET,
-	
-	
-	_INVALID,
 };
 
 enum QueryType {
@@ -133,16 +130,19 @@ void mark_end(TSLexer *lexer) {
 	if (debugging) log_marked = log_consumed.length();
 }
 
-//scan includes the start and end characters
-bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
-	logFunction("check_for_closure");
+//scan does not include the starting '@' or '%'
+bool scan_placeholder(TSLexer *lexer) {
+	logFunction("scan_placeholder");
 	char c = lexer->lookahead;
-	if (c == start_char) {
-		c = advance(lexer);
-		while (c != 0 && c != '\n' && c != end_char) {
+	if (c == '{') {
+		while (c != '}' && c != 0 && c != '\n') {
 			c = advance(lexer);
+			if (c == '@' || c == '%') {
+				c = advance(lexer);
+				if (c == '{') break;
+			}
 		}
-		if (c == end_char) {
+		if (c == '}') {
 			advance(lexer);
 			return true;
 		}
@@ -162,7 +162,7 @@ bool scan_macro_start(TSLexer *lexer, unsigned depth) {
 		if (depth > 0 && (c == '|' || c == '}')) break;
 		if (c == '@' || c == '%') {
 			c = advance(lexer);
-			if (c == '{' && !check_for_closure(lexer, '{', '}')) return false;
+			if (c == '{' && !scan_placeholder(lexer)) return false;
 		}
 		else {
 			c = advance(lexer);
@@ -186,8 +186,8 @@ bool scan_diceRoll_start(TSLexer *lexer) {
 		return true;
 	}
 	else if (c == '@' || c == '%') {
-		advance(lexer);
-		if (check_for_closure(lexer, '{', '}')) return true;
+		c = advance(lexer);
+		if (scan_placeholder(lexer)) return true;
 	}
 	return false;
 }
@@ -200,24 +200,24 @@ bool scan_tableRoll_start(TSLexer *lexer) {
 	bool rightBracketFound = false;
 	if (c == '[') {
 		c = advance(lexer);
-		while (c != 0 && c != '\n' && c != ']') {
-			if (c == '\r'){
-				c = advance(lexer);
-				continue;
-			}
+		while (c != ']' && c != 0 && c != '\n') {
 			if (c == '@' || c == '%') {
 				c = advance(lexer);
 				if (c = '{') {
-					while (c != 0 && c != '\n' && c != '}' && c != ']') {
+					while (c != '}' && c != 0 && c != '\n') {
 						c = advance(lexer);
+						if (c == '@' || c == '%') {
+							c = advance(lexer);
+							if (c == '{') break;
+						}
+						else if (c == ']') {
+							rightBracketFound = true;
+						}
 					}
 					if (c == '}') {
 						rightBracketFound = false;	//reset this; if it was found, it was just part of the attribute/ability name
 						c = advance(lexer);
 						continue;
-					}
-					else if (c == ']') {
-						rightBracketFound = true;
 					}
 					else {	//end of input
 						//if rightBracketFound == true, the "@{" or "%{" is interpreted as being part of the table name
@@ -387,12 +387,12 @@ struct Query {
 		} while (lastChar == '|');
 		
 		if (lastChar == 0) {
-			log(color(brightRed)+"  Query missing closing delimiter");
+			log(color(red)+"The query at depth "+to_string(depth)+" is missing a closing delimiter");
 			*type = this->type |= QT_INVALID_UNCLOSED;
 			return false;
 		}
 		else if (isEmpty) {
-			log(color(brightRed)+"  Query has no content");
+			log(color(red)+"The query at depth "+to_string(depth)+" has no content");
 			*type = this->type |= QT_INVALID_EMPTY;
 			return false;
 		}
@@ -424,7 +424,6 @@ struct Query {
 		string entity = "", delimiter = "";
 		bool prevCharIsForPlaceholder = false;
 		bool inPlaceholder = false;
-		bool skipNextAdvance = false;
 		
 		while (c != 0) {
 			if (inPlaceholder) {
@@ -435,57 +434,60 @@ struct Query {
 					inPlaceholder = false;
 				}
 			}
-			else {
-				if (c == '&' && depth > 0) {
-				//unescape the HTML entity
+			else if (depth == 0) {
+				if (c == '{' && prevCharIsForPlaceholder) {
+				//begins an attribute or ability: @{ or %{
+					log(color(cyan)+"Begin @{} or %{}");
+					inPlaceholder = true;
+				}
+				prevCharIsForPlaceholder = false;
+				
+				if (c == '@' || c == '%') {
+				//might begin an attribute or ability
+					prevCharIsForPlaceholder = true;
+				}
+				else if (c == '|' || c == '}') {
+				//ends the roll query option
+					if (c == '|') *isEmpty = false;
+					advance(lexer);
+					log(color(green)+"Query delimiter found: '"+c+"'");
+					return c;
+				}
+			}
+			else {	//depth > 0
+				if (c == '&') {
+					prevCharIsForPlaceholder = false;
 					c = advance(lexer);
 					entity = get_entity(lexer, depth, true);
 					if (entity != "") {
 						delimiter = matchDelimiters(entity, "|}", depth, false);
-						if (delimiter == "") delimiter = matchDelimiters(entity, "@%{", depth, true);
 						if (delimiter != "") {
-						//set unescaped delimiter as the character we're processing
-							c = delimiter.c_str()[0];
+							if (delimiter == "|") *isEmpty = false;
+							log(color(green)+"Query delimiter found: '"+delimiter+"'");
+							return char(delimiter[0]);
+						}
+						delimiter = matchDelimiters(entity, "|}", depth, true);
+						if (delimiter != "") {
+							//encountered a delimiter of a containing roll query
+							return 0;
 						}
 					}
-					skipNextAdvance = true;
+					
+					*isEmpty = false;
+					c = lexer->lookahead;
+					continue;
 				}
-				
-				if (c == '|' || c == '}') {
-				//ends the roll query option
-					if (!skipNextAdvance) advance(lexer);
-					log(color(green)+"Part end delimiter found: '"+c+"'");
-					return c;
-				}
-				
-				if (c == '{' && prevCharIsForPlaceholder) {
-				//begins an attribute or ability: @{ or %{
-					log(color(cyan)+"Begin @{} or %{}");
-					prevCharIsForPlaceholder = false;
-					inPlaceholder = true;
-				}
-				else if (c == '@' || c == '%') {
-				//might begin an attribute or ability
-					prevCharIsForPlaceholder = true;
-				}
-				else {
-					prevCharIsForPlaceholder = false;
+				else if (c == '|' || c == '}') {
+					//encountered a delimiter of a containing roll query
+					return 0;
 				}
 			}
 			
 			*isEmpty = false;
-			if (skipNextAdvance) {
-				skipNextAdvance = false;
-				logLookahead(lexer);
-				c = lexer->lookahead;
-			}
-			else {
-				c = advance(lexer);
-			}
+			c = advance(lexer);
 		}
 		
 		//EOF; the roll query was never closed
-		log(color(red)+"No part end delimiter was found");
 		return 0;
 	}
 };
@@ -503,7 +505,8 @@ struct Scanner {
 	}
 	void logTokenType(TSLexer *lexer, string tokenType) {
 		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
-		log(color(brightYellow)+log_consumed.substr(0, log_marked)
+		log("  "
+			+color(brightYellow)+log_consumed.substr(0, log_marked)
 			+color(gray)+log_consumed.substr(log_marked)
 			+color(cyan)+string({char(lexer->lookahead)})
 		);
@@ -525,24 +528,14 @@ struct Scanner {
 		string entity, delimAtDepth, delimAtOrAbove;
 		
 		if (c == '@') {
-			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[_INVALID] || valid_symbols[JUST_AT]) {
+			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (c == '{') {
-					if (valid_symbols[ATTRIBUTE_START]) {
-						if (check_for_closure(lexer, '{', '}')) {
-							logTokenType(lexer, "ATTRIBUTE_START");
-							lexer->result_symbol = ATTRIBUTE_START;
-							return true;
-						}
-					}
-					
-					if (valid_symbols[_INVALID]) {
-						advance(lexer);
-						mark_end(lexer);
-						logTokenType(lexer, "_INVALID");
-						lexer->result_symbol = _INVALID;
+				if (valid_symbols[ATTRIBUTE_START]) {
+					if (scan_placeholder(lexer)) {
+						logTokenType(lexer, "ATTRIBUTE_START");
+						lexer->result_symbol = ATTRIBUTE_START;
 						return true;
 					}
 				}
@@ -555,24 +548,14 @@ struct Scanner {
 			}
 		}
 		else if (c == '%') {
-			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[_INVALID] || valid_symbols[JUST_PERCENT]) {
+			if (valid_symbols[ABILITY_START] || valid_symbols[JUST_PERCENT]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (c == '{') {
-					if (valid_symbols[ABILITY_START]) {
-						if (check_for_closure(lexer, '{', '}')) {
-							logTokenType(lexer, "ABILITY_START");
-							lexer->result_symbol = ABILITY_START;
-							return true;
-						}
-					}
-					
-					if (valid_symbols[_INVALID] && c == '{') {
-						advance(lexer);
-						mark_end(lexer);
-						logTokenType(lexer, "_INVALID");
-						lexer->result_symbol = _INVALID;
+				if (valid_symbols[ABILITY_START]) {
+					if (scan_placeholder(lexer)) {
+						logTokenType(lexer, "ABILITY_START");
+						lexer->result_symbol = ABILITY_START;
 						return true;
 					}
 				}
@@ -626,27 +609,19 @@ struct Scanner {
 							
 							if (c == '{' || delimAtOrAbove == "{") {
 								if (c == '{') advance(lexer);
-								mark_end(lexer);
 								
 								Query *query = new Query(this, queries.size());
 								queries.push(query);
 								queryType = 0;
 								logPushQuery();
 								
-								if (queries.top()->scan_query(lexer, &queryType, depth)) {
+								if (queries.top()->scan_query(lexer, &queryType, queries.size()-1)) {
 									logTokenType(lexer, "QUERY_START");
 									lexer->result_symbol = QUERY_START;
 									return true;
 								}
-								else if (valid_symbols[_INVALID] && queries.top()->type & QT_INVALID_UNCLOSED) {
-									log(color(brightRed)+"  _INVALID \"?{\"");
-									lexer->result_symbol = _INVALID;
-									queries.pop();
-									logPopQuery();
-									return true;
-								}
 								
-								//else it's empty: ?{}
+								//else it's unclosed or empty
 								queries.pop();
 								logPopQuery();
 								return false;
@@ -773,27 +748,19 @@ struct Scanner {
 					
 					if (c == '{' || delimAtOrAbove == "{") {
 						if (c == '{') advance(lexer);
-						mark_end(lexer);
 						
 						Query *query = new Query(this, queries.size());
 						queries.push(query);
 						queryType = 0;
 						logPushQuery();
 						
-						if (queries.top()->scan_query(lexer, &queryType, depth)) {
+						if (queries.top()->scan_query(lexer, &queryType, queries.size()-1)) {
 							logTokenType(lexer, "QUERY_START");
 							lexer->result_symbol = QUERY_START;
 							return true;
 						}
-						else if (valid_symbols[_INVALID] && queries.top()->type & QT_INVALID_UNCLOSED) {
-							log(color(brightRed)+"  _INVALID \"?{\"");
-							lexer->result_symbol = _INVALID;
-							queries.pop();
-							logPopQuery();
-							return true;
-						}
 						
-						//else it's empty: ?{}
+						//else it's unclosed or empty
 						queries.pop();
 						logPopQuery();
 						return false;
@@ -844,14 +811,13 @@ struct Scanner {
 				return true;
 			}
 		}
-		else {
-			if (debugging) {
-				advance(lexer);
-				mark_end(lexer);
-			}
-			logTokenType(lexer, "(no match)");
-			return false;
+		
+		if (debugging) {
+			advance(lexer);
+			mark_end(lexer);
 		}
+		logTokenType(lexer, "(no match)");
+		return false;
 	}
 };
 

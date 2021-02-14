@@ -1,11 +1,8 @@
 ==================
 Dice Roll: Valid: [[d20]]
 ==================
-
 [[d20]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -14,11 +11,8 @@ Dice Roll: Valid: [[d20]]
 ==================
 Dice Roll: Valid: [[ d20 ]]
 ==================
-
 [[ d20 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -27,11 +21,8 @@ Dice Roll: Valid: [[ d20 ]]
 ==================
 Dice Roll: Valid: [[ D20 ]]
 ==================
-
 [[ D20 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -40,11 +31,8 @@ Dice Roll: Valid: [[ D20 ]]
 ==================
 Dice Roll: Valid: [[10d20]]
 ==================
-
 [[10d20]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -54,11 +42,8 @@ Dice Roll: Valid: [[10d20]]
 ==================
 Dice Roll: Valid: [[ 10d20 ]]
 ==================
-
 [[ 10d20 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -68,11 +53,8 @@ Dice Roll: Valid: [[ 10d20 ]]
 ==================
 Dice Roll: Valid: [[ df ]]
 ==================
-
 [[ df ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -81,11 +63,8 @@ Dice Roll: Valid: [[ df ]]
 ==================
 Dice Roll: Valid: [[ @{a}d@{a} ]]
 ==================
-
 [[ @{a}d@{a} ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -99,11 +78,8 @@ Dice Roll: Valid: [[ @{a}d@{a} ]]
 ==================
 Dice Roll: Valid: [[ %{b|a}d%{b|a} ]]
 ==================
-
 [[ %{b|a}d%{b|a} ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -119,11 +95,8 @@ Dice Roll: Valid: [[ %{b|a}d%{b|a} ]]
 ==================
 Dice Roll: Valid: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 ==================
-
 [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -148,11 +121,8 @@ Dice Roll: Valid: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 ==================
 Dice Roll: Valid: [[ d6c@{s}5 ]]
 ==================
-
 [[ d6c@{s}5 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -164,11 +134,8 @@ Dice Roll: Valid: [[ d6c@{s}5 ]]
 ==================
 Dice Roll: Valid: long one, lower case
 ==================
-
 [[ 4d6r5r=5ro5ro=5!5!=5!!5!!=5!p!p5!p=5k5kh5kl5d5dh5dl5>1>10f5>10f<5cs5cs>5cf2cf<2m5m5=5mt5mt5=5sasd ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -209,11 +176,8 @@ Dice Roll: Valid: long one, lower case
 ==================
 Dice Roll: Valid: long one, upper case
 ==================
-
 [[ 4D6R5R=5RO5RO=5!5!=5!!5!!=5!P!P5!P=5K5Kh5Kl5D5DH5DL5>1>10F5>10F<5CS5CS>5CF2CF<2M5M5=5MT5MT5=5SASD ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -254,11 +218,8 @@ Dice Roll: Valid: long one, upper case
 ==================
 Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 ==================
-
 [[ d6c@{s}5cs>5s_c@{f}3 ]]
-
 ---
-
 (roll20_script
 	(inlineRoll
 		(diceRoll
@@ -274,11 +235,8 @@ Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 ==================
 Number: Valid with Invalid Remainder: [[5d_]]
 ==================
-
 [[5d_]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(number)
@@ -287,11 +245,8 @@ Number: Valid with Invalid Remainder: [[5d_]]
 ==================
 Dice Roll: Valid with Invalid Remainder: [[5d3_]]
 ==================
-
 [[5d3_]]
-
 ---
-
 (roll20_script
  	(inlineRoll
 		(diceRoll
