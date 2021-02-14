@@ -10,7 +10,53 @@ namespace {
 
 using namespace std;
 
-const bool doLog = true;
+
+//For debugging:
+const bool debugging = true;
+enum ANSI_Color {
+	//https://stackoverflow.com/a/45300654/15788
+	default=39,
+	
+	black=30,
+	darkGray=90,gray=90,dimGray=90,
+	lightGray=37,brightGray=37,
+	white=97,
+	
+	red=31,dimRed=31,darkRed=31,
+	yellow=33,dimYellow=33,darkYellow=33,
+	green=32,dimGreen=32,darkGreen=32,
+	cyan=36,dimCyan=36,darkCyan=36,
+	blue=34,dimBlue=34,darkBlue=34,
+	magenta=35,dimMagenta=35,darkMagenta=35,
+	
+	brightRed=91,lightRed=91,
+	brightYellow=93,lightYellow=93,
+	brightGreen=92,lightGreen=92,
+	brightCyan=96,lightCyan=96,
+	brightBlue=94,lightBlue=94,
+	brightMagenta=95,lightMagenta=95,
+};
+string color(int foreground = 0, int background = 0) {
+	return "\033["
+		+(foreground?to_string(foreground):"")
+		+((foreground&&background)?";":"")
+		+(background?to_string(background+10):"")
+		+"m";
+}
+unsigned log_marked = 0;
+string log_consumed = "";
+void log(string str) {
+	if (debugging) cout << "\033[0m" << str << "\033[0m" << endl;
+}
+void logLookahead(TSLexer *lexer) {
+	char c = lexer->lookahead;
+	string str = string({c}) + (c=='\n'?"•":"");
+	log(color(darkCyan)+"  Lookahead '"+color(lightCyan)+str+color(darkCyan)+"'");
+	
+}
+void logEntity(string character) { log(color(blue)+"  Entity of '"+character+"'"); }
+void logFunction(string functionName) { log(color(magenta)+functionName); }
+
 
 struct Query;
 struct Scanner;
@@ -73,44 +119,9 @@ enum QueryType {
 	QT_OPTIONS = 16,
 };
 
-enum ANSI_Color {
-	//https://stackoverflow.com/a/45300654/15788
-	default=39,
-	black=30,darkGray=97,gray=37,white=97,
-	red=31,yellow=33,green=32,cyan=36,blue=34,magenta=35,
-};
-string dim(int color, bool background = false) {
-	return "\033["+to_string(
-		(
-			color==default?default:
-			color==gray?darkGray:
-			color
-		)
-		+(background?10:0)
-	)+"m";
-}
-string bright(int color, bool background = false) {
-	return "\033["+to_string(
-		(
-			color==default?default:
-			color==white?white:
-			color==gray?gray:
-			color==black?black:
-			color+60
-		)
-		+(background?10:0)
-	)+"m";
-}
-
-void log(string str) {
-	if (doLog) cout << "\033[0m" << str << "\033[0m" << endl;
-}
-void logLookahead(TSLexer *lexer) {
-	char c = lexer->lookahead;
-	log(dim(green)+"  Lookahead '"+bright(green)+""+string({c})+dim(green)+"'");
-}
 
 char advance(TSLexer *lexer) {
+	if (debugging) log_consumed += lexer->lookahead;
 	lexer->advance(lexer, false);
 	logLookahead(lexer);
 	return lexer->lookahead;
@@ -118,12 +129,13 @@ char advance(TSLexer *lexer) {
 void mark_end(TSLexer *lexer) {
 	lexer->mark_end(lexer);
 	char c = lexer->lookahead;
-	log(dim(cyan)+"  Mark end before '"+bright(cyan)+string({c})+dim(cyan)+"'");
+	log(color(yellow)+"Mark end before '"+string({c})+"'");
+	if (debugging) log_marked = log_consumed.length();
 }
 
-
+//scan includes the start and end characters
 bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
-	log(dim(magenta)+"  check_for_closure");
+	logFunction("check_for_closure");
 	char c = lexer->lookahead;
 	if (c == start_char) {
 		c = advance(lexer);
@@ -138,12 +150,13 @@ bool check_for_closure(TSLexer *lexer, char start_char, char end_char) {
 	return false;
 }
 
+//scan does not include the starting hash character
 bool scan_macro_start(TSLexer *lexer, unsigned depth) {
-	log(dim(magenta)+"  scan_macro_start");
+	logFunction("scan_macro_start");
 	char c = lexer->lookahead;
 	
+	while (c == '\r') { c = advance(lexer); }
 	if (c == 0 || c == ' ' || c == '\n') return false;
-	if (depth > 0 && (c == '|' || c == '}')) return false;
 	
 	while (c != 0 && c != ' ' && c != '\n') {
 		if (depth > 0 && (c == '|' || c == '}')) break;
@@ -161,8 +174,9 @@ bool scan_macro_start(TSLexer *lexer, unsigned depth) {
 	return false;
 }
 
+//scan does not include the dice count or the 'd' or 'D'
 bool scan_diceRoll_start(TSLexer *lexer) {
-	log(dim(magenta)+"  scan_diceRoll_start");
+	logFunction("scan_diceRoll_start");
 	char c = lexer->lookahead;
 	
 	if (c == 'f' || c == 'F') {
@@ -178,8 +192,9 @@ bool scan_diceRoll_start(TSLexer *lexer) {
 	return false;
 }
 
+//scan does not include the 't' or 'T'
 bool scan_tableRoll_start(TSLexer *lexer) {
-	log(dim(magenta)+"  scan_tableRoll_start");
+	logFunction("scan_tableRoll_start");
 	char c = lexer->lookahead;
 	
 	bool rightBracketFound = false;
@@ -221,35 +236,33 @@ bool scan_tableRoll_start(TSLexer *lexer) {
 }
 
 
-map<string, string> entitiesMap;
+map<string, string> entitiesMap = {
+	{"@", "#64|#[xX](00)?40|commat"},
+	{"%", "#37|#[xX](00)?25|percnt"},
+	{"#", "#35|#[xX](00)?23|num"},
+	{"&", "#38|#[xX](00)?26|amp|AMP"},
+	{"[", "#91|#[xX](00)?5[bB]|lsqb|lbrack"},
+	{"(", "#40|#[xX](00)?28|lpar"},
+	{"{", "#123|#[xX](00)?7[bB]|lcub|lbrace"},
+	{"+", "#43|#[xX](00)?2[bB]|plus"},
+	{"-", "#45|#[xX](00)?2[dD]|dash|hyphen"},
+	{"}", "#125|#[xX](00)?7[dD]|rcub|rbrace"},
+	{")", "#41|#[xX](00)?29|rpar"},
+	{"]", "#93|#[xX](00)?5[dD]|rsqb|rbrack"},
+	{"|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"},
+	{"?", "#63|#[xX](00)?3[fF]|quest"},
+	{",", "#44|#[xX](00)?2[cC]|comma"},
+	{"=", "#61|#[xX](00)?3[dD]|equals"},
+	{"~", "#126|#[xX](00)?7[eE]"},
+	{"d", "#100|#[xX](00)?64"},
+	{"D", "#68|#[xX](00)?44"},
+	{"t", "#116|#[xX](00)?74"},
+	{"T", "#84|#[xX](00)?54"},
+};
 
-void populateEntitiesMap() {
-	if (!entitiesMap.empty()) return;
-	entitiesMap.insert(pair<string, string>("@", "#64|#[xX](00)?40|commat"));
-	entitiesMap.insert(pair<string, string>("%", "#37|#[xX](00)?25|percnt"));
-	entitiesMap.insert(pair<string, string>("#", "#35|#[xX](00)?23|num"));
-	entitiesMap.insert(pair<string, string>("&", "#38|#[xX](00)?26|amp|AMP"));
-	entitiesMap.insert(pair<string, string>("[", "#91|#[xX](00)?5[bB]|lsqb|lbrack"));
-	entitiesMap.insert(pair<string, string>("(", "#40|#[xX](00)?28|lpar"));
-	entitiesMap.insert(pair<string, string>("{", "#123|#[xX](00)?7[bB]|lcub|lbrace"));
-	entitiesMap.insert(pair<string, string>("+", "#43|#[xX](00)?2[bB]|plus"));
-	entitiesMap.insert(pair<string, string>("-", "#45|#[xX](00)?2[dD]|dash|hyphen"));
-	entitiesMap.insert(pair<string, string>("}", "#125|#[xX](00)?7[dD]|rcub|rbrace"));
-	entitiesMap.insert(pair<string, string>(")", "#41|#[xX](00)?29|rpar"));
-	entitiesMap.insert(pair<string, string>("]", "#93|#[xX](00)?5[dD]|rsqb|rbrack"));
-	entitiesMap.insert(pair<string, string>("|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"));
-	entitiesMap.insert(pair<string, string>("?", "#63|#[xX](00)?3[fF]|quest"));
-	entitiesMap.insert(pair<string, string>(",", "#44|#[xX](00)?2[cC]|comma"));
-	entitiesMap.insert(pair<string, string>("=", "#61|#[xX](00)?3[dD]|equals"));
-	entitiesMap.insert(pair<string, string>("~", "#126|#[xX](00)?7[eE]"));
-	entitiesMap.insert(pair<string, string>("d", "#100|#[xX](00)?64"));
-	entitiesMap.insert(pair<string, string>("D", "#68|#[xX](00)?44"));
-	entitiesMap.insert(pair<string, string>("t", "#116|#[xX](00)?74"));
-	entitiesMap.insert(pair<string, string>("T", "#84|#[xX](00)?54"));
-}
-
+//returns a string with the delimiter represented by the passed entity string, or an empty string if no match is found
 string matchDelimiters(string entity, string delimiters, unsigned depth, bool shallowerIsOkay = false) {
-	log(dim(magenta)+"  matchDelimiters");
+	logFunction("matchDelimiters");
 	
 	//if no delimiters were passed, check this list by default
 	if (delimiters == "") delimiters = "@%#&[({+-})]|?,=~dDtT";
@@ -275,80 +288,79 @@ string matchDelimiters(string entity, string delimiters, unsigned depth, bool sh
 	return "";
 }
 
+//scan does not include the '&'
+//however, the '&' is included in the result if a match is found
 string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
-	log(dim(magenta)+"  get_entity");
+	logFunction("get_entity");
 	regex charsRxp = regex("[a-zA-Z0-9]");
-	string code = "";
+	string code = "", prevCode = "";
 	string entity = "&";
 	unsigned amps = 0;
 	
 	char c = lexer->lookahead;
 	
-	if (c != '&') {
-		log(dim(cyan)+"  not an ampersand '"+bright(cyan)+string({c})+dim(cyan)+"'");
-		return "";
-	}
-	c = advance(lexer);
-	
-	while (c != 0){
-		if (c == '#' && code == "") {
-			entity += "#";
+	do {
+		if (c == '#') {
+			code = "#";
 			c = advance(lexer);
 			if (c == 'x' || c == 'X') {
-				entity += string({c});
-				charsRxp = regex("[a-fA-F0-9]");
+				code += string({c});
+				charsRxp = regex("[a-fA-F0-9]");	//hex code
 				c = advance(lexer);
 			}
 			else {
-				charsRxp = regex("\\d");
+				charsRxp = regex("\\d");	//decimal code
 			}
 		}
 		else {
-			charsRxp = regex("[a-zA-Z0-9]");
+			charsRxp = regex("[a-zA-Z0-9]");	//named
 		}
 		
-		if (c == ';') {
-			entity += code + ";";
-			if (depth == 0 || amps == depth-1) {
-				advance(lexer);
-				if (code.length() < 2){
-					log(dim(cyan)+"  entity name too short: \""+code+"\"");
+		while (c != 0) {
+			if (c == ';') {
+				c = advance(lexer);
+				if (code == "") {	//TODO: if (not_a_valid_HTML_entity_code) {
+				//just found a semicolon at this depth (no entity name)
+					if (amps == 0){
+					//at depth 0; nothing found but the semicolon
+						return "";
+					}
+					
+					//use the entity name at the previous depth
+					log(color(green)+"Found \"&amp;\" at depth "+to_string(depth+amps-1)+" (current depth: "+to_string(depth)+")");
+					return entity;
+				}
+				else if (amps < depth && regex_match(code, regex(entitiesMap["&"]))) {
+					amps++;
+					entity += code + ";";
+					prevCode = code;
+					code = "";
+					break;
+				}
+				else if (amps == depth || shallowerIsOkay) {
+				//found an entity
+					log(color(green)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (current depth: "+to_string(depth)+")");
+					return entity+code+";";
+				}
+				else {
+				//found an entity, but it's too shallow
+					log(color(red)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (too shallow; current depth: "+to_string(depth)+")");
 					return "";
 				}
-				log(dim(cyan)+"  found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
-				return entity;
 			}
-			else if (code.compare("amp") == 0) {
-				amps++;
-				code = "";
-			}
-			else if (shallowerIsOkay) {
-				advance(lexer);
-				log(dim(cyan)+"  found \""+entity+"\" at depth "+to_string(amps+1)+" of "+to_string(depth));
-				return entity;
-			}
-			else{
-				advance(lexer);
-				log(dim(cyan)+"  depth != "+to_string(depth)+" for \""+entity+"\"");
+			else if (!regex_match(string({c}), charsRxp)){
+			//it's not a valid character
+				log(color(red)+"Invalid character for an HTML entity: '"+color(brightRed)+string({c})+color(red)+"'");
 				return "";
 			}
+			else {
+				code += c;
+				c = advance(lexer);
+			}
 		}
-		else if (!regex_match(string({c}), charsRxp)){
-			c = advance(lexer);
-			log(dim(cyan)+"  invalid character '"+bright(cyan)+string({c})+dim(cyan)+"'");
-			return "";
-		}
-		code += c;
-		c = advance(lexer);
-	}
-	log(dim(cyan)+"  eof");
+	} while (c != 0);
+	log(color(red)+"No closing semicolon");
 	return "";
-}
-string get_entity_delimiter(TSLexer *lexer, string toMatch, unsigned depth, bool shallowerIsOkay = false) {
-	log(dim(magenta)+"  get_entity_delimiter");
-	string entity = get_entity(lexer, depth, shallowerIsOkay);
-	if (entity == "") return "";
-	return matchDelimiters(entity, toMatch, depth, shallowerIsOkay);
 }
 
 
@@ -361,7 +373,7 @@ struct Query {
 	
 	//consumes the part after "?{"
 	bool scan_query(TSLexer *lexer, int *type, unsigned depth) {
-		log(dim(magenta)+"  Query.scan_query");
+		logFunction("Query.scan_query");
 		logLookahead(lexer);
 		
 		char c = lexer->lookahead;
@@ -375,26 +387,26 @@ struct Query {
 		} while (lastChar == '|');
 		
 		if (lastChar == 0) {
-			log(bright(red)+"  Query missing closing delimiter");
+			log(color(brightRed)+"  Query missing closing delimiter");
 			*type = this->type |= QT_INVALID_UNCLOSED;
 			return false;
 		}
 		else if (isEmpty) {
-			log(bright(red)+"  Query has no content");
+			log(color(brightRed)+"  Query has no content");
 			*type = this->type |= QT_INVALID_EMPTY;
 			return false;
 		}
 		
 		if (optionCount == 0) {
-			log(dim(green)+"  Query prompts for text, no default");
+			log(color(yellow)+"The query at depth "+to_string(depth)+" will prompt for text, no default");
 			*type = this->type |= QT_PROMPT_ONLY;
 		}
 		else if (optionCount == 1) {
-			log(dim(green)+"  Query prompts for text");
+			log(color(yellow)+"The query at depth "+to_string(depth)+" will prompt for text");
 			*type = this->type |= QT_TEXTBOX;
 		}
 		else {
-			log(dim(green)+"  Query prompts for selection");
+			log(color(yellow)+"The query at depth "+to_string(depth)+" will prompt for a selection");
 			*type = this->type |= QT_OPTIONS;
 		}
 		return true;
@@ -405,11 +417,11 @@ struct Query {
 	//sets `isEmpty` to false if it finds content
 	//returns the last consumed character (or the unescaped HTML entity)
 	char scan_query_part(TSLexer *lexer, int *type, unsigned depth, bool *isEmpty) {
-		log(dim(magenta)+"  Query.scan_query_part");
+		logFunction("Query.scan_query_part");
 		logLookahead(lexer);
 		
 		char c = lexer->lookahead;
-		string delimiter = "";
+		string entity = "", delimiter = "";
 		bool prevCharIsForPlaceholder = false;
 		bool inPlaceholder = false;
 		bool skipNextAdvance = false;
@@ -419,31 +431,36 @@ struct Query {
 			//inside an attribute or ability
 				if (c == '}') {
 				//ends the attribute or ability
-					log(dim(cyan)+"  End @{} or %{}");
+					log(color(green)+"End @{} or %{}");
 					inPlaceholder = false;
 				}
 			}
 			else {
 				if (c == '&' && depth > 0) {
 				//unescape the HTML entity
-					delimiter = get_entity_delimiter(lexer, "|}", depth, false);
-					if (delimiter == "") delimiter = get_entity_delimiter(lexer, "@%{", depth, true);
-					if (delimiter != "") {
-					//set unescaped delimiter as the character we're processing
-						c = delimiter.c_str()[0];
-						skipNextAdvance = true;
+					c = advance(lexer);
+					entity = get_entity(lexer, depth, true);
+					if (entity != "") {
+						delimiter = matchDelimiters(entity, "|}", depth, false);
+						if (delimiter == "") delimiter = matchDelimiters(entity, "@%{", depth, true);
+						if (delimiter != "") {
+						//set unescaped delimiter as the character we're processing
+							c = delimiter.c_str()[0];
+						}
 					}
+					skipNextAdvance = true;
 				}
 				
 				if (c == '|' || c == '}') {
 				//ends the roll query option
 					if (!skipNextAdvance) advance(lexer);
+					log(color(green)+"Part end delimiter found: '"+c+"'");
 					return c;
 				}
 				
 				if (c == '{' && prevCharIsForPlaceholder) {
 				//begins an attribute or ability: @{ or %{
-					log(dim(cyan)+"  Begin @{} or %{}");
+					log(color(cyan)+"Begin @{} or %{}");
 					prevCharIsForPlaceholder = false;
 					inPlaceholder = true;
 				}
@@ -468,6 +485,7 @@ struct Query {
 		}
 		
 		//EOF; the roll query was never closed
+		log(color(red)+"No part end delimiter was found");
 		return 0;
 	}
 };
@@ -475,74 +493,92 @@ struct Query {
 struct Scanner {
 	stack<Query*> queries;
 	
-	Scanner() {
-		populateEntitiesMap();
+	Scanner() {}
+	
+	void logPopQuery(){
+		log(color(brightCyan)+"Pop "+color(cyan)+"a Query; stack size: "+color(brightCyan)+to_string(queries.size()));
+	}
+	void logPushQuery(){
+		log(color(brightCyan)+"Push "+color(cyan)+"a Query; stack size: "+color(brightCyan)+to_string(queries.size()));
+	}
+	void logTokenType(TSLexer *lexer, string tokenType) {
+		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
+		log(color(brightYellow)+log_consumed.substr(0, log_marked)
+			+color(gray)+log_consumed.substr(log_marked)
+			+color(cyan)+string({char(lexer->lookahead)})
+		);
 	}
 	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
-		log(bright(magenta)+"  Scanner.scan");
+		log_marked = 0;
+		log_consumed = "";
+		log(color(brightMagenta)+"Scanner.scan");
 		logLookahead(lexer);
+		
 		char c = lexer->lookahead;
-		while (c == '\r') { c = advance(lexer); }
 		mark_end(lexer);
 		
 		int queryType = 0;
 		if (queries.size() > 0) queryType = queries.top()->type;
 		
-		
-		
-		
-		if (regex_match(string({c}), "[@%#&[({+-})]|?,=~dDtT]") && depth == 0;) {
-			
-		}
-		
-		
-		
-		
+		unsigned depth = queries.size()>0 ? queries.size()-1 : 0;
+		string entity, delimAtDepth, delimAtOrAbove;
 		
 		if (c == '@') {
-			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT] || valid_symbols[_INVALID]) {
+			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[_INVALID] || valid_symbols[JUST_AT]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[ATTRIBUTE_START] && check_for_closure(lexer, '{', '}')) {
-					log(bright(yellow)+"  ATTRIBUTE_START");
-					lexer->result_symbol = ATTRIBUTE_START;
-					return true;
+				if (c == '{') {
+					if (valid_symbols[ATTRIBUTE_START]) {
+						if (check_for_closure(lexer, '{', '}')) {
+							logTokenType(lexer, "ATTRIBUTE_START");
+							lexer->result_symbol = ATTRIBUTE_START;
+							return true;
+						}
+					}
+					
+					if (valid_symbols[_INVALID]) {
+						advance(lexer);
+						mark_end(lexer);
+						logTokenType(lexer, "_INVALID");
+						lexer->result_symbol = _INVALID;
+						return true;
+					}
 				}
-				else if (valid_symbols[_INVALID] && c == '{') {
-					advance(lexer);
-					lexer->mark_end(lexer);
-					log(bright(yellow)+"  _INVALID");
-					lexer->result_symbol = _INVALID;
-					return true;
-				}
-				else if (valid_symbols[JUST_AT]) {
-					log(bright(yellow)+"  JUST_AT");
+				
+				if (valid_symbols[JUST_AT]) {
+					logTokenType(lexer, "JUST_AT");
 					lexer->result_symbol = JUST_AT;
 					return true;
 				}
 			}
 		}
 		else if (c == '%') {
-			if (valid_symbols[ABILITY_START] || valid_symbols[JUST_PERCENT] || valid_symbols[_INVALID]) {
+			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[_INVALID] || valid_symbols[JUST_PERCENT]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[ABILITY_START] && check_for_closure(lexer, '{', '}')) {
-					log(bright(yellow)+"  ABILITY_START");
-					lexer->result_symbol = ABILITY_START;
-					return true;
+				if (c == '{') {
+					if (valid_symbols[ABILITY_START]) {
+						if (check_for_closure(lexer, '{', '}')) {
+							logTokenType(lexer, "ABILITY_START");
+							lexer->result_symbol = ABILITY_START;
+							return true;
+						}
+					}
+					
+					if (valid_symbols[_INVALID] && c == '{') {
+						advance(lexer);
+						mark_end(lexer);
+						logTokenType(lexer, "_INVALID");
+						lexer->result_symbol = _INVALID;
+						return true;
+					}
 				}
-				else if (valid_symbols[_INVALID] && c == '{') {
-					advance(lexer);
-					lexer->mark_end(lexer);
-					log(bright(yellow)+"  _INVALID");
-					lexer->result_symbol = _INVALID;
-					return true;
-				}
-				else if (valid_symbols[JUST_PERCENT]) {
-					log(bright(yellow)+"  JUST_PERCENT");
+				
+				if (valid_symbols[JUST_PERCENT]) {
+					logTokenType(lexer, "JUST_PERCENT");
 					lexer->result_symbol = JUST_PERCENT;
 					return true;
 				}
@@ -553,120 +589,131 @@ struct Scanner {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[JUST_HASH] && (c == 0 || c == '\r' || c == '\n' || c == ' ')) {
-					while (c == '\r') { c = advance(lexer); }
-					log(bright(yellow)+"  JUST_HASH");
-					lexer->result_symbol = JUST_HASH;
-					return true;
-				}
-				
-				if (valid_symbols[MACRO_START] && scan_macro_start(lexer, queries.size())) {
-					log(bright(yellow)+"  MACRO_START");
-					lexer->result_symbol = MACRO_START;
-					return true;
+				if (valid_symbols[MACRO_START]) {
+					if (scan_macro_start(lexer, depth)) {
+						logTokenType(lexer, "MACRO_START");
+						lexer->result_symbol = MACRO_START;
+						return true;
+					}
 				}
 				
 				if (valid_symbols[JUST_HASH]) {
-					log(bright(yellow)+"  JUST_HASH");
+					logTokenType(lexer, "JUST_HASH");
 					lexer->result_symbol = JUST_HASH;
 					return true;
 				}
 			}
 		}
 		else if (c == '&') {
-			
-			if (valid_symbols[QUERY_START]) {
-				if (get_entity_delimiter(lexer, "?", queries.top()->depth, true) != "") {
-					log(dim(blue)+"  entity of '?'");
-					c = lexer->lookahead;
-					mark_end(lexer);
-					
-					if (c == '{' || get_entity_delimiter(lexer, "{", queries.top()->depth, true) != "") {
-						if (c == '{') advance(lexer);
+			if (depth > 0) {
+				advance(lexer);
+				entity = get_entity(lexer, depth, true);
+				delimAtDepth = matchDelimiters(entity, "", depth, false);
+				delimAtOrAbove = matchDelimiters(entity, "", depth, true);
+				
+				if (delimAtOrAbove == "?") {
+					logEntity("?");
+					if (valid_symbols[QUERY_START] || valid_symbols[JUST_QUESTIONMARK]) {
+						c = lexer->lookahead;
+						
+						if (valid_symbols[QUERY_START]) {
+							delimAtOrAbove = "";
+							if (c == '&') {
+								advance(lexer);
+								entity = get_entity(lexer, depth, true);
+								delimAtOrAbove = matchDelimiters(entity, "{", depth, true);
+							}
+							
+							if (c == '{' || delimAtOrAbove == "{") {
+								if (c == '{') advance(lexer);
+								mark_end(lexer);
+								
+								Query *query = new Query(this, queries.size());
+								queries.push(query);
+								queryType = 0;
+								logPushQuery();
+								
+								if (queries.top()->scan_query(lexer, &queryType, depth)) {
+									logTokenType(lexer, "QUERY_START");
+									lexer->result_symbol = QUERY_START;
+									return true;
+								}
+								else if (valid_symbols[_INVALID] && queries.top()->type & QT_INVALID_UNCLOSED) {
+									log(color(brightRed)+"  _INVALID \"?{\"");
+									lexer->result_symbol = _INVALID;
+									queries.pop();
+									logPopQuery();
+									return true;
+								}
+								
+								//else it's empty: ?{}
+								queries.pop();
+								logPopQuery();
+								return false;
+							}
+						}
+						
+						if (valid_symbols[JUST_QUESTIONMARK]) {
+							mark_end(lexer);
+							logTokenType(lexer, "JUST_QUESTIONMARK");
+							lexer->result_symbol = JUST_QUESTIONMARK;
+							return true;
+						}
+					}
+				}
+				else if (delimAtDepth == "}") {
+					logEntity("}");
+					if (valid_symbols[QUERY_END] && queries.size() > 0) {
+						c = lexer->lookahead;
 						mark_end(lexer);
 						
-						Query *query = new Query(this, queries.size());
-						queries.push(query);
-						queryType = 0;
-						log(bright(cyan)+"  push "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
-						
-						if (queries.top()->scan_query(lexer, &queryType, queries.top()->depth)) {
-							//if (queries.top()->scan_query_part(lexer, &queryType, queries.top()->depth)) {
-								log(bright(yellow)+"  QUERY_START");
-								lexer->result_symbol = QUERY_START;
-								return true;
-							//}
-						}
-						
+						logTokenType(lexer, "QUERY_END");
+						lexer->result_symbol = QUERY_END;
 						queries.pop();
-						log(bright(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
-						return false;
-					}
-					
-					if (valid_symbols[JUST_QUESTIONMARK]) {
-						log(bright(yellow)+"  JUST_QUESTIONMARK");
-						lexer->result_symbol = JUST_QUESTIONMARK;
+						logPopQuery();
 						return true;
 					}
 				}
-			}
-			else if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() > 1) {
-				if (get_entity_delimiter(lexer, "|", queries.top()->depth, false) != "") {
-					log(dim(blue)+"  entity of '|'");
-					mark_end(lexer);
-					
-					//if (queries.top()->scan_query_part(lexer, &queryType, queries.top()->depth)) {
-						if (queryType & QT_TEXTBOX) {
-							log(bright(yellow)+"  QUERY_PIPE_HASDEFAULT");
-							lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
+				else if (delimAtDepth == "|") {
+					logEntity("|");
+					if (valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS] || valid_symbols[JUST_PIPE]) {
+						c = lexer->lookahead;
+						
+						if (valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) {
+							if (queryType & QT_TEXTBOX) {
+								mark_end(lexer);
+								logTokenType(lexer, "QUERY_PIPE_HASDEFAULT");
+								lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
+								return true;
+							}
+							else if (queryType & QT_OPTIONS) {
+								mark_end(lexer);
+								logTokenType(lexer, "QUERY_PIPE_HASOPTIONS");
+								lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
+								return true;
+							}
 						}
-						else if (queryType & QT_OPTIONS) {
-							log(bright(yellow)+"  QUERY_PIPE_HASOPTIONS");
-							lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
+						
+						if (valid_symbols[JUST_PIPE]) {
+							mark_end(lexer);
+							logTokenType(lexer, "JUST_PIPE");
+							lexer->result_symbol = JUST_PIPE;
+							return true;
 						}
-						return true;
-					//}
+					}
 				}
-				return false;
-			}
-			else if (valid_symbols[QUERY_END] && queries.size() > 0) {
-				log(bright(green)+"  >>> QUERY_END <<<");
-				if (get_entity_delimiter(lexer, "}", queries.top()->depth, false) != "") {
-					log(dim(blue)+"  entity of '}'");
-					mark_end(lexer);
-					
-					log(bright(yellow)+"  QUERY_END");
-					lexer->result_symbol = QUERY_END;
-					queries.pop();
-					log(dim(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
+				
+				if (valid_symbols[JUST_AMPERSAND]) {
+					logTokenType(lexer, "JUST_AMPERSAND");
+					lexer->result_symbol = JUST_AMPERSAND;
 					return true;
 				}
 			}
-			else if (valid_symbols[JUST_PIPE] && queries.size() > 0) {
-				if (get_entity_delimiter(lexer, "|", queries.size(), true) != "") {
-					log(dim(blue)+"  entity of '|'");
-					mark_end(lexer);
-					
-					log(bright(yellow)+"  JUST_PIPE");
-					lexer->result_symbol = JUST_PIPE;
-					return true;
-				}
-			}
-			else if (valid_symbols[JUST_QUESTIONMARK] && queries.size() > 0) {
-				if (get_entity_delimiter(lexer, "?", queries.size(), true) != "") {
-					log(dim(blue)+"  entity of '?'");
-					mark_end(lexer);
-					
-					log(bright(yellow)+"  JUST_QUESTIONMARK");
-					lexer->result_symbol = JUST_QUESTIONMARK;
-					return true;
-				}
-			}
-			else {
-				advance(lexer);
+			else if (valid_symbols[JUST_AMPERSAND]) {
+				c = advance(lexer);
 				mark_end(lexer);
 				
-				log(bright(yellow)+"  JUST_AMPERSAND");
+				logTokenType(lexer, "JUST_AMPERSAND");
 				lexer->result_symbol = JUST_AMPERSAND;
 				return true;
 			}
@@ -676,14 +723,16 @@ struct Scanner {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[DICE_ROLL_START] && scan_diceRoll_start(lexer)) {
-					log(bright(yellow)+"  DICE_ROLL_START");
-					lexer->result_symbol = DICE_ROLL_START;
-					return true;
+				if (valid_symbols[DICE_ROLL_START]) {
+					if (scan_diceRoll_start(lexer)) {
+						logTokenType(lexer, "DICE_ROLL_START");
+						lexer->result_symbol = DICE_ROLL_START;
+						return true;
+					}
 				}
 				
 				if (valid_symbols[JUST_D]) {
-					log(bright(yellow)+"  JUST_D");
+					logTokenType(lexer, "JUST_D");
 					lexer->result_symbol = JUST_D;
 					return true;
 				}
@@ -694,13 +743,16 @@ struct Scanner {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[TABLE_ROLL_START] && scan_tableRoll_start(lexer)) {
-					log(bright(yellow)+"  TABLE_ROLL_START");
-					lexer->result_symbol = TABLE_ROLL_START;
-					return true;
+				if (valid_symbols[TABLE_ROLL_START]) {
+					if (scan_tableRoll_start(lexer)) {
+						logTokenType(lexer, "TABLE_ROLL_START");
+						lexer->result_symbol = TABLE_ROLL_START;
+						return true;
+					}
 				}
-				else if (valid_symbols[JUST_T]) {
-					log(bright(yellow)+"  JUST_T");
+				
+				if (valid_symbols[JUST_T]) {
+					logTokenType(lexer, "JUST_T");
 					lexer->result_symbol = JUST_T;
 					return true;
 				}
@@ -712,90 +764,94 @@ struct Scanner {
 				mark_end(lexer);
 				
 				if (valid_symbols[QUERY_START]) {
-					if (c == '{' || get_entity_delimiter(lexer, "{", queries.top()->depth, true) != "") {
+					delimAtOrAbove = "";
+					if (c == '&') {
+						advance(lexer);
+						entity = get_entity(lexer, depth, true);
+						delimAtOrAbove = matchDelimiters(entity, "{", depth, true);
+					}
+					
+					if (c == '{' || delimAtOrAbove == "{") {
 						if (c == '{') advance(lexer);
 						mark_end(lexer);
 						
 						Query *query = new Query(this, queries.size());
 						queries.push(query);
 						queryType = 0;
-						log(bright(cyan)+"  push "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
+						logPushQuery();
 						
-						if (queries.top()->scan_query(lexer, &queryType, queries.top()->depth)) {
-							//if (queries.top()->scan_query_options(lexer, &queryType, queries.top()->depth)) {
-								log(bright(yellow)+"  QUERY_START");
-								lexer->result_symbol = QUERY_START;
-								return true;
-							//}
+						if (queries.top()->scan_query(lexer, &queryType, depth)) {
+							logTokenType(lexer, "QUERY_START");
+							lexer->result_symbol = QUERY_START;
+							return true;
 						}
 						else if (valid_symbols[_INVALID] && queries.top()->type & QT_INVALID_UNCLOSED) {
-							advance(lexer);
-							mark_end(lexer);
-							log(bright(red)+"  _INVALID \"?{\"");
+							log(color(brightRed)+"  _INVALID \"?{\"");
 							lexer->result_symbol = _INVALID;
 							queries.pop();
-							log(dim(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
+							logPopQuery();
 							return true;
 						}
 						
+						//else it's empty: ?{}
 						queries.pop();
-						log(dim(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
+						logPopQuery();
 						return false;
 					}
 				}
 				
 				if (valid_symbols[JUST_QUESTIONMARK]) {
-					log(bright(yellow)+"  JUST_QUESTIONMARK");
+					logTokenType(lexer, "JUST_QUESTIONMARK");
 					lexer->result_symbol = JUST_QUESTIONMARK;
 					return true;
 				}
 			}
 		}
 		else if (c == '|') {
-			if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() == 1) {
-				advance(lexer);
+			if (valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS] || valid_symbols[JUST_PIPE]) {
+				c = advance(lexer);
 				mark_end(lexer);
 				
-				//log(bright(cyan)+"  get first pipe");
-				//if (queries.top()->scan_query_options(lexer, &queryType)) {
+				if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() == 1) {
 					if (queryType & QT_TEXTBOX) {
-						log("  QUERY_PIPE_HASDEFAULT");
+						logTokenType(lexer, "QUERY_PIPE_HASDEFAULT");
 						lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
 						return true;
 					}
 					else if (queryType & QT_OPTIONS) {
-						log(bright(yellow)+"  QUERY_PIPE_HASOPTIONS");
+						logTokenType(lexer, "QUERY_PIPE_HASOPTIONS");
 						lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
 						return true;
 					}
-				//}
-			}
-			else if (valid_symbols[JUST_PIPE]) {
-				advance(lexer);
-				mark_end(lexer);
+				}
 				
-				log(bright(yellow)+"  JUST_PIPE");
-				lexer->result_symbol = JUST_PIPE;
-				return true;
+				if (valid_symbols[JUST_PIPE]) {
+					logTokenType(lexer, "JUST_PIPE");
+					lexer->result_symbol = JUST_PIPE;
+					return true;
+				}
 			}
 		}
-		else if (c == '}' && queries.top()->depth == 0) {
-			if (valid_symbols[QUERY_END] && queries.size() > 0) {
+		else if (c == '}') {
+			if (valid_symbols[QUERY_END] && queries.size() == 1) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				log(bright(yellow)+"  QUERY_END");
+				logTokenType(lexer, "QUERY_END");
 				lexer->result_symbol = QUERY_END;
 				queries.pop();
-				log(bright(cyan)+"  pop "+dim(cyan)+"a Query: "+bright(cyan)+to_string(queries.size()));
+				logPopQuery();
 				return true;
 			}
 		}
 		else {
-			log(bright(yellow)+"  (no match)");
+			if (debugging) {
+				advance(lexer);
+				mark_end(lexer);
+			}
+			logTokenType(lexer, "(no match)");
 			return false;
 		}
-		return false;
 	}
 };
 
@@ -804,7 +860,7 @@ struct Scanner {
 extern "C" {
 
 void *tree_sitter_roll20_script_external_scanner_create() {
-	log(bright(magenta, true)+"                                        ");
+	log(color(NULL, brightMagenta)+"                                        ");
 	return new Scanner();
 }
 

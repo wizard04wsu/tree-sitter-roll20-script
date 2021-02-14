@@ -375,7 +375,7 @@ module.exports = grammar({
 		
 		_rollQuery: $ => choice(
 			$.rollQuery,
-			alias($._rollQuery_invalid_start, $.invalid),
+			alias($.__invalid, $.invalid),	//?{
 		),
 		rollQuery: $ => choice(
 			alias($._rollQuery_empty, $.invalid),	//?{}
@@ -386,7 +386,6 @@ module.exports = grammar({
 			),
 		),
 		_rollQuery_empty: $ => seq( $.__rollQuery_start, $.__rollQuery_end ),	//?{}
-		_rollQuery_invalid_start: $ => seq( $.__just_questionmark, $.__leftBrace ),	//?{
 		_rollQuery_content: $ => prec.right(choice(
 			$.prompt,
 			seq(
