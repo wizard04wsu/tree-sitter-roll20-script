@@ -12,7 +12,7 @@ using namespace std;
 
 
 //For debugging:
-const bool debugging = false;
+const bool debugging = true;
 enum ANSI_Color {
 	//https://stackoverflow.com/a/45300654/15788
 	default=39,
@@ -106,6 +106,9 @@ enum TokenType {
 	//JUST_RIGHTBRACE,
 	//JUST_LEFTBRACKET,
 	//JUST_RIGHTBRACKET,
+	
+	NUMBER_UNSIGNED,
+	NUMBER_SIGNED,
 };
 
 enum QueryType {
@@ -114,6 +117,41 @@ enum QueryType {
 	QT_PROMPT_ONLY = 4,
 	QT_TEXTBOX = 8,
 	QT_OPTIONS = 16,
+};
+
+map<string, string> entitiesMap = {
+	{"@", "#64|#[xX](00)?40|commat"},
+	{"%", "#37|#[xX](00)?25|percnt"},
+	{"#", "#35|#[xX](00)?23|num"},
+	{"&", "#38|#[xX](00)?26|amp|AMP"},
+	{"[", "#91|#[xX](00)?5[bB]|lsqb|lbrack"},
+	{"(", "#40|#[xX](00)?28|lpar"},
+	{"{", "#123|#[xX](00)?7[bB]|lcub|lbrace"},
+	{"+", "#43|#[xX](00)?2[bB]|plus"},
+	{"-", "#45|#[xX](00)?2[dD]|dash|hyphen"},
+	{"}", "#125|#[xX](00)?7[dD]|rcub|rbrace"},
+	{")", "#41|#[xX](00)?29|rpar"},
+	{"]", "#93|#[xX](00)?5[dD]|rsqb|rbrack"},
+	{"|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"},
+	{"?", "#63|#[xX](00)?3[fF]|quest"},
+	{",", "#44|#[xX](00)?2[cC]|comma"},
+	{"=", "#61|#[xX](00)?3[dD]|equals"},
+	{"~", "#126|#[xX](00)?7[eE]"},
+	{"d", "#100|#[xX](00)?64"},
+	{"D", "#68|#[xX](00)?44"},
+	{"t", "#116|#[xX](00)?74"},
+	{"T", "#84|#[xX](00)?54"},
+	{"0", "#48|#[xX](00)?30"},
+	{"1", "#49|#[xX](00)?31"},
+	{"2", "#50|#[xX](00)?32"},
+	{"3", "#51|#[xX](00)?33"},
+	{"4", "#52|#[xX](00)?34"},
+	{"5", "#53|#[xX](00)?35"},
+	{"6", "#54|#[xX](00)?36"},
+	{"7", "#55|#[xX](00)?37"},
+	{"8", "#56|#[xX](00)?38"},
+	{"9", "#57|#[xX](00)?39"},
+	{".", "#46|#[xX](00)?2[eE]"},
 };
 
 
@@ -129,6 +167,151 @@ void mark_end(TSLexer *lexer) {
 	log(color(yellow)+"Mark end before '"+string({c})+"'");
 	if (debugging) log_marked = log_consumed.length();
 }
+
+
+//returns a string with the delimiter represented by the passed entity string, or an empty string if no match is found
+string matchDelimiters(string entity, string delimiters, unsigned depth, bool shallowerIsOkay = false) {
+	logFunction("matchDelimiters");
+	
+	//if no delimiters were passed, check this list by default
+	if (delimiters == "") delimiters = "@%#&[({+-})]|?,=~dDtT";
+	
+	for (unsigned i=0; i<delimiters.length(); i++) {
+		string delimiter = string({delimiters[i]});
+		
+		if (depth == 0) {
+			if (entity.compare(delimiter) == 0) return delimiter;
+			continue;
+		}
+		
+		if (shallowerIsOkay && entity.compare(delimiter) == 0) return delimiter;
+		
+		string rxpStr = "&(amp;){";
+		rxpStr.append(shallowerIsOkay?"0,":"");
+		rxpStr.append(to_string(depth-1));
+		rxpStr.append("}(");
+		rxpStr.append(entitiesMap[delimiter]);
+		rxpStr.append(");");
+		if (regex_match(entity, regex(rxpStr))) return delimiter;
+	}
+	return "";
+}
+
+string matchNumbers(string entity, string accepted, unsigned depth) {
+	logFunction("matchNumbers");
+	
+	//if no accepted digits were passed, check this list by default
+	if (accepted == "") accepted = "0123456789.";
+	
+	for (unsigned i=0; i<accepted.length(); i++) {
+		string digit = string({accepted[i]});
+		
+		if (entity.compare(digit) == 0) return digit;
+		if (depth == 0) continue;
+		
+		string rxpStr = "&(amp;){0,";
+		rxpStr.append(to_string(depth-1));
+		rxpStr.append("}(");
+		rxpStr.append(entitiesMap[digit]);
+		rxpStr.append(");");
+		if (regex_match(entity, regex(rxpStr))) return digit;
+	}
+	return "";
+}
+
+//scan does not include the '&'
+//however, the '&' is included in the result if a match is found
+string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
+	logFunction("get_entity");
+	regex charsRxp = regex("[a-zA-Z0-9]");
+	string code = "", prevCode = "";
+	string entity = "&";
+	unsigned amps = 0;
+	
+	char c = lexer->lookahead;
+	
+	do {
+		if (c == '#') {
+			code = "#";
+			c = advance(lexer);
+			if (c == 'x' || c == 'X') {
+				code += string({c});
+				charsRxp = regex("[a-fA-F0-9]");	//hex code
+				c = advance(lexer);
+			}
+			else {
+				charsRxp = regex("\\d");	//decimal code
+			}
+		}
+		else {
+			charsRxp = regex("[a-zA-Z0-9]");	//named
+		}
+		
+		while (c != 0) {
+			if (c == ';') {
+				c = advance(lexer);
+				if (code == "") {	//TODO: if (not_a_valid_HTML_entity_code) {
+				//just found a semicolon at this depth (no entity name)
+					if (amps == 0){
+					//at depth 0; nothing found but the semicolon
+						return "";
+					}
+					
+					//use the entity name at the previous depth
+					log(color(green)+"Found \"&amp;\" at depth "+to_string(depth+amps-1)+" (current depth: "+to_string(depth)+")");
+					return entity;
+				}
+				else if (amps < depth && regex_match(code, regex(entitiesMap["&"]))) {
+					amps++;
+					entity += code + ";";
+					prevCode = code;
+					code = "";
+					break;
+				}
+				else if (amps == depth || shallowerIsOkay) {
+				//found an entity
+					log(color(green)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (current depth: "+to_string(depth)+")");
+					return entity+code+";";
+				}
+				else {
+				//found an entity, but it's too shallow
+					log(color(red)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (too shallow; current depth: "+to_string(depth)+")");
+					return "";
+				}
+			}
+			else if (!regex_match(string({c}), charsRxp)){
+			//it's not a valid character
+				log(color(red)+"Invalid character for an HTML entity: '"+color(brightRed)+string({c})+color(red)+"'");
+				return "";
+			}
+			else {
+				code += c;
+				c = advance(lexer);
+			}
+		}
+	} while (c != 0);
+	log(color(red)+"No closing semicolon");
+	return "";
+}
+
+string get_number(TSLexer *lexer, unsigned depth) {
+	logFunction("get_number");
+	char c = lexer->lookahead;
+	string digit = "";
+	string number = "";
+	bool decimalFound = false;
+	
+	while ((digit = matchNumbers(string({c}), "", depth)) != "") {
+		if (digit == ".") {
+			if (decimalFound) break;
+			decimalFound = true;
+		}
+		number += digit;
+		c = advance(lexer);
+	}
+	return number;
+}
+
 
 //scan does not include the starting '@' or '%'
 bool scan_placeholder(TSLexer *lexer) {
@@ -233,134 +416,6 @@ bool scan_tableRoll_start(TSLexer *lexer) {
 		if (c == ']') return true;
 	}
 	return false;
-}
-
-
-map<string, string> entitiesMap = {
-	{"@", "#64|#[xX](00)?40|commat"},
-	{"%", "#37|#[xX](00)?25|percnt"},
-	{"#", "#35|#[xX](00)?23|num"},
-	{"&", "#38|#[xX](00)?26|amp|AMP"},
-	{"[", "#91|#[xX](00)?5[bB]|lsqb|lbrack"},
-	{"(", "#40|#[xX](00)?28|lpar"},
-	{"{", "#123|#[xX](00)?7[bB]|lcub|lbrace"},
-	{"+", "#43|#[xX](00)?2[bB]|plus"},
-	{"-", "#45|#[xX](00)?2[dD]|dash|hyphen"},
-	{"}", "#125|#[xX](00)?7[dD]|rcub|rbrace"},
-	{")", "#41|#[xX](00)?29|rpar"},
-	{"]", "#93|#[xX](00)?5[dD]|rsqb|rbrack"},
-	{"|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"},
-	{"?", "#63|#[xX](00)?3[fF]|quest"},
-	{",", "#44|#[xX](00)?2[cC]|comma"},
-	{"=", "#61|#[xX](00)?3[dD]|equals"},
-	{"~", "#126|#[xX](00)?7[eE]"},
-	{"d", "#100|#[xX](00)?64"},
-	{"D", "#68|#[xX](00)?44"},
-	{"t", "#116|#[xX](00)?74"},
-	{"T", "#84|#[xX](00)?54"},
-};
-
-//returns a string with the delimiter represented by the passed entity string, or an empty string if no match is found
-string matchDelimiters(string entity, string delimiters, unsigned depth, bool shallowerIsOkay = false) {
-	logFunction("matchDelimiters");
-	
-	//if no delimiters were passed, check this list by default
-	if (delimiters == "") delimiters = "@%#&[({+-})]|?,=~dDtT";
-	
-	for (unsigned i=0; i<delimiters.length(); i++) {
-		string delimiter = string({delimiters[i]});
-		
-		if (depth == 0) {
-			if (entity.compare(delimiter) == 0) return delimiter;
-			continue;
-		}
-		
-		if (shallowerIsOkay && entity.compare(delimiter) == 0) return delimiter;
-		
-		string rxpStr = "&(amp;){";
-		rxpStr.append(shallowerIsOkay?"0,":"");
-		rxpStr.append(to_string(depth-1));
-		rxpStr.append("}(");
-		rxpStr.append(entitiesMap[delimiter]);
-		rxpStr.append(");");
-		if (regex_match(entity, regex(rxpStr))) return delimiter;
-	}
-	return "";
-}
-
-//scan does not include the '&'
-//however, the '&' is included in the result if a match is found
-string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) {
-	logFunction("get_entity");
-	regex charsRxp = regex("[a-zA-Z0-9]");
-	string code = "", prevCode = "";
-	string entity = "&";
-	unsigned amps = 0;
-	
-	char c = lexer->lookahead;
-	
-	do {
-		if (c == '#') {
-			code = "#";
-			c = advance(lexer);
-			if (c == 'x' || c == 'X') {
-				code += string({c});
-				charsRxp = regex("[a-fA-F0-9]");	//hex code
-				c = advance(lexer);
-			}
-			else {
-				charsRxp = regex("\\d");	//decimal code
-			}
-		}
-		else {
-			charsRxp = regex("[a-zA-Z0-9]");	//named
-		}
-		
-		while (c != 0) {
-			if (c == ';') {
-				c = advance(lexer);
-				if (code == "") {	//TODO: if (not_a_valid_HTML_entity_code) {
-				//just found a semicolon at this depth (no entity name)
-					if (amps == 0){
-					//at depth 0; nothing found but the semicolon
-						return "";
-					}
-					
-					//use the entity name at the previous depth
-					log(color(green)+"Found \"&amp;\" at depth "+to_string(depth+amps-1)+" (current depth: "+to_string(depth)+")");
-					return entity;
-				}
-				else if (amps < depth && regex_match(code, regex(entitiesMap["&"]))) {
-					amps++;
-					entity += code + ";";
-					prevCode = code;
-					code = "";
-					break;
-				}
-				else if (amps == depth || shallowerIsOkay) {
-				//found an entity
-					log(color(green)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (current depth: "+to_string(depth)+")");
-					return entity+code+";";
-				}
-				else {
-				//found an entity, but it's too shallow
-					log(color(red)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (too shallow; current depth: "+to_string(depth)+")");
-					return "";
-				}
-			}
-			else if (!regex_match(string({c}), charsRxp)){
-			//it's not a valid character
-				log(color(red)+"Invalid character for an HTML entity: '"+color(brightRed)+string({c})+color(red)+"'");
-				return "";
-			}
-			else {
-				code += c;
-				c = advance(lexer);
-			}
-		}
-	} while (c != 0);
-	log(color(red)+"No closing semicolon");
-	return "";
 }
 
 
@@ -503,11 +558,11 @@ struct Scanner {
 	void logPushQuery(){
 		log(color(brightCyan)+"Push "+color(cyan)+"a Query; stack size: "+color(brightCyan)+to_string(queries.size()));
 	}
-	void logTokenType(TSLexer *lexer, string tokenType) {
+	void logTokenType(TSLexer *lexer, string tokenType, bool noMatch = false) {
 		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
 		log("  "
 			+color(brightYellow)+log_consumed.substr(0, log_marked)
-			+color(gray)+log_consumed.substr(log_marked)
+			+color(noMatch?cyan:gray)+log_consumed.substr(log_marked)
 			+color(cyan)+string({char(lexer->lookahead)})
 		);
 	}
@@ -811,12 +866,38 @@ struct Scanner {
 				return true;
 			}
 		}
+		else if (regex_match(string({c}), regex("[\\d.]"))) {
+			if (valid_symbols[NUMBER_UNSIGNED] || valid_symbols[NUMBER_SIGNED]) {
+				string number = get_number(lexer, depth);
+				
+				if (valid_symbols[NUMBER_SIGNED]) {
+					if (regex_match(number, regex("\\d+(\\.\\d+)?"))) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "NUMBER_SIGNED");
+						lexer->result_symbol = NUMBER_SIGNED;
+						return true;
+					}
+				}
+				
+				if (valid_symbols[NUMBER_UNSIGNED]) {
+					if (regex_match(number, regex("\\d+(\\.\\d+)?|\\.\\d+"))) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "NUMBER_UNSIGNED");
+						lexer->result_symbol = NUMBER_UNSIGNED;
+						return true;
+					}
+				}
+			}
+		}
 		
 		if (debugging) {
-			advance(lexer);
-			mark_end(lexer);
+		//consume an extra character
+			log_consumed += lexer->lookahead;
+			lexer->advance(lexer, false);
+			logTokenType(lexer, "(no match)", true);
 		}
-		logTokenType(lexer, "(no match)");
 		return false;
 	}
 };

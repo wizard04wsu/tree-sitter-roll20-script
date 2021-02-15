@@ -75,6 +75,9 @@ module.exports = grammar({
 		//$.__rightBrace,				// }
 		//$.__leftBracket,				// [
 		//$.__rightBracket,				// ]
+		
+		$.__number_unsigned,
+		$.__number_signed,
 	],
 	
 	extras: $ => [
@@ -553,7 +556,9 @@ module.exports = grammar({
 			$._element_groupRoll,
 			$._element_diceRoll,
 			$._element_tableRoll,
+			$._element_number_unsigned,
 			$._element_number_signed,
+			$._inlineRoll_signed,
 			//TODO: query
 			seq(
 				$._placeholders,
@@ -567,6 +572,7 @@ module.exports = grammar({
 			$._element_diceRoll,
 			$._element_tableRoll,
 			$._element_number_unsigned,
+			$._inlineRoll,
 			//TODO: query
 			seq(
 				$._placeholders,
@@ -612,7 +618,7 @@ module.exports = grammar({
 			$.__just_d,						// d or D     |  dice roll
 			//TODO
 		),
-		_element_invalid_remainder: $ => seq(
+		_element_invalid_remainder: $ => prec.right(seq(
 											//-------------------------------------------
 											// doesn't    |  so it's *not* the start of
 											// match this |  this other thing
@@ -637,7 +643,7 @@ module.exports = grammar({
 				$._placeholders,
 				/[^@%#\[({*/+\-\s})\]]/,
 			)),
-		),
+		)),
 		
 		
 		/*┌──────────────────────────────
@@ -696,104 +702,35 @@ module.exports = grammar({
 		   │ • Inline rolls can be used in place of numbers.
 		   └───────────────────────────────────────────────────────────*/
 		
-		/*┌──────────────────────────────
-		  │ Signed Number
-		  └──────────────────────────────*/
-		
 		_element_number_signed: $ => choice(
-			$._element_number_unsigned,
 			seq(
-				choice(
-					//valid: -5  -5.5
-					//both: -5_  -5.5_
-					seq(
-						choice(
-							alias($._element_number_signed_integer, $.number),	// -5
-							alias($._element_number_signed_decimal, $.number),	// -5.5
-						),
-						optional(alias($._number_invalid_remainder, $.invalid)),	// _
-					),
-					
-					//both: -5.  -5._
-					seq(
-						alias($._element_number_signed_integer, $.number),	// -5
-						alias($._number_invalid_decimal, $.invalid),	// .  ._
-					),
-					
-					//invalid:  -.5  -_  -.  -._
-					alias($._element_number_signed_invalid, $.invalid),	// -.5  -_  -.  -._
-				),
-				optional($._macro),
+				$._sign,
+				alias($.__number_signed, $.number),
+				repeat($._element_number_unsigned),
+				optional(alias($._number_invalid_remainder, $.invalid)),
+			),
+			seq(
+				$._sign,
+				alias($._number_invalid_remainder, $.invalid)
 			),
 		),
 		
-		_sign: $ => /[+-]/,
+		_sign: $ => alias(/[+-]/, $.operator),
 		
-		_element_number_signed_integer: $ => prec.left(seq(	// -5
-			$._sign,
-			$._unsigned_integer_with_placeholders
-		)),
-		_element_number_signed_decimal: $ => seq(	// -5.5
-			$._element_number_signed_integer,
-			".",
-			$._unsigned_integer_with_placeholders,
-		),
-		_element_number_signed_invalid: $ => seq(
-			$._sign,
-			choice(
-				$._number_predicate,	// -.5
-				$._number_invalid_remainder,	// -_
-				$._number_invalid_decimal,	// -.  -._
+		_element_number_unsigned: $ => prec.left(repeat1(choice(
+			seq(
+				alias($.__number_unsigned, $.number),
+				optional(alias($._number_invalid_remainder, $.invalid)),
 			),
-		),
+			$._placeholders,
+			$._inlineRoll,
+		))),
 		
-		
-		/*┌──────────────────────────────
-		  │ Unsigned Number
-		  └──────────────────────────────*/
-		
-		_element_number_unsigned: $ => seq(
-			choice(
-				//valid: 5  5.5  .5
-				//both: 5_  5.5_  .5_
-				seq(
-					choice(
-						alias($._unsigned_integer_with_placeholders, $.number),
-						alias($._unsigned_decimal_with_placeholders, $.number),
-						alias($._number_predicate, $.number),
-					),
-					optional(alias($._number_invalid_remainder, $.invalid)),
-				),
-				
-				//both: 5.  5._
-				seq(
-					alias($._unsigned_integer_with_placeholders, $.number),
-					alias($._number_invalid_decimal, $.invalid),
-				),
-				
-				//invalid: .  ._
-				alias($._number_invalid_decimal, $.invalid),
-			),
-			optional($._macro),
-		),
-		
-		_number_invalid_decimal: $ => seq( ".", optional($._number_invalid_remainder) ),	// .  ._
 		_number_invalid_remainder: $ => seq(	// _
-			/[^@%#\[({*/+\-\s})\]\d]/,	//definitely invalid
+			/[^@%#\[({*/+\-\s})\]\d.]/,	//definitely invalid
 			//treat the rest as invalid
 			optional($._element_invalid_remainder),
 		),
-		
-		_unsigned_integer_with_placeholders: $ => repeat1(choice(	// 5
-			/\d+/,
-			$._placeholders,
-			$._inlineRoll,
-		)),
-		_number_predicate: $ => seq( ".", $._unsigned_integer_with_placeholders ),	// .5
-		_unsigned_decimal_with_placeholders: $ => prec(1, seq(	// 5.5
-			$._unsigned_integer_with_placeholders,
-			$._number_predicate,
-		)),
 		
 		
 		/*┌──────────────────────────────
@@ -824,6 +761,10 @@ module.exports = grammar({
 			),
 			/\s*\]\]/,
 		),
+		_inlineRoll_signed: $ => prec(1, seq(
+			optional($._sign),
+			$._inlineRoll,
+		)),
 		
 		
 		/*┌──────────────────────────────
@@ -949,7 +890,7 @@ module.exports = grammar({
 		
 		diceRoll: $ => prec.right(seq(
 			//count: number of dice (optional)
-			optional(alias($._unsigned_integer_with_placeholders, $.count)),
+			optional(alias($._element_number_unsigned, $.count)),
 			//keyword (the letter 'd')
 			$.__diceRoll_start,
 			//sides: number of sides per die
@@ -958,7 +899,8 @@ module.exports = grammar({
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
 		)),
 		_diceRoll_sides: $ => choice(
-			/\d+|[fF]/,
+			alias(/\d+/, $.number),
+			alias(/[fF]/, $.fate),
 			$._attribute,
 			$._ability,
 		),
@@ -988,16 +930,16 @@ module.exports = grammar({
 			optional($._macro),
 		),
 		
-		tableRoll: $ => seq(
+		tableRoll: $ => prec.right(seq(
 			//count: number of "dice" (optional)
-			optional(alias($._unsigned_integer_with_placeholders, $.count)),
+			optional(alias($._element_number_unsigned, $.count)),
 			//keyword (the letter 't')
 			$.__tableRoll_start,
 			$.__leftBracket,
 			//table name
 			$.tableName,
 			$.__rightBracket,
-		),
+		)),
 		tableName: $ => name(choice(
 			///[^@%#& \r\n\]]+/,
 			/[^@%# \r\n\]]+/,

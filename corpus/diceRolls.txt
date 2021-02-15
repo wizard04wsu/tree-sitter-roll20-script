@@ -6,7 +6,8 @@ Dice Roll: Valid: [[d20]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(sides))))
+			(sides
+				(number)))))
 
 ==================
 Dice Roll: Valid: [[ d20 ]]
@@ -16,7 +17,8 @@ Dice Roll: Valid: [[ d20 ]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(sides))))
+			(sides
+				(number)))))
 
 ==================
 Dice Roll: Valid: [[ D20 ]]
@@ -26,7 +28,8 @@ Dice Roll: Valid: [[ D20 ]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(sides))))
+			(sides
+				(number)))))
 
 ==================
 Dice Roll: Valid: [[10d20]]
@@ -36,8 +39,10 @@ Dice Roll: Valid: [[10d20]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(count)
-			(sides))))
+			(count
+				(number))
+			(sides
+				(number)))))
 
 ==================
 Dice Roll: Valid: [[ 10d20 ]]
@@ -47,8 +52,10 @@ Dice Roll: Valid: [[ 10d20 ]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(count)
-			(sides))))
+			(count
+				(number))
+			(sides
+				(number)))))
 
 ==================
 Dice Roll: Valid: [[ df ]]
@@ -58,7 +65,8 @@ Dice Roll: Valid: [[ df ]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(sides))))
+			(sides
+				(fate)))))
 
 ==================
 Dice Roll: Valid: [[ @{a}d@{a} ]]
@@ -126,7 +134,8 @@ Dice Roll: Valid: [[ d6c@{s}5 ]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(sides)
+			(sides
+				(number))
 			(modifiers
 				(attribute
 					(attributeName))))))
@@ -139,8 +148,10 @@ Dice Roll: Valid: long one, lower case
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(count)
-			(sides)
+			(count
+				(number))
+			(sides
+				(number))
 			(modifiers
 				(reroll)
 				(reroll)
@@ -181,8 +192,10 @@ Dice Roll: Valid: long one, upper case
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(count)
-			(sides)
+			(count
+				(number))
+			(sides
+				(number))
 			(modifiers
 				(reroll)
 				(reroll)
@@ -223,7 +236,8 @@ Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 (roll20_script
 	(inlineRoll
 		(diceRoll
-			(sides)
+			(sides
+				(number))
 			(modifiers
 				(attribute
 					(attributeName))
@@ -250,7 +264,9 @@ Dice Roll: Valid with Invalid Remainder: [[5d3_]]
 (roll20_script
  	(inlineRoll
 		(diceRoll
-			(count)
-			(sides))
+			(count
+				(number))
+			(sides
+				(number)))
 		(invalid)))
 

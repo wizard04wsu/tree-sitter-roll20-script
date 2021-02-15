@@ -21,21 +21,25 @@ Table Roll: Valid: [[ t[n] ]]
 ==================
 Table Roll: Valid: [[2t[n]]]
 ==================
-[[t[n]]]
+[[2t[n]]]
 ---
 (roll20_script
 	(inlineRoll
 		(tableRoll
+			(count
+				(number))
 			(tableName))))
 
 ==================
 Table Roll: Valid: [[ 2t[n] ]]
 ==================
-[[ t[n] ]]
+[[ 2t[n] ]]
 ---
 (roll20_script
 	(inlineRoll
 		(tableRoll
+			(count
+				(number))
 			(tableName))))
 
 ==================
