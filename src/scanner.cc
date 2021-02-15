@@ -5,6 +5,7 @@
 #include <utility>	//pair
 #include <regex>	//regex, regex_match
 #include <iostream>	//cout
+#include <algorithm>	//max
 
 namespace {
 
@@ -12,7 +13,7 @@ using namespace std;
 
 
 //For debugging:
-const bool debugging = true;
+const bool debugging = false;
 enum ANSI_Color {
 	//https://stackoverflow.com/a/45300654/15788
 	default=39,
@@ -107,8 +108,8 @@ enum TokenType {
 	//JUST_LEFTBRACKET,
 	//JUST_RIGHTBRACKET,
 	
-	NUMBER_UNSIGNED,
-	NUMBER_SIGNED,
+	INTEGER,
+	DECIMAL,
 };
 
 enum QueryType {
@@ -151,7 +152,7 @@ map<string, string> entitiesMap = {
 	{"7", "#55|#[xX](00)?37"},
 	{"8", "#56|#[xX](00)?38"},
 	{"9", "#57|#[xX](00)?39"},
-	{".", "#46|#[xX](00)?2[eE]"},
+	{".", "#46|#[xX](00)?2[eE]|period"},
 };
 
 
@@ -200,8 +201,8 @@ string matchDelimiters(string entity, string delimiters, unsigned depth, bool sh
 string matchNumbers(string entity, string accepted, unsigned depth) {
 	logFunction("matchNumbers");
 	
-	//if no accepted digits were passed, check this list by default
-	if (accepted == "") accepted = "0123456789.";
+	//if no accepted characters were passed, check this list by default
+	if (accepted == "") accepted = "0123456789";
 	
 	for (unsigned i=0; i<accepted.length(); i++) {
 		string digit = string({accepted[i]});
@@ -292,24 +293,6 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 	} while (c != 0);
 	log(color(red)+"No closing semicolon");
 	return "";
-}
-
-string get_number(TSLexer *lexer, unsigned depth) {
-	logFunction("get_number");
-	char c = lexer->lookahead;
-	string digit = "";
-	string number = "";
-	bool decimalFound = false;
-	
-	while ((digit = matchNumbers(string({c}), "", depth)) != "") {
-		if (digit == ".") {
-			if (decimalFound) break;
-			decimalFound = true;
-		}
-		number += digit;
-		c = advance(lexer);
-	}
-	return number;
 }
 
 
@@ -560,11 +543,25 @@ struct Scanner {
 	}
 	void logTokenType(TSLexer *lexer, string tokenType, bool noMatch = false) {
 		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
-		log("  "
-			+color(brightYellow)+log_consumed.substr(0, log_marked)
-			+color(noMatch?cyan:gray)+log_consumed.substr(log_marked)
-			+color(cyan)+string({char(lexer->lookahead)})
-		);
+		if (noMatch) {
+			//consume an extra character
+			log_consumed += lexer->lookahead;
+			lexer->advance(lexer, false);
+			
+			unsigned consumed_length = max(int(log_marked), int(log_consumed.length()-1));
+			log("  "
+				+color(gray)+log_consumed.substr(0, consumed_length)
+				+color(cyan)+log_consumed.substr(consumed_length)
+				+color(cyan)+string({char(lexer->lookahead)})
+			);
+		}
+		else {
+			log("  "
+				+color(brightYellow)+log_consumed.substr(0, log_marked)
+				+color(gray)+log_consumed.substr(log_marked)
+				+color(cyan)+string({char(lexer->lookahead)})
+			);
+		}
 	}
 	
 	bool scan(TSLexer *lexer, const bool *valid_symbols){
@@ -580,7 +577,7 @@ struct Scanner {
 		if (queries.size() > 0) queryType = queries.top()->type;
 		
 		unsigned depth = queries.size()>0 ? queries.size()-1 : 0;
-		string entity, delimAtDepth, delimAtOrAbove;
+		string entity, delimAtDepth, delimAtOrAbove, digitAtOrAbove;
 		
 		if (c == '@') {
 			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT]) {
@@ -648,6 +645,7 @@ struct Scanner {
 				entity = get_entity(lexer, depth, true);
 				delimAtDepth = matchDelimiters(entity, "", depth, false);
 				delimAtOrAbove = matchDelimiters(entity, "", depth, true);
+				digitAtOrAbove = matchNumbers(entity, "", depth);
 				
 				if (delimAtOrAbove == "?") {
 					logEntity("?");
@@ -730,6 +728,36 @@ struct Scanner {
 							lexer->result_symbol = JUST_PIPE;
 							return true;
 						}
+					}
+				}
+				else if (delimAtOrAbove == ".") {
+					logEntity(".");
+					if (valid_symbols[DECIMAL]) {
+						if (c == '&') entity = get_entity(lexer, depth, true);
+						else entity = string({c});
+						
+						if (matchNumbers(entity, "", depth) != "") {
+							mark_end(lexer);
+							
+							logTokenType(lexer, "DECIMAL");
+							lexer->result_symbol = DECIMAL;
+							return true;
+						}
+					}
+				}
+				else if (digitAtOrAbove != "") {
+					logEntity(digitAtOrAbove);
+					if (valid_symbols[INTEGER]) {
+						do {
+							c = advance(lexer);
+							mark_end(lexer);
+							if (c == '&') entity = get_entity(lexer, depth, true);
+							else entity = string({c});
+						} while (matchNumbers(entity, "", depth) != "");
+						
+						logTokenType(lexer, "INTEGER");
+						lexer->result_symbol = INTEGER;
+						return true;
 					}
 				}
 				
@@ -866,38 +894,39 @@ struct Scanner {
 				return true;
 			}
 		}
-		else if (regex_match(string({c}), regex("[\\d.]"))) {
-			if (valid_symbols[NUMBER_UNSIGNED] || valid_symbols[NUMBER_SIGNED]) {
-				string number = get_number(lexer, depth);
+		else if (c == '.') {
+			if (valid_symbols[DECIMAL]) {
+				c = advance(lexer);
 				
-				if (valid_symbols[NUMBER_SIGNED]) {
-					if (regex_match(number, regex("\\d+(\\.\\d+)?"))) {
-						mark_end(lexer);
-						
-						logTokenType(lexer, "NUMBER_SIGNED");
-						lexer->result_symbol = NUMBER_SIGNED;
-						return true;
-					}
-				}
+				if (c == '&') entity = get_entity(lexer, depth, true);
+				else entity = string({c});
 				
-				if (valid_symbols[NUMBER_UNSIGNED]) {
-					if (regex_match(number, regex("\\d+(\\.\\d+)?|\\.\\d+"))) {
-						mark_end(lexer);
-						
-						logTokenType(lexer, "NUMBER_UNSIGNED");
-						lexer->result_symbol = NUMBER_UNSIGNED;
-						return true;
-					}
+				if (matchNumbers(entity, "", depth) != "") {
+					mark_end(lexer);
+					
+					logTokenType(lexer, "DECIMAL");
+					lexer->result_symbol = DECIMAL;
+					return true;
 				}
 			}
 		}
-		
-		if (debugging) {
-		//consume an extra character
-			log_consumed += lexer->lookahead;
-			lexer->advance(lexer, false);
-			logTokenType(lexer, "(no match)", true);
+		else if (matchNumbers(string({c}), "", depth) != "") {
+			if (valid_symbols[INTEGER]) {
+				do {
+					c = advance(lexer);
+					mark_end(lexer);
+					if (c == '&') entity = get_entity(lexer, depth, true);
+					else entity = string({c});
+				} while (matchNumbers(entity, "", depth) != "");
+				mark_end(lexer);
+				
+				logTokenType(lexer, "INTEGER");
+				lexer->result_symbol = INTEGER;
+				return true;
+			}
 		}
+		
+		logTokenType(lexer, "(no match)", true);
 		return false;
 	}
 };

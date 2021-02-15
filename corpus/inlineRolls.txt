@@ -350,8 +350,7 @@ Inline Roll: Invalid: [[x 5]]
 (roll20_script
  	(inlineRoll
 		(invalid)
-		(invalid
-			(number))))
+		(invalid)))
 
 ==================
 Inline Roll: Invalid: [[5x]]

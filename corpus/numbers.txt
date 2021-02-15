@@ -99,8 +99,8 @@ Number: Invalid: [[-.5]]
 ---
 (roll20_script
 	(inlineRoll
-		(operator)
-		(invalid)))
+		(invalid
+			(operator))))
 
 ==================
 Number: Invalid: [[ -.5 ]]
@@ -109,8 +109,8 @@ Number: Invalid: [[ -.5 ]]
 ---
 (roll20_script
 	(inlineRoll
-		(operator)
-		(invalid)))
+		(invalid
+			(operator))))
 
 ==================
 Number: Valid with Invalid Remainder: [[5_]]
@@ -305,8 +305,8 @@ Number: Invalid: [[-.]]
 ---
 (roll20_script
 	(inlineRoll
-		(operator)
-		(invalid)))
+		(invalid
+			(operator))))
 
 ==================
 Number: Invalid: [[ -. ]]
@@ -315,8 +315,8 @@ Number: Invalid: [[ -. ]]
 ---
 (roll20_script
 	(inlineRoll
-		(operator)
-		(invalid)))
+		(invalid
+			(operator))))
 
 ==================
 Number: Invalid: [[._]]
@@ -343,8 +343,8 @@ Number: Invalid: [[-._]]
 ---
 (roll20_script
 	(inlineRoll
-		(operator)
-		(invalid)))
+		(invalid
+			(operator))))
 
 ==================
 Number: Invalid: [[ -._ ]]
@@ -353,8 +353,8 @@ Number: Invalid: [[ -._ ]]
 ---
 (roll20_script
 	(inlineRoll
-		(operator)
-		(invalid)))
+		(invalid
+			(operator))))
 
 ==================
 Number: Valid with Invalid Remainder: [[5d]]
@@ -397,5 +397,6 @@ Inline Roll: Valid: [[5d6]]
 		(diceRoll
 			(count
 				(number))
-			(sides))))
+			(sides
+				(number)))))
 

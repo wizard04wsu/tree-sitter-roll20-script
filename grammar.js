@@ -76,15 +76,17 @@ module.exports = grammar({
 		//$.__leftBracket,				// [
 		//$.__rightBracket,				// ]
 		
-		$.__number_unsigned,
-		$.__number_signed,
+		$.__integer,
+		$.__decimal,
 	],
 	
 	extras: $ => [
 		//(manually handle whitespace)
 	],
 	
-	conflicts: $ => [],
+	conflicts: $ => [
+		[ $._integer_etc, $.diceRoll, $.tableRoll, ],
+	],
 	
 	inline: $ => [
 		$.formula,
@@ -586,9 +588,12 @@ module.exports = grammar({
 			alias($._element_invalid_2, $.invalid),
 			optional($._macro),
 		),
-		_element_invalid_2: $ => seq(
-			$._element_invalid_begin,
-			optional($._element_invalid_remainder),
+		_element_invalid_2: $ => choice(
+			seq(
+				$._element_invalid_begin,
+				optional($._element_invalid_remainder),
+			),
+			$._element_invalid_number,
 		),
 		_element_invalid_begin: $ => choice(
 											//-------------------------------------------
@@ -702,35 +707,81 @@ module.exports = grammar({
 		   │ • Inline rolls can be used in place of numbers.
 		   └───────────────────────────────────────────────────────────*/
 		
-		_element_number_signed: $ => choice(
+		_element_number_signed: $ => prec(2, seq(
+			$._sign,
+			choice(
+				seq(
+					alias($._integer_etc, $.number),
+					optional(alias($._element_invalid_remainder, $.invalid)),
+				),
+				seq(
+					alias($._number_signed_decimal, $.number),
+					optional(alias($._number_invalid_remainder, $.invalid)),
+				),
+			),
+		)),
+		_number_signed_decimal: $ => prec.right(seq(
+			$._integer_etc,
+			$.__decimal,
+			$._integer_etc,
+		)),
+		
+		_element_number_unsigned: $ => prec(1, choice(
 			seq(
-				$._sign,
-				alias($.__number_signed, $.number),
-				repeat($._element_number_unsigned),
-				optional(alias($._number_invalid_remainder, $.invalid)),
+				alias($._integer_etc, $.number),
+				optional(alias($._element_invalid_remainder, $.invalid)),
 			),
 			seq(
+				alias($._number_unsigned_decimal, $.number),
+				optional(alias($._number_invalid_remainder, $.invalid)),
+			),
+		)),
+		_number_unsigned_decimal: $ => prec.right(choice(
+			$._integer_etc,
+			seq(
+				optional($._integer_etc),
+				$.__decimal,
+				$._integer_etc,
+			),
+		)),
+		
+		_element_invalid_number: $ => choice(
+			$._number_invalid_remainder,
+			seq(
 				$._sign,
-				alias($._number_invalid_remainder, $.invalid)
+				optional(/[\d.]+/),
+				optional($._element_invalid_remainder),
+			),
+		),
+		_number_invalid_remainder: $ => seq(
+			optional(/[\d.]+/),
+			$._element_invalid_remainder,
+		),
+		
+		_integer_etc: $ => choice(
+			seq(
+				$.__integer,
+				repeat(choice(
+					$.__integer,
+					$._placeholders,
+					$._inlineRoll,
+				)),
+			),
+			seq(
+				repeat1(choice(
+					$._placeholders,
+					$._inlineRoll,
+				)),
+				$.__integer,
+				repeat(choice(
+					$.__integer,
+					$._placeholders,
+					$._inlineRoll,
+				)),
 			),
 		),
 		
 		_sign: $ => alias(/[+-]/, $.operator),
-		
-		_element_number_unsigned: $ => prec.left(repeat1(choice(
-			seq(
-				alias($.__number_unsigned, $.number),
-				optional(alias($._number_invalid_remainder, $.invalid)),
-			),
-			$._placeholders,
-			$._inlineRoll,
-		))),
-		
-		_number_invalid_remainder: $ => seq(	// _
-			/[^@%#\[({*/+\-\s})\]\d.]/,	//definitely invalid
-			//treat the rest as invalid
-			optional($._element_invalid_remainder),
-		),
 		
 		
 		/*┌──────────────────────────────
@@ -888,15 +939,20 @@ module.exports = grammar({
 			optional($._macro),
 		),
 		
-		diceRoll: $ => prec.right(seq(
+		diceRoll: $ => prec.right(1, seq(
 			//count: number of dice (optional)
-			optional(alias($._element_number_unsigned, $.count)),
+			optional(alias($._diceRoll_count, $.count)),
 			//keyword (the letter 'd')
 			$.__diceRoll_start,
 			//sides: number of sides per die
 			alias($._diceRoll_sides, $.sides),
 			//modifiers (optional)
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
+		)),
+		_diceRoll_count: $ => repeat1(choice(
+			alias($.__integer, $.number),
+			$._placeholders,
+			$._inlineRoll,
 		)),
 		_diceRoll_sides: $ => choice(
 			alias(/\d+/, $.number),
@@ -932,7 +988,7 @@ module.exports = grammar({
 		
 		tableRoll: $ => prec.right(seq(
 			//count: number of "dice" (optional)
-			optional(alias($._element_number_unsigned, $.count)),
+			optional(alias($._diceRoll_count, $.count)),
 			//keyword (the letter 't')
 			$.__tableRoll_start,
 			$.__leftBracket,

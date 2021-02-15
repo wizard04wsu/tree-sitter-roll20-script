@@ -359,6 +359,10 @@
         {
           "type": "modifiers",
           "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
         }
       ]
     }
@@ -464,6 +468,33 @@
         },
         {
           "type": "successesMinusFailures",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "number",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         }
       ]
@@ -826,10 +857,6 @@
   },
   {
     "type": "macroHash",
-    "named": true
-  },
-  {
-    "type": "number",
     "named": true
   },
   {
