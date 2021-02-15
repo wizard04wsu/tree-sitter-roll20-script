@@ -60,6 +60,8 @@ enum TokenType {
 	
 	INTEGER,
 	DECIMAL,
+	
+	EOF,
 };
 
 
@@ -110,7 +112,7 @@ void logEntity(string character) { log(color(cyan)+"  Entity of '"+character+"'"
 void logFunction(string functionName) { log(color(magenta)+functionName); }
 void logValidSymbols(const bool *valid_symbols) {
 	if (!debugging || !log_valid_symbols) return;
-	cout << color(darkGray) << "Valid symbols:" << "\n"
+	cout << color(darkGray) //<< "Valid symbols:" << "\n"
 		 << (valid_symbols[ATTRIBUTE_START]?"ATTRIBUTE_START, ":"")
 		 << (valid_symbols[ABILITY_START]?"ABILITY_START, ":"")
 		 << (valid_symbols[MACRO_START]?"MACRO_START, ":"")
@@ -130,6 +132,7 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[JUST_PIPE]?"JUST_PIPE, ":"")
 		 << (valid_symbols[INTEGER]?"INTEGER, ":"")
 		 << (valid_symbols[DECIMAL]?"DECIMAL, ":"")
+		 << (valid_symbols[EOF]?"EOF, ":"")
 		 << "\n";
 }
 
@@ -605,7 +608,14 @@ struct Scanner {
 		unsigned depth = queries.size()>0 ? queries.size()-1 : 0;
 		string entity, delimAtDepth, delimAtOrAbove, digitAtOrAbove;
 		
-		if (c == '@') {
+		if (c == 0) {
+			if (valid_symbols[EOF]) {
+				logTokenType(lexer, "EOF");
+				lexer->result_symbol = EOF;
+				return true;
+			}
+		}
+		else if (c == '@') {
 			if (valid_symbols[ATTRIBUTE_START] || valid_symbols[JUST_AT]) {
 				c = advance(lexer);
 				mark_end(lexer);

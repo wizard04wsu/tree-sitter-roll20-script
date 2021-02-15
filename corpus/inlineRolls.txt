@@ -247,7 +247,8 @@ Inline Roll: Invalid: [[ 5 [[]] ]]
 (roll20_script
  	(inlineRoll
 		(number)
-		(invalid)))
+		(invalid
+			(invalid))))
 
 ==================
 Inline Roll: Invalid: [[ 5 + [[]] ]]
@@ -350,7 +351,8 @@ Inline Roll: Invalid: [[x 5]]
 (roll20_script
  	(inlineRoll
 		(invalid)
-		(invalid)))
+		(invalid
+			(number))))
 
 ==================
 Inline Roll: Invalid: [[5x]]

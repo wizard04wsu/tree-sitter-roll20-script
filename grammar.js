@@ -78,6 +78,8 @@ module.exports = grammar({
 		
 		$.__integer,
 		$.__decimal,
+		
+		$.__EOF,
 	],
 	
 	extras: $ => [
@@ -480,78 +482,86 @@ module.exports = grammar({
 		_expression_first: $ => prec.right(choice(
 			seq(
 				optional($._labels_and_wsp),
-				$._element_first,
+				choice(
+					$._element_first,
+					$._element_invalid,
+				),
 				optional($._labels_and_wsp),
 			),
-			seq(
+			prec(1, seq(
 				optional($._labels_and_wsp),
 				choice(
-					$._expression_first_pair,
-					$._expression_invalid,
+					$._element_first,
+					$._element_invalid,
 				),
-			),
+				choice(
+					seq(
+						optional($._labels_and_wsp),
+						$._operator,
+						optional($._labels_and_wsp),
+						$._expression_next,
+					),
+					seq(
+						$._labels_and_wsp,
+						$._expression_next_invalid,
+					),
+				),
+			)),
 		)),
 		_expression_next: $ => prec.right(choice(
 			seq(
-				$._element_next,
+				choice(
+					$._element_next,
+					$._element_invalid,
+				),
 				optional($._labels_and_wsp),
 			),
-			$._expression_next_pair,
-			$._expression_invalid,
+			prec(1, seq(
+				choice(
+					$._element_next,
+					$._element_invalid,
+				),
+				choice(
+					seq(
+						optional($._labels_and_wsp),
+						$._operator,
+						optional($._labels_and_wsp),
+						$._expression_next,
+					),
+					seq(
+						$._labels_and_wsp,
+						$._expression_next_invalid,
+					),
+				),
+			)),
 		)),
-		_expression_invalid: $ => prec.right(choice(
+		_expression_next_invalid: $ => prec.right(choice(
 			seq(
-				$._element_invalid,
+				choice(
+					alias($._element_next, $.invalid),
+					$._element_invalid,
+				),
 				optional($._labels_and_wsp),
 			),
-			$._expression_invalid_pair,
+			prec(1, seq(
+				choice(
+					alias($._element_next, $.invalid),
+					$._element_invalid,
+				),
+				choice(
+					seq(
+						optional($._labels_and_wsp),
+						$._operator,
+						optional($._labels_and_wsp),
+						$._expression_next,
+					),
+					seq(
+						$._labels_and_wsp,
+						$._expression_next_invalid,
+					),
+				),
+			)),
 		)),
-		
-		_expression_first_pair: $ => seq(
-			$._element_first,
-			choice(
-				seq(
-					optional($._labels_and_wsp),
-					$._operator,
-					optional($._labels_and_wsp),
-					$._expression_next,
-				),
-				seq(
-					$._labels_and_wsp,
-					$._expression_invalid,
-				),
-			),
-		),
-		_expression_next_pair: $ => seq(
-			$._element_next,
-			choice(
-				seq(
-					optional($._labels_and_wsp),
-					$._operator,
-					optional($._labels_and_wsp),
-					$._expression_next,
-				),
-				seq(
-					$._labels_and_wsp,
-					$._expression_invalid,
-				),
-			),
-		),
-		_expression_invalid_pair: $ => seq(
-			$._element_invalid,
-			choice(
-				seq(
-					optional($._labels_and_wsp),
-					$._operator,
-					optional($._labels_and_wsp),
-					$._expression_next,
-				),
-				seq(
-					$._labels_and_wsp,
-					$._expression_invalid,
-				),
-			),
-		),
 		
 		_element_first: $ => prec.right(2, choice(
 			$._element_parenthesized,
@@ -583,11 +593,11 @@ module.exports = grammar({
 			$._macro,
 		)),
 		
-		_element_invalid: $ => seq(
+		_element_invalid: $ => prec.right(seq(
 			optional($._placeholders),
 			alias($._element_invalid_2, $.invalid),
 			optional($._macro),
-		),
+		)),
 		_element_invalid_2: $ => choice(
 			seq(
 				$._element_invalid_begin,
@@ -742,7 +752,7 @@ module.exports = grammar({
 		)),
 		
 		
-		_element_invalid_number: $ => seq(
+		_element_invalid_number: $ => prec.right(seq(
 			choice(
 				$.__decimal,
 				seq(
@@ -764,7 +774,7 @@ module.exports = grammar({
 					)),
 				),
 			),
-		),
+		)),
 		_number_invalid_integer_remainder: $ => choice(
 			$.__decimal,
 			seq(
@@ -797,7 +807,7 @@ module.exports = grammar({
 		
 		_sign: $ => alias(/[+-]/, $.operator),
 		
-		_integer_etc: $ => choice(
+		_integer_etc: $ => prec(1, choice(
 			seq(
 				$.__integer,
 				repeat(choice(
@@ -818,9 +828,9 @@ module.exports = grammar({
 					$._inlineRoll,
 				)),
 			),
-		),
+		)),
 		
-		_number_fraction: $ => seq( $.__decimal, $._integer_etc),
+		_number_fraction: $ => prec(1, seq( $.__decimal, $._integer_etc)),
 		
 		
 		/*┌──────────────────────────────
@@ -890,7 +900,14 @@ module.exports = grammar({
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Rolls
 		  ╚════════════════════════════════════════════════════════════*/
-		 
+		
+		_diceRoll_count: $ => repeat1(choice(
+			alias($.__integer, $.number),
+			$._placeholders,
+			$._inlineRoll,
+		)),
+		
+		
 		/*┌──────────────────────────────
 		  │ Roll Modifiers
 		  └┬─────────────────────────────*/
@@ -987,11 +1004,6 @@ module.exports = grammar({
 			alias($._diceRoll_sides, $.sides),
 			//modifiers (optional)
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
-		)),
-		_diceRoll_count: $ => repeat1(choice(
-			alias($.__integer, $.number),
-			$._placeholders,
-			$._inlineRoll,
 		)),
 		_diceRoll_sides: $ => choice(
 			alias(/\d+/, $.number),
