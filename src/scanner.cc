@@ -12,56 +12,6 @@ namespace {
 using namespace std;
 
 
-//For debugging:
-const bool debugging = false;
-enum ANSI_Color {
-	//https://stackoverflow.com/a/45300654/15788
-	default=39,
-	
-	black=30,
-	darkGray=90,gray=90,dimGray=90,
-	lightGray=37,brightGray=37,
-	white=97,
-	
-	red=31,dimRed=31,darkRed=31,
-	yellow=33,dimYellow=33,darkYellow=33,
-	green=32,dimGreen=32,darkGreen=32,
-	cyan=36,dimCyan=36,darkCyan=36,
-	blue=34,dimBlue=34,darkBlue=34,
-	magenta=35,dimMagenta=35,darkMagenta=35,
-	
-	brightRed=91,lightRed=91,
-	brightYellow=93,lightYellow=93,
-	brightGreen=92,lightGreen=92,
-	brightCyan=96,lightCyan=96,
-	brightBlue=94,lightBlue=94,
-	brightMagenta=95,lightMagenta=95,
-};
-string color(int foreground = 0, int background = 0) {
-	return "\033["
-		+(foreground?to_string(foreground):"")
-		+((foreground&&background)?";":"")
-		+(background?to_string(background+10):"")
-		+"m";
-}
-unsigned log_marked = 0;
-string log_consumed = "";
-void log(string str) {
-	if (debugging) cout << "\033[0m" << str << "\033[0m" << endl;
-}
-void logLookahead(TSLexer *lexer) {
-	char c = lexer->lookahead;
-	string str = string({c}) + (c=='\n'?"•":"");
-	log(color(darkCyan)+"  Lookahead '"+color(lightCyan)+str+color(darkCyan)+"'");
-	
-}
-void logEntity(string character) { log(color(cyan)+"  Entity of '"+character+"'"); }
-void logFunction(string functionName) { log(color(magenta)+functionName); }
-
-
-struct Query;
-struct Scanner;
-
 enum TokenType {
 	ATTRIBUTE_START,
 	
@@ -111,6 +61,81 @@ enum TokenType {
 	INTEGER,
 	DECIMAL,
 };
+
+
+//For debugging:
+const bool debugging = false;
+const bool log_valid_symbols = true;
+enum ANSI_Color {
+	//https://stackoverflow.com/a/45300654/15788
+	default=39,
+	
+	black=30,
+	darkGray=90,gray=90,dimGray=90,
+	lightGray=37,brightGray=37,
+	white=97,
+	
+	red=31,dimRed=31,darkRed=31,
+	yellow=33,dimYellow=33,darkYellow=33,
+	green=32,dimGreen=32,darkGreen=32,
+	cyan=36,dimCyan=36,darkCyan=36,
+	blue=34,dimBlue=34,darkBlue=34,
+	magenta=35,dimMagenta=35,darkMagenta=35,
+	
+	brightRed=91,lightRed=91,
+	brightYellow=93,lightYellow=93,
+	brightGreen=92,lightGreen=92,
+	brightCyan=96,lightCyan=96,
+	brightBlue=94,lightBlue=94,
+	brightMagenta=95,lightMagenta=95,
+};
+string color(int foreground = 0, int background = 0) {
+	return "\033["
+		+(foreground?to_string(foreground):"")
+		+((foreground&&background)?";":"")
+		+(background?to_string(background+10):"")
+		+"m";
+}
+unsigned log_marked = 0;
+string log_consumed = "";
+void log(string str) {
+	if (debugging) cout << "\033[0m" << str << "\033[0m" << endl;
+}
+void logLookahead(TSLexer *lexer) {
+	char c = lexer->lookahead;
+	log(color(darkCyan)+"  Lookahead '"+color(lightCyan)+string({c})+color(darkCyan)+"'");
+	
+}
+void logEntity(string character) { log(color(cyan)+"  Entity of '"+character+"'"); }
+void logFunction(string functionName) { log(color(magenta)+functionName); }
+void logValidSymbols(const bool *valid_symbols) {
+	if (!debugging || !log_valid_symbols) return;
+	cout << color(darkGray) << "Valid symbols:" << "\n"
+		 << (valid_symbols[ATTRIBUTE_START]?"ATTRIBUTE_START, ":"")
+		 << (valid_symbols[ABILITY_START]?"ABILITY_START, ":"")
+		 << (valid_symbols[MACRO_START]?"MACRO_START, ":"")
+		 << (valid_symbols[QUERY_START]?"QUERY_START, ":"")
+		 << (valid_symbols[QUERY_PIPE_HASDEFAULT]?"QUERY_PIPE_HASDEFAULT, ":"")
+		 << (valid_symbols[QUERY_PIPE_HASOPTIONS]?"QUERY_PIPE_HASOPTIONS, ":"")
+		 << (valid_symbols[QUERY_END]?"QUERY_END, ":"")
+		 << (valid_symbols[DICE_ROLL_START]?"DICE_ROLL_START, ":"")
+		 << (valid_symbols[TABLE_ROLL_START]?"TABLE_ROLL_START, ":"")
+		 << (valid_symbols[JUST_AT]?"JUST_AT, ":"")
+		 << (valid_symbols[JUST_PERCENT]?"JUST_PERCENT, ":"")
+		 << (valid_symbols[JUST_HASH]?"JUST_HASH, ":"")
+		 << (valid_symbols[JUST_AMPERSAND]?"JUST_AMPERSAND, ":"")
+		 << (valid_symbols[JUST_D]?"JUST_D, ":"")
+		 << (valid_symbols[JUST_T]?"JUST_T, ":"")
+		 << (valid_symbols[JUST_QUESTIONMARK]?"JUST_QUESTIONMARK, ":"")
+		 << (valid_symbols[JUST_PIPE]?"JUST_PIPE, ":"")
+		 << (valid_symbols[INTEGER]?"INTEGER, ":"")
+		 << (valid_symbols[DECIMAL]?"DECIMAL, ":"")
+		 << "\n";
+}
+
+
+struct Query;
+struct Scanner;
 
 enum QueryType {
 	QT_INVALID_EMPTY = 1,
@@ -568,6 +593,7 @@ struct Scanner {
 		log_marked = 0;
 		log_consumed = "";
 		log(color(brightMagenta)+"Scanner.scan");
+		logValidSymbols(valid_symbols);
 		logLookahead(lexer);
 		
 		char c = lexer->lookahead;
@@ -733,16 +759,11 @@ struct Scanner {
 				else if (delimAtOrAbove == ".") {
 					logEntity(".");
 					if (valid_symbols[DECIMAL]) {
-						if (c == '&') entity = get_entity(lexer, depth, true);
-						else entity = string({c});
+						mark_end(lexer);
 						
-						if (matchNumbers(entity, "", depth) != "") {
-							mark_end(lexer);
-							
-							logTokenType(lexer, "DECIMAL");
-							lexer->result_symbol = DECIMAL;
-							return true;
-						}
+						logTokenType(lexer, "DECIMAL");
+						lexer->result_symbol = DECIMAL;
+						return true;
 					}
 				}
 				else if (digitAtOrAbove != "") {
@@ -896,18 +917,12 @@ struct Scanner {
 		}
 		else if (c == '.') {
 			if (valid_symbols[DECIMAL]) {
-				c = advance(lexer);
+				advance(lexer);
+				mark_end(lexer);
 				
-				if (c == '&') entity = get_entity(lexer, depth, true);
-				else entity = string({c});
-				
-				if (matchNumbers(entity, "", depth) != "") {
-					mark_end(lexer);
-					
-					logTokenType(lexer, "DECIMAL");
-					lexer->result_symbol = DECIMAL;
-					return true;
-				}
+				logTokenType(lexer, "DECIMAL");
+				lexer->result_symbol = DECIMAL;
+				return true;
 			}
 		}
 		else if (matchNumbers(string({c}), "", depth) != "") {

@@ -3259,7 +3259,7 @@
                         "type": "ALIAS",
                         "content": {
                           "type": "SYMBOL",
-                          "name": "_element_invalid_remainder"
+                          "name": "_number_invalid_integer_remainder"
                         },
                         "named": true,
                         "value": "invalid"
@@ -3290,7 +3290,7 @@
                         "type": "ALIAS",
                         "content": {
                           "type": "SYMBOL",
-                          "name": "_number_invalid_remainder"
+                          "name": "_number_invalid_decimal_remainder"
                         },
                         "named": true,
                         "value": "invalid"
@@ -3309,7 +3309,7 @@
     },
     "_number_signed_decimal": {
       "type": "PREC_RIGHT",
-      "value": 0,
+      "value": 1,
       "content": {
         "type": "SEQ",
         "members": [
@@ -3319,11 +3319,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "__decimal"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_integer_etc"
+            "name": "_number_fraction"
           }
         ]
       }
@@ -3353,7 +3349,7 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "_element_invalid_remainder"
+                      "name": "_number_invalid_integer_remainder"
                     },
                     "named": true,
                     "value": "invalid"
@@ -3384,7 +3380,7 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "_number_invalid_remainder"
+                      "name": "_number_invalid_decimal_remainder"
                     },
                     "named": true,
                     "value": "invalid"
@@ -3401,104 +3397,217 @@
     },
     "_number_unsigned_decimal": {
       "type": "PREC_RIGHT",
-      "value": 0,
+      "value": 1,
       "content": {
-        "type": "CHOICE",
+        "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_integer_etc"
-          },
-          {
-            "type": "SEQ",
+            "type": "CHOICE",
             "members": [
-              {
-                "type": "CHOICE",
-                "members": [
-                  {
-                    "type": "SYMBOL",
-                    "name": "_integer_etc"
-                  },
-                  {
-                    "type": "BLANK"
-                  }
-                ]
-              },
-              {
-                "type": "SYMBOL",
-                "name": "__decimal"
-              },
               {
                 "type": "SYMBOL",
                 "name": "_integer_etc"
+              },
+              {
+                "type": "BLANK"
               }
             ]
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_number_fraction"
           }
         ]
       }
     },
     "_element_invalid_number": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_number_invalid_remainder"
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_sign"
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "PATTERN",
-                  "value": "[\\d.]+"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_element_invalid_remainder"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            }
-          ]
-        }
-      ]
-    },
-    "_number_invalid_remainder": {
       "type": "SEQ",
       "members": [
         {
           "type": "CHOICE",
           "members": [
             {
-              "type": "PATTERN",
-              "value": "[\\d.]+"
+              "type": "SYMBOL",
+              "name": "__decimal"
             },
             {
-              "type": "BLANK"
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_sign"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "__decimal"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "PATTERN",
+                        "value": "[^@%#\\[({*\\/+\\-\\s})\\]]"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_placeholders"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_inlineRoll"
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "__decimal"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[^@%#\\[({*\\/+\\-\\s})\\]\\d]"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "CHOICE",
+                    "members": [
+                      {
+                        "type": "PATTERN",
+                        "value": "[^@%#\\[({*\\/+\\-\\s})\\]]"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_placeholders"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_inlineRoll"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "_number_invalid_integer_remainder": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__decimal"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "__decimal"
+            },
+            {
+              "type": "PATTERN",
+              "value": "[^@%#\\[({*\\/+\\-\\s})\\]\\d]"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "[^@%#\\[({*\\/+\\-\\s})\\]]"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_placeholders"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_inlineRoll"
+                  }
+                ]
+              }
             }
           ]
         },
         {
-          "type": "SYMBOL",
-          "name": "_element_invalid_remainder"
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "[^@%#\\[({*\\/+\\-\\s})\\]\\d.]"
+            },
+            {
+              "type": "REPEAT",
+              "content": {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "PATTERN",
+                    "value": "[^@%#\\[({*\\/+\\-\\s})\\]]"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_placeholders"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_inlineRoll"
+                  }
+                ]
+              }
+            }
+          ]
         }
       ]
+    },
+    "_number_invalid_decimal_remainder": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[^@%#\\[({*\\/+\\-\\s})\\]\\d]"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PATTERN",
+                "value": "[^@%#\\[({*\\/+\\-\\s})\\]]"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_placeholders"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_inlineRoll"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "_sign": {
+      "type": "ALIAS",
+      "content": {
+        "type": "PATTERN",
+        "value": "[+-]"
+      },
+      "named": true,
+      "value": "operator"
     },
     "_integer_etc": {
       "type": "CHOICE",
@@ -3579,14 +3688,18 @@
         }
       ]
     },
-    "_sign": {
-      "type": "ALIAS",
-      "content": {
-        "type": "PATTERN",
-        "value": "[+-]"
-      },
-      "named": true,
-      "value": "operator"
+    "_number_fraction": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__decimal"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_integer_etc"
+        }
+      ]
     },
     "_element_inlineRoll": {
       "type": "SEQ",

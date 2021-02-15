@@ -712,51 +712,90 @@ module.exports = grammar({
 			choice(
 				seq(
 					alias($._integer_etc, $.number),
-					optional(alias($._element_invalid_remainder, $.invalid)),
+					optional(alias($._number_invalid_integer_remainder, $.invalid)),
 				),
 				seq(
 					alias($._number_signed_decimal, $.number),
-					optional(alias($._number_invalid_remainder, $.invalid)),
+					optional(alias($._number_invalid_decimal_remainder, $.invalid)),
 				),
 			),
 		)),
-		_number_signed_decimal: $ => prec.right(seq(
+		_number_signed_decimal: $ => prec.right(1, seq(
 			$._integer_etc,
-			$.__decimal,
-			$._integer_etc,
+			$._number_fraction,
 		)),
+		
 		
 		_element_number_unsigned: $ => prec(1, choice(
 			seq(
 				alias($._integer_etc, $.number),
-				optional(alias($._element_invalid_remainder, $.invalid)),
+				optional(alias($._number_invalid_integer_remainder, $.invalid)),
 			),
 			seq(
 				alias($._number_unsigned_decimal, $.number),
-				optional(alias($._number_invalid_remainder, $.invalid)),
+				optional(alias($._number_invalid_decimal_remainder, $.invalid)),
 			),
 		)),
-		_number_unsigned_decimal: $ => prec.right(choice(
-			$._integer_etc,
-			seq(
-				optional($._integer_etc),
-				$.__decimal,
-				$._integer_etc,
-			),
+		_number_unsigned_decimal: $ => prec.right(1, seq(
+			optional($._integer_etc),
+			$._number_fraction,
 		)),
 		
-		_element_invalid_number: $ => choice(
-			$._number_invalid_remainder,
-			seq(
-				$._sign,
-				optional(/[\d.]+/),
-				optional($._element_invalid_remainder),
+		
+		_element_invalid_number: $ => seq(
+			choice(
+				$.__decimal,
+				seq(
+					$._sign,
+					$.__decimal,
+					repeat(choice(
+						/[^@%#\[({*/+\-\s})\]]/,
+						$._placeholders,
+						$._inlineRoll,
+					)),
+				),
+				seq(
+					$.__decimal,
+					/[^@%#\[({*/+\-\s})\]\d]/,
+					repeat(choice(
+						/[^@%#\[({*/+\-\s})\]]/,
+						$._placeholders,
+						$._inlineRoll,
+					)),
+				),
 			),
 		),
-		_number_invalid_remainder: $ => seq(
-			optional(/[\d.]+/),
-			$._element_invalid_remainder,
+		_number_invalid_integer_remainder: $ => choice(
+			$.__decimal,
+			seq(
+				$.__decimal,
+				/[^@%#\[({*/+\-\s})\]\d]/,
+				repeat(choice(
+					/[^@%#\[({*/+\-\s})\]]/,
+					$._placeholders,
+					$._inlineRoll,
+				)),
+			),
+			seq(
+				/[^@%#\[({*/+\-\s})\]\d.]/,
+				repeat(choice(
+					/[^@%#\[({*/+\-\s})\]]/,
+					$._placeholders,
+					$._inlineRoll,
+				)),
+			),
 		),
+		_number_invalid_decimal_remainder: $ => seq(
+			/[^@%#\[({*/+\-\s})\]\d]/,
+			repeat(choice(
+				/[^@%#\[({*/+\-\s})\]]/,
+				$._placeholders,
+				$._inlineRoll,
+			)),
+		),
+		
+		
+		_sign: $ => alias(/[+-]/, $.operator),
 		
 		_integer_etc: $ => choice(
 			seq(
@@ -781,7 +820,7 @@ module.exports = grammar({
 			),
 		),
 		
-		_sign: $ => alias(/[+-]/, $.operator),
+		_number_fraction: $ => seq( $.__decimal, $._integer_etc),
 		
 		
 		/*┌──────────────────────────────

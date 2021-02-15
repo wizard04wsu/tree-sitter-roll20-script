@@ -400,3 +400,13 @@ Inline Roll: Valid: [[5d6]]
 			(sides
 				(number)))))
 
+==================
+Inline Roll: Valid: [[5.5.5]]
+==================
+[[5.5.5]]
+---
+(roll20_script
+ 	(inlineRoll
+		(number)
+		(invalid)))
+
