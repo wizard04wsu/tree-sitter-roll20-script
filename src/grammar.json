@@ -3835,6 +3835,15 @@
         {
           "type": "ALIAS",
           "content": {
+            "type": "SYMBOL",
+            "name": "_inlineRoll_unclosed"
+          },
+          "named": true,
+          "value": "inlineRoll"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
             "type": "PATTERN",
             "value": "\\[\\[\\s*\\]\\]"
           },
@@ -3851,26 +3860,64 @@
           "value": "\\[\\[\\s*"
         },
         {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "formula"
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_labels_and_wsp"
-              },
-              "named": true,
-              "value": "invalid"
-            }
-          ]
+          "type": "SYMBOL",
+          "name": "_inlineRoll_content"
         },
         {
           "type": "PATTERN",
           "value": "\\s*\\]\\]"
+        }
+      ]
+    },
+    "_inlineRoll_content": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "formula"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_labels_and_wsp"
+          },
+          "named": true,
+          "value": "invalid"
+        }
+      ]
+    },
+    "_inlineRoll_unclosed": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "PATTERN",
+            "value": "\\[\\[\\s*"
+          },
+          "named": true,
+          "value": "invalid"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_inlineRoll_content"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "\\]\\]?"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "SYMBOL",
+          "name": "__EOF"
         }
       ]
     },
@@ -5255,6 +5302,10 @@
     {
       "type": "SYMBOL",
       "name": "__decimal"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__EOF"
     }
   ],
   "inline": [

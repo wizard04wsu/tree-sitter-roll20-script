@@ -421,12 +421,18 @@ Inline Roll, unclosed: Invalid: [[5]
 ==================
 [[5]
 ---
-(roll20_script)
+(roll20_script
+	(inlineRoll
+		(invalid)
+		(number)))
 
 ==================
 Inline Roll, unclosed: Invalid: [[5
 ==================
 [[5
 ---
-(roll20_script)
+(roll20_script
+	(inlineRoll
+		(invalid)
+		(number)))
 

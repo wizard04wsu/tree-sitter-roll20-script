@@ -61,7 +61,7 @@ enum TokenType {
 	INTEGER,
 	DECIMAL,
 	
-	EOF,
+	_EOF,
 };
 
 
@@ -132,7 +132,7 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[JUST_PIPE]?"JUST_PIPE, ":"")
 		 << (valid_symbols[INTEGER]?"INTEGER, ":"")
 		 << (valid_symbols[DECIMAL]?"DECIMAL, ":"")
-		 << (valid_symbols[EOF]?"EOF, ":"")
+		 << (valid_symbols[_EOF]?"_EOF, ":"")
 		 << "\n";
 }
 
@@ -609,9 +609,9 @@ struct Scanner {
 		string entity, delimAtDepth, delimAtOrAbove, digitAtOrAbove;
 		
 		if (c == 0) {
-			if (valid_symbols[EOF]) {
-				logTokenType(lexer, "EOF");
-				lexer->result_symbol = EOF;
+			if (valid_symbols[_EOF]) {
+				logTokenType(lexer, "_EOF");
+				lexer->result_symbol = _EOF;
 				return true;
 			}
 		}

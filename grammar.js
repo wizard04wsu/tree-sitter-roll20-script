@@ -851,15 +851,23 @@ module.exports = grammar({
 		
 		_inlineRoll: $ => choice(
 			$.inlineRoll,
+			alias($._inlineRoll_unclosed, $.inlineRoll),
 			alias(/\[\[\s*\]\]/, $.invalid),
 		),
 		inlineRoll: $ => seq(
 			/\[\[\s*/,
-			choice(
-				$.formula,
-				alias($._labels_and_wsp, $.invalid),
-			),
+			$._inlineRoll_content,
 			/\s*\]\]/,
+		),
+		_inlineRoll_content: $ => choice(
+			$.formula,
+			alias($._labels_and_wsp, $.invalid),
+		),
+		_inlineRoll_unclosed: $ => seq(
+			alias(/\[\[\s*/, $.invalid),
+			$._inlineRoll_content,
+			optional(/\]\]?/),
+			$.__EOF,
 		),
 		_inlineRoll_signed: $ => prec(1, seq(
 			optional($._sign),
