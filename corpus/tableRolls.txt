@@ -95,8 +95,12 @@ Table Roll, missing bracket: Invalid: [[ t[@{ab]} ]]
 [[ t[@{ab]} ]]
 ---
 (roll20_script
-	(attribute
-		(attributeName)))
+	(inlineRoll
+		(invalid)
+		(tableRoll
+			(tableName
+				(attribute
+					(attributeName))))))
 
 ==================
 Table Roll & Attribute: Valid: [[ t[@{ab] + @{a} ]]
