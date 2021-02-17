@@ -4,8 +4,10 @@ Attribute: Valid: @{a}
 @{a}
 ---
 (roll20_script
- 	(attribute
-		(attributeName)))
+	(attribute
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{ a }
@@ -13,8 +15,10 @@ Attribute: Valid: @{ a }
 @{ a }
 ---
 (roll20_script
- 	(attribute
-		(attributeName)))
+	(attribute
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{c|a}
@@ -22,9 +26,11 @@ Attribute: Valid: @{c|a}
 @{c|a}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
-		(attributeName)))
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{ c | a }
@@ -32,9 +38,11 @@ Attribute: Valid: @{ c | a }
 @{ c | a }
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
-		(attributeName)))
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{c|a|max}
@@ -42,10 +50,12 @@ Attribute: Valid: @{c|a|max}
 @{c|a|max}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
 		(attributeName)
-		(keyword)))
+		(keyword)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{ c | a |max}
@@ -53,10 +63,12 @@ Attribute: Valid: @{ c | a |max}
 @{ c | a |max}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
 		(attributeName)
-		(keyword)))
+		(keyword)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{selected|a}
@@ -64,9 +76,11 @@ Attribute: Valid: @{selected|a}
 @{selected|a}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(token)
-		(attributeName)))
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{selected|a|max}
@@ -74,10 +88,12 @@ Attribute: Valid: @{selected|a|max}
 @{selected|a|max}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(token)
 		(attributeName)
-		(keyword)))
+		(keyword)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{target|a}
@@ -85,9 +101,11 @@ Attribute: Valid: @{target|a}
 @{target|a}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(token)
-		(attributeName)))
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid: @{target|a|max}
@@ -96,9 +114,11 @@ Attribute: Valid: @{target|a|max}
 ---
 (roll20_script
 	(attribute
+		(delimiter)
 		(token)
 		(attributeName)
-		(keyword)))
+		(keyword)
+		(delimiter)))
 
 ==================
 Attribute with Macro: Valid: @{#a }
@@ -107,8 +127,10 @@ Attribute with Macro: Valid: @{#a }
 ---
 (roll20_script
  	(attribute
+		(delimiter)
 		(attributeName
-			(macroHash))))
+			(macroHash))
+		(delimiter)))
 
 ==================
 Attribute with Macro: Valid: @{a#a a}
@@ -117,8 +139,10 @@ Attribute with Macro: Valid: @{a#a a}
 ---
 (roll20_script
  	(attribute
+		(delimiter)
 		(attributeName
-			(macroHash))))
+			(macroHash))
+		(delimiter)))
 
 ==================
 Attribute with Macro: Valid: @{#c |#a }
@@ -127,10 +151,12 @@ Attribute with Macro: Valid: @{#c |#a }
 ---
 (roll20_script
  	(attribute
+		(delimiter)
 		(characterName
 			(macroHash))
 		(attributeName
-			(macroHash))))
+			(macroHash))
+		(delimiter)))
 
 ==================
 Attribute with Macro: Valid: @{c#c c|a#a a}
@@ -139,10 +165,12 @@ Attribute with Macro: Valid: @{c#c c|a#a a}
 ---
 (roll20_script
  	(attribute
+		(delimiter)
 		(characterName
 			(macroHash))
 		(attributeName
-			(macroHash))))
+			(macroHash))
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{}
@@ -150,7 +178,9 @@ Attribute: Invalid: @{}
 @{}
 ---
 (roll20_script
- 	(invalid))
+ 	(invalid
+		(delimiter)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{|}
@@ -158,8 +188,10 @@ Attribute: Invalid: @{|}
 @{|}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{||}
@@ -167,8 +199,10 @@ Attribute: Invalid: @{||}
 @{||}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{|||}
@@ -177,7 +211,9 @@ Attribute: Invalid: @{|||}
 ---
 (roll20_script
 	(attribute
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c|}
@@ -185,9 +221,11 @@ Attribute: Invalid: @{c|}
 @{c|}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{|a}
@@ -195,8 +233,10 @@ Attribute: Invalid: @{|a}
 @{|a}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c||}
@@ -204,9 +244,11 @@ Attribute: Invalid: @{c||}
 @{c||}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{|a|}
@@ -214,8 +256,10 @@ Attribute: Invalid: @{|a|}
 @{|a|}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{||m}
@@ -223,8 +267,10 @@ Attribute: Invalid: @{||m}
 @{||m}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{||max}
@@ -232,8 +278,10 @@ Attribute: Invalid: @{||max}
 @{||max}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{||maxx}
@@ -241,8 +289,10 @@ Attribute: Invalid: @{||maxx}
 @{||maxx}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c|a|}
@@ -250,10 +300,12 @@ Attribute: Invalid: @{c|a|}
 @{c|a|}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
 		(attributeName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{|a|max}
@@ -261,8 +313,10 @@ Attribute: Invalid: @{|a|max}
 @{|a|max}
 ---
 (roll20_script
- 	(attribute
-		(invalid)))
+	(attribute
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c||max}
@@ -270,9 +324,11 @@ Attribute: Invalid: @{c||max}
 @{c||max}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c|a|m}
@@ -280,10 +336,12 @@ Attribute: Invalid: @{c|a|m}
 @{c|a|m}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
 		(attributeName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c|a|maxx}
@@ -291,10 +349,12 @@ Attribute: Invalid: @{c|a|maxx}
 @{c|a|maxx}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
 		(attributeName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c|a|max|}
@@ -302,10 +362,12 @@ Attribute: Invalid: @{c|a|max|}
 @{c|a|max|}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
 		(attributeName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c||max|}
@@ -313,9 +375,11 @@ Attribute: Invalid: @{c||max|}
 @{c||max|}
 ---
 (roll20_script
- 	(attribute
+	(attribute
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{c||max|x}
@@ -324,8 +388,10 @@ Attribute: Invalid: @{c||max|x}
 ---
 (roll20_script
 	(attribute
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Attribute w/o closing brace: Invalid: @{a
@@ -367,7 +433,9 @@ Attribute: Invalid: @{x@{y}
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{x@{y}z
@@ -377,7 +445,9 @@ Attribute: Invalid: @{x@{y}z
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{x@{y}z}
@@ -387,7 +457,9 @@ Attribute: Invalid: @{x@{y}z}
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Valid but Not Accepted: @{ab] + @{a}
@@ -397,7 +469,9 @@ Attribute: Valid but Not Accepted: @{ab] + @{a}
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Attribute: Invalid: @{ab] + %{a}
@@ -407,5 +481,7 @@ Attribute: Invalid: @{ab] + %{a}
 (roll20_script
 	(invalid)
 	(ability
-		(abilityName)))
+		(delimiter)
+		(abilityName)
+		(delimiter)))
 

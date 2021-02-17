@@ -5,9 +5,12 @@ Dice Roll: Valid: [[d20]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
+			(delimiter)
 			(sides
-				(number)))))
+				(number)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ d20 ]]
@@ -16,9 +19,12 @@ Dice Roll: Valid: [[ d20 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
+			(delimiter)
 			(sides
-				(number)))))
+				(number)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ D20 ]]
@@ -27,9 +33,12 @@ Dice Roll: Valid: [[ D20 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
+			(delimiter)
 			(sides
-				(number)))))
+				(number)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[10d20]]
@@ -38,11 +47,14 @@ Dice Roll: Valid: [[10d20]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
 				(number))
+			(delimiter)
 			(sides
-				(number)))))
+				(number)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ 10d20 ]]
@@ -51,11 +63,14 @@ Dice Roll: Valid: [[ 10d20 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
 				(number))
+			(delimiter)
 			(sides
-				(number)))))
+				(number)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ df ]]
@@ -64,9 +79,12 @@ Dice Roll: Valid: [[ df ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
+			(delimiter)
 			(sides
-				(fate)))))
+				(fate)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ @{a}d@{a} ]]
@@ -75,13 +93,21 @@ Dice Roll: Valid: [[ @{a}d@{a} ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
-				(attribute
-					(attributeName)))
+				(number
+					(attribute
+						(delimiter)
+						(attributeName)
+						(delimiter))))
+			(delimiter)
 			(sides
 				(attribute
-					(attributeName))))))
+					(delimiter)
+					(attributeName)
+					(delimiter))))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ %{b|a}d%{b|a} ]]
@@ -90,15 +116,23 @@ Dice Roll: Valid: [[ %{b|a}d%{b|a} ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
-				(ability
-					(characterName)
-					(abilityName)))
+				(number
+					(ability
+						(delimiter)
+						(characterName)
+						(abilityName)
+						(delimiter))))
+			(delimiter)
 			(sides
 				(ability
+					(delimiter)
 					(characterName)
-					(abilityName))))))
+					(abilityName)
+					(delimiter))))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
@@ -107,24 +141,40 @@ Dice Roll: Valid: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
-				(attribute
-					(attributeName))
-				(ability
-					(characterName)
-					(abilityName)))
+				(number
+					(attribute
+						(delimiter)
+						(attributeName)
+						(delimiter))
+					(ability
+						(delimiter)
+						(characterName)
+						(abilityName)
+						(delimiter))))
+			(delimiter)
 			(sides
 				(attribute
-					(attributeName)))
+					(delimiter)
+					(attributeName)
+					(delimiter)))
 			(modifiers
 				(ability
+					(delimiter)
 					(characterName)
-					(abilityName))
+					(abilityName)
+					(delimiter))
 				(attribute
-					(attributeName))
+					(delimiter)
+					(attributeName)
+					(delimiter))
 				(attribute
-					(attributeName))))))
+					(delimiter)
+					(attributeName)
+					(delimiter))))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: [[ d6c@{s}5 ]]
@@ -133,12 +183,17 @@ Dice Roll: Valid: [[ d6c@{s}5 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
+			(delimiter)
 			(sides
 				(number))
 			(modifiers
 				(attribute
-					(attributeName))))))
+					(delimiter)
+					(attributeName)
+					(delimiter))))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: long one, lower case
@@ -147,9 +202,11 @@ Dice Roll: Valid: long one, lower case
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
 				(number))
+			(delimiter)
 			(sides
 				(number))
 			(modifiers
@@ -182,7 +239,8 @@ Dice Roll: Valid: long one, lower case
 				(countMatches)
 				(countMatches)
 				(sort)
-				(sort)))))
+				(sort)))
+		(delimiter)))
 
 ==================
 Dice Roll: Valid: long one, upper case
@@ -191,9 +249,11 @@ Dice Roll: Valid: long one, upper case
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
 				(number))
+			(delimiter)
 			(sides
 				(number))
 			(modifiers
@@ -226,7 +286,8 @@ Dice Roll: Valid: long one, upper case
 				(countMatches)
 				(countMatches)
 				(sort)
-				(sort)))))
+				(sort)))
+		(delimiter)))
 
 ==================
 Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
@@ -235,16 +296,23 @@ Dice Roll: Invalid: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(diceRoll
+			(delimiter)
 			(sides
 				(number))
 			(modifiers
 				(attribute
-					(attributeName))
+					(delimiter)
+					(attributeName)
+					(delimiter))
 				(criticalSuccess)))
 		(invalid
 			(attribute
-				(attributeName)))))
+				(delimiter)
+				(attributeName)
+				(delimiter)))
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5d_]]
@@ -253,8 +321,10 @@ Number: Valid with Invalid Remainder: [[5d_]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Dice Roll: Valid with Invalid Remainder: [[5d3_]]
@@ -263,10 +333,13 @@ Dice Roll: Valid with Invalid Remainder: [[5d3_]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
 				(number))
+			(delimiter)
 			(sides
 				(number)))
-		(invalid)))
+		(invalid)
+		(delimiter)))
 

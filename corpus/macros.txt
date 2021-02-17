@@ -63,7 +63,9 @@ Macro: Valid with Attributes: #m@{a}
 (roll20_script
 	(macroHash)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Macro: Valid with Attributes: #m@{a}m
@@ -73,7 +75,9 @@ Macro: Valid with Attributes: #m@{a}m
 (roll20_script
 	(macroHash)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Macro: Valid with Attributes: #m@{c|a}
@@ -83,8 +87,10 @@ Macro: Valid with Attributes: #m@{c|a}
 (roll20_script
 	(macroHash)
 	(attribute
+		(delimiter)
 		(characterName)
-		(attributeName)))
+		(attributeName)
+		(delimiter)))
 
 ==================
 Macro: Valid with Attributes: #m@{c|a}m
@@ -94,8 +100,10 @@ Macro: Valid with Attributes: #m@{c|a}m
 (roll20_script
 	(macroHash)
 	(attribute
+		(delimiter)
 		(characterName)
-		(attributeName)))
+		(attributeName)
+		(delimiter)))
 
 ==================
 String: #

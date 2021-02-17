@@ -106,10 +106,14 @@ Roll Query: Valid: ?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
 		(prompt)
 		(defaultValue
 			(attribute
-				(attributeName))
+				(delimiter)
+				(attributeName)
+				(delimiter))
 			(ability
+				(delimiter)
 				(characterName)
-				(abilityName)))))
+				(abilityName)
+				(delimiter)))))
 
 ==================
 Roll Query: Valid: ?{|a|b,c|d|}

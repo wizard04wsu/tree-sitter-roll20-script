@@ -47,8 +47,8 @@ module.exports = grammar({
 		//$.__label_start,
 		//$.__label_end,
 		
-		//$.__inlineRoll_start,
-		//$.__inlineRoll_end,
+		$.__inlineRoll_start,
+		$.__inlineRoll_end,
 		
 		//$.__parenthesized_start,
 		//$.__parenthesized_end,
@@ -59,7 +59,6 @@ module.exports = grammar({
 		$.__diceRoll_start,				// d or D  or equivalent HTML entity
 		
 		$.__tableRoll_start,			// t or T  or equivalent HTML entity
-		//$.__tableRoll_end,
 		
 		
 		$.__just_at,					// @
@@ -69,15 +68,15 @@ module.exports = grammar({
 		$.__just_d,						// d or D
 		$.__just_t,						// t or T
 		$.__just_questionmark,			// ?
-		$.__pipe,						// |
-		//$.__comma,					// ,
-		//$.__leftBrace,				// {
-		//$.__rightBrace,				// }
-		//$.__leftBracket,				// [
-		//$.__rightBracket,				// ]
+		$.__just_leftBrace,				// {
+		$.__just_pipe,					// |
+		$.__just_comma,					// ,
+		$.__just_rightBrace,			// }
+		$.__just_leftBracket,			// [
+		$.__just_rightBracket,				// ]
 		
 		$.__integer,
-		$.__decimal,
+		$.__decimal_point,
 		
 		$.__EOF,
 	],
@@ -86,9 +85,7 @@ module.exports = grammar({
 		//(manually handle whitespace)
 	],
 	
-	conflicts: $ => [
-		[ $._integer_etc, $.diceRoll, $.tableRoll, ],
-	],
+	conflicts: $ => [],
 	
 	inline: $ => [
 		$.formula,
@@ -145,6 +142,7 @@ module.exports = grammar({
 				$._macro,
 				$._rollQuery,
 				$._inlineRoll,
+				alias($._element_invalid_inlineRoll, $.invalid),
 				//TODO:
 				//template
 				//property
@@ -174,11 +172,7 @@ module.exports = grammar({
 		
 		//TODO: get these from the scanner so they're properly escaped
 		__just_ampersand: $ => "&",
-		__leftBracket: $ => "[",
-		__leftBrace: $ => "{",
-		__rightBrace: $ => "}",
-		__rightBracket: $ => "]",
-		__comma: $ => ",",
+		//parens
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -244,13 +238,12 @@ module.exports = grammar({
 			alias($._attribute_empty, $.invalid),	//@{}
 			alias("@{", $.invalid),
 		),
-		attribute: $ => seq(
-			$.__attribute_start,
-			"{",
+		attribute: $ => prec(2, seq(
+			$._$attributeLeft,
 			$._attribute_content,
-			"}",
-		),
-		_attribute_empty: $ => seq( $.__attribute_start, "{}" ),
+			$._$braceRight,
+		)),
+		_attribute_empty: $ => seq( $._$attributeLeft, $._$braceRight ),
 		_attribute_content: $ => choice(
 			alias($._propertyName, $.attributeName),
 			seq(
@@ -301,13 +294,12 @@ module.exports = grammar({
 			alias($._ability_empty, $.invalid),	//%{}
 			alias("%{", $.invalid),
 		),
-		ability: $ => seq(
-			$.__ability_start,
-			"{",
+		ability: $ => prec(2, seq(
+			$._$abilityLeft,
 			$._ability_content,
-			"}",
-		),
-		_ability_empty: $ => seq( $.__ability_start, "{}" ),
+			$._$braceRight,
+		)),
+		_ability_empty: $ => seq( $._$abilityLeft, $._$braceRight ),
 		_ability_content: $ => choice(
 			alias($._propertyName, $.abilityName),
 			seq(
@@ -405,11 +397,11 @@ module.exports = grammar({
 					seq(
 						$.__rollQuery_pipe_hasOptions,
 						optional($.option),
-						$.__pipe,
+						$.__just_pipe,
 						optional($.option),
 						repeat(
 							seq(
-								$.__pipe,
+								$.__just_pipe,
 								optional($.option),
 							),
 						),
@@ -432,25 +424,23 @@ module.exports = grammar({
 			$.optionName,
 			prec.right(seq(
 				optional($.optionName),
-				$.__comma,
+				$.__just_comma,
 				optional($.optionValue),
 			)),
 		),
 		optionName: $ => name(prec.right(choice(
-			/[^@%#&}|,\r\n]+/,
+			/[^@%#&}|, \r\n]+/,
 			$._attribute,
 			$._ability,
-			alias($.__macro_start, $.macroHash),
 			//$.htmlEntity,
 			$.__just_at,
 			$.__just_percent,
 			$.__just_ampersand,
 		)))($),
 		optionValue: $ => name(prec.right(choice(
-			/[^@%#&}|,?\r\n]+/,
+			/[^@%#&}|,? \r\n]+/,
 			$._attribute,
 			$._ability,
-			alias($.__macro_start, $.macroHash),
 			//$.htmlEntity,
 			$._rollQuery,
 			//$.property,
@@ -480,33 +470,77 @@ module.exports = grammar({
 		formula: $ => $._expression_first,
 		
 		_expression_first: $ => prec.right(choice(
+			alias($._labels_with_wsp, $.invalid),
 			seq(
-				optional($._labels_and_wsp),
+				$._expression_first_single,
 				choice(
-					$._element_first,
-					$._element_invalid,
-				),
-				optional($._labels_and_wsp),
-			),
-			prec(1, seq(
-				optional($._labels_and_wsp),
-				choice(
-					$._element_first,
-					$._element_invalid,
-				),
-				choice(
+					optional($._labels_or_wsp),
 					seq(
-						optional($._labels_and_wsp),
+						optional($._labels_or_wsp),
 						$._operator,
-						optional($._labels_and_wsp),
+						optional($._labels_or_wsp),
 						$._expression_next,
 					),
 					seq(
-						$._labels_and_wsp,
+						$._labels_or_wsp,
 						$._expression_next_invalid,
 					),
 				),
+			),
+		)),
+		_expression_first_single: $ => prec.right(choice(
+			prec(3, seq(
+				optional($._labels_with_wsp),
+				choice(
+					$._element_diceRoll,
+					$._element_tableRoll,
+				),
 			)),
+			prec(2, seq(
+				alias($._labels_with_wsp, $.invalid),
+				choice(
+					$._element_parenthesized,
+					$._element_groupRoll,
+					$._element_number_unsigned,
+					$._element_number_signed,
+					$._inlineRoll_signed,
+					//TODO: query
+					$._element_invalid,
+				),
+			)),
+			prec(1, seq(
+				optional($._labels_with_wsp),
+				choice(
+					seq(
+						$._placeholders,
+						optional($._macro),
+					),
+					$._macro,
+				),
+			)),
+			seq(
+				optional($._wsp_inline),
+				choice(
+					$._element_parenthesized,
+					$._element_groupRoll,
+					
+					$._element_diceRoll,
+					$._element_tableRoll,
+					
+					$._element_number_unsigned,
+					$._element_number_signed,
+					$._inlineRoll_signed,
+					//TODO: query
+					
+					seq(
+						$._placeholders,
+						optional($._macro),
+					),
+					$._macro,
+					
+					$._element_invalid,
+				),
+			),
 		)),
 		_expression_next: $ => prec.right(choice(
 			seq(
@@ -514,7 +548,7 @@ module.exports = grammar({
 					$._element_next,
 					$._element_invalid,
 				),
-				optional($._labels_and_wsp),
+				optional($._labels_or_wsp),
 			),
 			prec(1, seq(
 				choice(
@@ -523,13 +557,13 @@ module.exports = grammar({
 				),
 				choice(
 					seq(
-						optional($._labels_and_wsp),
+						optional($._labels_or_wsp),
 						$._operator,
-						optional($._labels_and_wsp),
+						optional($._labels_or_wsp),
 						$._expression_next,
 					),
 					seq(
-						$._labels_and_wsp,
+						$._labels_or_wsp,
 						$._expression_next_invalid,
 					),
 				),
@@ -541,7 +575,7 @@ module.exports = grammar({
 					alias($._element_next, $.invalid),
 					$._element_invalid,
 				),
-				optional($._labels_and_wsp),
+				optional($._labels_or_wsp),
 			),
 			prec(1, seq(
 				choice(
@@ -550,20 +584,20 @@ module.exports = grammar({
 				),
 				choice(
 					seq(
-						optional($._labels_and_wsp),
+						optional($._labels_or_wsp),
 						$._operator,
-						optional($._labels_and_wsp),
+						optional($._labels_or_wsp),
 						$._expression_next,
 					),
 					seq(
-						$._labels_and_wsp,
+						$._labels_or_wsp,
 						$._expression_next_invalid,
 					),
 				),
 			)),
 		)),
 		
-		_element_first: $ => prec.right(2, choice(
+		/*_element_first: $ => prec.right(2, choice(
 			$._element_parenthesized,
 			$._element_groupRoll,
 			$._element_diceRoll,
@@ -577,7 +611,24 @@ module.exports = grammar({
 				optional($._macro),
 			),
 			$._macro,
+		)),*/
+		/*_element_first_after_invalid_label: $ => prec.right(2, choice(
+			$._element_parenthesized,
+			$._element_groupRoll,
+			$._element_number_unsigned,
+			$._element_number_signed,
+			$._inlineRoll_signed,
+			//TODO: query
 		)),
+		_element_first_after_valid_label: $ => prec.right(2, choice(
+			$._element_diceRoll,
+			$._element_tableRoll,
+			seq(
+				$._placeholders,
+				optional($._macro),
+			),
+			$._macro,
+		)),*/
 		_element_next: $ => prec.right(1, choice(
 			$._element_parenthesized,
 			$._element_groupRoll,
@@ -593,7 +644,7 @@ module.exports = grammar({
 			$._macro,
 		)),
 		
-		_element_invalid: $ => prec.right(seq(
+		_element_invalid: $ => prec.right(1, seq(
 			optional($._placeholders),
 			alias($._element_invalid_2, $.invalid),
 			optional($._macro),
@@ -604,12 +655,13 @@ module.exports = grammar({
 				optional($._element_invalid_remainder),
 			),
 			$._element_invalid_number,
+			$._element_invalid_inlineRoll,
 		),
 		_element_invalid_begin: $ => choice(
 											//-------------------------------------------
 											// doesn't    |  so it's *not* one of
 											// match this |  these potentially valid things
-			/[^@%#\d.dDtT\[({*/+\-\s]/,		//-------------------------------------------
+			/[^@%#\d.dDtT\[({*/+\-\s\]]/,		//-------------------------------------------
 											// @          |  attribute
 											// %          |  ability
 											// #          |  macro
@@ -617,7 +669,7 @@ module.exports = grammar({
 											// .          |  number
 											// d or D     |  dice roll
 											// t or T     |  table roll (TODO)
-											// [          |  label or inline roll
+											// [ or ]     |  label or inline roll
 											// (          |  parenthesized
 											// {          |  group roll
 											// * or /     |  operator
@@ -631,6 +683,7 @@ module.exports = grammar({
 			$.__just_at,					// @          |  attribute
 			$.__just_percent,				// %          |  ability
 			$.__just_d,						// d or D     |  dice roll
+			$.__just_rightBracket,
 			//TODO
 		),
 		_element_invalid_remainder: $ => prec.right(seq(
@@ -687,7 +740,7 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		label: $ => seq(
-			$.__leftBracket,
+			$._$bracketLeft,
 			optional(name(choice(
 				///[^@%#&\[ \r\n\]]+/,
 				/[^@%#\[ \r\n\]]+/,
@@ -698,15 +751,19 @@ module.exports = grammar({
 				$.__just_percent,
 				//$.__just_ampersand,
 			))($)),
-			$.__rightBracket,
+			$._$bracketRight,
 		),
 		
-		_labels_and_wsp: $ => prec.right(choice(
+		_labels_or_wsp: $ => prec.right(1, choice(
 			$._wsp_inline,
-			seq(
+			$._labels_with_wsp,
+		)),
+		_labels_with_wsp: $ => prec.right(seq(
+			optional($._wsp_inline),
+			repeat1(seq(
+				$.label,
 				optional($._wsp_inline),
-				repeat1(seq( $.label, optional($._wsp_inline) )),
-			),
+			)),
 		)),
 		
 		
@@ -754,10 +811,10 @@ module.exports = grammar({
 		
 		_element_invalid_number: $ => prec.right(seq(
 			choice(
-				$.__decimal,
+				$.__decimal_point,
 				seq(
 					$._sign,
-					$.__decimal,
+					$.__decimal_point,
 					repeat(choice(
 						/[^@%#\[({*/+\-\s})\]]/,
 						$._placeholders,
@@ -765,7 +822,7 @@ module.exports = grammar({
 					)),
 				),
 				seq(
-					$.__decimal,
+					$.__decimal_point,
 					/[^@%#\[({*/+\-\s})\]\d]/,
 					repeat(choice(
 						/[^@%#\[({*/+\-\s})\]]/,
@@ -775,10 +832,10 @@ module.exports = grammar({
 				),
 			),
 		)),
-		_number_invalid_integer_remainder: $ => choice(
-			$.__decimal,
+		_number_invalid_integer_remainder: $ => prec.right(choice(
+			$.__decimal_point,
 			seq(
-				$.__decimal,
+				$.__decimal_point,
 				/[^@%#\[({*/+\-\s})\]\d]/,
 				repeat(choice(
 					/[^@%#\[({*/+\-\s})\]]/,
@@ -794,43 +851,39 @@ module.exports = grammar({
 					$._inlineRoll,
 				)),
 			),
-		),
-		_number_invalid_decimal_remainder: $ => seq(
+		)),
+		_number_invalid_decimal_remainder: $ => prec.right(seq(
 			/[^@%#\[({*/+\-\s})\]\d]/,
 			repeat(choice(
 				/[^@%#\[({*/+\-\s})\]]/,
 				$._placeholders,
 				$._inlineRoll,
 			)),
-		),
+		)),
 		
 		
 		_sign: $ => alias(/[+-]/, $.operator),
 		
-		_integer_etc: $ => prec(1, choice(
-			seq(
-				$.__integer,
-				repeat(choice(
-					$.__integer,
-					$._placeholders,
-					$._inlineRoll,
-				)),
-			),
-			seq(
+		_integer_etc: $ => prec.right(1, seq(
+			repeat(prec(2, choice(
+				$._placeholders,
+				$._inlineRoll,
+			))),
+			$.__integer,
+			repeat(seq(
 				repeat1(choice(
 					$._placeholders,
 					$._inlineRoll,
 				)),
 				$.__integer,
-				repeat(choice(
-					$.__integer,
-					$._placeholders,
-					$._inlineRoll,
-				)),
-			),
+			)),
+			repeat(choice(
+				$._placeholders,
+				$._inlineRoll,
+			)),
 		)),
 		
-		_number_fraction: $ => prec(1, seq( $.__decimal, $._integer_etc)),
+		_number_fraction: $ => prec(1, seq( $.__decimal_point, $._integer_etc)),
 		
 		
 		/*┌──────────────────────────────
@@ -852,21 +905,30 @@ module.exports = grammar({
 		_inlineRoll: $ => choice(
 			$.inlineRoll,
 			alias($._inlineRoll_unclosed, $.inlineRoll),
-			alias(/\[\[\s*\]\]/, $.invalid),
+			//alias($._inlineRoll_invalid, $.invalid),
 		),
 		inlineRoll: $ => seq(
-			/\[\[\s*/,
-			$._inlineRoll_content,
-			/\s*\]\]/,
-		),
-		_inlineRoll_content: $ => choice(
+			$._$inlineRollLeft,
 			$.formula,
-			alias($._labels_and_wsp, $.invalid),
+			$._$inlineRollRight,
 		),
+		
+		_element_invalid_inlineRoll: $ => alias($._inlineRoll_invalid, $.inlineRoll),
+		_inlineRoll_invalid: $ => prec(1, seq(
+			$._$inlineRollLeft,
+			optional($._wsp_inline),
+			choice(
+				$._$inlineRollRight,
+				seq(
+					optional($.__just_rightBracket,),
+					$.__EOF,
+				),
+			),
+		)),
 		_inlineRoll_unclosed: $ => seq(
-			alias(/\[\[\s*/, $.invalid),
-			$._inlineRoll_content,
-			optional(/\]\]?/),
+			alias($._$inlineRollLeft, $.invalid),
+			$.formula,
+			optional(alias($.__just_rightBracket, $.invalid)),
 			$.__EOF,
 		),
 		_inlineRoll_signed: $ => prec(1, seq(
@@ -892,16 +954,24 @@ module.exports = grammar({
 		
 		_parenthesized: $ => choice(
 			$.parenthesized,
-			alias(/(abs|ceil|floor|round)?\(\s*\)/, $.invalid),
+			alias($._parenthesized_invalid, $.invalid),
 		),
 		parenthesized: $ => seq(
 			optional(alias(/abs|ceil|floor|round/, $.functionName)),
-			/\(\s*/,
-			choice(
+			///\(\s*/,
+			"(",
+			//choice(
 				$.formula,
-				alias($._labels_and_wsp, $.invalid),
-			),
-			/\s*\)/,
+				//alias($._labels_or_wsp, $.invalid),
+			//),
+			///\s*\)/,
+			")",
+		),
+		_parenthesized_invalid: $ => seq(
+			optional(alias(/abs|ceil|floor|round/, $.functionName)),
+			"(",
+			optional($._wsp_inline),
+			")",
 		),
 		
 		
@@ -909,8 +979,9 @@ module.exports = grammar({
 		  ║ Rolls
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		_diceRoll_count: $ => repeat1(choice(
-			alias($.__integer, $.number),
+		_dice_count: $ => alias($._dice_count_2, $.number),
+		_dice_count_2: $ => repeat1(choice(
+			$.__integer,
 			$._placeholders,
 			$._inlineRoll,
 		)),
@@ -958,16 +1029,17 @@ module.exports = grammar({
 			alias($._groupRoll_invalid, $.invalid),
 		),
 		groupRoll: $ => prec.right(seq(
-			$.__leftBrace,
+			$._$braceLeft,
 			optional(alias($._groupRoll_invalid_commas, $.invalid)),
 			$.formula,
 			repeat(seq(
-				$.__comma,
+				$.__just_comma,
 				optional(alias($._groupRoll_invalid_commas, $.invalid)),
 				$.formula,
 			)),
-			optional(alias($._groupRoll_invalid_commas, $.invalid)),
-			$.__rightBrace,
+			//optional(alias($._groupRoll_invalid_commas, $.invalid)),
+			optional(alias($._groupRoll_invalid_commas_last, $.invalid)),
+			$._$braceRight,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 			optional(alias($._element_invalid_remainder, $.invalid)),
 		)),
@@ -977,13 +1049,24 @@ module.exports = grammar({
 				/[dfhklDFHKL<=>\d]/,	//potentially valid
 		)),
 		_groupRoll_invalid: $ => seq(
-			$.__leftBrace,
-			/\s*(,\s*)*/,
-			$.__rightBrace,
+			$._$braceLeft,
+			///\s*(,\s*)*/,
+			$._groupRoll_invalid_commas,
+			optional($._labels_or_wsp),
+			$._$braceRight,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 			optional($._groupRoll_invalid_remainder),
 		),
-		_groupRoll_invalid_commas: $ => prec.right(repeat1(prec.right(choice($._labels_and_wsp, $.__comma)))),
+		_groupRoll_invalid_commas: $ => repeat1(seq(
+			optional($._labels_or_wsp),
+			$.__just_comma,
+		)),
+		_groupRoll_invalid_commas_last: $ => prec.right(repeat1(
+			prec.right(seq(
+				$.__just_comma,
+				optional($._labels_or_wsp),
+			))
+		)),
 		_groupRoll_invalid_remainder: $ => seq(
 			/[^@%#\[({*/+\-\s})\]dfhklDFHKL<=>\d]/,	//definitely invalid
 			//treat the rest as invalid
@@ -1005,9 +1088,9 @@ module.exports = grammar({
 		
 		diceRoll: $ => prec.right(1, seq(
 			//count: number of dice (optional)
-			optional(alias($._diceRoll_count, $.count)),
+			optional(alias($._dice_count, $.count)),
 			//keyword (the letter 'd')
-			$.__diceRoll_start,
+			$._$diceRoll,
 			//sides: number of sides per die
 			alias($._diceRoll_sides, $.sides),
 			//modifiers (optional)
@@ -1047,13 +1130,12 @@ module.exports = grammar({
 		
 		tableRoll: $ => prec.right(seq(
 			//count: number of "dice" (optional)
-			optional(alias($._diceRoll_count, $.count)),
+			optional(alias($._dice_count, $.count)),
 			//keyword (the letter 't')
-			$.__tableRoll_start,
-			$.__leftBracket,
+			$._$tableRoll,
 			//table name
 			$.tableName,
-			$.__rightBracket,
+			$._$bracketRight,
 		)),
 		tableName: $ => name(choice(
 			///[^@%#& \r\n\]]+/,
@@ -1066,6 +1148,43 @@ module.exports = grammar({
 			$.__just_percent,
 			//$.__just_ampersand,
 		))($),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Delimiters
+		  ╚════════════════════════════════════════════════════════════*/
+		
+		
+		_$attributeLeft: $ => alias($._$_attributeLeft, $.delimiter),
+		_$_attributeLeft: $ => seq( $.__attribute_start, "{" ),
+		
+		_$abilityLeft: $ => alias($._$_abilityLeft, $.delimiter),
+		_$_abilityLeft: $ => seq( $.__ability_start, "{" ),
+		
+		_$macro: $ => alias($.__macro_start, $.delimiter),
+		
+		
+		_$rollQueryLeft: $ => alias($.__rollQuery_start, $.delimiter),
+		_$rollQueryPipeDefault: $ => alias($.__rollQuery_pipe_hasDefault, $.delimiter),
+		_$rollQueryPipeFirstOption: $ => alias($.__rollQuery_pipe_hasOptions, $.delimiter),
+		_$rollQueryRight: $ => alias($.__rollQuery_end, $.delimiter),
+		
+		
+		_$inlineRollLeft: $ => alias($.__inlineRoll_start, $.delimiter),
+		_$inlineRollRight: $ => alias($.__inlineRoll_end, $.delimiter),
+		
+		
+		_$diceRoll: $ => alias($.__diceRoll_start, $.delimiter),
+		
+		_$tableRoll: $ => alias($._$_tableRoll, $.delimiter),
+		_$_tableRoll: $ => seq( $.__tableRoll_start, $.__just_leftBracket ),
+		
+		
+		_$pipe: $ => alias($.__just_pipe, $.delimiter),
+		_$braceLeft: $ => alias($.__just_leftBrace, $.delimiter),
+		_$braceRight: $ => alias($.__just_rightBrace, $.delimiter),
+		_$bracketLeft: $ => alias($.__just_leftBracket, $.delimiter),
+		_$bracketRight: $ => alias($.__just_rightBracket, $.delimiter),
 		
 		
 	},

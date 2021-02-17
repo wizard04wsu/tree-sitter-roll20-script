@@ -29,8 +29,8 @@ enum TokenType {
 	//LABEL_START,
 	//LABEL_END,
 	
-	//INLINE_ROLL_START,
-	//INLINE_ROLL_END,
+	INLINE_ROLL_START,
+	INLINE_ROLL_END,
 	
 	//PARENTHESIZED_START,
 	//PARENTHESIZED_END,
@@ -41,7 +41,6 @@ enum TokenType {
 	DICE_ROLL_START,
 	
 	TABLE_ROLL_START,
-	//TABLE_ROLL_END,
 	
 	
 	JUST_AT,
@@ -51,15 +50,15 @@ enum TokenType {
 	JUST_D,
 	JUST_T,
 	JUST_QUESTIONMARK,
+	JUST_LEFTBRACE,
 	JUST_PIPE,
-	//JUST_COMMA,
-	//JUST_LEFTBRACE,
-	//JUST_RIGHTBRACE,
-	//JUST_LEFTBRACKET,
-	//JUST_RIGHTBRACKET,
+	JUST_COMMA,
+	JUST_RIGHTBRACE,
+	JUST_LEFTBRACKET,
+	JUST_RIGHTBRACKET,
 	
 	INTEGER,
-	DECIMAL,
+	JUST_DECIMALPOINT,
 	
 	_EOF,
 };
@@ -120,6 +119,8 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[QUERY_PIPE_HASDEFAULT]?"QUERY_PIPE_HASDEFAULT, ":"")
 		 << (valid_symbols[QUERY_PIPE_HASOPTIONS]?"QUERY_PIPE_HASOPTIONS, ":"")
 		 << (valid_symbols[QUERY_END]?"QUERY_END, ":"")
+		 << (valid_symbols[INLINE_ROLL_START]?"INLINE_ROLL_START, ":"")
+		 << (valid_symbols[INLINE_ROLL_END]?"INLINE_ROLL_END, ":"")
 		 << (valid_symbols[DICE_ROLL_START]?"DICE_ROLL_START, ":"")
 		 << (valid_symbols[TABLE_ROLL_START]?"TABLE_ROLL_START, ":"")
 		 << (valid_symbols[JUST_AT]?"JUST_AT, ":"")
@@ -129,9 +130,14 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[JUST_D]?"JUST_D, ":"")
 		 << (valid_symbols[JUST_T]?"JUST_T, ":"")
 		 << (valid_symbols[JUST_QUESTIONMARK]?"JUST_QUESTIONMARK, ":"")
+		 << (valid_symbols[JUST_LEFTBRACE]?"JUST_LEFTBRACE, ":"")
 		 << (valid_symbols[JUST_PIPE]?"JUST_PIPE, ":"")
+		 << (valid_symbols[JUST_COMMA]?"JUST_COMMA, ":"")
+		 << (valid_symbols[JUST_RIGHTBRACE]?"JUST_RIGHTBRACE, ":"")
+		 << (valid_symbols[JUST_LEFTBRACKET]?"JUST_LEFTBRACKET, ":"")
+		 << (valid_symbols[JUST_RIGHTBRACKET]?"JUST_RIGHTBRACKET, ":"")
 		 << (valid_symbols[INTEGER]?"INTEGER, ":"")
-		 << (valid_symbols[DECIMAL]?"DECIMAL, ":"")
+		 << (valid_symbols[JUST_DECIMALPOINT]?"JUST_DECIMALPOINT, ":"")
 		 << (valid_symbols[_EOF]?"_EOF, ":"")
 		 << "\n";
 }
@@ -269,7 +275,7 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 				c = advance(lexer);
 			}
 			else {
-				charsRxp = regex("\\d");	//decimal code
+				charsRxp = regex("\\d");	//JUST_DECIMALPOINT code
 			}
 		}
 		else {
@@ -675,6 +681,214 @@ struct Scanner {
 				}
 			}
 		}
+		else if (c == 'd' || c == 'D') {
+			if (valid_symbols[DICE_ROLL_START] || valid_symbols[JUST_D]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (valid_symbols[DICE_ROLL_START]) {
+					if (scan_diceRoll_start(lexer)) {
+						logTokenType(lexer, "DICE_ROLL_START");
+						lexer->result_symbol = DICE_ROLL_START;
+						return true;
+					}
+				}
+				
+				if (valid_symbols[JUST_D]) {
+					logTokenType(lexer, "JUST_D");
+					lexer->result_symbol = JUST_D;
+					return true;
+				}
+			}
+		}
+		else if (c == 't' || c == 'T') {
+			if (valid_symbols[TABLE_ROLL_START] || valid_symbols[JUST_T]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (valid_symbols[TABLE_ROLL_START]) {
+					if (scan_tableRoll_start(lexer)) {
+						logTokenType(lexer, "TABLE_ROLL_START");
+						lexer->result_symbol = TABLE_ROLL_START;
+						return true;
+					}
+				}
+				
+				if (valid_symbols[JUST_T]) {
+					logTokenType(lexer, "JUST_T");
+					lexer->result_symbol = JUST_T;
+					return true;
+				}
+			}
+		}
+		else if (c == '?') {
+			if (valid_symbols[QUERY_START] || valid_symbols[JUST_QUESTIONMARK]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (valid_symbols[QUERY_START]) {
+					if (c == '{') {
+						advance(lexer);
+						
+						Query *query = new Query(this, queries.size());
+						queries.push(query);
+						queryType = 0;
+						logPushQuery();
+						
+						if (queries.top()->scan_query(lexer, &queryType, queries.size()-1)) {
+							logTokenType(lexer, "QUERY_START");
+							lexer->result_symbol = QUERY_START;
+							return true;
+						}
+						
+						//else it's unclosed or empty
+						queries.pop();
+						logPopQuery();
+						return false;
+					}
+				}
+				
+				if (valid_symbols[JUST_QUESTIONMARK]) {
+					logTokenType(lexer, "JUST_QUESTIONMARK");
+					lexer->result_symbol = JUST_QUESTIONMARK;
+					return true;
+				}
+			}
+		}
+		else if (c == '{') {
+			if (valid_symbols[JUST_LEFTBRACE]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_LEFTBRACE");
+				lexer->result_symbol = JUST_LEFTBRACE;
+				return true;
+			}
+		}
+		else if (c == '|') {
+			if (valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS] || valid_symbols[JUST_PIPE]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() == 1) {
+					if (queryType & QT_TEXTBOX) {
+						logTokenType(lexer, "QUERY_PIPE_HASDEFAULT");
+						lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
+						return true;
+					}
+					else if (queryType & QT_OPTIONS) {
+						logTokenType(lexer, "QUERY_PIPE_HASOPTIONS");
+						lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
+						return true;
+					}
+				}
+				
+				if (valid_symbols[JUST_PIPE]) {
+					logTokenType(lexer, "JUST_PIPE");
+					lexer->result_symbol = JUST_PIPE;
+					return true;
+				}
+			}
+		}
+		else if (c == ',') {
+			if (valid_symbols[JUST_COMMA]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_COMMA");
+				lexer->result_symbol = JUST_COMMA;
+				return true;
+			}
+		}
+		else if (c == '}') {
+			if (valid_symbols[QUERY_END] && queries.size() == 1) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "QUERY_END");
+				lexer->result_symbol = QUERY_END;
+				queries.pop();
+				logPopQuery();
+				return true;
+			}
+			
+			if (valid_symbols[JUST_RIGHTBRACE]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_RIGHTBRACE");
+				lexer->result_symbol = JUST_RIGHTBRACE;
+				return true;
+			}
+		}
+		else if (c == '[') {
+			if (valid_symbols[INLINE_ROLL_START]) {
+				c = advance(lexer);
+				
+				if (c == '[') {
+					advance(lexer);
+					mark_end(lexer);
+					
+					logTokenType(lexer, "INLINE_ROLL_START");
+					lexer->result_symbol = INLINE_ROLL_START;
+					return true;
+				}
+			}
+			
+			if (valid_symbols[JUST_LEFTBRACKET]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_LEFTBRACKET");
+				lexer->result_symbol = JUST_LEFTBRACKET;
+				return true;
+			}
+		}
+		else if (c == ']') {
+			if (valid_symbols[INLINE_ROLL_END]) {
+				c = advance(lexer);
+				
+				if (c == ']') {
+					advance(lexer);
+					mark_end(lexer);
+					
+					logTokenType(lexer, "INLINE_ROLL_END");
+					lexer->result_symbol = INLINE_ROLL_END;
+					return true;
+				}
+			}
+			
+			if (valid_symbols[JUST_RIGHTBRACKET]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_RIGHTBRACKET");
+				lexer->result_symbol = JUST_RIGHTBRACKET;
+				return true;
+			}
+		}
+		else if (c == '.') {
+			if (valid_symbols[JUST_DECIMALPOINT]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_DECIMALPOINT");
+				lexer->result_symbol = JUST_DECIMALPOINT;
+				return true;
+			}
+		}
+		else if (c >= 48 && c <= 57) {
+			if (valid_symbols[INTEGER]) {
+				do {
+					c = advance(lexer);
+				} while (matchNumbers(string({c}), "", 0) != "");
+				mark_end(lexer);
+				
+				logTokenType(lexer, "INTEGER");
+				lexer->result_symbol = INTEGER;
+				return true;
+			}
+		}
 		else if (c == '&') {
 			if (depth > 0) {
 				advance(lexer);
@@ -725,16 +939,13 @@ struct Scanner {
 						}
 					}
 				}
-				else if (delimAtDepth == "}") {
-					logEntity("}");
-					if (valid_symbols[QUERY_END] && queries.size() > 0) {
-						c = lexer->lookahead;
+				else if (delimAtDepth == "{") {
+					logEntity("{");
+					if (valid_symbols[JUST_LEFTBRACE]) {
 						mark_end(lexer);
 						
-						logTokenType(lexer, "QUERY_END");
-						lexer->result_symbol = QUERY_END;
-						queries.pop();
-						logPopQuery();
+						logTokenType(lexer, "JUST_LEFTBRACE");
+						lexer->result_symbol = JUST_LEFTBRACE;
 						return true;
 					}
 				}
@@ -766,13 +977,104 @@ struct Scanner {
 						}
 					}
 				}
-				else if (delimAtOrAbove == ".") {
-					logEntity(".");
-					if (valid_symbols[DECIMAL]) {
+				else if (delimAtDepth == ",") {
+					logEntity(",");
+					if (valid_symbols[JUST_COMMA]) {
 						mark_end(lexer);
 						
-						logTokenType(lexer, "DECIMAL");
-						lexer->result_symbol = DECIMAL;
+						logTokenType(lexer, "JUST_COMMA");
+						lexer->result_symbol = JUST_COMMA;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "}") {
+					logEntity("}");
+					if (valid_symbols[QUERY_END] && queries.size() > 0) {
+						c = lexer->lookahead;
+						mark_end(lexer);
+						
+						logTokenType(lexer, "QUERY_END");
+						lexer->result_symbol = QUERY_END;
+						queries.pop();
+						logPopQuery();
+						return true;
+					}
+					
+					if (valid_symbols[JUST_RIGHTBRACE]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_RIGHTBRACE");
+						lexer->result_symbol = JUST_RIGHTBRACE;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "[") {
+					logEntity("[");
+					if (valid_symbols[INLINE_ROLL_START]) {
+						c = lexer->lookahead;
+						
+						delimAtOrAbove = "";
+						if (c == '&') {
+							advance(lexer);
+							entity = get_entity(lexer, depth, true);
+							delimAtOrAbove = matchDelimiters(entity, "[", depth, true);
+						}
+						
+						if (c == '[' || delimAtOrAbove == "[") {
+							if (c == '[') advance(lexer);
+							mark_end(lexer);
+							
+							logTokenType(lexer, "INLINE_ROLL_START");
+							lexer->result_symbol = INLINE_ROLL_START;
+							return true;
+						}
+					}
+					
+					if (valid_symbols[JUST_LEFTBRACKET]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_LEFTBRACKET");
+						lexer->result_symbol = JUST_LEFTBRACKET;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "]") {
+					logEntity("]");
+					if (valid_symbols[INLINE_ROLL_END]) {
+						c = lexer->lookahead;
+						
+						delimAtOrAbove = "";
+						if (c == '&') {
+							advance(lexer);
+							entity = get_entity(lexer, depth, true);
+							delimAtOrAbove = matchDelimiters(entity, "]", depth, true);
+						}
+						
+						if (c == ']' || delimAtOrAbove == "]") {
+							if (c == ']') advance(lexer);
+							mark_end(lexer);
+							
+							logTokenType(lexer, "INLINE_ROLL_END");
+							lexer->result_symbol = INLINE_ROLL_END;
+							return true;
+						}
+					}
+					
+					if (valid_symbols[JUST_RIGHTBRACKET]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_RIGHTBRACKET");
+						lexer->result_symbol = JUST_RIGHTBRACKET;
+						return true;
+					}
+				}
+				else if (delimAtOrAbove == ".") {
+					logEntity(".");
+					if (valid_symbols[JUST_DECIMALPOINT]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_DECIMALPOINT");
+						lexer->result_symbol = JUST_DECIMALPOINT;
 						return true;
 					}
 				}
@@ -804,149 +1106,6 @@ struct Scanner {
 				
 				logTokenType(lexer, "JUST_AMPERSAND");
 				lexer->result_symbol = JUST_AMPERSAND;
-				return true;
-			}
-		}
-		else if (c == 'd' || c == 'D') {
-			if (valid_symbols[DICE_ROLL_START] || valid_symbols[JUST_D]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				if (valid_symbols[DICE_ROLL_START]) {
-					if (scan_diceRoll_start(lexer)) {
-						logTokenType(lexer, "DICE_ROLL_START");
-						lexer->result_symbol = DICE_ROLL_START;
-						return true;
-					}
-				}
-				
-				if (valid_symbols[JUST_D]) {
-					logTokenType(lexer, "JUST_D");
-					lexer->result_symbol = JUST_D;
-					return true;
-				}
-			}
-		}
-		else if (c == 't' || c == 'T') {
-			if (valid_symbols[TABLE_ROLL_START] || valid_symbols[JUST_T]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				if (valid_symbols[TABLE_ROLL_START]) {
-					if (scan_tableRoll_start(lexer)) {
-						logTokenType(lexer, "TABLE_ROLL_START");
-						lexer->result_symbol = TABLE_ROLL_START;
-						return true;
-					}
-				}
-				
-				if (valid_symbols[JUST_T]) {
-					logTokenType(lexer, "JUST_T");
-					lexer->result_symbol = JUST_T;
-					return true;
-				}
-			}
-		}
-		else if (c == '?') {
-			if (valid_symbols[QUERY_START] || valid_symbols[JUST_QUESTIONMARK]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				if (valid_symbols[QUERY_START]) {
-					delimAtOrAbove = "";
-					if (c == '&') {
-						advance(lexer);
-						entity = get_entity(lexer, depth, true);
-						delimAtOrAbove = matchDelimiters(entity, "{", depth, true);
-					}
-					
-					if (c == '{' || delimAtOrAbove == "{") {
-						if (c == '{') advance(lexer);
-						
-						Query *query = new Query(this, queries.size());
-						queries.push(query);
-						queryType = 0;
-						logPushQuery();
-						
-						if (queries.top()->scan_query(lexer, &queryType, queries.size()-1)) {
-							logTokenType(lexer, "QUERY_START");
-							lexer->result_symbol = QUERY_START;
-							return true;
-						}
-						
-						//else it's unclosed or empty
-						queries.pop();
-						logPopQuery();
-						return false;
-					}
-				}
-				
-				if (valid_symbols[JUST_QUESTIONMARK]) {
-					logTokenType(lexer, "JUST_QUESTIONMARK");
-					lexer->result_symbol = JUST_QUESTIONMARK;
-					return true;
-				}
-			}
-		}
-		else if (c == '|') {
-			if (valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS] || valid_symbols[JUST_PIPE]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				if ((valid_symbols[QUERY_PIPE_HASDEFAULT] || valid_symbols[QUERY_PIPE_HASOPTIONS]) && queries.size() == 1) {
-					if (queryType & QT_TEXTBOX) {
-						logTokenType(lexer, "QUERY_PIPE_HASDEFAULT");
-						lexer->result_symbol = QUERY_PIPE_HASDEFAULT;
-						return true;
-					}
-					else if (queryType & QT_OPTIONS) {
-						logTokenType(lexer, "QUERY_PIPE_HASOPTIONS");
-						lexer->result_symbol = QUERY_PIPE_HASOPTIONS;
-						return true;
-					}
-				}
-				
-				if (valid_symbols[JUST_PIPE]) {
-					logTokenType(lexer, "JUST_PIPE");
-					lexer->result_symbol = JUST_PIPE;
-					return true;
-				}
-			}
-		}
-		else if (c == '}') {
-			if (valid_symbols[QUERY_END] && queries.size() == 1) {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				logTokenType(lexer, "QUERY_END");
-				lexer->result_symbol = QUERY_END;
-				queries.pop();
-				logPopQuery();
-				return true;
-			}
-		}
-		else if (c == '.') {
-			if (valid_symbols[DECIMAL]) {
-				advance(lexer);
-				mark_end(lexer);
-				
-				logTokenType(lexer, "DECIMAL");
-				lexer->result_symbol = DECIMAL;
-				return true;
-			}
-		}
-		else if (matchNumbers(string({c}), "", depth) != "") {
-			if (valid_symbols[INTEGER]) {
-				do {
-					c = advance(lexer);
-					mark_end(lexer);
-					if (c == '&') entity = get_entity(lexer, depth, true);
-					else entity = string({c});
-				} while (matchNumbers(entity, "", depth) != "");
-				mark_end(lexer);
-				
-				logTokenType(lexer, "INTEGER");
-				lexer->result_symbol = INTEGER;
 				return true;
 			}
 		}

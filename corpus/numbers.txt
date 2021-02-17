@@ -5,7 +5,9 @@ Number: Valid: [[5]]
 ---
 (roll20_script
 	(inlineRoll
-		(number)))
+		(delimiter)
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[55.55]]
@@ -14,7 +16,9 @@ Number: Valid: [[55.55]]
 ---
 (roll20_script
 	(inlineRoll
-		(number)))
+		(delimiter)
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[5.5]]
@@ -23,7 +27,9 @@ Number: Valid: [[5.5]]
 ---
 (roll20_script
 	(inlineRoll
-		(number)))
+		(delimiter)
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[ 5.5 ]]
@@ -32,7 +38,9 @@ Number: Valid: [[ 5.5 ]]
 ---
 (roll20_script
 	(inlineRoll
-		(number)))
+		(delimiter)
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[-5.5]]
@@ -41,8 +49,10 @@ Number: Valid: [[-5.5]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
-		(number)))
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[ -5.5 ]]
@@ -51,8 +61,10 @@ Number: Valid: [[ -5.5 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
-		(number)))
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[+5]]
@@ -61,8 +73,10 @@ Number: Valid: [[+5]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
-		(number)))
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[ +5 ]]
@@ -71,8 +85,10 @@ Number: Valid: [[ +5 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
-		(number)))
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[.5]]
@@ -81,7 +97,9 @@ Number: Valid: [[.5]]
 ---
 (roll20_script
 	(inlineRoll
-		(number)))
+		(delimiter)
+		(number)
+		(delimiter)))
 
 ==================
 Number: Valid: [[ .5 ]]
@@ -90,7 +108,9 @@ Number: Valid: [[ .5 ]]
 ---
 (roll20_script
 	(inlineRoll
-		(number)))
+		(delimiter)
+		(number)
+		(delimiter)))
 
 ==================
 Number: Invalid: [[-.5]]
@@ -99,8 +119,10 @@ Number: Invalid: [[-.5]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(invalid
-			(operator))))
+			(operator))
+		(delimiter)))
 
 ==================
 Number: Invalid: [[ -.5 ]]
@@ -109,8 +131,10 @@ Number: Invalid: [[ -.5 ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(invalid
-			(operator))))
+			(operator))
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5_]]
@@ -119,8 +143,10 @@ Number: Valid with Invalid Remainder: [[5_]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[ 5_ ]]
@@ -129,8 +155,10 @@ Number: Valid with Invalid Remainder: [[ 5_ ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[-5_]]
@@ -139,9 +167,11 @@ Number: Valid with Invalid Remainder: [[-5_]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[ -5_ ]]
@@ -150,9 +180,11 @@ Number: Valid with Invalid Remainder: [[ -5_ ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5.]]
@@ -161,8 +193,10 @@ Number: Valid with Invalid Remainder: [[5.]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[ 5. ]]
@@ -171,8 +205,10 @@ Number: Valid with Invalid Remainder: [[ 5. ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[-5.]]
@@ -181,9 +217,11 @@ Number: Valid with Invalid Remainder: [[-5.]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[ -5. ]]
@@ -192,9 +230,11 @@ Number: Valid with Invalid Remainder: [[ -5. ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5._]]
@@ -203,8 +243,10 @@ Number: Valid with Invalid Remainder: [[5._]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[ 5._ ]]
@@ -213,8 +255,10 @@ Number: Valid with Invalid Remainder: [[ 5._ ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[-5._]]
@@ -223,9 +267,11 @@ Number: Valid with Invalid Remainder: [[-5._]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[ -5._ ]]
@@ -234,9 +280,11 @@ Number: Valid with Invalid Remainder: [[ -5._ ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5.5.]]
@@ -245,8 +293,10 @@ Number: Valid with Invalid Remainder: [[5.5.]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5.5_]]
@@ -255,8 +305,10 @@ Number: Valid with Invalid Remainder: [[5.5_]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[-5.5.]]
@@ -265,9 +317,11 @@ Number: Valid with Invalid Remainder: [[-5.5.]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[-5.5_]]
@@ -276,9 +330,11 @@ Number: Valid with Invalid Remainder: [[-5.5_]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Invalid: [[.]]
@@ -287,7 +343,9 @@ Number: Invalid: [[.]]
 ---
 (roll20_script
 	(inlineRoll
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Invalid: [[ . ]]
@@ -296,7 +354,9 @@ Number: Invalid: [[ . ]]
 ---
 (roll20_script
 	(inlineRoll
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Invalid: [[-.]]
@@ -305,8 +365,10 @@ Number: Invalid: [[-.]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(invalid
-			(operator))))
+			(operator))
+		(delimiter)))
 
 ==================
 Number: Invalid: [[ -. ]]
@@ -315,8 +377,10 @@ Number: Invalid: [[ -. ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(invalid
-			(operator))))
+			(operator))
+		(delimiter)))
 
 ==================
 Number: Invalid: [[._]]
@@ -325,7 +389,9 @@ Number: Invalid: [[._]]
 ---
 (roll20_script
 	(inlineRoll
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Invalid: [[ ._ ]]
@@ -334,7 +400,9 @@ Number: Invalid: [[ ._ ]]
 ---
 (roll20_script
 	(inlineRoll
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Invalid: [[-._]]
@@ -343,8 +411,10 @@ Number: Invalid: [[-._]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(invalid
-			(operator))))
+			(operator))
+		(delimiter)))
 
 ==================
 Number: Invalid: [[ -._ ]]
@@ -353,8 +423,10 @@ Number: Invalid: [[ -._ ]]
 ---
 (roll20_script
 	(inlineRoll
+		(delimiter)
 		(invalid
-			(operator))))
+			(operator))
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5d]]
@@ -363,8 +435,10 @@ Number: Valid with Invalid Remainder: [[5d]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[5d_]]
@@ -373,8 +447,10 @@ Number: Valid with Invalid Remainder: [[5d_]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Number: Valid with Invalid Remainder: [[-5d6]]
@@ -383,9 +459,11 @@ Number: Valid with Invalid Remainder: [[-5d6]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(operator)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Inline Roll: Valid: [[5d6]]
@@ -394,11 +472,14 @@ Inline Roll: Valid: [[5d6]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(diceRoll
 			(count
 				(number))
+			(delimiter)
 			(sides
-				(number)))))
+				(number)))
+		(delimiter)))
 
 ==================
 Inline Roll: Valid: [[5.5.5]]
@@ -407,6 +488,8 @@ Inline Roll: Valid: [[5.5.5]]
 ---
 (roll20_script
  	(inlineRoll
+		(delimiter)
 		(number)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 

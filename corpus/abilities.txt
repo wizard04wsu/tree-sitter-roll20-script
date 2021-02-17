@@ -5,8 +5,10 @@ Ability: Valid: %{c|a}
 ---
 (roll20_script
 	(ability
+		(delimiter)
 		(characterName)
-		(abilityName)))
+		(abilityName)
+		(delimiter)))
 
 ==================
 Ability: Valid: %{selected|a}
@@ -15,8 +17,10 @@ Ability: Valid: %{selected|a}
 ---
 (roll20_script
 	(ability
+		(delimiter)
 		(token)
-		(abilityName)))
+		(abilityName)
+		(delimiter)))
 
 ==================
 Ability: Valid: %{target|a}
@@ -25,8 +29,10 @@ Ability: Valid: %{target|a}
 ---
 (roll20_script
 	(ability
+		(delimiter)
 		(token)
-		(abilityName)))
+		(abilityName)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{}
@@ -34,7 +40,9 @@ Ability: Invalid: %{}
 %{}
 ---
 (roll20_script
- 	(invalid))
+ 	(invalid
+		(delimiter)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{|}
@@ -43,7 +51,9 @@ Ability: Invalid: %{|}
 ---
 (roll20_script
 	(ability
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{||}
@@ -52,7 +62,9 @@ Ability: Invalid: %{||}
 ---
 (roll20_script
 	(ability
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{c|}
@@ -61,8 +73,10 @@ Ability: Invalid: %{c|}
 ---
 (roll20_script
 	(ability
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{|a}
@@ -71,7 +85,9 @@ Ability: Invalid: %{|a}
 ---
 (roll20_script
 	(ability
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{c||}
@@ -80,8 +96,10 @@ Ability: Invalid: %{c||}
 ---
 (roll20_script
 	(ability
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{|a|}
@@ -90,7 +108,9 @@ Ability: Invalid: %{|a|}
 ---
 (roll20_script
 	(ability
-		(invalid)))
+		(delimiter)
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability: Invalid: %{c|a|}
@@ -99,8 +119,10 @@ Ability: Invalid: %{c|a|}
 ---
 (roll20_script
 	(ability
+		(delimiter)
 		(characterName)
-		(invalid)))
+		(invalid)
+		(delimiter)))
 
 ==================
 Ability w/o closing brace: Invalid: %{c
@@ -134,7 +156,9 @@ Ability w/ Attribute character sequence: Invalid: %{x@{y}
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Ability w/ Attribute character sequence: Invalid: %{x@{y}z
@@ -144,7 +168,9 @@ Ability w/ Attribute character sequence: Invalid: %{x@{y}z
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Ability w/ Attribute character sequence: Invalid: %{x@{y}z}
@@ -154,7 +180,9 @@ Ability w/ Attribute character sequence: Invalid: %{x@{y}z}
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Ability w/ Attribute character sequence: Invalid: %{x@{y}|
@@ -164,7 +192,9 @@ Ability w/ Attribute character sequence: Invalid: %{x@{y}|
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Ability w/ Attribute character sequence: Invalid: %{x@{y}|z
@@ -174,7 +204,9 @@ Ability w/ Attribute character sequence: Invalid: %{x@{y}|z
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
 ==================
 Ability w/ Attribute character sequence: Invalid: %{x@{y}|z}
@@ -184,5 +216,7 @@ Ability w/ Attribute character sequence: Invalid: %{x@{y}|z}
 (roll20_script
 	(invalid)
 	(attribute
-		(attributeName)))
+		(delimiter)
+		(attributeName)
+		(delimiter)))
 
