@@ -4,7 +4,7 @@ Macro: Valid: ##
 ##
 ---
 (roll20_script
-	(macroHash))
+	(macro (macroHash)))
 		
 ==================
 Macro: Valid: #m
@@ -12,7 +12,7 @@ Macro: Valid: #m
 #m
 ---
 (roll20_script
-	(macroHash))
+	(macro (macroHash)))
 		
 ==================
 Macro: Valid: #m#
@@ -20,7 +20,7 @@ Macro: Valid: #m#
 #m#
 ---
 (roll20_script
-	(macroHash))
+	(macro (macroHash)))
 		
 ==================
 Macro: Valid: #m#m
@@ -28,7 +28,7 @@ Macro: Valid: #m#m
 #m#m
 ---
 (roll20_script
-	(macroHash))
+	(macro (macroHash)))
 		
 ==================
 Macro: Valid: # #m
@@ -36,7 +36,7 @@ Macro: Valid: # #m
 # #m
 ---
 (roll20_script
-	(macroHash))
+	(macro (macroHash)))
 		
 ==================
 Macro: Valid: #m #
@@ -44,7 +44,7 @@ Macro: Valid: #m #
 #m #
 ---
 (roll20_script
-	(macroHash))
+	(macro (macroHash)))
 		
 ==================
 Macro: Valid: #m #m
@@ -52,68 +52,60 @@ Macro: Valid: #m #m
 #m #m
 ---
 (roll20_script
-	(macroHash)
-	(macroHash))
+	(macro (macroHash))
+	(macro (macroHash)))
 		
 ==================
-Macro: Valid with Attributes: #m@{a}
+Macro: Valid: #m@{a}
 ==================
 #m@{a}
 ---
 (roll20_script
-	(macroHash)
-	(attribute
-		(delimiter)
-		(attributeName)
-		(delimiter)))
+	(macro (macroHash)
+		(attribute (delimiter)
+			(attributeName) (delimiter))))
 
 ==================
-Macro: Valid with Attributes: #m@{a}m
+Macro: Valid: #m@{a}m
 ==================
 #m@{a}m
 ---
 (roll20_script
-	(macroHash)
-	(attribute
-		(delimiter)
-		(attributeName)
-		(delimiter)))
+	(macro (macroHash)
+		(attribute (delimiter)
+			(attributeName) (delimiter))))
 
 ==================
-Macro: Valid with Attributes: #m@{c|a}
+Macro: Valid: #m@{c|a}
 ==================
 #m@{c|a}
 ---
 (roll20_script
-	(macroHash)
-	(attribute
-		(delimiter)
-		(characterName)
-		(attributeName)
-		(delimiter)))
+	(macro (macroHash)
+		(attribute (delimiter)
+			(characterName) (delimiter)
+			(attributeName) (delimiter))))
 
 ==================
-Macro: Valid with Attributes: #m@{c|a}m
+Macro: Valid: #m@{c|a}m
 ==================
 #m@{c|a}m
 ---
 (roll20_script
-	(macroHash)
-	(attribute
-		(delimiter)
-		(characterName)
-		(attributeName)
-		(delimiter)))
+	(macro (macroHash)
+		(attribute (delimiter)
+			(characterName) (delimiter)
+			(attributeName) (delimiter))))
 
 ==================
-String: #
+Macro: Valid: #
 ==================
 #
 ---
 (roll20_script)
 
 ==================
-String: # #
+Macro: Valid: # #
 ==================
 # #
 ---

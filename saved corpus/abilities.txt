@@ -7,6 +7,7 @@ Ability: Valid: %{c|a}
 	(ability
 		(delimiter)
 		(characterName)
+		(delimiter)
 		(abilityName)
 		(delimiter)))
 
@@ -19,6 +20,7 @@ Ability: Valid: %{selected|a}
 	(ability
 		(delimiter)
 		(token)
+		(delimiter)
 		(abilityName)
 		(delimiter)))
 
@@ -31,6 +33,7 @@ Ability: Valid: %{target|a}
 	(ability
 		(delimiter)
 		(token)
+		(delimiter)
 		(abilityName)
 		(delimiter)))
 
@@ -40,9 +43,7 @@ Ability: Invalid: %{}
 %{}
 ---
 (roll20_script
- 	(invalid
-		(delimiter)
-		(delimiter)))
+ 	(invalid))
 
 ==================
 Ability: Invalid: %{|}
@@ -98,6 +99,7 @@ Ability: Invalid: %{c||}
 	(ability
 		(delimiter)
 		(characterName)
+		(delimiter)
 		(invalid)
 		(delimiter)))
 
@@ -121,6 +123,7 @@ Ability: Invalid: %{c|a|}
 	(ability
 		(delimiter)
 		(characterName)
+		(delimiter)
 		(invalid)
 		(delimiter)))
 

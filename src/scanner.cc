@@ -13,13 +13,16 @@ using namespace std;
 
 
 enum TokenType {
+	INTEGER,
+	
 	ATTRIBUTE_START,
 	
 	ABILITY_START,
 	
-	MACRO_START,
+	MACRO_SAFE_START,
+	MACRO_UNSAFE_START,
 	
-	//HTML_ENTITY,
+	HTML_ENTITY,
 	
 	QUERY_START,
 	QUERY_PIPE_HASDEFAULT,
@@ -42,7 +45,6 @@ enum TokenType {
 	
 	TABLE_ROLL_START,
 	
-	
 	JUST_AT,
 	JUST_PERCENT,
 	JUST_HASH,
@@ -56,9 +58,16 @@ enum TokenType {
 	JUST_RIGHTBRACE,
 	JUST_LEFTBRACKET,
 	JUST_RIGHTBRACKET,
+	JUST_LEFTPAREN,
+	JUST_RIGHTPAREN,
+	JUST_PERIOD,
 	
-	INTEGER,
-	JUST_DECIMALPOINT,
+	JUST_SLASH,
+	JUST_ASTERISK,
+	JUST_PLUS,
+	JUST_DASH,
+	OPERATOR_POSITIVE,
+	OPERATOR_NEGATIVE,
 	
 	_EOF,
 };
@@ -112,9 +121,12 @@ void logFunction(string functionName) { log(color(magenta)+functionName); }
 void logValidSymbols(const bool *valid_symbols) {
 	if (!debugging || !log_valid_symbols) return;
 	cout << color(darkGray) //<< "Valid symbols:" << "\n"
+		 << (valid_symbols[INTEGER]?"INTEGER, ":"")
 		 << (valid_symbols[ATTRIBUTE_START]?"ATTRIBUTE_START, ":"")
 		 << (valid_symbols[ABILITY_START]?"ABILITY_START, ":"")
-		 << (valid_symbols[MACRO_START]?"MACRO_START, ":"")
+		 << (valid_symbols[MACRO_SAFE_START]?"MACRO_SAFE_START, ":"")
+		 << (valid_symbols[MACRO_UNSAFE_START]?"MACRO_UNSAFE_START, ":"")
+		 << (valid_symbols[HTML_ENTITY]?"HTML_ENTITY, ":"")
 		 << (valid_symbols[QUERY_START]?"QUERY_START, ":"")
 		 << (valid_symbols[QUERY_PIPE_HASDEFAULT]?"QUERY_PIPE_HASDEFAULT, ":"")
 		 << (valid_symbols[QUERY_PIPE_HASOPTIONS]?"QUERY_PIPE_HASOPTIONS, ":"")
@@ -136,8 +148,9 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[JUST_RIGHTBRACE]?"JUST_RIGHTBRACE, ":"")
 		 << (valid_symbols[JUST_LEFTBRACKET]?"JUST_LEFTBRACKET, ":"")
 		 << (valid_symbols[JUST_RIGHTBRACKET]?"JUST_RIGHTBRACKET, ":"")
-		 << (valid_symbols[INTEGER]?"INTEGER, ":"")
-		 << (valid_symbols[JUST_DECIMALPOINT]?"JUST_DECIMALPOINT, ":"")
+		 << (valid_symbols[JUST_LEFTPAREN]?"JUST_LEFTPAREN, ":"")
+		 << (valid_symbols[JUST_RIGHTPAREN]?"JUST_RIGHTPAREN, ":"")
+		 << (valid_symbols[JUST_PERIOD]?"JUST_PERIOD, ":"")
 		 << (valid_symbols[_EOF]?"_EOF, ":"")
 		 << "\n";
 }
@@ -162,6 +175,8 @@ map<string, string> entitiesMap = {
 	{"[", "#91|#[xX](00)?5[bB]|lsqb|lbrack"},
 	{"(", "#40|#[xX](00)?28|lpar"},
 	{"{", "#123|#[xX](00)?7[bB]|lcub|lbrace"},
+	{"/", "#47|#[xX](00)?2[fF]|sol"},
+	{"*", "#42|#[xX](00)?2[aA]|ast"},
 	{"+", "#43|#[xX](00)?2[bB]|plus"},
 	{"-", "#45|#[xX](00)?2[dD]|dash|hyphen"},
 	{"}", "#125|#[xX](00)?7[dD]|rcub|rbrace"},
@@ -275,7 +290,7 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 				c = advance(lexer);
 			}
 			else {
-				charsRxp = regex("\\d");	//JUST_DECIMALPOINT code
+				charsRxp = regex("\\d");	//decimal code
 			}
 		}
 		else {
@@ -335,12 +350,14 @@ bool scan_placeholder(TSLexer *lexer) {
 	logFunction("scan_placeholder");
 	char c = lexer->lookahead;
 	if (c == '{') {
+		c = advance(lexer);
+		if (c == '}') return false;	//empty
 		while (c != '}' && c != 0 && c != '\n') {
-			c = advance(lexer);
 			if (c == '@' || c == '%') {
 				c = advance(lexer);
-				if (c == '{') break;
+				if (c == '{') return false;	//start of a nested placeholder
 			}
+			c = advance(lexer);
 		}
 		if (c == '}') {
 			advance(lexer);
@@ -356,22 +373,39 @@ bool scan_macro_start(TSLexer *lexer, unsigned depth) {
 	char c = lexer->lookahead;
 	
 	while (c == '\r') { c = advance(lexer); }
-	if (c == 0 || c == ' ' || c == '\n') return false;
+	if (c == 0 || c == ' ' || c == '\n') {
+	//no macro name
+		return false;
+	}
 	
 	while (c != 0 && c != ' ' && c != '\n') {
-		if (depth > 0 && (c == '|' || c == '}')) break;
+		if (depth > 0 && c == '&') {
+			c = advance(lexer);
+			string entity = get_entity(lexer, depth, true);
+			if (entity != "") {
+				if (matchDelimiters(entity, "|,}", depth, false) != "") {
+				//found an unsafe character (valid for a macro name, but likely unintented)
+					return true;
+				}
+			}
+		}
+		
+		if (regex_match(string({c}), regex("[\\[({/*+\\-})\\]|]"))) {
+		//found an unsafe character (valid for a macro name, but likely unintented)
+			return true;
+		}
+		
 		if (c == '@' || c == '%') {
 			c = advance(lexer);
-			if (c == '{' && !scan_placeholder(lexer)) return false;
+			scan_placeholder(lexer);
+			c = lexer->lookahead;
 		}
 		else {
 			c = advance(lexer);
 		}
 	}
 	
-	if (c == 0 || c == ' ' || c == '\n') return true;
-	
-	return false;
+	return true;
 }
 
 //scan does not include the dice count or the 'd' or 'D'
@@ -662,15 +696,23 @@ struct Scanner {
 			}
 		}
 		else if (c == '#') {
-			if (valid_symbols[MACRO_START] || valid_symbols[JUST_HASH]) {
+			if (valid_symbols[MACRO_SAFE_START] || valid_symbols[MACRO_UNSAFE_START] || valid_symbols[JUST_HASH]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[MACRO_START]) {
+				if (valid_symbols[MACRO_SAFE_START] || valid_symbols[MACRO_UNSAFE_START]) {
 					if (scan_macro_start(lexer, depth)) {
-						logTokenType(lexer, "MACRO_START");
-						lexer->result_symbol = MACRO_START;
-						return true;
+						c = lexer->lookahead;
+						if ((c == 0 || c == ' ' || c == '\n') && valid_symbols[MACRO_SAFE_START]) {
+							logTokenType(lexer, "MACRO_SAFE_START");
+							lexer->result_symbol = MACRO_SAFE_START;
+							return true;
+						}
+						else {
+							logTokenType(lexer, "MACRO_UNSAFE_START");
+							lexer->result_symbol = MACRO_UNSAFE_START;
+							return true;
+						}
 					}
 				}
 				
@@ -736,6 +778,8 @@ struct Scanner {
 						logPushQuery();
 						
 						if (queries.top()->scan_query(lexer, &queryType, queries.size()-1)) {
+							mark_end(lexer);
+							
 							logTokenType(lexer, "QUERY_START");
 							lexer->result_symbol = QUERY_START;
 							return true;
@@ -836,7 +880,6 @@ struct Scanner {
 			}
 			
 			if (valid_symbols[JUST_LEFTBRACKET]) {
-				advance(lexer);
 				mark_end(lexer);
 				
 				logTokenType(lexer, "JUST_LEFTBRACKET");
@@ -867,13 +910,147 @@ struct Scanner {
 				return true;
 			}
 		}
-		else if (c == '.') {
-			if (valid_symbols[JUST_DECIMALPOINT]) {
+		else if (c == '(') {
+			if (valid_symbols[JUST_LEFTPAREN]) {
 				advance(lexer);
 				mark_end(lexer);
 				
-				logTokenType(lexer, "JUST_DECIMALPOINT");
-				lexer->result_symbol = JUST_DECIMALPOINT;
+				logTokenType(lexer, "JUST_LEFTPAREN");
+				lexer->result_symbol = JUST_LEFTPAREN;
+				return true;
+			}
+		}
+		else if (c == ')') {
+			if (valid_symbols[JUST_RIGHTPAREN]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_RIGHTPAREN");
+				lexer->result_symbol = JUST_RIGHTPAREN;
+				return true;
+			}
+		}
+		else if (c == '/') {
+			if (valid_symbols[JUST_SLASH]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_SLASH");
+				lexer->result_symbol = JUST_SLASH;
+				return true;
+			}
+		}
+		else if (c == '*') {
+			if (valid_symbols[JUST_ASTERISK]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_ASTERISK");
+				lexer->result_symbol = JUST_ASTERISK;
+				return true;
+			}
+		}
+		else if (c == '+') {
+			if (valid_symbols[JUST_PLUS]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (regex_match(string({c}), regex("[/*+\\-%\\s\\r\\n]"))) {
+					logTokenType(lexer, "JUST_PLUS");
+					lexer->result_symbol = JUST_PLUS;
+					return true;
+				}
+				
+				delimAtOrAbove = "";
+				if (c == '&') {
+					advance(lexer);
+					entity = get_entity(lexer, depth, true);
+					delimAtOrAbove = matchDelimiters(entity, "[/*+-%", depth, true);
+				}
+				
+				if (c == '[' || delimAtOrAbove == "[") {
+					c = advance(lexer);
+					
+					delimAtOrAbove = "";
+					if (c == '&') {
+						advance(lexer);
+						entity = get_entity(lexer, depth, true);
+						delimAtOrAbove = matchDelimiters(entity, "[", depth, true);
+					}
+					
+					if (c != '[' && delimAtOrAbove != "[") {
+						logTokenType(lexer, "JUST_PLUS");
+						lexer->result_symbol = JUST_PLUS;
+						return true;
+					}
+				}
+				else if (regex_match(delimAtOrAbove, regex("[/*+\\-%]"))) {
+					logTokenType(lexer, "JUST_PLUS");
+					lexer->result_symbol = JUST_PLUS;
+					return true;
+				}
+			}
+			
+			if (valid_symbols[OPERATOR_POSITIVE]) {
+				logTokenType(lexer, "OPERATOR_POSITIVE");
+				lexer->result_symbol = OPERATOR_POSITIVE;
+				return true;
+			}
+		}
+		else if (c == '-') {
+			if (valid_symbols[JUST_DASH]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (regex_match(string({c}), regex("[/*+\\-%\\s\\r\\n]"))) {
+					logTokenType(lexer, "JUST_DASH");
+					lexer->result_symbol = JUST_DASH;
+					return true;
+				}
+				
+				delimAtOrAbove = "";
+				if (c == '&') {
+					advance(lexer);
+					entity = get_entity(lexer, depth, true);
+					delimAtOrAbove = matchDelimiters(entity, "[/*+-%", depth, true);
+				}
+				
+				if (c == '[' || delimAtOrAbove == "[") {
+					c = advance(lexer);
+					
+					delimAtOrAbove = "";
+					if (c == '&') {
+						advance(lexer);
+						entity = get_entity(lexer, depth, true);
+						delimAtOrAbove = matchDelimiters(entity, "[", depth, true);
+					}
+					
+					if (c != '[' && delimAtOrAbove != "[") {
+						logTokenType(lexer, "JUST_DASH");
+						lexer->result_symbol = JUST_DASH;
+						return true;
+					}
+				}
+				else if (regex_match(delimAtOrAbove, regex("[/*+\\-%]"))) {
+					logTokenType(lexer, "JUST_DASH");
+					lexer->result_symbol = JUST_DASH;
+					return true;
+				}
+			}
+			
+			if (valid_symbols[OPERATOR_NEGATIVE]) {
+				logTokenType(lexer, "OPERATOR_NEGATIVE");
+				lexer->result_symbol = OPERATOR_NEGATIVE;
+				return true;
+			}
+		}
+		else if (c == '.') {
+			if (valid_symbols[JUST_PERIOD]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				logTokenType(lexer, "JUST_PERIOD");
+				lexer->result_symbol = JUST_PERIOD;
 				return true;
 			}
 		}
@@ -890,8 +1067,10 @@ struct Scanner {
 			}
 		}
 		else if (c == '&') {
+			advance(lexer);
+			mark_end(lexer);
+			
 			if (depth > 0) {
-				advance(lexer);
 				entity = get_entity(lexer, depth, true);
 				delimAtDepth = matchDelimiters(entity, "", depth, false);
 				delimAtOrAbove = matchDelimiters(entity, "", depth, true);
@@ -919,6 +1098,8 @@ struct Scanner {
 								logPushQuery();
 								
 								if (queries.top()->scan_query(lexer, &queryType, queries.size()-1)) {
+									mark_end(lexer);
+									
 									logTokenType(lexer, "QUERY_START");
 									lexer->result_symbol = QUERY_START;
 									return true;
@@ -1068,13 +1249,149 @@ struct Scanner {
 						return true;
 					}
 				}
-				else if (delimAtOrAbove == ".") {
-					logEntity(".");
-					if (valid_symbols[JUST_DECIMALPOINT]) {
+				else if (delimAtDepth == "(") {
+					logEntity("(");
+					if (valid_symbols[JUST_LEFTPAREN]) {
 						mark_end(lexer);
 						
-						logTokenType(lexer, "JUST_DECIMALPOINT");
-						lexer->result_symbol = JUST_DECIMALPOINT;
+						logTokenType(lexer, "JUST_LEFTPAREN");
+						lexer->result_symbol = JUST_LEFTPAREN;
+						return true;
+					}
+				}
+				else if (delimAtDepth == ")") {
+					logEntity(")");
+					if (valid_symbols[JUST_RIGHTPAREN]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_RIGHTPAREN");
+						lexer->result_symbol = JUST_RIGHTPAREN;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "/") {
+					logEntity(delimAtDepth);
+					if (valid_symbols[JUST_SLASH]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_SLASH");
+						lexer->result_symbol = JUST_SLASH;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "*") {
+					logEntity(delimAtDepth);
+					if (valid_symbols[JUST_ASTERISK]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_ASTERISK");
+						lexer->result_symbol = JUST_ASTERISK;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "+") {
+					logEntity(delimAtDepth);
+					if (valid_symbols[JUST_PLUS]) {
+						c = lexer->lookahead;
+						mark_end(lexer);
+						
+						if (regex_match(string({c}), regex("[/*+\\-%\\s\\r\\n]"))) {
+							logTokenType(lexer, "JUST_PLUS");
+							lexer->result_symbol = JUST_PLUS;
+							return true;
+						}
+						
+						delimAtOrAbove = "";
+						if (c == '&') {
+							advance(lexer);
+							entity = get_entity(lexer, depth, true);
+							delimAtOrAbove = matchDelimiters(entity, "[/*+-%", depth, true);
+						}
+						
+						if (c == '[' || delimAtOrAbove == "[") {
+							c = advance(lexer);
+							
+							delimAtOrAbove = "";
+							if (c == '&') {
+								advance(lexer);
+								entity = get_entity(lexer, depth, true);
+								delimAtOrAbove = matchDelimiters(entity, "[", depth, true);
+							}
+							
+							if (c != '[' && delimAtOrAbove != "[") {
+								logTokenType(lexer, "JUST_PLUS");
+								lexer->result_symbol = JUST_PLUS;
+								return true;
+							}
+						}
+						else if (regex_match(delimAtOrAbove, regex("[/*+\\-%]"))) {
+							logTokenType(lexer, "JUST_PLUS");
+							lexer->result_symbol = JUST_PLUS;
+							return true;
+						}
+					}
+					
+					if (valid_symbols[OPERATOR_POSITIVE]) {
+						logTokenType(lexer, "OPERATOR_POSITIVE");
+						lexer->result_symbol = OPERATOR_POSITIVE;
+						return true;
+					}
+				}
+				else if (delimAtDepth == "-") {
+					logEntity(delimAtDepth);
+					if (valid_symbols[JUST_DASH]) {
+						c = lexer->lookahead;
+						mark_end(lexer);
+						
+						if (regex_match(string({c}), regex("[/*+\\-%\\s\\r\\n]"))) {
+							logTokenType(lexer, "JUST_DASH");
+							lexer->result_symbol = JUST_DASH;
+							return true;
+						}
+						
+						delimAtOrAbove = "";
+						if (c == '&') {
+							advance(lexer);
+							entity = get_entity(lexer, depth, true);
+							delimAtOrAbove = matchDelimiters(entity, "[/*+-%", depth, true);
+						}
+						
+						if (c == '[' || delimAtOrAbove == "[") {
+							c = advance(lexer);
+							
+							delimAtOrAbove = "";
+							if (c == '&') {
+								advance(lexer);
+								entity = get_entity(lexer, depth, true);
+								delimAtOrAbove = matchDelimiters(entity, "[", depth, true);
+							}
+							
+							if (c != '[' && delimAtOrAbove != "[") {
+								logTokenType(lexer, "JUST_DASH");
+								lexer->result_symbol = JUST_DASH;
+								return true;
+							}
+						}
+						else if (regex_match(delimAtOrAbove, regex("[/*+\\-%]"))) {
+							logTokenType(lexer, "JUST_DASH");
+							lexer->result_symbol = JUST_DASH;
+							return true;
+						}
+					}
+					
+					if (valid_symbols[OPERATOR_NEGATIVE]) {
+						logTokenType(lexer, "OPERATOR_NEGATIVE");
+						lexer->result_symbol = OPERATOR_NEGATIVE;
+						return true;
+					}
+				}
+				else if (delimAtOrAbove == ".") {
+					logEntity(".");
+					if (valid_symbols[JUST_PERIOD]) {
+						mark_end(lexer);
+						
+						logTokenType(lexer, "JUST_PERIOD");
+						lexer->result_symbol = JUST_PERIOD;
 						return true;
 					}
 				}
@@ -1094,16 +1411,27 @@ struct Scanner {
 					}
 				}
 				
-				if (valid_symbols[JUST_AMPERSAND]) {
-					logTokenType(lexer, "JUST_AMPERSAND");
-					lexer->result_symbol = JUST_AMPERSAND;
+				if (entity != "" && delimAtDepth == "" && valid_symbols[HTML_ENTITY]) {
+					mark_end(lexer);
+					
+					logTokenType(lexer, "HTML_ENTITY");
+					lexer->result_symbol = HTML_ENTITY;
 					return true;
 				}
 			}
-			else if (valid_symbols[JUST_AMPERSAND]) {
-				c = advance(lexer);
-				mark_end(lexer);
+			else if (valid_symbols[HTML_ENTITY]) {
+				entity = get_entity(lexer, 0, false);
 				
+				if (entity != "") {
+					mark_end(lexer);
+					
+					logTokenType(lexer, "HTML_ENTITY");
+					lexer->result_symbol = HTML_ENTITY;
+					return true;
+				}
+			}
+			
+			if (valid_symbols[JUST_AMPERSAND]) {
 				logTokenType(lexer, "JUST_AMPERSAND");
 				lexer->result_symbol = JUST_AMPERSAND;
 				return true;
