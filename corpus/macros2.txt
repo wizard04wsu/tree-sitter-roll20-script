@@ -1,0 +1,154 @@
+==================
+Macro: ##
+==================
+##
+---
+(roll20_script
+	(macro (delimiter) (name)))
+		
+==================
+Macro: #m
+==================
+#m
+---
+(roll20_script
+	(macro (delimiter) (name)))
+		
+==================
+Macro: #m#
+==================
+#m#
+---
+(roll20_script
+	(macro (delimiter) (name)))
+		
+==================
+Macro: #m#m
+==================
+#m#m
+---
+(roll20_script
+	(macro (delimiter) (name)))
+		
+==================
+Macro: # #m
+==================
+# #m
+---
+(roll20_script
+	(macro (delimiter) (name)))
+		
+==================
+Macro: #m #
+==================
+#m #
+---
+(roll20_script
+	(macro (delimiter) (name)))
+		
+==================
+Macro: #m #m
+==================
+#m #m
+---
+(roll20_script
+	(macro (delimiter) (name))
+	(macro (delimiter) (name)))
+		
+==================
+Macro: #m@{a}
+==================
+#m@{a}
+---
+(roll20_script
+	(macro (delimiter)
+		(name
+			(attribute (delimiter)
+				(name) (delimiter)))))
+
+==================
+Macro: #m@{a}m
+==================
+#m@{a}m
+---
+(roll20_script
+	(macro (delimiter)
+		(name
+			(attribute (delimiter)
+				(name) (delimiter)))))
+
+==================
+Macro: #m@{c|a}
+==================
+#m@{c|a}
+---
+(roll20_script
+	(macro (delimiter)
+		(name
+			(attribute (delimiter)
+				(character) (delimiter)
+				(name) (delimiter)))))
+
+==================
+Macro: #m@{c|a}m
+==================
+#m@{c|a}m
+---
+(roll20_script
+	(macro (delimiter)
+		(name
+			(attribute (delimiter)
+				(character) (delimiter)
+				(name) (delimiter)))))
+
+==================
+Macro: #m[@{a}
+==================
+#m[@{a}
+---
+(roll20_script
+	(macroHash)
+	(attribute (delimiter)
+		(name) (delimiter)))
+
+==================
+Macro: #m[[@{a}
+==================
+#m[[@{a}
+---
+(roll20_script
+	(macroHash)
+	(inlineRoll
+		(invalid)
+		(formula
+			(term
+				(number
+					(attribute (delimiter)
+						(name) (delimiter)))
+			)
+		)))
+
+==================
+Macro: #m]]@{a}
+==================
+#m]]@{a}
+---
+(roll20_script
+	(macroHash)
+	(attribute (delimiter)
+		(name) (delimiter)))
+
+==================
+Macro: #
+==================
+#
+---
+(roll20_script)
+
+==================
+Macro: # #
+==================
+# #
+---
+(roll20_script)
+

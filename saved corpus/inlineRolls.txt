@@ -1,5 +1,5 @@
 ==================
-Inline Roll: Valid: [[5]]
+Inline Roll: [[5]]
 ==================
 [[5]]
 ---
@@ -10,7 +10,7 @@ Inline Roll: Valid: [[5]]
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ 5 ]]
+Inline Roll: [[ 5 ]]
 ==================
 [[ 5 ]]
 ---
@@ -21,7 +21,7 @@ Inline Roll: Valid: [[ 5 ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[5[a]]]
+Inline Roll: [[5[a]]]
 ==================
 [[5[a]]]
 ---
@@ -35,7 +35,7 @@ Inline Roll: Valid: [[5[a]]]
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ 5 [ a ] ]]
+Inline Roll: [[ 5 [ a ] ]]
 ==================
 [[ 5 [ a ] ]]
 ---
@@ -49,7 +49,7 @@ Inline Roll: Valid: [[ 5 [ a ] ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[[a]5d6]]
+Inline Roll: [[[a]5d6]]
 ==================
 [[[a]5d6]]
 ---
@@ -60,15 +60,13 @@ Inline Roll: Valid: [[[a]5d6]]
 			(delimiter)
 			(delimiter))
 		(diceRoll
-			(count
-				(number))
+			(count)
 			(delimiter)
-			(sides
-				(number)))
+			(sides))
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ [a] 5d6 ]]
+Inline Roll: [[ [a] 5d6 ]]
 ==================
 [[ [a] 5d6 ]]
 ---
@@ -79,29 +77,28 @@ Inline Roll: Valid: [[ [a] 5d6 ]]
 			(delimiter)
 			(delimiter))
 		(diceRoll
-			(count
-				(number))
+			(count)
 			(delimiter)
-			(sides
-				(number)))
+			(sides))
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ [[5]] ]]
+Inline Roll: [[ [[5]] ]]
 ==================
 [[ [[5]] ]]
 ---
 (roll20_script
  	(inlineRoll
 		(delimiter)
-		(inlineRoll
-			(delimiter)
-			(number)
-			(delimiter))
+		(number
+			(inlineRoll
+				(delimiter)
+				(number)
+				(delimiter)))
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[5+5]]
+Inline Roll: [[5+5]]
 ==================
 [[5+5]]
 ---
@@ -114,7 +111,7 @@ Inline Roll: Valid: [[5+5]]
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ 5 + 5 ]]
+Inline Roll: [[ 5 + 5 ]]
 ==================
 [[ 5 + 5 ]]
 ---
@@ -127,7 +124,7 @@ Inline Roll: Valid: [[ 5 + 5 ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[5+[[5]]]]
+Inline Roll: [[5+[[5]]]]
 ==================
 [[5+[[5]]]]
 ---
@@ -136,14 +133,15 @@ Inline Roll: Valid: [[5+[[5]]]]
 		(delimiter)
 		(number)
 		(operator)
-		(inlineRoll
-			(delimiter)
-			(number)
-			(delimiter))
+		(number
+			(inlineRoll
+				(delimiter)
+				(number)
+				(delimiter)))
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ 5 + [[ 5 ]] ]]
+Inline Roll: [[ 5 + [[ 5 ]] ]]
 ==================
 [[ 5 + [[ 5 ]] ]]
 ---
@@ -152,10 +150,11 @@ Inline Roll: Valid: [[ 5 + [[ 5 ]] ]]
 		(delimiter)
 		(number)
 		(operator)
-		(inlineRoll
-			(delimiter)
-			(number)
-			(delimiter))
+		(number
+			(inlineRoll
+				(delimiter)
+				(number)
+				(delimiter)))
 		(delimiter)))
 
 ==================
@@ -166,10 +165,9 @@ Inline Roll: Invalid but Accepted: [[[a]5]]
 (roll20_script
  	(inlineRoll
 		(delimiter)
-		(invalid
-			(label
-				(delimiter)
-				(delimiter)))
+		(label
+			(delimiter)
+			(delimiter))
 		(number)
 		(delimiter)))
 
@@ -181,10 +179,9 @@ Inline Roll: Invalid but Accepted: [[ [a] 5 ]]
 (roll20_script
  	(inlineRoll
 		(delimiter)
-		(invalid
-			(label
-				(delimiter)
-				(delimiter)))
+		(label
+			(delimiter)
+			(delimiter))
 		(number)
 		(delimiter)))
 
@@ -196,18 +193,18 @@ Inline Roll: Invalid but Accepted: [[ [a] [[5]] ]]
 (roll20_script
  	(inlineRoll
 		(delimiter)
-		(invalid
-			(label
-				(delimiter)
-				(delimiter)))
-		(inlineRoll
+		(label
 			(delimiter)
-			(number)
 			(delimiter))
+		(number
+			(inlineRoll
+				(delimiter)
+				(number)
+				(delimiter)))
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ [a] [[5]]d6 ]]
+Inline Roll: [[ [a] [[5]]d6 ]]
 ==================
 [[ [a] [[5]]d6 ]]
 ---
@@ -219,18 +216,16 @@ Inline Roll: Valid: [[ [a] [[5]]d6 ]]
 			(delimiter))
 		(diceRoll
 			(count
-				(number
-					(inlineRoll
-						(delimiter)
-						(number)
-						(delimiter))))
+				(inlineRoll
+					(delimiter)
+					(number)
+					(delimiter)))
 			(delimiter)
-			(sides
-				(number)))
+			(sides))
 		(delimiter)))
 
 ==================
-Inline Roll: Valid: [[ -[[5]]+3-[[2]] ]]
+Inline Roll: [[ -[[5]]+3-[[2]] ]]
 ==================
 [[ -[[5]]+3-[[2]] ]]
 ---
@@ -238,57 +233,53 @@ Inline Roll: Valid: [[ -[[5]]+3-[[2]] ]]
  	(inlineRoll
 		(delimiter)
 		(operator)
-		(inlineRoll
-			(delimiter)
-			(number)
-			(delimiter))
+		(number
+			(inlineRoll
+				(delimiter)
+				(number)
+				(delimiter)))
 		(operator)
 		(number)
 		(operator)
-		(inlineRoll
-			(delimiter)
-			(number)
-			(delimiter))
+		(number
+			(inlineRoll
+				(delimiter)
+				(number)
+				(delimiter)))
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[]]
+Inline Roll: [[]]
 ==================
 [[]]
 ---
 (roll20_script
- 	(invalid
-		(inlineRoll
-			(delimiter)
-			(delimiter))))
+ 	(invalid))
 
 ==================
-Inline Roll: Invalid: [[ ]]
+Inline Roll: [[ ]]
 ==================
 [[ ]]
 ---
 (roll20_script
- 	(invalid
-		(inlineRoll
-			(delimiter)
-			(delimiter))))
+ 	(invalid))
 
 ==================
-Inline Roll: Invalid: [[[a]]]
+Inline Roll: [[[a]]]
 ==================
 [[[a]]]
 ---
 (roll20_script
 	(inlineRoll
 		(delimiter)
-	 	(invalid
+		(invalid
 			(label
 				(delimiter)
 				(delimiter)))
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ [ a ] ]]
+Inline Roll: [[ [ a ] ]]
 ==================
 [[ [ a ] ]]
 ---
@@ -302,21 +293,18 @@ Inline Roll: Invalid: [[ [ a ] ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ [[]] ]]
+Inline Roll: [[ [[]] ]]
 ==================
 [[ [[]] ]]
 ---
 (roll20_script
 	(inlineRoll
 		(delimiter)
-		(invalid
-			(inlineRoll
-				(delimiter)
-				(delimiter)))
+		(invalid)
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ 5 [[5]] ]]
+Inline Roll: [[ 5 [[5]] ]]
 ==================
 [[ 5 [[5]] ]]
 ---
@@ -325,14 +313,15 @@ Inline Roll: Invalid: [[ 5 [[5]] ]]
 		(delimiter)
 		(number)
 		(invalid
-			(inlineRoll
-				(delimiter)
-				(number)
-				(delimiter)))
+			(number
+				(inlineRoll
+					(delimiter)
+					(number)
+					(delimiter))))
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ 5 [[]] ]]
+Inline Roll: [[ 5 [[]] ]]
 ==================
 [[ 5 [[]] ]]
 ---
@@ -340,14 +329,11 @@ Inline Roll: Invalid: [[ 5 [[]] ]]
  	(inlineRoll
 		(delimiter)
 		(number)
-		(invalid
-			(inlineRoll
-				(delimiter)
-				(delimiter)))
+		(invalid)
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ 5 + [[]] ]]
+Inline Roll: [[ 5 + [[]] ]]
 ==================
 [[ 5 + [[]] ]]
 ---
@@ -356,14 +342,11 @@ Inline Roll: Invalid: [[ 5 + [[]] ]]
 		(delimiter)
 		(number)
 		(operator)
-		(invalid
-			(inlineRoll
-				(delimiter)
-				(delimiter)))
+		(invalid)
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[x]]
+Inline Roll: [[x]]
 ==================
 [[x]]
 ---
@@ -374,7 +357,7 @@ Inline Roll: Invalid: [[x]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ x ]]
+Inline Roll: [[ x ]]
 ==================
 [[ x ]]
 ---
@@ -385,7 +368,7 @@ Inline Roll: Invalid: [[ x ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ x]]
+Inline Roll: [[ x]]
 ==================
 [[ x]]
 ---
@@ -396,7 +379,7 @@ Inline Roll: Invalid: [[ x]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[x ]]
+Inline Roll: [[x ]]
 ==================
 [[x ]]
 ---
@@ -407,7 +390,7 @@ Inline Roll: Invalid: [[x ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[.]]
+Inline Roll: [[.]]
 ==================
 [[.]]
 ---
@@ -418,7 +401,7 @@ Inline Roll: Invalid: [[.]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ . ]]
+Inline Roll: [[ . ]]
 ==================
 [[ . ]]
 ---
@@ -429,7 +412,7 @@ Inline Roll: Invalid: [[ . ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ .]]
+Inline Roll: [[ .]]
 ==================
 [[ .]]
 ---
@@ -440,7 +423,7 @@ Inline Roll: Invalid: [[ .]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[. ]]
+Inline Roll: [[. ]]
 ==================
 [[. ]]
 ---
@@ -451,7 +434,7 @@ Inline Roll: Invalid: [[. ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[5 x]]
+Inline Roll: [[5 x]]
 ==================
 [[5 x]]
 ---
@@ -463,7 +446,7 @@ Inline Roll: Invalid: [[5 x]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[x 5]]
+Inline Roll: [[x 5]]
 ==================
 [[x 5]]
 ---
@@ -476,7 +459,7 @@ Inline Roll: Invalid: [[x 5]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[5x]]
+Inline Roll: [[5x]]
 ==================
 [[5x]]
 ---
@@ -488,7 +471,7 @@ Inline Roll: Invalid: [[5x]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ 5x ]]
+Inline Roll: [[ 5x ]]
 ==================
 [[ 5x ]]
 ---
@@ -500,7 +483,7 @@ Inline Roll: Invalid: [[ 5x ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[x5]]
+Inline Roll: [[x5]]
 ==================
 [[x5]]
 ---
@@ -511,7 +494,7 @@ Inline Roll: Invalid: [[x5]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[ x5 ]]
+Inline Roll: [[ x5 ]]
 ==================
 [[ x5 ]]
 ---
@@ -522,7 +505,7 @@ Inline Roll: Invalid: [[ x5 ]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[5d_]]
+Inline Roll: [[5d_]]
 ==================
 [[5d_]]
 ---
@@ -534,7 +517,7 @@ Inline Roll: Invalid: [[5d_]]
 		(delimiter)))
 
 ==================
-Inline Roll: Invalid: [[5d3_]]
+Inline Roll: [[5d3_]]
 ==================
 [[5d3_]]
 ---
@@ -542,16 +525,14 @@ Inline Roll: Invalid: [[5d3_]]
  	(inlineRoll
 		(delimiter)
 		(diceRoll
-			(count
-				(number))
+			(count)
 			(delimiter)
-			(sides
-				(number)))
+			(sides))
 		(invalid)
 		(delimiter)))
 
 ==================
-Inline Roll, unclosed: Invalid: [[5]
+Inline Roll, unclosed: [[5]
 ==================
 [[5]
 ---
@@ -563,7 +544,7 @@ Inline Roll, unclosed: Invalid: [[5]
 		(invalid)))
 
 ==================
-Inline Roll, unclosed: Invalid: [[5
+Inline Roll, unclosed: [[5
 ==================
 [[5
 ---
