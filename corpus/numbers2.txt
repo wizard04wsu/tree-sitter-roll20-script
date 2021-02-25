@@ -1,0 +1,701 @@
+==================
+Number: [[5]]
+==================
+[[5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 5 ]]
+==================
+[[ 5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[42]]
+==================
+[[42]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 42 ]]
+==================
+[[ 42 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[5.5]]
+==================
+[[5.5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 5.5 ]]
+==================
+[[ 5.5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[42.42]]
+==================
+[[42.42]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 42.42 ]]
+==================
+[[ 42.42 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5]]
+==================
+[[-5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -5 ]]
+==================
+[[ -5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-42.42]]
+==================
+[[-42.42]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -42.42 ]]
+==================
+[[ -42.42 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[+5]]
+==================
+[[+5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ +5 ]]
+==================
+[[ +5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[+42.42]]
+==================
+[[+42.42]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ +42.42 ]]
+==================
+[[ +42.42 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[.5]]
+==================
+[[.5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ .5 ]]
+==================
+[[ .5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+
+==================
+Number: [[-.5]]
+==================
+[[-.5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -.5 ]]
+==================
+[[ -.5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[+.5]]
+==================
+[[+.5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ +.5 ]]
+==================
+[[ +.5 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Number: [[5.]]
+==================
+[[5.]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 5. ]]
+==================
+[[ 5. ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5.]]
+==================
+[[-5.]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -5. ]]
+==================
+[[ -5. ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[5_]]
+==================
+[[5_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 5_ ]]
+==================
+[[ 5_ ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[5._]]
+==================
+[[5._]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ 5._ ]]
+==================
+[[ 5._ ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5_]]
+==================
+[[-5_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -5_ ]]
+==================
+[[ -5_ ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5._]]
+==================
+[[-5._]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -5._ ]]
+==================
+[[ -5._ ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Number: [[5.5.]]
+==================
+[[5.5.]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[5.5_]]
+==================
+[[5.5_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[5.5._]]
+==================
+[[5.5._]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5.5.]]
+==================
+[[-5.5.]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5.5_]]
+==================
+[[-5.5_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5.5._]]
+==================
+[[-5.5._]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[5.5.5]]
+==================
+[[5.5.5]]
+---
+(roll20_script
+ 	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5.5.5]]
+==================
+[[-5.5.5]]
+---
+(roll20_script
+ 	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Number: [[.]]
+==================
+[[.]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ . ]]
+==================
+[[ . ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-.]]
+==================
+[[-.]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -. ]]
+==================
+[[ -. ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[._]]
+==================
+[[._]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ ._ ]]
+==================
+[[ ._ ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[-._]]
+==================
+[[-._]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Number: [[ -._ ]]
+==================
+[[ -._ ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(invalid)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Number: [[5d6]]
+==================
+[[5d6]]
+---
+(roll20_script
+ 	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(count)
+				(delimiter)
+				(sides))
+		)
+	) (delimiter)))
+
+==================
+Number: [[-5d6]]
+==================
+[[-5d6]]
+---
+(roll20_script
+ 	(inlineRoll (delimiter) (formula
+		(term
+			(operator)
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
