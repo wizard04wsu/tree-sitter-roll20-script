@@ -112,7 +112,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "__just_period"
+          "name": "__decimal_point"
         },
         {
           "type": "SYMBOL",
@@ -4886,6 +4886,10 @@
     {
       "type": "SYMBOL",
       "name": "__just_rightParen"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__decimal_point"
     },
     {
       "type": "SYMBOL",

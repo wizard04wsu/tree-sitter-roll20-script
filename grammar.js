@@ -76,7 +76,9 @@ module.exports = grammar({
 		$.__just_rightBracket,			// ]
 		$.__just_leftParen,				// (
 		$.__just_rightParen,			// )
-		$.__just_period,				// .
+		
+		$.__decimal_point,
+		$.__just_period,
 		
 		$.__just_slash,
 		$.__just_asterisk,
@@ -195,7 +197,7 @@ module.exports = grammar({
 			optional($._number_fraction),
 		)),
 		_number_fraction: $ => seq(
-			$.__just_period,
+			$.__decimal_point,
 			$._number_integer,
 		),
 		_number_integer: $ => prec.right(repeat1(
