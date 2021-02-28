@@ -16,14 +16,6 @@
           "named": true
         },
         {
-          "type": "delimiter",
-          "named": true
-        },
-        {
-          "type": "formula",
-          "named": true
-        },
-        {
           "type": "htmlEntity",
           "named": true
         },
@@ -398,6 +390,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "delimiter",
+          "named": true
+        },
         {
           "type": "formula",
           "named": true
@@ -1188,6 +1184,10 @@
       "required": true,
       "types": [
         {
+          "type": "count",
+          "named": true
+        },
+        {
           "type": "delimiter",
           "named": true
         },
@@ -1275,10 +1275,6 @@
   },
   {
     "type": "!!",
-    "named": false
-  },
-  {
-    "type": "?{",
     "named": false
   },
   {

@@ -1,0 +1,185 @@
+==================
+Math Function: [[abs(5)]]
+==================
+[[abs(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(function (name) (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[ abs( 5 ) ]]
+==================
+[[ abs( 5 ) ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(function (name) (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[ceil(5)]]
+==================
+[[ceil(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(function (name) (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[floor(5)]]
+==================
+[[floor(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(function (name) (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[round(5)]]
+==================
+[[round(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(function (name) (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Math Function: [[abs()]]
+==================
+[[abs()]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid (name) (delimiter) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[abs( )]]
+==================
+[[abs( )]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid (name) (delimiter) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[-abs(5)]]
+==================
+[[-abs(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(function (name) (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[x(5)]]
+==================
+[[x(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Math Function: [[x()]]
+==================
+[[x()]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Math Function: [[abs(5
+==================
+[[abs(5
+---
+(roll20_script
+	(inlineRoll
+		(invalid (delimiter))
+		(formula
+			(term
+				(function
+					(invalid (name) (delimiter))
+					(formula
+						(term
+							(number)
+						)))))))
+
+==================
+Math Function: [[abs(
+==================
+[[abs(
+---
+(roll20_script
+	(inlineRoll
+		(invalid (delimiter))
+		(formula
+			(term
+				(invalid (name) (delimiter))
+			))))
+
