@@ -76,7 +76,7 @@ enum TokenType {
 
 
 //For debugging:
-const bool debugging = true;
+const bool debugging = false;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	//https://stackoverflow.com/a/45300654/15788
@@ -152,7 +152,14 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[JUST_RIGHTBRACKET]?"JUST_RIGHTBRACKET, ":"")
 		 << (valid_symbols[JUST_LEFTPAREN]?"JUST_LEFTPAREN, ":"")
 		 << (valid_symbols[JUST_RIGHTPAREN]?"JUST_RIGHTPAREN, ":"")
+		 << (valid_symbols[DECIMAL_POINT]?"DECIMAL_POINT, ":"")
 		 << (valid_symbols[JUST_PERIOD]?"JUST_PERIOD, ":"")
+		 << (valid_symbols[JUST_SLASH]?"JUST_SLASH, ":"")
+		 << (valid_symbols[JUST_ASTERISK]?"JUST_ASTERISK, ":"")
+		 << (valid_symbols[JUST_PLUS]?"JUST_PLUS, ":"")
+		 << (valid_symbols[JUST_DASH]?"JUST_DASH, ":"")
+		 << (valid_symbols[OPERATOR_POSITIVE]?"OPERATOR_POSITIVE, ":"")
+		 << (valid_symbols[OPERATOR_NEGATIVE]?"OPERATOR_NEGATIVE, ":"")
 		 << (valid_symbols[_EOF]?"_EOF, ":"")
 		 << "\n";
 }
@@ -654,7 +661,7 @@ struct Scanner {
 				}
 				
 				if (c == '[' || delimAtOrAbove == "[") {
-					c = advance(lexer);
+					c = (c == '&' ? lexer->lookahead : advance(lexer));
 					
 					delimAtOrAbove = "";
 					if (c == '&') {
@@ -664,6 +671,7 @@ struct Scanner {
 					}
 					
 					if (c == '[' || delimAtOrAbove == "[") {
+					//inline roll start "[["
 						return match_found(lexer, symbolOnPass, typeOnPass);
 					}
 				}
@@ -944,6 +952,7 @@ struct Scanner {
 				if (valid_symbols[INLINE_ROLL_END] || valid_symbols[JUST_RIGHTBRACKET]) {
 					if (scanningEntity) logEntity("]");
 					c = (scanningEntity ? lexer->lookahead : advance(lexer));
+					mark_end(lexer);
 					
 					if (valid_symbols[INLINE_ROLL_END]) {
 						delimAtOrAbove = "";

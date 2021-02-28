@@ -730,7 +730,7 @@ Inline Roll: [[5]
 				(number)
 			)
 		)
-	(invalid)))
+		(invalid)))
 
 ==================
 Inline Roll: [[5

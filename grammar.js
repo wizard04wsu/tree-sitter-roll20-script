@@ -651,51 +651,53 @@ module.exports = grammar({
 			),
 		)),
 		
-		_term_first: $ => choice(
-			prec(1, seq(
-				optional($._operators_invalid_before_first_term),
-				prec.right(choice(
-					seq(
-						optional(alias(choice(
-							$.__operator_positive,
-							$.__operator_negative,
-						), $.operator)),
-						alias($._number_signable, $.number),
-						optional(alias($._term_remainder_number_invalid, $.invalid)),
-					),
-					seq(
-						alias($._number_fraction, $.number),
-						optional(alias($._term_remainder_number_invalid, $.invalid)),
-					),
-					seq(
-						$.diceRoll,
-						//optional($._term_remainder_diceRoll_indeterminate),
-						optional($._placeholders),
-						optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
-					),
-					seq(
-						$._groupRoll,
-						//optional($._term_remainder_groupRoll_indeterminate),
-						optional($._placeholders),
-						optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
-					),
-					seq(
-						choice(
-							$.rollQuery,
-							$._parenthesized,
-							$._function,
-							$._tableRoll,
+		_term_first: $ => seq(
+			optional($._operators_invalid_before_first_term),
+			choice(
+				prec(1, seq(
+					prec.right(choice(
+						seq(
+							optional(alias(choice(
+								$.__operator_positive,
+								$.__operator_negative,
+							), $.operator)),
+							alias($._number_signable, $.number),
+							optional(alias($._term_remainder_number_invalid, $.invalid)),
 						),
-						optional(alias($._term_remainder_general_invalid, $.invalid)),
-					),
-					seq(
-						alias($._term_invalid, $.invalid),
-					),
+						seq(
+							alias($._number_fraction, $.number),
+							optional(alias($._term_remainder_number_invalid, $.invalid)),
+						),
+						seq(
+							$.diceRoll,
+							//optional($._term_remainder_diceRoll_indeterminate),
+							optional($._placeholders),
+							optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
+						),
+						seq(
+							$._groupRoll,
+							//optional($._term_remainder_groupRoll_indeterminate),
+							optional($._placeholders),
+							optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
+						),
+						seq(
+							choice(
+								$.rollQuery,
+								$._parenthesized,
+								$._function,
+								$._tableRoll,
+							),
+							optional(alias($._term_remainder_general_invalid, $.invalid)),
+						),
+						seq(
+							alias($._term_invalid, $.invalid),
+						),
+					)),
+					optional($._macro_and_wsp),
 				)),
-				optional($._macro_and_wsp),
-			)),
-			prec(1, $._macro_and_wsp),
-			alias($._term_invalid_and_unrecognized, $.invalid),
+				prec(1, $._macro_and_wsp),
+				alias($._term_invalid_and_unrecognized, $.invalid),
+			),
 		),
 		
 		_term: $ => choice(
@@ -830,7 +832,25 @@ module.exports = grammar({
 			//just right bracket
 		)),
 		
-		_term_invalid_and_unrecognized: $ => /[^@%#\[{(/*+\-})\]dDtT\d\s\r\n]/,	//TODO: make sure this only matches what's intended
+		//TODO: make sure this only matches what's intended
+		_term_invalid_and_unrecognized: $ => seq(
+			choice(
+				/[^@%#&\[{(/*+\-})\]dDtT\d.\s\r\n]/,
+				$.__just_at,
+				$.__just_ampersand,
+				$.__just_d,
+				$.__just_t,
+				$.__just_questionmark,
+				$.__just_period,
+			),
+			repeat(choice(
+				$.attribute,
+				$.ability,
+				$._attribute_empty,
+				$._ability_empty,
+			)),
+			optional($._term_remainder_general_invalid),
+		),
 		
 		
 		/*┌──────────────────────────────
