@@ -119,7 +119,7 @@ Macro: #m[[@{a}
 (roll20_script
 	(macroHash)
 	(inlineRoll
-		(invalid)
+		(invalid (delimiter))
 		(formula
 			(term
 				(number

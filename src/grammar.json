@@ -312,13 +312,8 @@
               "name": "_selector"
             },
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "|"
-              },
-              "named": true,
-              "value": "delimiter"
+              "type": "SYMBOL",
+              "name": "_$pipe"
             },
             {
               "type": "CHOICE",
@@ -345,13 +340,8 @@
                       "value": "name"
                     },
                     {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "STRING",
-                        "value": "|"
-                      },
-                      "named": true,
-                      "value": "delimiter"
+                      "type": "SYMBOL",
+                      "name": "_$pipe"
                     },
                     {
                       "type": "CHOICE",
@@ -409,8 +399,8 @@
                     {
                       "type": "ALIAS",
                       "content": {
-                        "type": "STRING",
-                        "value": "|"
+                        "type": "SYMBOL",
+                        "name": "__just_pipe"
                       },
                       "named": true,
                       "value": "invalid"
@@ -447,8 +437,8 @@
             {
               "type": "ALIAS",
               "content": {
-                "type": "STRING",
-                "value": "|"
+                "type": "SYMBOL",
+                "name": "__just_pipe"
               },
               "named": true,
               "value": "invalid"
@@ -474,17 +464,8 @@
       ]
     },
     "_attribute_empty": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_$attributeLeft"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_$braceRight"
-        }
-      ]
+      "type": "STRING",
+      "value": "@{}"
     },
     "_attribute_invalid": {
       "type": "STRING",
@@ -562,13 +543,8 @@
               "name": "_selector"
             },
             {
-              "type": "ALIAS",
-              "content": {
-                "type": "STRING",
-                "value": "|"
-              },
-              "named": true,
-              "value": "delimiter"
+              "type": "SYMBOL",
+              "name": "_$pipe"
             },
             {
               "type": "CHOICE",
@@ -642,8 +618,8 @@
             {
               "type": "ALIAS",
               "content": {
-                "type": "STRING",
-                "value": "|"
+                "type": "SYMBOL",
+                "name": "__just_pipe"
               },
               "named": true,
               "value": "invalid"
@@ -669,17 +645,8 @@
       ]
     },
     "_ability_empty": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_$abilityLeft"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "_$braceRight"
-        }
-      ]
+      "type": "STRING",
+      "value": "%{}"
     },
     "_ability_invalid": {
       "type": "STRING",
@@ -722,13 +689,8 @@
             "type": "SEQ",
             "members": [
               {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "__macro_unsafe_start"
-                },
-                "named": true,
-                "value": "macroHash"
+                "type": "SYMBOL",
+                "name": "_$macroHash_unsafe"
               },
               {
                 "type": "SYMBOL",
@@ -743,13 +705,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "__macro_safe_start"
-          },
-          "named": true,
-          "value": "delimiter"
+          "type": "SYMBOL",
+          "name": "_$macroHash_safe"
         },
         {
           "type": "ALIAS",
@@ -885,13 +842,8 @@
             "type": "SEQ",
             "members": [
               {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
-                  "name": "__macro_unsafe_start"
-                },
-                "named": true,
-                "value": "macroHash"
+                "type": "SYMBOL",
+                "name": "_$macroHash_unsafe"
               },
               {
                 "type": "SYMBOL",
@@ -906,13 +858,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "__macro_safe_start"
-          },
-          "named": true,
-          "value": "delimiter"
+          "type": "SYMBOL",
+          "name": "_$macroHash_safe"
         },
         {
           "type": "ALIAS",
@@ -1096,31 +1043,30 @@
         ]
       }
     },
-    "_rollQuery_empty": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "__rollQuery_start"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__rollQuery_end"
-        }
-      ]
-    },
     "_rollQuery_invalid": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "_rollQuery_empty"
-        },
-        {
-          "type": "STRING",
-          "value": "?{"
-        }
-      ]
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "__rollQuery_start"
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "__rollQuery_end"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          }
+        ]
+      }
     },
     "prompt": {
       "type": "REPEAT1",
@@ -1412,7 +1358,7 @@
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
-            "name": "__inlineRoll_start"
+            "name": "_$inlineRollStart"
           },
           "named": true,
           "value": "invalid"
@@ -1428,7 +1374,7 @@
               "type": "ALIAS",
               "content": {
                 "type": "SYMBOL",
-                "name": "__just_rightBracket"
+                "name": "_$bracketRight"
               },
               "named": true,
               "value": "invalid"
@@ -1448,26 +1394,16 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "__inlineRoll_start"
-          },
-          "named": true,
-          "value": "delimiter"
+          "type": "SYMBOL",
+          "name": "_$inlineRollStart"
         },
         {
           "type": "SYMBOL",
           "name": "formula"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "__inlineRoll_end"
-          },
-          "named": true,
-          "value": "delimiter"
+          "type": "SYMBOL",
+          "name": "_$inlineRollEnd"
         }
       ]
     },
@@ -1476,7 +1412,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "__inlineRoll_start"
+          "name": "_$inlineRollStart"
         },
         {
           "type": "CHOICE",
@@ -1495,7 +1431,7 @@
           "members": [
             {
               "type": "SYMBOL",
-              "name": "__inlineRoll_end"
+              "name": "_$inlineRollEnd"
             },
             {
               "type": "SEQ",
@@ -1505,7 +1441,7 @@
                   "members": [
                     {
                       "type": "SYMBOL",
-                      "name": "__just_rightBracket"
+                      "name": "_$bracketRight"
                     },
                     {
                       "type": "BLANK"
@@ -3531,7 +3467,7 @@
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
-            "name": "_function_unclosed_2"
+            "name": "_function_start"
           },
           "named": true,
           "value": "invalid"
@@ -3546,52 +3482,24 @@
         }
       ]
     },
-    "_function_unclosed_2": {
-      "type": "PREC",
-      "value": 1,
-      "content": {
-        "type": "SEQ",
-        "members": [
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "PATTERN",
-              "value": "abs|ceil|floor|round"
-            },
-            "named": true,
-            "value": "name"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_$parenLeft"
-          }
-        ]
-      }
-    },
     "function": {
       "type": "SEQ",
       "members": [
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "PATTERN",
-            "value": "abs|ceil|floor|round"
-          },
-          "named": true,
-          "value": "name"
+          "type": "SYMBOL",
+          "name": "_function_start"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "parenthesized"
-          },
-          "named": false,
-          "value": ""
+          "type": "SYMBOL",
+          "name": "formula"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_$parenRight"
         }
       ]
     },
-    "_function_invalid": {
+    "_function_start": {
       "type": "SEQ",
       "members": [
         {
@@ -3605,13 +3513,43 @@
         },
         {
           "type": "SYMBOL",
-          "name": "_parenthesized_invalid"
+          "name": "_$parenLeft"
         }
       ]
     },
-    "_dice_count": {
-      "type": "SYMBOL",
-      "name": "_number"
+    "_function_invalid": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_function_start"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_wsp_inline"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "_$parenRight"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "__EOF"
+            }
+          ]
+        }
+      ]
     },
     "_shared_modifier": {
       "type": "CHOICE",
@@ -4146,7 +4084,7 @@
                 "type": "ALIAS",
                 "content": {
                   "type": "SYMBOL",
-                  "name": "_dice_count"
+                  "name": "_number"
                 },
                 "named": true,
                 "value": "count"
@@ -4194,7 +4132,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "_dice_count"
+          "name": "_number"
         },
         {
           "type": "ALIAS",
@@ -4253,6 +4191,23 @@
       "content": {
         "type": "SEQ",
         "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_number"
+                },
+                "named": true,
+                "value": "count"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
           {
             "type": "SYMBOL",
             "name": "_$tableRoll"
@@ -4318,7 +4273,7 @@
               "type": "ALIAS",
               "content": {
                 "type": "SYMBOL",
-                "name": "_dice_count"
+                "name": "_number"
               },
               "named": true,
               "value": "count"
@@ -4703,6 +4658,42 @@
         }
       ]
     },
+    "_$macroHash_safe": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "__macro_safe_start"
+      },
+      "named": true,
+      "value": "delimiter"
+    },
+    "_$macroHash_unsafe": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "__macro_unsafe_start"
+      },
+      "named": true,
+      "value": "macroHash"
+    },
+    "_$inlineRollStart": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "__inlineRoll_start"
+      },
+      "named": true,
+      "value": "delimiter"
+    },
+    "_$inlineRollEnd": {
+      "type": "ALIAS",
+      "content": {
+        "type": "SYMBOL",
+        "name": "__inlineRoll_end"
+      },
+      "named": true,
+      "value": "delimiter"
+    },
     "_$rollQueryLeft": {
       "type": "ALIAS",
       "content": {
@@ -4825,13 +4816,17 @@
       "value": "delimiter"
     },
     "_$parenLeft": {
-      "type": "ALIAS",
+      "type": "PREC_LEFT",
+      "value": 0,
       "content": {
-        "type": "SYMBOL",
-        "name": "__just_leftParen"
-      },
-      "named": true,
-      "value": "delimiter"
+        "type": "ALIAS",
+        "content": {
+          "type": "SYMBOL",
+          "name": "__just_leftParen"
+        },
+        "named": true,
+        "value": "delimiter"
+      }
     },
     "_$parenRight": {
       "type": "ALIAS",
