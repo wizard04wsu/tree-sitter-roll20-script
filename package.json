@@ -11,7 +11,7 @@
 	"author": "Andy Harrison",
 	"license": "MIT",
 	"devDependencies": {
-		"tree-sitter-cli": "^0.16.7"
+		"tree-sitter-cli": "^0.16.9"
 	},
 	"dependencies": {
 		"nan": "^2.14.2"
