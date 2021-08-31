@@ -611,7 +611,7 @@ module.exports = grammar({
 			),
 		)),
 		
-		_term_first: $ => seq(
+		_term_first: $ => prec.right(seq(
 			optional($._operators_invalid_before_first_term),
 			choice(
 				prec(1, seq(
@@ -630,13 +630,11 @@ module.exports = grammar({
 						),
 						seq(
 							$.diceRoll,
-							//optional($._term_remainder_diceRoll_indeterminate),
 							optional($._placeholders),
 							optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
 						),
 						seq(
 							$._groupRoll,
-							//optional($._term_remainder_groupRoll_indeterminate),
 							optional($._placeholders),
 							optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
 						),
@@ -656,9 +654,12 @@ module.exports = grammar({
 					optional($._macro_and_wsp),
 				)),
 				prec(1, $._macro_and_wsp),
-				alias($._term_invalid_and_unrecognized, $.invalid),
+				seq(
+					alias($._term_invalid_and_unrecognized, $.invalid),
+					optional($._term_first),
+				),
 			),
-		),
+		)),
 		
 		_term: $ => choice(
 			prec(1, seq(
@@ -669,13 +670,11 @@ module.exports = grammar({
 					),
 					seq(
 						$.diceRoll,
-						//optional($._term_remainder_diceRoll_indeterminate),
 						optional($._placeholders),
 						optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
 					),
 					seq(
 						$._groupRoll,
-						//optional($._term_remainder_groupRoll_indeterminate),
 						optional($._placeholders),
 						optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
 					),
@@ -694,13 +693,15 @@ module.exports = grammar({
 				optional($._macro_and_wsp),
 			)),
 			prec(1, $._macro_and_wsp),
-			alias($._term_invalid_and_unrecognized, $.invalid),
+			seq(
+				alias($._term_invalid_and_unrecognized, $.invalid),
+				optional($._term),
+			),
 		),
 		
-		_term_invalid: $ => choice(
+		_term_invalid: $ => prec.left(choice(
 			seq(
 				$._groupRoll_invalid,
-				//optional($._term_remainder_groupRoll_indeterminate),
 				repeat(choice(
 					$.attribute,
 					$.ability,
@@ -727,7 +728,7 @@ module.exports = grammar({
 				)),
 				optional($._term_remainder_general_invalid),
 			),
-		),
+		)),
 		
 		_term_remainder_number_invalid: $ => seq(
 			choice(
@@ -784,8 +785,7 @@ module.exports = grammar({
 			//just right bracket
 		)),
 		
-		//TODO: make sure this only matches what's intended
-		_term_invalid_and_unrecognized: $ => seq(
+		_term_invalid_and_unrecognized: $ => prec.left(repeat1(
 			choice(
 				/[^@%#&\[{(/*+\-})\]dDtT\d.\s\r\n]/,
 				$.__just_at,
@@ -795,14 +795,7 @@ module.exports = grammar({
 				$.__just_questionmark,
 				$.__just_period,
 			),
-			repeat(choice(
-				$.attribute,
-				$.ability,
-				$._attribute_empty,
-				$._ability_empty,
-			)),
-			optional($._term_remainder_general_invalid),
-		),
+		)),
 		
 		
 		/*┌──────────────────────────────

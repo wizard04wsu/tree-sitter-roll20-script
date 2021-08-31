@@ -133,6 +133,11 @@ Math Function: [[x(5)]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
+			(parenthesized (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
 		)
 	) (delimiter)))
 
@@ -145,6 +150,7 @@ Math Function: [[x()]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
+			(invalid (delimiter) (delimiter))
 		)
 	) (delimiter)))
 
