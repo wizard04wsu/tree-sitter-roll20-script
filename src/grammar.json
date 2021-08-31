@@ -1563,265 +1563,303 @@
       }
     },
     "_term_first": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_operators_invalid_before_first_term"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PREC",
-              "value": 1,
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "PREC_RIGHT",
-                    "value": 0,
-                    "content": {
+      "type": "PREC_RIGHT",
+      "value": 0,
+      "content": {
+        "type": "SEQ",
+        "members": [
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_operators_invalid_before_first_term"
+              },
+              {
+                "type": "BLANK"
+              }
+            ]
+          },
+          {
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "PREC",
+                "value": 1,
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "PREC_RIGHT",
+                      "value": 0,
+                      "content": {
+                        "type": "CHOICE",
+                        "members": [
+                          {
+                            "type": "SEQ",
+                            "members": [
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "CHOICE",
+                                      "members": [
+                                        {
+                                          "type": "SYMBOL",
+                                          "name": "__operator_positive"
+                                        },
+                                        {
+                                          "type": "SYMBOL",
+                                          "name": "__operator_negative"
+                                        }
+                                      ]
+                                    },
+                                    "named": true,
+                                    "value": "operator"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "ALIAS",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "_number_signable"
+                                },
+                                "named": true,
+                                "value": "number"
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "SYMBOL",
+                                      "name": "_term_remainder_number_invalid"
+                                    },
+                                    "named": true,
+                                    "value": "invalid"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "SEQ",
+                            "members": [
+                              {
+                                "type": "ALIAS",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "_number_fraction"
+                                },
+                                "named": true,
+                                "value": "number"
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "SYMBOL",
+                                      "name": "_term_remainder_number_invalid"
+                                    },
+                                    "named": true,
+                                    "value": "invalid"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "SEQ",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "diceRoll"
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "_placeholders"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "SYMBOL",
+                                      "name": "_term_remainder_diceRoll_invalid"
+                                    },
+                                    "named": true,
+                                    "value": "invalid"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "SEQ",
+                            "members": [
+                              {
+                                "type": "SYMBOL",
+                                "name": "_groupRoll"
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "_placeholders"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "SYMBOL",
+                                      "name": "_term_remainder_groupRoll_invalid"
+                                    },
+                                    "named": true,
+                                    "value": "invalid"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "SEQ",
+                            "members": [
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "rollQuery"
+                                  },
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "_parenthesized"
+                                  },
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "_function"
+                                  },
+                                  {
+                                    "type": "SYMBOL",
+                                    "name": "_tableRoll"
+                                  }
+                                ]
+                              },
+                              {
+                                "type": "CHOICE",
+                                "members": [
+                                  {
+                                    "type": "ALIAS",
+                                    "content": {
+                                      "type": "SYMBOL",
+                                      "name": "_term_remainder_general_invalid"
+                                    },
+                                    "named": true,
+                                    "value": "invalid"
+                                  },
+                                  {
+                                    "type": "BLANK"
+                                  }
+                                ]
+                              }
+                            ]
+                          },
+                          {
+                            "type": "SEQ",
+                            "members": [
+                              {
+                                "type": "ALIAS",
+                                "content": {
+                                  "type": "SYMBOL",
+                                  "name": "_term_invalid"
+                                },
+                                "named": true,
+                                "value": "invalid"
+                              }
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    {
                       "type": "CHOICE",
                       "members": [
                         {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "ALIAS",
-                                  "content": {
-                                    "type": "CHOICE",
-                                    "members": [
-                                      {
-                                        "type": "SYMBOL",
-                                        "name": "__operator_positive"
-                                      },
-                                      {
-                                        "type": "SYMBOL",
-                                        "name": "__operator_negative"
-                                      }
-                                    ]
-                                  },
-                                  "named": true,
-                                  "value": "operator"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "ALIAS",
-                              "content": {
-                                "type": "SYMBOL",
-                                "name": "_number_signable"
-                              },
-                              "named": true,
-                              "value": "number"
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "ALIAS",
-                                  "content": {
-                                    "type": "SYMBOL",
-                                    "name": "_term_remainder_number_invalid"
-                                  },
-                                  "named": true,
-                                  "value": "invalid"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            }
-                          ]
+                          "type": "SYMBOL",
+                          "name": "_macro_and_wsp"
                         },
                         {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "ALIAS",
-                              "content": {
-                                "type": "SYMBOL",
-                                "name": "_number_fraction"
-                              },
-                              "named": true,
-                              "value": "number"
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "ALIAS",
-                                  "content": {
-                                    "type": "SYMBOL",
-                                    "name": "_term_remainder_number_invalid"
-                                  },
-                                  "named": true,
-                                  "value": "invalid"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "diceRoll"
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_placeholders"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "ALIAS",
-                                  "content": {
-                                    "type": "SYMBOL",
-                                    "name": "_term_remainder_diceRoll_invalid"
-                                  },
-                                  "named": true,
-                                  "value": "invalid"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "_groupRoll"
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_placeholders"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "ALIAS",
-                                  "content": {
-                                    "type": "SYMBOL",
-                                    "name": "_term_remainder_groupRoll_invalid"
-                                  },
-                                  "named": true,
-                                  "value": "invalid"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "rollQuery"
-                                },
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_parenthesized"
-                                },
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_function"
-                                },
-                                {
-                                  "type": "SYMBOL",
-                                  "name": "_tableRoll"
-                                }
-                              ]
-                            },
-                            {
-                              "type": "CHOICE",
-                              "members": [
-                                {
-                                  "type": "ALIAS",
-                                  "content": {
-                                    "type": "SYMBOL",
-                                    "name": "_term_remainder_general_invalid"
-                                  },
-                                  "named": true,
-                                  "value": "invalid"
-                                },
-                                {
-                                  "type": "BLANK"
-                                }
-                              ]
-                            }
-                          ]
-                        },
-                        {
-                          "type": "SEQ",
-                          "members": [
-                            {
-                              "type": "ALIAS",
-                              "content": {
-                                "type": "SYMBOL",
-                                "name": "_term_invalid"
-                              },
-                              "named": true,
-                              "value": "invalid"
-                            }
-                          ]
+                          "type": "BLANK"
                         }
                       ]
                     }
+                  ]
+                }
+              },
+              {
+                "type": "PREC",
+                "value": 1,
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_macro_and_wsp"
+                }
+              },
+              {
+                "type": "SEQ",
+                "members": [
+                  {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_term_invalid_and_unrecognized"
+                    },
+                    "named": true,
+                    "value": "invalid"
                   },
                   {
                     "type": "CHOICE",
                     "members": [
                       {
                         "type": "SYMBOL",
-                        "name": "_macro_and_wsp"
+                        "name": "_term_first"
                       },
                       {
                         "type": "BLANK"
@@ -1830,27 +1868,10 @@
                   }
                 ]
               }
-            },
-            {
-              "type": "PREC",
-              "value": 1,
-              "content": {
-                "type": "SYMBOL",
-                "name": "_macro_and_wsp"
-              }
-            },
-            {
-              "type": "ALIAS",
-              "content": {
-                "type": "SYMBOL",
-                "name": "_term_invalid_and_unrecognized"
-              },
-              "named": true,
-              "value": "invalid"
-            }
-          ]
-        }
-      ]
+            ]
+          }
+        ]
+      }
     },
     "_term": {
       "type": "CHOICE",
@@ -2065,139 +2086,160 @@
           }
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_term_invalid_and_unrecognized"
-          },
-          "named": true,
-          "value": "invalid"
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_term_invalid_and_unrecognized"
+              },
+              "named": true,
+              "value": "invalid"
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_term"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
         }
       ]
     },
     "_term_invalid": {
-      "type": "CHOICE",
-      "members": [
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_groupRoll_invalid"
-            },
-            {
-              "type": "REPEAT",
-              "content": {
+      "type": "PREC_LEFT",
+      "value": 0,
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_groupRoll_invalid"
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "attribute"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "ability"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_attribute_empty"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_ability_empty"
+                    }
+                  ]
+                }
+              },
+              {
                 "type": "CHOICE",
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "attribute"
+                    "name": "_term_remainder_groupRoll_invalid"
                   },
                   {
-                    "type": "SYMBOL",
-                    "name": "ability"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_attribute_empty"
-                  },
-                  {
-                    "type": "SYMBOL",
-                    "name": "_ability_empty"
+                    "type": "BLANK"
                   }
                 ]
               }
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_term_remainder_groupRoll_invalid"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            }
-          ]
-        },
-        {
-          "type": "SEQ",
-          "members": [
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_attribute_invalid"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_ability_invalid"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_rollQuery_invalid"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_inlineRoll_invalid"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_parenthesized_invalid"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_function_invalid"
-                },
-                {
-                  "type": "SYMBOL",
-                  "name": "_tableRoll_invalid"
-                }
-              ]
-            },
-            {
-              "type": "REPEAT",
-              "content": {
+            ]
+          },
+          {
+            "type": "SEQ",
+            "members": [
+              {
                 "type": "CHOICE",
                 "members": [
                   {
                     "type": "SYMBOL",
-                    "name": "attribute"
+                    "name": "_attribute_invalid"
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "ability"
+                    "name": "_ability_invalid"
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "_attribute_empty"
+                    "name": "_rollQuery_invalid"
                   },
                   {
                     "type": "SYMBOL",
-                    "name": "_ability_empty"
+                    "name": "_inlineRoll_invalid"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_parenthesized_invalid"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_function_invalid"
+                  },
+                  {
+                    "type": "SYMBOL",
+                    "name": "_tableRoll_invalid"
+                  }
+                ]
+              },
+              {
+                "type": "REPEAT",
+                "content": {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "attribute"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "ability"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_attribute_empty"
+                    },
+                    {
+                      "type": "SYMBOL",
+                      "name": "_ability_empty"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_term_remainder_general_invalid"
+                  },
+                  {
+                    "type": "BLANK"
                   }
                 ]
               }
-            },
-            {
-              "type": "CHOICE",
-              "members": [
-                {
-                  "type": "SYMBOL",
-                  "name": "_term_remainder_general_invalid"
-                },
-                {
-                  "type": "BLANK"
-                }
-              ]
-            }
-          ]
-        }
-      ]
+            ]
+          }
+        ]
+      }
     },
     "_term_remainder_number_invalid": {
       "type": "SEQ",
@@ -2344,9 +2386,11 @@
       }
     },
     "_term_invalid_and_unrecognized": {
-      "type": "SEQ",
-      "members": [
-        {
+      "type": "PREC_LEFT",
+      "value": 0,
+      "content": {
+        "type": "REPEAT1",
+        "content": {
           "type": "CHOICE",
           "members": [
             {
@@ -2378,44 +2422,8 @@
               "name": "__just_period"
             }
           ]
-        },
-        {
-          "type": "REPEAT",
-          "content": {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "attribute"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "ability"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_attribute_empty"
-              },
-              {
-                "type": "SYMBOL",
-                "name": "_ability_empty"
-              }
-            ]
-          }
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SYMBOL",
-              "name": "_term_remainder_general_invalid"
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
         }
-      ]
+      }
     },
     "_operator": {
       "type": "SEQ",

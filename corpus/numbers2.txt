@@ -624,6 +624,7 @@ Number: [[._]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
+			(invalid)
 		)
 	) (delimiter)))
 
@@ -635,6 +636,7 @@ Number: [[ ._ ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
+			(invalid)
 			(invalid)
 		)
 	) (delimiter)))
@@ -649,6 +651,7 @@ Number: [[-._]]
 		(term
 			(invalid)
 			(invalid)
+			(invalid)
 		)
 	) (delimiter)))
 
@@ -660,6 +663,7 @@ Number: [[ -._ ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
+			(invalid)
 			(invalid)
 			(invalid)
 		)
