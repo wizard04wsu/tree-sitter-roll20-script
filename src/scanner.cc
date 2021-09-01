@@ -76,7 +76,7 @@ enum TokenType {
 
 
 //For debugging:
-const bool debugging = false;
+const bool debugging = true;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	//https://stackoverflow.com/a/45300654/15788

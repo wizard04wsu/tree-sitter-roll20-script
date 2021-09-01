@@ -1,0 +1,15 @@
+==================
+Dice Roll: [[ d6r3 ]]
+==================
+[[ d6r3 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(delimiter)
+				(sides)
+				(modifiers
+					(reroll)))
+		)
+	) (delimiter)))
