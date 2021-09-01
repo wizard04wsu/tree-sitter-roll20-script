@@ -42,6 +42,7 @@ enum TokenType {
 	//GROUP_ROLL_END,
 	
 	DICE_ROLL_START,
+	DICE_ROLL_MODIFIERS,
 	
 	TABLE_ROLL_START,
 	
@@ -76,7 +77,7 @@ enum TokenType {
 
 
 //For debugging:
-const bool debugging = false;
+const bool debugging = true;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	//https://stackoverflow.com/a/45300654/15788
@@ -136,6 +137,7 @@ void logValidSymbols(const bool *valid_symbols) {
 		 << (valid_symbols[INLINE_ROLL_START]?"INLINE_ROLL_START, ":"")
 		 << (valid_symbols[INLINE_ROLL_END]?"INLINE_ROLL_END, ":"")
 		 << (valid_symbols[DICE_ROLL_START]?"DICE_ROLL_START, ":"")
+		 << (valid_symbols[DICE_ROLL_MODIFIERS]?"DICE_ROLL_MODIFIERS, ":"")
 		 << (valid_symbols[TABLE_ROLL_START]?"TABLE_ROLL_START, ":"")
 		 << (valid_symbols[JUST_AT]?"JUST_AT, ":"")
 		 << (valid_symbols[JUST_PERCENT]?"JUST_PERCENT, ":"")
@@ -702,6 +704,7 @@ struct Scanner {
 		unsigned depth = queries.size()>0 ? queries.size()-1 : 0;
 		string entity = "", delimAtDepth = "", delimAtOrAbove = "", digitAtOrAbove = "";
 		bool scanningEntity = false;
+		string potentiallyValidModifiers = "acdfhklmoprstACDFHKLMOPRST<=>!0123456789.";
 		
 		if (c == 0) {
 			if (valid_symbols[_EOF]) {
@@ -761,6 +764,11 @@ struct Scanner {
 					return match_found(lexer, JUST_HASH, "JUST_HASH");
 				}
 			}
+		}
+		else if (valid_symbols[DICE_ROLL_MODIFIERS] && potentiallyValidModifiers.find(c) > -1) {
+			c = advance(lexer);
+			mark_end(lexer);
+			return match_found(lexer, DICE_ROLL_MODIFIERS, "DICE_ROLL_MODIFIERS");
 		}
 		else {
 			entity = string({c});

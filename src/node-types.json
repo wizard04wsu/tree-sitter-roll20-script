@@ -128,29 +128,6 @@
     }
   },
   {
-    "type": "compounding",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "count",
     "named": true,
     "fields": {},
@@ -174,53 +151,7 @@
     }
   },
   {
-    "type": "countMatches",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "criticalFailure",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "criticalSuccess",
+    "type": "critical",
     "named": true,
     "fields": {},
     "children": {
@@ -310,7 +241,7 @@
     }
   },
   {
-    "type": "drop",
+    "type": "exploding",
     "named": true,
     "fields": {},
     "children": {
@@ -333,7 +264,7 @@
     }
   },
   {
-    "type": "exploding",
+    "type": "failures",
     "named": true,
     "fields": {},
     "children": {
@@ -548,21 +479,13 @@
     }
   },
   {
-    "type": "keep",
+    "type": "keep_or_drop",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
         {
           "type": "inlineRoll",
           "named": true
@@ -625,6 +548,29 @@
     }
   },
   {
+    "type": "matches",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "modifiers",
     "named": true,
     "fields": {},
@@ -641,23 +587,7 @@
           "named": true
         },
         {
-          "type": "compounding",
-          "named": true
-        },
-        {
-          "type": "countMatches",
-          "named": true
-        },
-        {
-          "type": "criticalFailure",
-          "named": true
-        },
-        {
-          "type": "criticalSuccess",
-          "named": true
-        },
-        {
-          "type": "drop",
+          "type": "critical",
           "named": true
         },
         {
@@ -665,27 +595,23 @@
           "named": true
         },
         {
+          "type": "failures",
+          "named": true
+        },
+        {
           "type": "inlineRoll",
           "named": true
         },
         {
-          "type": "keep",
+          "type": "keep_or_drop",
           "named": true
         },
         {
-          "type": "penetrating",
+          "type": "matches",
           "named": true
         },
         {
           "type": "reroll",
-          "named": true
-        },
-        {
-          "type": "reroll_once",
-          "named": true
-        },
-        {
-          "type": "showMatches",
           "named": true
         },
         {
@@ -694,10 +620,6 @@
         },
         {
           "type": "successes",
-          "named": true
-        },
-        {
-          "type": "successesMinusFailures",
           "named": true
         }
       ]
@@ -883,29 +805,6 @@
     }
   },
   {
-    "type": "penetrating",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "prompt",
     "named": true,
     "fields": {},
@@ -942,29 +841,6 @@
   },
   {
     "type": "reroll",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "reroll_once",
     "named": true,
     "fields": {},
     "children": {
@@ -1053,29 +929,6 @@
     }
   },
   {
-    "type": "showMatches",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "sides",
     "named": true,
     "fields": {},
@@ -1103,7 +956,7 @@
     }
   },
   {
-    "type": "successes",
+    "type": "sort",
     "named": true,
     "fields": {},
     "children": {
@@ -1117,16 +970,12 @@
         {
           "type": "attribute",
           "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
         }
       ]
     }
   },
   {
-    "type": "successesMinusFailures",
+    "type": "successes",
     "named": true,
     "fields": {},
     "children": {
@@ -1274,10 +1123,6 @@
     "named": false
   },
   {
-    "type": "!!",
-    "named": false
-  },
-  {
     "type": "fate",
     "named": true
   },
@@ -1287,10 +1132,6 @@
   },
   {
     "type": "macroHash",
-    "named": true
-  },
-  {
-    "type": "sort",
     "named": true
   },
   {
