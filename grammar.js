@@ -32,7 +32,6 @@ module.exports = grammar({
 		//$.__groupRoll_end,
 		
 		$.__diceRoll_start,				// d or D  or equivalent HTML entity
-		$.__diceRoll_modifiers_indeterminate,	// placeholders surrounded by potentially valid characters
 		
 		$.__tableRoll_start,			// t or T  or equivalent HTML entity
 		
@@ -143,7 +142,7 @@ module.exports = grammar({
 		  ║ Strings and Characters
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		_stringNL: $ => chainOf(choice( /[^#]|\r\n|\n/, $.__just_hash )),
+		_stringNL: $ => chainOf(choice( /[^#]|\r?\n/, $.__just_hash )),
 		
 		_wsp_inline: $ => /\s+/,
 		
@@ -166,12 +165,12 @@ module.exports = grammar({
 			optional($._number_fraction),
 		)),
 		_number_fraction: $ => seq(
-			$.__decimal_point,
+			alias($.__decimal_point, $.decimalPoint),
 			$._number_integer,
 		),
 		_number_integer: $ => prec.right(repeat1(
 			prec.right(1, choice(
-				$.__integer,
+				alias($.__integer, $.number),
 				$._placeholders,
 				$._inlineRoll,
 			))
@@ -369,7 +368,7 @@ module.exports = grammar({
 			seq(
 				alias($._root_macro_safe, $.macro),
 				choice(
-					/ |\r\n|\n/,
+					/ |\r?\n/,
 					$.__EOF,
 				),
 			),
@@ -405,7 +404,7 @@ module.exports = grammar({
 			seq(
 				alias($._macro_safe, $.macro),
 				choice(
-					/ |\r\n|\n/,
+					/ |\r?\n/,
 					$.__EOF,
 				),
 			),
@@ -622,21 +621,21 @@ module.exports = grammar({
 								$.__operator_positive,
 								$.__operator_negative,
 							), $.operator)),
-							alias($._number_signable, $.number),
+							alias($._number_signable, $.quantity),
 							optional(alias($._term_remainder_number_invalid, $.invalid)),
 						),
 						seq(
-							alias($._number_fraction, $.number),
+							alias($._number_fraction, $.quantity),
 							optional(alias($._term_remainder_number_invalid, $.invalid)),
 						),
 						seq(
 							$.diceRoll,
-							optional($._placeholders),
+							//optional($._placeholders),
 							optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
 						),
 						seq(
 							$._groupRoll,
-							optional($._placeholders),
+							//optional($._placeholders),
 							optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
 						),
 						seq(
@@ -666,17 +665,17 @@ module.exports = grammar({
 			prec(1, seq(
 				prec.right(choice(
 					seq(
-						alias($._number, $.number),	//numbers, attributes, abilities, and inline rolls
+						alias($._number, $.quantity),	//numbers, attributes, abilities, and inline rolls
 						optional(alias($._term_remainder_number_invalid, $.invalid)),
 					),
 					seq(
 						$.diceRoll,
-						optional($._placeholders),
+						//optional($._placeholders),
 						optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
 					),
 					seq(
 						$._groupRoll,
-						optional($._placeholders),
+						//optional($._placeholders),
 						optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
 					),
 					seq(
@@ -1078,7 +1077,7 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		_integer_or_inlineRoll: $ => choice(
-			$.__integer,
+			alias($.__integer, $.number),
 			$._inlineRoll,
 		),
 		
@@ -1106,7 +1105,7 @@ module.exports = grammar({
 			alias($._modifier_keepOrDrop, $.keep_or_drop),
 		),
 		
-		_diceRoll_modifiers: $ => prec(1, repeat1(
+		_diceRoll_modifiers: $ => prec.right(1, repeat1(
 			prec.right(1, choice(
 				alias($._modifier_critical, $.critical),
 				alias($._modifier_exploding, $.exploding),
@@ -1158,12 +1157,8 @@ module.exports = grammar({
 				),
 			)),
 		)),
-		/*_diceRoll_modifiers: $ => repeat1(choice(
-			/[aAcCdDfFhHkKlLmMoOpPrRsStT!<=>]/,
-			$._number,
-		)),*/
 		
-		_groupRoll_modifiers: $ => prec(1, repeat1(
+		_groupRoll_modifiers: $ => prec.right(1, repeat1(
 			prec.right(1, choice(
 				$._shared_modifier,
 				seq(
@@ -1188,13 +1183,10 @@ module.exports = grammar({
 				),
 			)),
 		)),
-		/*_groupRoll_modifiers: $ => repeat1(choice(
-			/[dDfFhHkKlL<=>]/,
-			$._number,
-		)),*/
 		
 		_modifier_critical: $ => seq(
-			/[cC][sSfF]/,
+			/[cC]/,
+			optional(/[sSfF]/),
 			$._modifier_comparison_lazy,
 		),
 		_modifier_countSuccesses: $ => seq(
@@ -1205,8 +1197,7 @@ module.exports = grammar({
 			$._modifier_comparison_lazy,
 		),
 		_modifier_exploding: $ => prec.right(seq(
-			"!",
-			optional(/[!pP]/),
+			/![!pP]?/,
 			optional($._modifier_comparison_lazy),
 		)),
 		_modifier_matches: $ => prec.right(seq(
@@ -1247,7 +1238,6 @@ module.exports = grammar({
 			alias($._diceRoll_sides, $.sides),
 			//modifiers
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
-			//optional(alias($._diceRoll_modifiers_both, $.modifiers)),
 		)),
 		_diceRoll_sides: $ => choice(
 			$._number,
@@ -1322,7 +1312,6 @@ module.exports = grammar({
 			$._groupRoll_content,
 			$._$braceRight,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
-			//optional(alias($._groupRoll_modifiers_both, $.modifiers)),
 		)),
 		_groupRoll_content: $ => seq(
 			optional(alias($._groupRoll_invalid_commas, $.invalid)),
@@ -1359,7 +1348,6 @@ module.exports = grammar({
 				seq(
 					$._$braceRight,
 					optional(alias($._groupRoll_modifiers, $.modifiers)),
-					//optional(alias($._groupRoll_modifiers_both, $.modifiers)),
 				),
 				$.__EOF,
 			),

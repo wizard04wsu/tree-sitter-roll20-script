@@ -51,7 +51,7 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^#]|\\r\\n|\\n"
+              "value": "[^#]|\\r?\\n"
             },
             {
               "type": "SYMBOL",
@@ -111,8 +111,13 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "__decimal_point"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "__decimal_point"
+          },
+          "named": true,
+          "value": "decimalPoint"
         },
         {
           "type": "SYMBOL",
@@ -132,8 +137,13 @@
             "type": "CHOICE",
             "members": [
               {
-                "type": "SYMBOL",
-                "name": "__integer"
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "__integer"
+                },
+                "named": true,
+                "value": "number"
               },
               {
                 "type": "SYMBOL",
@@ -675,7 +685,7 @@
                 "members": [
                   {
                     "type": "PATTERN",
-                    "value": " |\\r\\n|\\n"
+                    "value": " |\\r?\\n"
                   },
                   {
                     "type": "SYMBOL",
@@ -828,7 +838,7 @@
                 "members": [
                   {
                     "type": "PATTERN",
-                    "value": " |\\r\\n|\\n"
+                    "value": " |\\r?\\n"
                   },
                   {
                     "type": "SYMBOL",
@@ -1631,7 +1641,7 @@
                                   "name": "_number_signable"
                                 },
                                 "named": true,
-                                "value": "number"
+                                "value": "quantity"
                               },
                               {
                                 "type": "CHOICE",
@@ -1662,7 +1672,7 @@
                                   "name": "_number_fraction"
                                 },
                                 "named": true,
-                                "value": "number"
+                                "value": "quantity"
                               },
                               {
                                 "type": "CHOICE",
@@ -1694,18 +1704,6 @@
                                 "type": "CHOICE",
                                 "members": [
                                   {
-                                    "type": "SYMBOL",
-                                    "name": "_placeholders"
-                                  },
-                                  {
-                                    "type": "BLANK"
-                                  }
-                                ]
-                              },
-                              {
-                                "type": "CHOICE",
-                                "members": [
-                                  {
                                     "type": "ALIAS",
                                     "content": {
                                       "type": "SYMBOL",
@@ -1727,18 +1725,6 @@
                               {
                                 "type": "SYMBOL",
                                 "name": "_groupRoll"
-                              },
-                              {
-                                "type": "CHOICE",
-                                "members": [
-                                  {
-                                    "type": "SYMBOL",
-                                    "name": "_placeholders"
-                                  },
-                                  {
-                                    "type": "BLANK"
-                                  }
-                                ]
                               },
                               {
                                 "type": "CHOICE",
@@ -1898,7 +1884,7 @@
                             "name": "_number"
                           },
                           "named": true,
-                          "value": "number"
+                          "value": "quantity"
                         },
                         {
                           "type": "CHOICE",
@@ -1930,18 +1916,6 @@
                           "type": "CHOICE",
                           "members": [
                             {
-                              "type": "SYMBOL",
-                              "name": "_placeholders"
-                            },
-                            {
-                              "type": "BLANK"
-                            }
-                          ]
-                        },
-                        {
-                          "type": "CHOICE",
-                          "members": [
-                            {
                               "type": "ALIAS",
                               "content": {
                                 "type": "SYMBOL",
@@ -1963,18 +1937,6 @@
                         {
                           "type": "SYMBOL",
                           "name": "_groupRoll"
-                        },
-                        {
-                          "type": "CHOICE",
-                          "members": [
-                            {
-                              "type": "SYMBOL",
-                              "name": "_placeholders"
-                            },
-                            {
-                              "type": "BLANK"
-                            }
-                          ]
                         },
                         {
                           "type": "CHOICE",
@@ -3563,8 +3525,13 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "__integer"
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "__integer"
+          },
+          "named": true,
+          "value": "number"
         },
         {
           "type": "SYMBOL",
@@ -3674,7 +3641,7 @@
       ]
     },
     "_diceRoll_modifiers": {
-      "type": "PREC",
+      "type": "PREC_RIGHT",
       "value": 1,
       "content": {
         "type": "REPEAT1",
@@ -3914,7 +3881,7 @@
       }
     },
     "_groupRoll_modifiers": {
-      "type": "PREC",
+      "type": "PREC_RIGHT",
       "value": 1,
       "content": {
         "type": "REPEAT1",
@@ -4008,7 +3975,19 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[cC][sSfF]"
+          "value": "[cC]"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "PATTERN",
+              "value": "[sSfF]"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "SYMBOL",
@@ -4045,20 +4024,8 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
-            "value": "!"
-          },
-          {
-            "type": "CHOICE",
-            "members": [
-              {
-                "type": "PATTERN",
-                "value": "[!pP]"
-              },
-              {
-                "type": "BLANK"
-              }
-            ]
+            "type": "PATTERN",
+            "value": "![!pP]?"
           },
           {
             "type": "CHOICE",
@@ -5017,10 +4984,6 @@
     {
       "type": "SYMBOL",
       "name": "__diceRoll_start"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__diceRoll_modifiers_indeterminate"
     },
     {
       "type": "SYMBOL",

@@ -8,7 +8,7 @@ Dice Roll: [[d20]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides))
+				(sides (number)))
 		)
 	) (delimiter)))
 
@@ -22,7 +22,7 @@ Dice Roll: [[ d20 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides))
+				(sides (number)))
 		)
 	) (delimiter)))
 
@@ -36,7 +36,7 @@ Dice Roll: [[ D20 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides))
+				(sides (number)))
 		)
 	) (delimiter)))
 
@@ -49,9 +49,9 @@ Dice Roll: [[10d20]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
-				(count)
+				(count (number))
 				(delimiter)
-				(sides))
+				(sides (number)))
 		)
 	) (delimiter)))
 
@@ -64,9 +64,9 @@ Dice Roll: [[ 10d20 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
-				(count)
+				(count (number))
 				(delimiter)
-				(sides))
+				(sides (number)))
 		)
 	) (delimiter)))
 
@@ -154,7 +154,8 @@ Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 						(character)
 						(delimiter)
 						(name)
-						(delimiter)))
+						(delimiter))
+				)
 				(delimiter)
 				(sides
 					(attribute
@@ -166,16 +167,22 @@ Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 						(character)
 						(delimiter)
 						(name)
-						(delimiter)))
+						(delimiter))
+				)
 				(modifiers
+					(critical
+						(attribute
+							(delimiter)
+							(name)
+							(delimiter))
+						(number)
+					)
 					(attribute
 						(delimiter)
 						(name)
 						(delimiter))
-					(attribute
-						(delimiter)
-						(name)
-						(delimiter))))
+				)
+			)
 		)
 	) (delimiter)))
 
@@ -189,12 +196,17 @@ Dice Roll: [[ d6c@{s}5 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
-					(attribute
-						(delimiter)
-						(name)
-						(delimiter))))
+					(critical
+						(attribute
+							(delimiter)
+							(name)
+							(delimiter))
+						(number)
+					)
+				)
+			)
 		)
 	) (delimiter)))
 
@@ -208,10 +220,12 @@ Dice Roll: [[ d6r5r=5 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
-					(reroll)
-					(reroll)))
+					(reroll (number))
+					(reroll (number))
+				)
+			)
 		)
 	) (delimiter)))
 
@@ -225,9 +239,9 @@ Dice Roll: [[ d6r5 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
-					(reroll)))
+					(reroll (number))))
 		)
 	) (delimiter)))
 
@@ -241,9 +255,9 @@ Dice Roll: [[ d6r=5 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
-					(reroll)))
+					(reroll (number))))
 		)
 	) (delimiter)))
 
@@ -256,40 +270,42 @@ Dice Roll: long one, lower case
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
-				(count)
+				(count (number))
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
 					(sort)
-					(reroll)
+					(reroll (number))
 					(sort)
-					(reroll)
-					(reroll_once)
-					(reroll_once)
+					(reroll (number))
+					(reroll (number))
+					(reroll (number))
+					(exploding (number))
+					(exploding (number))
+					(exploding (number))
+					(exploding (number))
 					(exploding)
-					(exploding)
-					(compounding)
-					(compounding)
-					(penetrating)
-					(penetrating)
-					(penetrating)
-					(keep)
-					(keep)
-					(keep)
-					(drop)
-					(drop)
-					(drop)
-					(successes)
-					(successesMinusFailures)
-					(successesMinusFailures)
-					(criticalSuccess)
-					(criticalSuccess)
-					(criticalFailure)
-					(criticalFailure)
-					(showMatches)
-					(showMatches)
-					(countMatches)
-					(countMatches)
+					(exploding (number))
+					(exploding (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(successes (number))
+					(successes (number))
+					(failures (number))
+					(successes (number))
+					(failures (number))
+					(critical (number))
+					(critical (number))
+					(critical (number))
+					(critical (number))
+					(matches (number))
+					(matches (number) (number))
+					(matches (number))
+					(matches (number) (number))
 					(sort)
 					(sort)))
 		)
@@ -304,38 +320,40 @@ Dice Roll: long one, upper case
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
-				(count)
+				(count (number))
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
-					(reroll)
-					(reroll)
-					(reroll_once)
-					(reroll_once)
+					(reroll (number))
+					(reroll (number))
+					(reroll (number))
+					(reroll (number))
+					(exploding (number))
+					(exploding (number))
+					(exploding (number))
+					(exploding (number))
 					(exploding)
-					(exploding)
-					(compounding)
-					(compounding)
-					(penetrating)
-					(penetrating)
-					(penetrating)
-					(keep)
-					(keep)
-					(keep)
-					(drop)
-					(drop)
-					(drop)
-					(successes)
-					(successesMinusFailures)
-					(successesMinusFailures)
-					(criticalSuccess)
-					(criticalSuccess)
-					(criticalFailure)
-					(criticalFailure)
-					(showMatches)
-					(showMatches)
-					(countMatches)
-					(countMatches)
+					(exploding (number))
+					(exploding (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(keep_or_drop (number))
+					(successes (number))
+					(successes (number))
+					(failures (number))
+					(successes (number))
+					(failures (number))
+					(critical (number))
+					(critical (number))
+					(critical (number))
+					(critical (number))
+					(matches (number))
+					(matches (number) (number))
+					(matches (number))
+					(matches (number) (number))
 					(sort)
 					(sort)))
 		)
@@ -351,13 +369,18 @@ Dice Roll: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides)
+				(sides (number))
 				(modifiers
-					(attribute
-						(delimiter)
-						(name)
-						(delimiter))
-					(criticalSuccess)))
+					(critical
+						(attribute
+							(delimiter)
+							(name)
+							(delimiter))
+						(number)
+					)
+					(critical
+						(number)
+					)
 			(invalid
 				(attribute
 					(delimiter)
@@ -374,7 +397,7 @@ Number: Valid with Invalid Remainder: [[5d_]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -388,9 +411,9 @@ Dice Roll: [[5d3_]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
-				(count)
+				(count (number))
 				(delimiter)
-				(sides))
+				(sides (number)))
 			(invalid)
 		)
 	) (delimiter)))

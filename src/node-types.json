@@ -144,7 +144,15 @@
           "named": true
         },
         {
+          "type": "decimalPoint",
+          "named": true
+        },
+        {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -168,6 +176,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -259,6 +271,10 @@
         {
           "type": "inlineRoll",
           "named": true
+        },
+        {
+          "type": "number",
+          "named": true
         }
       ]
     }
@@ -281,6 +297,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -416,6 +436,10 @@
           "named": true
         },
         {
+          "type": "decimalPoint",
+          "named": true
+        },
+        {
           "type": "delimiter",
           "named": true
         },
@@ -468,6 +492,10 @@
           "named": true
         },
         {
+          "type": "quantity",
+          "named": true
+        },
+        {
           "type": "rollQuery",
           "named": true
         },
@@ -484,10 +512,14 @@
     "fields": {},
     "children": {
       "multiple": false,
-      "required": false,
+      "required": true,
       "types": [
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -566,6 +598,10 @@
         {
           "type": "inlineRoll",
           "named": true
+        },
+        {
+          "type": "number",
+          "named": true
         }
       ]
     }
@@ -611,6 +647,10 @@
           "named": true
         },
         {
+          "type": "number",
+          "named": true
+        },
+        {
           "type": "reroll",
           "named": true
         },
@@ -651,29 +691,6 @@
         },
         {
           "type": "macroHash",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "number",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
           "named": true
         }
       ]
@@ -840,6 +857,37 @@
     }
   },
   {
+    "type": "quantity",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "decimalPoint",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "reroll",
     "named": true,
     "fields": {},
@@ -857,6 +905,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -945,11 +997,19 @@
           "named": true
         },
         {
+          "type": "decimalPoint",
+          "named": true
+        },
+        {
           "type": "fate",
           "named": true
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -992,6 +1052,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
@@ -1096,15 +1160,15 @@
           "named": true
         },
         {
-          "type": "number",
-          "named": true
-        },
-        {
           "type": "operator",
           "named": true
         },
         {
           "type": "parenthesized",
+          "named": true
+        },
+        {
+          "type": "quantity",
           "named": true
         },
         {
@@ -1119,8 +1183,8 @@
     }
   },
   {
-    "type": "!",
-    "named": false
+    "type": "decimalPoint",
+    "named": true
   },
   {
     "type": "fate",
@@ -1132,6 +1196,10 @@
   },
   {
     "type": "macroHash",
+    "named": true
+  },
+  {
+    "type": "number",
     "named": true
   },
   {

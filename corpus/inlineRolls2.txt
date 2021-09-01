@@ -46,7 +46,7 @@ Inline Roll: [[5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -58,7 +58,7 @@ Inline Roll: [[ 5 ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -76,7 +76,7 @@ Inline Roll: [[-5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -89,7 +89,7 @@ Inline Roll: [[ -5 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -102,7 +102,7 @@ Inline Roll: [[+5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -115,7 +115,7 @@ Inline Roll: [[- 5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -129,7 +129,7 @@ Inline Roll: [[-+5]]
 		(term
 			(invalid)
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -143,7 +143,7 @@ Inline Roll: [[+-5]]
 		(term
 			(invalid)
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -158,7 +158,7 @@ Inline Roll: [[- - -5]]
 			(invalid)
 			(invalid)
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -171,7 +171,7 @@ Inline Roll: [[*5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -184,7 +184,7 @@ Inline Roll: [[%5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -201,11 +201,11 @@ Inline Roll: [[1-5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -217,11 +217,11 @@ Inline Roll: [[1 - 5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -233,11 +233,11 @@ Inline Roll: [[1+5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -249,11 +249,11 @@ Inline Roll: [[1*5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -265,11 +265,11 @@ Inline Roll: [[1/5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -281,11 +281,11 @@ Inline Roll: [[1%5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -297,12 +297,12 @@ Inline Roll: [[1+-5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -314,12 +314,12 @@ Inline Roll: [[1 + - 5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -331,12 +331,12 @@ Inline Roll: [[1-+5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -348,12 +348,12 @@ Inline Roll: [[1 - + 5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -365,12 +365,12 @@ Inline Roll: [[1--5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(invalid)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -382,12 +382,12 @@ Inline Roll: [[1 - - 5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(invalid)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -399,7 +399,7 @@ Inline Roll: [[1+ - + -+ -+-5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(operator)
@@ -410,7 +410,7 @@ Inline Roll: [[1+ - + -+ -+-5]]
 		(operator)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -422,7 +422,7 @@ Inline Roll: [[1 / + - + -+ -+-5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(operator)
@@ -434,7 +434,7 @@ Inline Roll: [[1 / + - + -+ -+-5]]
 		(operator)
 		(operator)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -446,7 +446,7 @@ Inline Roll: [[1 - / + - + -+ -+-5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(invalid)
@@ -459,7 +459,7 @@ Inline Roll: [[1 - / + - + -+ -+-5]]
 		(invalid)
 		(invalid)
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -476,7 +476,7 @@ Inline Roll: [[@{a}]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(attribute (delimiter)
 					(name) (delimiter)))
 		)
@@ -490,7 +490,7 @@ Inline Roll: [[ @{a} ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(attribute (delimiter)
 					(name) (delimiter)))
 		)
@@ -504,7 +504,7 @@ Inline Roll: [[@{c|a}]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(attribute (delimiter)
 					(character) (delimiter)
 					(name) (delimiter)))
@@ -519,7 +519,7 @@ Inline Roll: [[%{a}]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(ability (delimiter)
 					(name) (delimiter)))
 		)
@@ -533,7 +533,7 @@ Inline Roll: [[ %{a} ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(ability (delimiter)
 					(name) (delimiter)))
 		)
@@ -547,7 +547,7 @@ Inline Roll: [[%{c|a}]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(ability (delimiter)
 					(character) (delimiter)
 					(name) (delimiter)))
@@ -660,10 +660,10 @@ Inline Roll: [[ [[5]] ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(inlineRoll (delimiter) (formula
 					(term
-						(number)
+						(quantity (number))
 					)
 				) (delimiter)))
 		)
@@ -678,12 +678,12 @@ Inline Roll: [[ @{a}[[5]]%{b} ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(attribute (delimiter)
 					(name) (delimiter))
 				(inlineRoll (delimiter) (formula
 					(term
-						(number)
+						(quantity (number))
 					)
 				) (delimiter))
 				(ability (delimiter)
@@ -699,12 +699,12 @@ Inline Roll: [[ -@{a}[[5]]%{b} ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number
+			(quantity
 				(attribute (delimiter)
 					(name) (delimiter))
 				(inlineRoll (delimiter) (formula
 					(term
-						(number)
+						(quantity (number))
 					)
 				) (delimiter))
 				(ability (delimiter)
@@ -727,7 +727,7 @@ Inline Roll: [[5]
 		(invalid (delimiter))
 		(formula
 			(term
-				(number)
+				(quantity (number))
 			)
 		)
 		(invalid (delimiter))))
@@ -742,7 +742,7 @@ Inline Roll: [[5
 		(invalid (delimiter))
 		(formula
 			(term
-				(number)
+				(quantity (number))
 			)
 		)))
 
