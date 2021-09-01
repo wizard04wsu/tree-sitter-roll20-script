@@ -32,6 +32,7 @@ module.exports = grammar({
 		//$.__groupRoll_end,
 		
 		$.__diceRoll_start,				// d or D  or equivalent HTML entity
+		$.__diceRoll_modifiers_indeterminate,	// placeholders surrounded by potentially valid characters
 		
 		$.__tableRoll_start,			// t or T  or equivalent HTML entity
 		
@@ -142,7 +143,7 @@ module.exports = grammar({
 		  ║ Strings and Characters
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		_stringNL: $ => chainOf(choice( /[^#]|\r?\n/, $.__just_hash )),
+		_stringNL: $ => chainOf(choice( /[^#]|\r\n|\n/, $.__just_hash )),
 		
 		_wsp_inline: $ => /\s+/,
 		
@@ -368,7 +369,7 @@ module.exports = grammar({
 			seq(
 				alias($._root_macro_safe, $.macro),
 				choice(
-					/ |\r?\n/,
+					/ |\r\n|\n/,
 					$.__EOF,
 				),
 			),
@@ -404,7 +405,7 @@ module.exports = grammar({
 			seq(
 				alias($._macro_safe, $.macro),
 				choice(
-					/ |\r?\n/,
+					/ |\r\n|\n/,
 					$.__EOF,
 				),
 			),
@@ -1076,11 +1077,22 @@ module.exports = grammar({
 		   │   this script doesn't allow for those.
 		   └─────────────────────────────*/
 		
+		_modifier_comparison: $ => /[<=>]/,
+		_modifier_comparison_strict: $ => seq(
+			/[<=>]/,
+			$._number,
+		),
+		_modifier_comparison_lazy: $ => seq(
+			optional(/[<=>]/),
+			$._number,
+		),
+		_modifier_high_low: $ => /[hHlL]/,
+		
 		_shared_modifier: $ => choice(
 			alias($._modifier_keep, $.keep),
 			alias($._modifier_drop, $.drop),
-			alias($._modifier_successes, $.successes),
-			alias($._modifier_successesMinusFailures, $.successesMinusFailures),
+			alias($._modifier_countSuccesses, $.successes),
+			alias($._modifier_countFailures, $.failures),
 		),
 		
 		_diceRoll_modifiers: $ => prec(1, repeat1(choice(
@@ -1095,17 +1107,61 @@ module.exports = grammar({
 			alias($._modifier_showMatches, $.showMatches),
 			alias($._modifier_countMatches, $.countMatches),
 			alias($._modifier_sort, $.sort),
+			choice(
+				seq(
+					$._placeholders,
+					optional(choice(
+						seq(
+							$._modifier_comparison,
+							optional(choice(
+								seq(
+									$._placeholders,
+									optional($._number),
+								),
+								$._number,
+							)),
+						),
+						seq(
+							/[oO!pPsSfF0123456789tT]/,
+							$._modifier_comparison,
+							optional(choice(
+								seq(
+									$._placeholders,
+									optional($._number),
+								),
+								$._number,
+							)),
+						),
+						seq(
+							/[oO!pPsSfF0123456789tT]/,
+							optional(seq(
+								choice(
+									$._placeholders,
+									$._modifier_comparison,
+								),
+								optional(choice(
+									seq(
+										$._placeholders,
+										optional($._number),
+									),
+									$._number,
+								)),
+							)),
+						),
+					)),
+				),
+			),
 		))),
-		_diceRoll_modifiers_indeterminate: $ => repeat1(choice(
+		/*_diceRoll_modifiers_indeterminate: $ => repeat1(choice(
 			$._number,
 			/[acdfhklmoprstACDFHKLMOPRST<=>!]/,	//potentially valid
 		)),
-		_diceRoll_modifiers_both: $ => prec.right(repeat1(
-				prec.right(choice(
+		_diceRoll_modifiers_both: $ => repeat1(
+			prec.right(choice(
 				$._diceRoll_modifiers,
 				$._diceRoll_modifiers_indeterminate,
 			))
-		)),
+		),*/
 		
 		_groupRoll_modifiers: $ => prec(1, repeat1($._shared_modifier)),
 		_groupRoll_modifiers_indeterminate: $ => repeat1(choice(
@@ -1119,40 +1175,46 @@ module.exports = grammar({
 			))
 		)),
 		
-		_modifier_reroll: $ => seq( /[rR][<=>]?/, $._number ),
-		_modifier_reroll_once: $ => seq( /[rR][oO][<=>]?/, $._number ),
-		_modifier_exploding: $ => seq(
-			"!",
-			optional(seq(
-				/[<=>]?/,
-				$._number,
-			)),
+		_modifier_criticalSuccess: $ => seq(
+			/[cC][Ss]/,
+			optional($._modifier_comparison),
+			$._number,
 		),
-		_modifier_compounding: $ => seq(
+		_modifier_criticalFailure: $ => seq(
+			/[cC][fF]/,
+			optional($._modifier_comparison),
+			$._number,
+		),
+		_modifier_countSuccesses: $ => seq(
+			$._modifier_comparison_strict,
+		),
+		_modifier_countFailures: $ => seq(
+			/[fF]/,
+			$._modifier_comparison_lazy,
+		),
+		_modifier_exploding: $ => prec.right(seq(
+			"!",
+			optional($._modifier_comparison_lazy),
+		)),
+		_modifier_compounding: $ => prec.right(seq(
 			"!!",
 			optional(seq(
-				/[<=>]?/,
+				optional($._modifier_comparison),
 				$._number,
 			)),
-		),
-		_modifier_penetrating: $ => seq(
+		)),
+		_modifier_penetrating: $ => prec.right(seq(
 			/![pP]/,
 			optional(seq(
-				/[<=>]?/,
+				optional($._modifier_comparison),
 				$._number,
 			)),
-		),
-		_modifier_keep: $ => seq( /[kK][hHlL]?/, $._number ),
-		_modifier_drop: $ => seq( /[dD][hHlL]?/, $._number ),
-		_modifier_successes: $ => seq( /[<=>]/, $._number ),
-		_modifier_successesMinusFailures: $ => seq( /[<=>]/, $._number, /[fF][<=>]?/, $._number ),
-		_modifier_criticalSuccess: $ => seq( /[cC][Ss][<=>]?/, $._number ),
-		_modifier_criticalFailure: $ => seq( /[cC][fF][<=>]?/, $._number ),
+		)),
 		_modifier_showMatches: $ => prec.right(seq(
 			/[mM]/,
 			$._number,
 			optional(seq(
-				/[<=>]/,
+				optional($._modifier_comparison),
 				$._number,
 			)),
 		)),
@@ -1160,10 +1222,28 @@ module.exports = grammar({
 			/[mM][tT]/,
 			$._number,
 			optional(seq(
-				/[<=>]/,
+				optional($._modifier_comparison),
 				$._number,
 			)),
 		)),
+		_modifier_keep: $ => seq(
+			/[kK]/,
+			optional($._modifier_high_low),
+			$._number,
+		),
+		_modifier_drop: $ => seq(
+			/[dD]/,
+			optional($._modifier_high_low),
+			$._number,
+		),
+		_modifier_reroll: $ => seq(
+			/[rR]/,
+			$._modifier_comparison_lazy,
+		),
+		_modifier_reroll_once: $ => seq(
+			/[rR][oO]/,
+			$._modifier_comparison_lazy,
+		),
 		_modifier_sort: $ => /[sS][aAdD]/,
 		
 		
@@ -1179,8 +1259,8 @@ module.exports = grammar({
 			//number of sides per die
 			alias($._diceRoll_sides, $.sides),
 			//modifiers
-			//optional(alias($._diceRoll_modifiers, $.modifiers)),
-			optional(alias($._diceRoll_modifiers_both, $.modifiers)),
+			optional(alias($._diceRoll_modifiers, $.modifiers)),
+			//optional(alias($._diceRoll_modifiers_both, $.modifiers)),
 		)),
 		_diceRoll_sides: $ => choice(
 			$._number,
