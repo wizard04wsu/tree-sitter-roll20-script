@@ -1159,9 +1159,8 @@ module.exports = grammar({
 			)),
 		)),
 		/*_diceRoll_modifiers: $ => repeat1(choice(
-			/[aAcCdDfFhHkKlLmMoOpPrRsStT!<=>\d]/,
-			$._inlineRoll,
-			$._placeholders,
+			/[aAcCdDfFhHkKlLmMoOpPrRsStT!<=>]/,
+			$._number,
 		)),*/
 		
 		_groupRoll_modifiers: $ => prec(1, repeat1(
@@ -1190,9 +1189,8 @@ module.exports = grammar({
 			)),
 		)),
 		/*_groupRoll_modifiers: $ => repeat1(choice(
-			/[dDfFhHkKlL<=>\d]/,
-			$._inlineRoll,
-			$._placeholders,
+			/[dDfFhHkKlL<=>]/,
+			$._number,
 		)),*/
 		
 		_modifier_critical: $ => seq(
