@@ -8,7 +8,7 @@ Parenthesized: [[(5)]]
 		(term
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -24,7 +24,7 @@ Parenthesized: [[ ( 5 ) ]]
 		(term
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -41,11 +41,11 @@ Parenthesized: [[(-5-5)]]
 			(parenthesized (delimiter) (formula
 				(term
 					(operator)
-					(number)
+					(quantity (number))
 				)
 				(operator)
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -62,11 +62,11 @@ Parenthesized: [[ ( -5 - 5 ) ]]
 			(parenthesized (delimiter) (formula
 				(term
 					(operator)
-					(number)
+					(quantity (number))
 				)
 				(operator)
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -80,13 +80,13 @@ Parenthesized: [[5+(5)]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -100,13 +100,13 @@ Parenthesized: [[ 5 + ( 5 ) ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 		(operator)
 		(term
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -128,7 +128,7 @@ Parenthesized: [[-(5)]]
 			(invalid)
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -145,7 +145,7 @@ Parenthesized: [[ -(5) ]]
 			(invalid)
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -215,7 +215,7 @@ Parenthesized: [[(5
 					(invalid (delimiter))
 					(formula
 						(term
-							(number)
+							(quantity (number))
 						)
 					))
 			))))

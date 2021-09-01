@@ -8,7 +8,7 @@ Math Function: [[abs(5)]]
 		(term
 			(function (name) (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -24,7 +24,7 @@ Math Function: [[ abs( 5 ) ]]
 		(term
 			(function (name) (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -40,7 +40,7 @@ Math Function: [[ceil(5)]]
 		(term
 			(function (name) (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -56,7 +56,7 @@ Math Function: [[floor(5)]]
 		(term
 			(function (name) (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -72,7 +72,7 @@ Math Function: [[round(5)]]
 		(term
 			(function (name) (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -118,7 +118,7 @@ Math Function: [[-abs(5)]]
 			(invalid)
 			(function (name) (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -135,7 +135,7 @@ Math Function: [[x(5)]]
 			(invalid)
 			(parenthesized (delimiter) (formula
 				(term
-					(number)
+					(quantity (number))
 				)
 			) (delimiter))
 		)
@@ -173,7 +173,7 @@ Math Function: [[abs(5
 					(invalid (name) (delimiter))
 					(formula
 						(term
-							(number)
+							(quantity (number))
 						)))))))
 
 ==================

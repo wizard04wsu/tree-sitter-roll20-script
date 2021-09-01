@@ -6,7 +6,7 @@ Number: [[5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -18,7 +18,7 @@ Number: [[ 5 ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -30,7 +30,7 @@ Number: [[42]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -42,7 +42,7 @@ Number: [[ 42 ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -54,7 +54,7 @@ Number: [[5.5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -66,7 +66,7 @@ Number: [[ 5.5 ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -78,7 +78,7 @@ Number: [[42.42]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -90,7 +90,7 @@ Number: [[ 42.42 ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -103,7 +103,7 @@ Number: [[-5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -116,7 +116,7 @@ Number: [[ -5 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -129,7 +129,7 @@ Number: [[-42.42]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -142,7 +142,7 @@ Number: [[ -42.42 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -155,7 +155,7 @@ Number: [[+5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -168,7 +168,7 @@ Number: [[ +5 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 		)
 	) (delimiter)))
 
@@ -181,7 +181,7 @@ Number: [[+42.42]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -194,7 +194,7 @@ Number: [[ +42.42 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -206,7 +206,7 @@ Number: [[.5]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -218,7 +218,7 @@ Number: [[ .5 ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -237,7 +237,7 @@ Number: [[-.5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -250,7 +250,7 @@ Number: [[ -.5 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -263,7 +263,7 @@ Number: [[+.5]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -276,7 +276,7 @@ Number: [[ +.5 ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
-			(number)
+			(quantity (decimalPoint) (number))
 		)
 	) (delimiter)))
 
@@ -293,7 +293,7 @@ Number: [[5.]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -306,7 +306,7 @@ Number: [[ 5. ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -320,7 +320,7 @@ Number: [[-5.]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -334,7 +334,7 @@ Number: [[ -5. ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -347,7 +347,7 @@ Number: [[5_]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -360,7 +360,7 @@ Number: [[ 5_ ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -373,7 +373,7 @@ Number: [[5._]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -386,7 +386,7 @@ Number: [[ 5._ ]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -400,7 +400,7 @@ Number: [[-5_]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -414,7 +414,7 @@ Number: [[ -5_ ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -428,7 +428,7 @@ Number: [[-5._]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -442,7 +442,7 @@ Number: [[ -5._ ]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -460,7 +460,7 @@ Number: [[5.5.]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -473,7 +473,7 @@ Number: [[5.5_]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -486,7 +486,7 @@ Number: [[5.5._]]
 (roll20_script
 	(inlineRoll (delimiter) (formula
 		(term
-			(number)
+			(quantity (number) (decimalPoint) (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -500,7 +500,7 @@ Number: [[-5.5.]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -514,7 +514,7 @@ Number: [[-5.5_]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -528,7 +528,7 @@ Number: [[-5.5._]]
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
+			(quantity (number) (decimalPoint) (number))
 			(invalid)
 		)
 	) (delimiter)))
@@ -541,8 +541,8 @@ Number: [[5.5.5]]
 (roll20_script
  	(inlineRoll (delimiter) (formula
 		(term
-			(number)
-			(invalid)
+			(quantity (number) (decimalPoint) (number))
+			(invalid (number))
 		)
 	) (delimiter)))
 
@@ -555,8 +555,8 @@ Number: [[-5.5.5]]
  	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
-			(invalid)
+			(quantity (number) (decimalPoint) (number))
+			(invalid (number))
 		)
 	) (delimiter)))
 
@@ -683,9 +683,9 @@ Number: [[5d6]]
  	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
-				(count)
+				(count (number))
 				(delimiter)
-				(sides))
+				(sides (number)))
 		)
 	) (delimiter)))
 
@@ -698,8 +698,8 @@ Number: [[-5d6]]
  	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
-			(number)
-			(invalid)
+			(quantity (number))
+			(invalid (number))
 		)
 	) (delimiter)))
 

@@ -122,7 +122,7 @@ Macro: #m[[@{a}
 		(invalid (delimiter))
 		(formula
 			(term
-				(number
+				(quantity
 					(attribute (delimiter)
 						(name) (delimiter)))
 			)
