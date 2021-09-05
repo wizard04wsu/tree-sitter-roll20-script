@@ -76,9 +76,11 @@ enum TokenType {
 
 
 //For debugging:
-const bool debugging = false;
+const bool debugging = true;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
+	noChange=0,
+	
 	//https://stackoverflow.com/a/45300654/15788
 	default=39,
 	
@@ -101,7 +103,7 @@ enum ANSI_Color {
 	brightBlue=94,lightBlue=94,
 	brightMagenta=95,lightMagenta=95,
 };
-string color(int foreground = 0, int background = 0) {
+string color(ANSI_Color foreground = noChange, ANSI_Color background = noChange) {
 	return "\033["
 		+(foreground?to_string(foreground):"")
 		+((foreground&&background)?";":"")
@@ -229,9 +231,9 @@ void mark_end(TSLexer *lexer) {
 }
 
 
-//Returns a string with the character that was represented by the `entity` argument, or an empty string if no match is found.
+//Returns a string with the character that was represented by the `entity` argument (mapped entities only), or an empty string if no match is found.
 //`entity` should not include the starting ampersand.
-//`entity` can be a single character; it will be returned if it matches an accepted character at appropriate depth.
+//`entity` can be a single character (instead of an entity name); it will be returned if it matches an accepted mapped character at appropriate depth.
 string matchCharEntity(string entity, string acceptedCharacters, unsigned depth, bool shallowerIsOkay = false) {
 	//logFunction("matchCharEntity");
 	
@@ -307,6 +309,7 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 					return entity;
 				}
 				else if (amps < depth && regex_match(code, regex(entitiesMap["&"]))) {
+				//found an ampersand entity before reaching depth
 					amps++;
 					entity += code + ";";
 					prevCode = code;
@@ -314,12 +317,12 @@ string get_entity(TSLexer *lexer, unsigned depth, bool shallowerIsOkay = false) 
 					break;
 				}
 				else if (amps == depth || shallowerIsOkay) {
-				//found an entity
+				//found an entity at depth, or (if shallower is okay) found a non-ampersand entity before reaching depth
 					log(color(green)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (current depth: "+to_string(depth)+")");
 					return entity+code+";";
 				}
 				else {
-				//found an entity, but it's too shallow
+				//found a non-ampersand entity before reaching depth; it's too shallow
 					log(color(red)+"Found \"&"+code+";\" at depth "+to_string(depth+amps)+" (too shallow; current depth: "+to_string(depth)+")");
 					return "";
 				}
@@ -788,7 +791,7 @@ struct Scanner {
 			delimAtDepth = matchCharEntity(entity, "", depth, false);
 			delimAtOrAbove = matchCharEntity(entity, "", depth, true);
 			digitAtOrAbove = matchNumbers(entity, depth);
-			log(color(red)+"e="+entity+" @="+delimAtDepth+" ^="+delimAtOrAbove+" #="+digitAtOrAbove);
+			log(color(red)+"'"+entity+"' --> '"+(delimAtOrAbove==""?entity:delimAtOrAbove)+"' "+(delimAtDepth==""&&delimAtOrAbove!=""?"shallower than":"at")+" depth "+to_string(depth));
 			
 			if (delimAtOrAbove == "d" || delimAtOrAbove == "D") {
 				if (valid_symbols[DICE_ROLL_START] || valid_symbols[JUST_D]) {
@@ -1094,7 +1097,7 @@ struct Scanner {
 extern "C" {
 
 void *tree_sitter_roll20_script_external_scanner_create() {
-	log(color(NULL, brightMagenta)+"                                        ");
+	log(color(noChange, brightMagenta)+"                                        ");
 	for (const auto& e : entitiesMap) {
 		entityChars += e.first;	//map key
 	}

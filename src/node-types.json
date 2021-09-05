@@ -144,10 +144,6 @@
           "named": true
         },
         {
-          "type": "decimalPoint",
-          "named": true
-        },
-        {
           "type": "inlineRoll",
           "named": true
         },
@@ -239,6 +235,10 @@
         },
         {
           "type": "delimiter",
+          "named": true
+        },
+        {
+          "type": "invalid",
           "named": true
         },
         {
@@ -507,6 +507,33 @@
     }
   },
   {
+    "type": "keepOrDrop",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "keep_or_drop",
     "named": true,
     "fields": {},
@@ -636,6 +663,14 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "invalid",
+          "named": true
+        },
+        {
+          "type": "keepOrDrop",
           "named": true
         },
         {
@@ -994,10 +1029,6 @@
         },
         {
           "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "decimalPoint",
           "named": true
         },
         {
