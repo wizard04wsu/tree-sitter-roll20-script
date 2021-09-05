@@ -71,9 +71,7 @@ module.exports = grammar({
 	
 	conflicts: $ => [],
 	
-	inline: $ => [
-		//$.formula,
-	],
+	inline: $ => [],
 	
 	rules: {
 		
@@ -122,11 +120,11 @@ module.exports = grammar({
 		roll20_script: $ => prec.right(repeat(
 			choice(
 				//$._placeholders,
-				$._attribute_or_invalid,
-				$._ability_or_invalid,
+				$.attribute,
+				$.ability,
 				$._root_macro_and_wsp,
 				$.rollQuery,
-				$._root_inlineRoll,
+				$.inlineRoll,
 				//TODO:
 				//template
 				//property
@@ -155,26 +153,93 @@ module.exports = grammar({
 		 /*│ Numbers are combined with attributes, abilities, and inline rolls.
 		   └───────────────────────────────────────────────────────────*/
 		
+		_number_signed: $ => seq(
+			optional(alias(choice(
+				$.__operator_positive,
+				$.__operator_negative,
+			), $.operator)),
+			$._number_signable,
+		),
+		_number_signed_IR_PH: $ => seq(
+			optional(alias(choice(
+				$.__operator_positive,
+				$.__operator_negative,
+			), $.operator)),
+			$._number_signable_IR_PH,
+		),
+		
 		_number: $ => choice(
 			$._number_signable,
 			$._number_fraction,
 		),
+		_number_IR_PH: $ => choice(
+			$._number_signable_IR_PH,
+			$._number_fraction_IR_PH,
+		),
 		
 		_number_signable: $ => prec.right(seq(
-			$._number_integer,
+			$.__integer,
 			optional($._number_fraction),
 		)),
+		_number_signable_IR_PH: $ => prec.right(seq(
+			prec.right(repeat1(choice(
+				alias($.__integer, $.number),
+				$.inlineRoll,
+				$._placeholders,
+			))),
+			optional($._number_fraction_IR_PH),
+		)),
+		
 		_number_fraction: $ => seq(
 			alias($.__decimal_point, $.decimalPoint),
-			$._number_integer,
+			$.__integer,
 		),
+		_number_fraction_IR_PH: $ => choice(
+			seq(
+				alias(seq(
+					alias($.__decimal_point, $.decimalPoint),
+					$.__integer,
+				), $.number),
+				optional(seq(
+					choice(
+						$.inlineRoll,
+						$._placeholders,
+					),
+					repeat(choice(
+						$.__integer,
+						$.inlineRoll,
+						$._placeholders,
+					)),
+				)),
+			),
+			seq(
+				alias($.__decimal_point, $.decimalPoint),
+				optional(seq(
+					choice(
+						$.inlineRoll,
+						$._placeholders,
+					),
+					repeat(choice(
+						$.__integer,
+						$.inlineRoll,
+						$._placeholders,
+					)),
+				)),
+			),
+		),
+		
 		_number_integer: $ => prec.right(repeat1(
 			prec.right(1, choice(
-				alias($.__integer, $.number),
+				$.__integer,
 				$._placeholders,
-				$._inlineRoll,
+				$.inlineRoll,
 			))
 		)),
+		_number_integer_IR_PH: $ => prec.right(repeat1(choice(
+			alias($.__integer, $.number),
+			$.inlineRoll,
+			$._placeholders,
+		))),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -241,49 +306,27 @@ module.exports = grammar({
 		   │ @{character|name|max}
 		   └─────────────────────────────*/
 		
-		_attribute_or_invalid: $ => prec.right(1, choice(
-			$.attribute,
-			alias($._attribute_empty, $.invalid),
-			alias($._attribute_invalid, $.invalid),
-		)),
-		
 		attribute: $ => prec(2, seq(
 			$._$attributeLeft,
-			$._attribute_content,
+			choice(
+				alias($._propertyName, $.name),
+				seq(
+					$._selector,
+					$._$pipe,
+					choice(
+						alias($._propertyName, $.name),
+						seq(
+							alias($._propertyName, $.name),
+							$._$pipe,
+							alias("max", $.keyword),
+						),
+						alias($._propertyName, $.name),
+					),
+				),
+				$._selector,
+			),
 			$._$braceRight,
 		)),
-		_attribute_content: $ => choice(
-			alias($._propertyName, $.name),
-			seq(
-				$._selector,
-				$._$pipe,
-				choice(
-					alias($._propertyName, $.name),
-					seq(
-						alias($._propertyName, $.name),
-						$._$pipe,
-						choice(
-							alias("max", $.keyword),
-							alias(/max[^}]+/, $.invalid),
-							alias(chainOf(/[^}]/), $.invalid),
-						),
-					),
-					seq(
-						alias($._propertyName, $.name),
-						alias($.__just_pipe, $.invalid),
-					),
-					alias(chainOf(/[^}]/), $.invalid),
-				),
-			),
-			seq(
-				$._selector,
-				alias($.__just_pipe, $.invalid),
-			),
-			alias(chainOf(/[^}]/), $.invalid),
-		),
-		
-		_attribute_empty: $ => "@{}",
-		_attribute_invalid: $ => "@{",
 		
 		
 		/*┌──────────────────────────────
@@ -300,40 +343,19 @@ module.exports = grammar({
 		   │ %{character|name}
 		   └─────────────────────────────*/
 		
-		_ability_or_invalid: $ => prec.right(1, choice(
-			$.ability,
-			alias($._ability_empty, $.invalid),
-			alias($._ability_invalid, $.invalid),
-		)),
-		
 		ability: $ => prec(2, seq(
 			$._$abilityLeft,
-			$._ability_content,
+			choice(
+				alias($._propertyName, $.name),
+				seq(
+					$._selector,
+					$._$pipe,
+					alias($._propertyName, $.name),
+				),
+				$._selector,
+			),
 			$._$braceRight,
 		)),
-		_ability_content: $ => choice(
-			alias($._propertyName, $.name),
-			seq(
-				$._selector,
-				$._$pipe,
-				choice(
-					alias($._propertyName, $.name),
-					alias(seq(
-						alias($._propertyName, ""),
-						chainOf(/[^}]/),
-					), $.invalid),
-					alias(chainOf(/[^}]/), $.invalid),
-				),
-			),
-			seq(
-				$._selector,
-				alias($.__just_pipe, $.invalid),
-			),
-			alias(chainOf(/[^}]/), $.invalid),
-		),
-		
-		_ability_empty: $ => "%{}",
-		_ability_invalid: $ => "%{",
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -460,15 +482,10 @@ module.exports = grammar({
 			),
 		)),
 		
-		_rollQuery_invalid: $ => prec.right(seq(
-			$.__rollQuery_start,
-			optional($.__rollQuery_end),
-		)),
-		
 		prompt: $ => repeat1(choice(
 			/[^@%#&}|]+/,	//new lines are allowed, but replaced with a space
-			$._attribute_or_invalid,
-			$._ability_or_invalid,
+			$.attribute,
+			$.ability,
 			$._macro_and_wsp,
 			$.htmlEntity,
 			$.__just_at,
@@ -479,8 +496,8 @@ module.exports = grammar({
 		
 		defaultValue: $ => repeat1(choice(
 			/[^@%#&}|]+/,	//new lines are allowed, but removed
-			$._attribute_or_invalid,
-			$._ability_or_invalid,
+			$.attribute,
+			$.ability,
 			$._macro_and_wsp,
 			$.htmlEntity,
 			$.__just_at,
@@ -499,23 +516,23 @@ module.exports = grammar({
 		),
 		optionName: $ => prec.right(1, repeat1(choice(
 			/[^@%#&}|,]+/,	//new lines are allowed, but replaced with a space
-			$._attribute_or_invalid,
-			$._ability_or_invalid,
+			$.attribute,
+			$.ability,
 			$._macro_and_wsp,
 			$.htmlEntity,
 			$.__just_at,
 			$.__just_percent,
 			$.__just_hash,
 			$.__just_ampersand,
-//		)))($),
 		))),
 		optionValue: $ => prec.right(1, repeat1(choice(
 			/[^@%#&}|,?]+/,	//new lines are allowed
-			$._attribute_or_invalid,
-			$._ability_or_invalid,
+			$.attribute,
+			$.ability,
 			$._macro_and_wsp,
 			$.htmlEntity,
 			$.rollQuery,
+			//TODO:
 			//$.property,
 			//$.button,
 			$.__just_at,
@@ -523,7 +540,6 @@ module.exports = grammar({
 			$.__just_hash,
 			$.__just_ampersand,
 			$.__just_questionmark,
-//		)))($),
 		))),
 		
 		
@@ -535,39 +551,10 @@ module.exports = grammar({
 		   │   reduced to a number.
 		   └─────────────────────────────*/
 		
-		_root_inlineRoll: $ => choice(
-			$.inlineRoll,
-			alias($._inlineRoll_unclosed, $.inlineRoll),
-			alias($._inlineRoll_invalid, $.invalid),
-		),
-		
-		_inlineRoll: $ => choice(
-			$.inlineRoll,
-			alias($._inlineRoll_unclosed, $.inlineRoll),
-		),
-		_inlineRoll_unclosed: $ => seq(
-			alias($._$inlineRollStart, $.invalid),
-			$.formula,
-			optional(alias($._$bracketRight, $.invalid)),
-			$.__EOF,
-		),
-		
 		inlineRoll: $ => seq(
 			$._$inlineRollStart,
 			$.formula,
 			$._$inlineRollEnd,
-		),
-		
-		_inlineRoll_invalid: $ => seq(
-			$._$inlineRollStart,
-			optional($._wsp_inline),
-			choice(
-				$._$inlineRollEnd,
-				seq(
-					optional($._$bracketRight),
-					$.__EOF,
-				),
-			),
 		),
 		
 		
@@ -585,216 +572,56 @@ module.exports = grammar({
 		   │   This implementation does not detect that.
 		   └─────────────────────────────*/
 		
-		formula: $ => prec.right(choice(
-			alias($._labels_with_wsp, $.invalid),
-			seq(
-				//In Roll20, a label here will cause an error if it's followed
-				//   by anything but a dice roll or table roll. I haven't found
-				//   a decent way to check that since placeholders make things
-				//   so indeterminate.
+		formula: $ => seq(
+			optional($._labels_or_wsp),
+			
+			alias($._term_first, $.term),
+			repeat(seq(
 				optional($._labels_or_wsp),
-				
-				alias($._term_first, $.term),
-				prec.right(repeat(choice(
-					seq(
-						$._operator,
-						alias($._term, $.term),
-					),
-					seq(
-						$._labels_or_wsp,
-						alias($._term, $.invalid),	//missing an operator before it
-					),
-				))),
+				$._operator,
 				optional($._labels_or_wsp),
-			),
-		)),
+				alias($._term, $.term),
+			)),
+			optional($._labels_or_wsp),
+		),
 		
-		_term_first: $ => prec.right(seq(
-			optional($._operators_invalid_before_first_term),
-			choice(
-				prec(1, seq(
-					prec.right(choice(
-						seq(
-							optional(alias(choice(
-								$.__operator_positive,
-								$.__operator_negative,
-							), $.operator)),
-							alias($._number_signable, $.quantity),
-							optional(alias($._term_remainder_number_invalid, $.invalid)),
-						),
-						seq(
-							alias($._number_fraction, $.quantity),
-							optional(alias($._term_remainder_number_invalid, $.invalid)),
-						),
-						seq(
-							$.diceRoll,
-							//optional($._placeholders),
-							//optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
-							//optional(alias($._term_remainder_general_invalid, $.invalid)),
-						),
-						seq(
-							$._groupRoll,
-							//optional($._placeholders),
-							optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
-						),
-						seq(
-							choice(
-								$.rollQuery,
-								$._parenthesized,
-								$._function,
-								$._tableRoll,
-							),
-							optional(alias($._term_remainder_general_invalid, $.invalid)),
-						),
-						seq(
-							alias($._term_invalid, $.invalid),
-						),
-					)),
-					optional($._macro_and_wsp),
+		_term_first: $ => prec.right(choice(
+			prec(1, seq(
+				prec.right(choice(
+					$._number_signed_IR_PH,
+					$._number_fraction_IR_PH,
+					$.diceRoll,
+					$.groupRoll,
+					$.rollQuery,
+					$.parenthesized,
+					$.function,
+					$.tableRoll,
 				)),
-				prec(1, $._macro_and_wsp),
-				seq(
-					alias($._term_invalid_and_unrecognized, $.invalid),
-					optional($._term_first),
-				),
-			),
+				optional($._macro_and_wsp),
+			)),
+			prec(1, $._macro_and_wsp),
 		)),
 		
 		_term: $ => choice(
 			prec(1, seq(
 				prec.right(choice(
-					seq(
-						alias($._number, $.quantity),	//numbers, attributes, abilities, and inline rolls
-						optional(alias($._term_remainder_number_invalid, $.invalid)),
-					),
-					seq(
-						$.diceRoll,
-						//optional($._placeholders),
-						optional(alias($._term_remainder_diceRoll_invalid, $.invalid)),
-					),
-					seq(
-						$._groupRoll,
-						//optional($._placeholders),
-						optional(alias($._term_remainder_groupRoll_invalid, $.invalid)),
-					),
+					$._number_IR_PH,	//numbers, attributes, abilities, and inline rolls
+					$.diceRoll,
+					$.groupRoll,
 					seq(
 						choice(
 							$.rollQuery,
-							$._parenthesized,
-							$._function,
-							$._tableRoll,
+							$.parenthesized,
+							$.function,
+							$.tableRoll,
 						),
 						optional($._placeholders),
-						optional(alias($._term_remainder_general_invalid, $.invalid)),
 					),
-					alias($._term_invalid, $.invalid),
 				)),
 				optional($._macro_and_wsp),
 			)),
 			prec(1, $._macro_and_wsp),
-			seq(
-				alias($._term_invalid_and_unrecognized, $.invalid),
-				optional($._term),
-			),
 		),
-		
-		_term_invalid: $ => prec.left(choice(
-			seq(
-				$._groupRoll_invalid,
-				repeat(choice(
-					$.attribute,
-					$.ability,
-					$._attribute_empty,
-					$._ability_empty,
-				)),
-				optional($._term_remainder_groupRoll_invalid),
-			),
-			seq(
-				choice(
-					$._attribute_invalid,
-					$._ability_invalid,
-					$._rollQuery_invalid,
-					$._inlineRoll_invalid,
-					$._parenthesized_invalid,
-					$._function_invalid,
-					$._tableRoll_invalid,
-				),
-				repeat(choice(
-					$.attribute,
-					$.ability,
-					$._attribute_empty,
-					$._ability_empty,
-				)),
-				optional($._term_remainder_general_invalid),
-			),
-		)),
-		
-		_term_remainder_number_invalid: $ => seq(
-			choice(
-				/[^#\[%/*+\-})\]dDtT\s\r\n]/,
-				$.__ability_start,
-				$.__just_d,
-				$.__just_t,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-			optional($._term_remainder_general_invalid_continue),
-		),
-		_term_remainder_diceRoll_invalid: $ => seq(
-			choice(
-				/[^#\[/*+\-})\]acdfhklmoprstACDFHKLMOPRST<=>!\d\s\r\n]/,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-			optional($._term_remainder_general_invalid_continue),
-		),
-		_term_remainder_groupRoll_invalid: $ => seq(
-			choice(
-				/[^#\[%/*+\-})\]dfhklDFHKL<=>\d\s\r\n]/,
-				$.__ability_start,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-			optional($._term_remainder_general_invalid_continue),
-		),
-		_term_remainder_general_invalid: $ => prec.right(seq(
-			choice(
-				/[^@%#\[/*+\-})\]\s\r\n]/,
-				$.__just_at,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-			optional($._term_remainder_general_invalid_continue),
-		)),
-		_term_remainder_general_invalid_continue: $ => repeat1(choice(
-			/[^@%#\[/*+\-})\]\s\r\n]/,
-			$._number,
-			$.__just_at,
-			//TODO:
-			//just right brace
-			//just right paren
-			//just right bracket
-		)),
-		
-		_term_invalid_and_unrecognized: $ => prec.left(repeat1(
-			choice(
-				/[^@%#&\[{(/*+\-})\]dDtT\d.\s\r\n]/,
-				$.__just_at,
-				$.__just_ampersand,
-				$.__just_d,
-				$.__just_t,
-				$.__just_questionmark,
-				$.__just_period,
-			),
-		)),
 		
 		
 		/*┌──────────────────────────────
@@ -807,27 +634,15 @@ module.exports = grammar({
 		   │   the first element in a formula.
 		   └─────────────────────────────*/
 		
-		_operator: $ => seq(
-			optional($._labels_or_wsp),
-			choice(
-				seq(
-					$._operator_summation,
-					optional($._operators_invalid_after_valid),
-				),
-				seq(
-					$._operator_multiplication,
-					optional(choice(
-						seq(
-							$._operator_summation,
-							optional($._operators_invalid_after_valid),
-						),
-						$._operators_invalid_after_valid,
-					)),
-				),
+		_operator: $ => choice(
+			$._operator_summation,
+			seq(
+				$._operator_multiplication,
+				optional($._operator_summation),
 			),
 		),
 		
-		_operator_multiplication: $ => prec.right(seq(
+		_operator_multiplication: $ => prec.right(1, seq(
 			alias(choice(
 				$.__just_slash,
 				seq(
@@ -836,49 +651,38 @@ module.exports = grammar({
 				),
 				$.__just_percent,
 			), $.operator),
-			optional($._labels_or_wsp),
 		)),
 		_operator_summation: $ => prec.right(choice(
+			alias($._operator_plus, $.operator),
+			alias($._operator_minus, $.operator),
 			seq(
 				alias($._operator_plus, $.operator),
 				optional($._labels_or_wsp),
-				optional($._operators_invalid_after_plus),
+				alias($._operator_minus, $.operator),
+				repeat(seq(
+					optional($._labels_or_wsp),
+					alias($._operator_plus, $.operator),
+					optional($._labels_or_wsp),
+					alias($._operator_minus, $.operator),
+				)),
+				optional(seq(
+					optional($._labels_or_wsp),
+					alias($._operator_plus, $.operator),
+				)),
 			),
 			seq(
 				alias($._operator_minus, $.operator),
 				optional($._labels_or_wsp),
-				optional($._operators_invalid_after_minus),
-			),
-			seq(
-				repeat1(seq(
-					alias($._operator_plus, $.operator),
+				alias($._operator_plus, $.operator),
+				repeat(seq(
 					optional($._labels_or_wsp),
 					alias($._operator_minus, $.operator),
 					optional($._labels_or_wsp),
-				)),
-				optional(choice(
-					seq(
-						alias($._operator_plus, $.operator),
-						optional($._labels_or_wsp),
-						optional($._operators_invalid_after_plus),
-					),
-					$._operators_invalid_after_minus,
-				)),
-			),
-			seq(
-				repeat1(seq(
-					alias($._operator_minus, $.operator),
-					optional($._labels_or_wsp),
 					alias($._operator_plus, $.operator),
-					optional($._labels_or_wsp),
 				)),
-				optional(choice(
-					seq(
-						alias($._operator_minus, $.operator),
-						optional($._labels_or_wsp),
-						optional($._operators_invalid_after_minus),
-					),
-					$._operators_invalid_after_plus,
+				optional(seq(
+					optional($._labels_or_wsp),
+					alias($._operator_minus, $.operator),
 				)),
 			),
 		)),
@@ -891,65 +695,6 @@ module.exports = grammar({
 			$.__operator_negative,
 		),
 		
-		_operators_invalid_before_first_term: $ => prec.right(repeat1(
-			prec.right(seq(
-				alias(repeat1(choice(
-					$.__just_slash,
-					$.__just_asterisk,
-					$.__just_percent,
-					$.__just_plus,
-					$.__just_dash,
-				)), $.invalid),
-				optional($._labels_or_wsp),
-			)),
-		)),
-		
-		_operators_invalid_after_valid: $ => prec.right(seq(
-			alias(choice(
-				$.__just_slash,
-				$.__just_asterisk,
-				$.__just_percent,
-			), $.invalid),
-			optional($._labels_or_wsp),
-			repeat(seq(
-				alias(choice(
-					$.__just_slash,
-					$.__just_asterisk,
-					$.__just_percent,
-					$._operator_plus,
-					$._operator_minus,
-				), $.invalid),
-				optional($._labels_or_wsp),
-			)),
-		)),
-		_operators_invalid_after_plus: $ => prec.right(seq(
-			alias($._operator_plus, $.invalid),
-			optional($._labels_or_wsp),
-			repeat(seq(
-				alias(choice(
-					$.__just_slash,
-					$.__just_asterisk,
-					$.__just_percent,
-					$._operator_plus,
-					$._operator_minus,
-				), $.invalid),
-				optional($._labels_or_wsp),
-			)),
-		)),
-		_operators_invalid_after_minus: $ => prec.right(seq(
-			alias($._operator_minus, $.invalid),
-			optional($._labels_or_wsp),
-			repeat(seq(
-				alias(choice(
-					$.__just_slash,
-					$.__just_asterisk,
-					$.__just_percent,
-					$._operator_plus,
-					$._operator_minus,
-				), $.invalid),
-				optional($._labels_or_wsp),
-			)),
-		)),
 		
 		/*┌──────────────────────────────
 		  │ Inline Label
@@ -1003,45 +748,16 @@ module.exports = grammar({
 		  │ Parenthesized Formulas
 		  └──────────────────────────────*/
 		
-		_parenthesized: $ => choice(
-			$.parenthesized,
-			alias($._parenthesized_unclosed, $.parenthesized),
-		),
-		_parenthesized_unclosed: $ => seq(
-			alias($._$parenLeft, $.invalid),
-			$.formula,
-			$.__EOF,
-		),
-		
 		parenthesized: $ => seq(
 			$._$parenLeft,
 			$.formula,
 			$._$parenRight,
 		),
 		
-		_parenthesized_invalid: $ => seq(
-			$._$parenLeft,
-			optional($._wsp_inline),
-			choice(
-				$._$parenRight,
-				$.__EOF,
-			),
-		),
-		
 		
 		/*┌──────────────────────────────
 		  │ Math Functions
 		  └──────────────────────────────*/
-		
-		_function: $ => prec.right(choice(
-			$.function,
-			alias($._function_unclosed, $.function),
-		)),
-		_function_unclosed: $ => seq(
-			alias($._function_start, $.invalid),
-			$.formula,
-			$.__EOF,
-		),
 		
 		function: $ => seq(
 			$._function_start,
@@ -1054,15 +770,6 @@ module.exports = grammar({
 			$._$parenLeft,
 		),
 		
-		_function_invalid: $ => seq(
-			$._function_start,
-			optional($._wsp_inline),
-			choice(
-				$._$parenRight,
-				$.__EOF,
-			),
-		),
-		
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Rolls
@@ -1071,119 +778,19 @@ module.exports = grammar({
 		/*┌──────────────────────────────
 		  │ Roll Modifiers
 		  └┬─────────────────────────────*/
-		 /*│ Roll modifiers can be injected with attributes and abilities, but
-		   │   this script doesn't allow for those.
+		 /*│ Roll modifiers can be injected with attributes, abilities, and
+		   │   inline rolls. This script does not parse the modifiers.
 		   └─────────────────────────────*/
 		
-		_integer_or_inlineRoll: $ => prec.right(repeat1(choice(
-			alias($.__integer, $.number),
-			$._inlineRoll,
+		_diceRoll_modifiers: $ => repeat1(prec.right(choice(
+			alias($._number_integer, $.number),
+			/[aAcCdDfFhHkKlLmMoOpPrRsStT<=>!]+/,
 		))),
 		
-		_diceRoll_modifier: $ => prec.right(1, choice(
-			alias($._modifier_criticalSuccess, $.criticalSuccess),
-			alias($._modifier_criticalFailure, $.criticalFailure),
-			alias($._modifier_countSuccesses, $.successes),
-			alias($._modifier_matchingSets, $.matches),
-			alias($._modifier_keep, $.keep),
-			alias($._modifier_drop, $.drop),
-			alias($._modifier_reroll, $.reroll),
-			alias($._modifier_explode, $.explode),
-			alias($._modifier_sort, $.sort),
-			
-			$._placeholders,
-			$._integer_or_inlineRoll,
-			// /[aAcCdDfFhHkKlLmMoOpPrRsStT<=>!]/,
-			/[aAcCdDfFhHkKlLoOpPsStT<=>]/,
-		)),
-		_diceRoll_remainder_invalid: $ => seq(
-			choice(
-				/[^aAcCdDfFhHkKlLmMoOpPrRsStT<=>!@%#\[/*+\-})\]\s\r\n]/,
-				$.__just_at,
-				$.__just_percent,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-			repeat(
-				/[^#\[/*+\-})\]\s\r\n]/,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-		),
-		
-		_groupRoll_modifier: $ => prec.right(1, choice(
-			alias($._modifier_countSuccesses, $.successes),
-			alias($._modifier_keep, $.keep),
-			alias($._modifier_drop, $.drop),
-			
-			$._placeholders,
-			$._integer_or_inlineRoll,
-			/[dDfFhHkKlL<=>]/,
-		)),
-		_groupRoll_remainder_invalid: $ => seq(
-			choice(
-				/[^dDfFhHkKlL<=>@%#\[/*+\-})\]\s\r\n]/,
-				$.__just_at,
-				$.__just_percent,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-			repeat(
-				/[^#\[/*+\-})\]\s\r\n]/,
-				//TODO:
-				//just right brace
-				//just right paren
-				//just right bracket
-			),
-		),
-		
-		
-		
-		_modifier_criticalSuccess: $ => seq(
-			/[cC][sS][<=>]?/,
-			$._integer_or_inlineRoll,
-		),
-		_modifier_criticalFailure: $ => seq(
-			/[cC][fF][<=>]?/,
-			$._integer_or_inlineRoll,
-		),
-		_modifier_countSuccesses: $ => seq(
-			/[<=>]/,
-			$._integer_or_inlineRoll,
-			optional(alias($._modifier_countFailures, $.failures)),
-		),
-		_modifier_countFailures: $ => seq(
-			/[fF][<=>]?/,
-			$._integer_or_inlineRoll,
-		),
-		_modifier_matchingSets: $ => prec.right(seq(
-			/[mM][tT]?/,
-			optional($._integer_or_inlineRoll),
-			optional($._modifier_countSuccesses),
-		)),
-		_modifier_keep: $ => seq(
-			/[kK][hHlL]?/,
-			$._integer_or_inlineRoll,
-		),
-		_modifier_drop: $ => seq(
-			/[dD][hHlL]?/,
-			$._integer_or_inlineRoll,
-		),
-		_modifier_reroll: $ => prec.right(seq(
-			/[rR][oO]?[<=>]?/,
-			optional($._integer_or_inlineRoll),
-		)),
-		_modifier_explode: $ => prec.right(seq(
-			/![!pP]?[<=>]?/,
-			optional($._integer_or_inlineRoll),
-		)),
-		_modifier_sort: $ => /[sS][aAdD]/,
+		_groupRoll_modifiers: $ => repeat1(prec.right(choice(
+			alias($._number_integer, $.number),
+			/[dDfFhHkKlL<=>]+/,
+		))),
 		
 		
 		/*┌──────────────────────────────
@@ -1192,38 +799,26 @@ module.exports = grammar({
 		
 		diceRoll: $ => prec.right(1, seq(
 			//number of dice to roll
-			optional(alias($._number_integer, $.count)),
+			optional(alias($._number_integer_IR_PH, $.count)),
 			//keyword (the letter 'd')
 			$._$diceRoll,
-			//number of sides per die
-			alias($._diceRoll_sides, $.sides),
+			//sides per die
+			choice(
+				alias($._number_integer_IR_PH, $.sides),
+				alias(/[fF]/, $.fate),
+			),
 			//modifiers
-			alias(repeat($._diceRoll_modifier), $.modifiers),
-			optional(alias($._diceRoll_remainder_invalid, $.invalid)),
+			optional(alias($._diceRoll_modifiers, $.modifiers)),
 		)),
-		_diceRoll_sides: $ => choice(
-			$._number_integer,
-			alias(/[fF]/, $.fate),
-		),
 		
 		
 		/*┌──────────────────────────────
 		  │ Table Roll
 		  └──────────────────────────────*/
 		
-		_tableRoll: $ => choice(
-			$.tableRoll,
-			alias($._tableRoll_unclosed, $.tableRoll),
-		),
-		_tableRoll_unclosed: $ => seq(
-			alias($._$tableRoll, $.invalid),
-			$.tableName,
-			$.__EOF,
-		),
-		
 		tableRoll: $ => prec.right(seq(
 			//number of "dice"
-			optional(alias($._number_integer, $.count)),
+			optional(alias($._number_integer_IR_PH, $.count)),
 			//keyword ("t[")
 			$._$tableRoll,
 			//table name
@@ -1244,77 +839,24 @@ module.exports = grammar({
 //		))($),
 		))),
 		
-		_tableRoll_invalid: $ => seq(
-			optional(alias($._number_integer, $.count)),
-			$._$tableRoll,
-			optional($._wsp_inline),
-			choice(
-				$._$bracketRight,
-				$.__EOF,
-			),
-		),
-		
 		
 		/*┌──────────────────────────────
 		  │ Group Roll
 		  └──────────────────────────────*/
 		
-		_groupRoll: $ => choice(
-			$.groupRoll,
-			alias($._groupRoll_unclosed, $.groupRoll),
-		),
-		_groupRoll_unclosed: $ => prec.right(seq(
-			alias($._$braceLeft, $.invalid),
-			$._groupRoll_content,
-			$.__EOF,
-		)),
-		
 		groupRoll: $ => prec.right(seq(
 			$._$braceLeft,
 			$._groupRoll_content,
 			$._$braceRight,
-			alias(repeat($._groupRoll_modifier), $.modifiers),
-			optional(alias($._groupRoll_remainder_invalid, $.invalid)),
+			optional(alias($._groupRoll_modifiers, $.modifiers)),
 		)),
 		_groupRoll_content: $ => seq(
-			optional(alias($._groupRoll_invalid_commas, $.invalid)),
 			$.formula,
 			repeat(seq(
 				$.__just_comma,
-				optional(alias($._groupRoll_invalid_commas, $.invalid)),
 				$.formula,
 			)),
-			optional(alias($._groupRoll_invalid_commas_last, $.invalid)),
 		),
-		
-		_groupRoll_invalid_commas: $ => repeat1(seq(
-			optional($._labels_or_wsp),
-			$.__just_comma,
-		)),
-		_groupRoll_invalid_commas_last: $ => prec.right(repeat1(
-			prec.right(seq(
-				$.__just_comma,
-				optional($._labels_or_wsp),
-			))
-		)),
-		
-		_groupRoll_invalid: $ => prec.right(seq(
-			$._$braceLeft,
-			optional(choice(
-				seq(
-					$._groupRoll_invalid_commas,
-					optional($._labels_or_wsp),
-				),
-				$._labels_or_wsp,
-			)),
-			choice(
-				seq(
-					$._$braceRight,
-					alias(repeat($._groupRoll_modifier), $.modifiers),
-				),
-				$.__EOF,
-			),
-		)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════

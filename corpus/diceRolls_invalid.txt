@@ -1,0 +1,91 @@
+==================
+Dice Roll: [[ d6c@{s}5cs>5s_c@{f}3 ]]
+==================
+[[ d6c@{s}5cs>5s_c@{f}3 ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(delimiter)
+				(sides (number))
+				(modifiers
+					(critical
+						(attribute
+							(delimiter)
+							(name)
+							(delimiter))
+						(number)
+					)
+					(critical
+						(number)
+					)
+					(invalid)
+				)
+			)
+		)
+	) (delimiter)))
+
+==================
+Number: Valid with Invalid Remainder: [[5d_]]
+==================
+[[5d_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Dice Roll: [[5d3_]]
+==================
+[[5d3_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(count (number))
+				(delimiter)
+				(sides (number))
+				(invalid))
+		)
+	) (delimiter)))
+
+==================
+Dice Roll: [[5d3c_]]
+==================
+[[5d3c_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(count (number))
+				(delimiter)
+				(sides (number))
+				(modifiers
+					(invalid)))
+		)
+	) (delimiter)))
+
+==================
+Dice Roll: [[5d3cs2_]]
+==================
+[[5d3cs2_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(count (number))
+				(delimiter)
+				(sides (number))
+				(modifiers
+					(critical (number)))
+				(invalid))
+		)
+	) (delimiter)))

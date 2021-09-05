@@ -1,0 +1,113 @@
+==================
+Parenthesized: [[(5)]]
+==================
+[[(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(parenthesized (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Parenthesized: [[ ( 5 ) ]]
+==================
+[[ ( 5 ) ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(parenthesized (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Parenthesized: [[(-5-5)]]
+==================
+[[(-5-5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(parenthesized (delimiter) (formula
+				(term
+					(operator)
+					(number)
+				)
+				(operator)
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Parenthesized: [[ ( -5 - 5 ) ]]
+==================
+[[ ( -5 - 5 ) ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(parenthesized (delimiter) (formula
+				(term
+					(operator)
+					(number)
+				)
+				(operator)
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Parenthesized: [[5+(5)]]
+==================
+[[5+(5)]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(parenthesized (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))
+
+==================
+Parenthesized: [[ 5 + ( 5 ) ]]
+==================
+[[ 5 + ( 5 ) ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(parenthesized (delimiter) (formula
+				(term
+					(number)
+				)
+			) (delimiter))
+		)
+	) (delimiter)))

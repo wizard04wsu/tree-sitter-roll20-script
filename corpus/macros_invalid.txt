@@ -1,0 +1,15 @@
+==================
+Macro: #m[[@{a}
+==================
+#m[[@{a}
+---
+(roll20_script
+	(macroHash)
+	(inlineRoll
+		(invalid (delimiter))
+		(formula
+			(term
+				(attribute (delimiter)
+					(name) (delimiter))
+			)
+		)))

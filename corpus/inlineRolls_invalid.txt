@@ -1,0 +1,250 @@
+==================
+Inline Roll: [[]]
+==================
+[[]]
+---
+(roll20_script
+	(invalid (delimiter) (delimiter)))
+		
+==================
+Inline Roll: [[ ]]
+==================
+[[ ]]
+---
+(roll20_script
+	(invalid (delimiter) (delimiter)))
+
+==================
+Inline Roll: [[x]]
+==================
+[[x]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[ x ]]
+==================
+[[ x ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Inline Roll: [[- 5]]
+==================
+[[- 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[-+5]]
+==================
+[[-+5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[+-5]]
+==================
+[[+-5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[- - -5]]
+==================
+[[- - -5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(invalid)
+			(operator)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[*5]]
+==================
+[[*5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[%5]]
+==================
+[[%5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid)
+			(number)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Inline Roll: [[1--5]]
+==================
+[[1--5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(invalid)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1 - - 5]]
+==================
+[[1 - - 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(invalid)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1 - / + - + -+ -+-5]]
+==================
+[[1 - / + - + -+ -+-5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(invalid)
+		(invalid)
+		(invalid)
+		(invalid)
+		(invalid)
+		(invalid)
+		(invalid)
+		(invalid)
+		(invalid)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Inline Roll: [[ [[]] ]]
+==================
+[[ [[]] ]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(invalid (delimiter) (delimiter))
+		)
+	) (delimiter)))
+
+
+
+
+
+
+==================
+Inline Roll: [[5]
+==================
+[[5]
+---
+(roll20_script
+	(inlineRoll
+		(invalid (delimiter))
+		(formula
+			(term
+				(number)
+			)
+		)
+		(invalid (delimiter))))
+
+==================
+Inline Roll: [[5
+==================
+[[5
+---
+(roll20_script
+	(inlineRoll
+		(invalid (delimiter))
+		(formula
+			(term
+				(number)
+			)
+		)))
+
+==================
+Inline Roll: [[
+==================
+[[
+---
+(roll20_script
+	(invalid (delimiter)))
+

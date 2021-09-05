@@ -112,23 +112,6 @@ Macro: #m[@{a}
 		(name) (delimiter)))
 
 ==================
-Macro: #m[[@{a}
-==================
-#m[[@{a}
----
-(roll20_script
-	(macroHash)
-	(inlineRoll
-		(invalid (delimiter))
-		(formula
-			(term
-				(quantity
-					(attribute (delimiter)
-						(name) (delimiter)))
-			)
-		)))
-
-==================
 Macro: #m]]@{a}
 ==================
 #m]]@{a}

@@ -1,64 +1,4 @@
 ==================
-Attribute: @{a}
-==================
-@{a}
----
-(roll20_script
-	(attribute (delimiter)
-		(name) (delimiter)))
-
-==================
-Attribute: @{ a }
-==================
-@{ a }
----
-(roll20_script
-	(attribute (delimiter)
-		(name) (delimiter)))
-
-==================
-Attribute: @{c|a}
-==================
-@{c|a}
----
-(roll20_script
-	(attribute (delimiter)
-		(character) (delimiter)
-		(name) (delimiter)))
-
-==================
-Attribute: @{ c | a }
-==================
-@{ c | a }
----
-(roll20_script
-	(attribute (delimiter)
-		(character) (delimiter)
-		(name) (delimiter)))
-
-==================
-Attribute: @{c|a|max}
-==================
-@{c|a|max}
----
-(roll20_script
-	(attribute (delimiter)
-		(character) (delimiter)
-		(name) (delimiter)
-		(keyword) (delimiter)))
-
-==================
-Attribute: @{ c | a |max}
-==================
-@{ c | a |max}
----
-(roll20_script
-	(attribute (delimiter)
-		(character) (delimiter)
-		(name) (delimiter)
-		(keyword) (delimiter)))
-
-==================
 Attribute: @{c|a|max_}
 ==================
 @{c|a|max_}
@@ -90,48 +30,6 @@ Attribute: @{c|a| max}
 		(character) (delimiter)
 		(name) (delimiter)
 		(invalid) (delimiter)))
-
-==================
-Attribute: @{selected|a}
-==================
-@{selected|a}
----
-(roll20_script
-	(attribute (delimiter)
-		(token) (delimiter)
-		(name) (delimiter)))
-
-==================
-Attribute: @{selected|a|max}
-==================
-@{selected|a|max}
----
-(roll20_script
-	(attribute (delimiter)
-		(token) (delimiter)
-		(name) (delimiter)
-		(keyword) (delimiter)))
-
-==================
-Attribute: @{target|a}
-==================
-@{target|a}
----
-(roll20_script
-	(attribute (delimiter)
-		(token) (delimiter)
-		(name) (delimiter)))
-
-==================
-Attribute: @{target|a|max}
-==================
-@{target|a|max}
----
-(roll20_script
-	(attribute (delimiter)
-		(token) (delimiter)
-		(name) (delimiter)
-		(keyword) (delimiter)))
 
 
 
@@ -366,61 +264,6 @@ Attribute: @{ab] %{a}
 	(invalid)
 	(ability (delimiter)
 		(name) (delimiter)))
-
-
-
-
-
-
-==================
-Attribute: @{#m }
-==================
-@{#m }
----
-(roll20_script
- 	(attribute (delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Attribute: @{a#a a}
-==================
-@{a#a a}
----
-(roll20_script
- 	(attribute (delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Attribute: @{#c |#a }
-==================
-@{#c |#a }
----
-(roll20_script
- 	(attribute (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Attribute: @{c#c c|a#a a}
-==================
-@{c#c c|a#a a}
----
-(roll20_script
- 	(attribute (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
 
 
 

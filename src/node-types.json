@@ -1,36 +1,5 @@
 [
   {
-    "type": "",
-    "named": false,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "macroHash",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "ability",
     "named": true,
     "fields": {},
@@ -44,10 +13,6 @@
         },
         {
           "type": "delimiter",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -75,10 +40,6 @@
         },
         {
           "type": "delimiter",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -155,44 +116,6 @@
     }
   },
   {
-    "type": "criticalFailure",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "criticalSuccess",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "defaultValue",
     "named": true,
     "fields": {},
@@ -210,10 +133,6 @@
         },
         {
           "type": "htmlEntity",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -249,7 +168,7 @@
           "named": true
         },
         {
-          "type": "invalid",
+          "type": "fate",
           "named": true
         },
         {
@@ -264,63 +183,6 @@
     }
   },
   {
-    "type": "drop",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "explode",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "failures",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "formula",
     "named": true,
     "fields": {},
@@ -328,10 +190,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "invalid",
-          "named": true
-        },
         {
           "type": "label",
           "named": true
@@ -364,10 +222,6 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
           "type": "name",
           "named": true
         }
@@ -388,10 +242,6 @@
         },
         {
           "type": "formula",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -420,120 +270,6 @@
         },
         {
           "type": "formula",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "invalid",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "count",
-          "named": true
-        },
-        {
-          "type": "decimalPoint",
-          "named": true
-        },
-        {
-          "type": "delimiter",
-          "named": true
-        },
-        {
-          "type": "diceRoll",
-          "named": true
-        },
-        {
-          "type": "function",
-          "named": true
-        },
-        {
-          "type": "groupRoll",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "macroHash",
-          "named": true
-        },
-        {
-          "type": "modifiers",
-          "named": true
-        },
-        {
-          "type": "name",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "parenthesized",
-          "named": true
-        },
-        {
-          "type": "quantity",
-          "named": true
-        },
-        {
-          "type": "rollQuery",
-          "named": true
-        },
-        {
-          "type": "tableRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "keep",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
           "named": true
         }
       ]
@@ -594,29 +330,6 @@
     }
   },
   {
-    "type": "matches",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "failures",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "modifiers",
     "named": true,
     "fields": {},
@@ -625,55 +338,7 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "criticalFailure",
-          "named": true
-        },
-        {
-          "type": "criticalSuccess",
-          "named": true
-        },
-        {
-          "type": "drop",
-          "named": true
-        },
-        {
-          "type": "explode",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "keep",
-          "named": true
-        },
-        {
-          "type": "matches",
-          "named": true
-        },
-        {
           "type": "number",
-          "named": true
-        },
-        {
-          "type": "reroll",
-          "named": true
-        },
-        {
-          "type": "sort",
-          "named": true
-        },
-        {
-          "type": "successes",
           "named": true
         }
       ]
@@ -705,6 +370,29 @@
         },
         {
           "type": "macroHash",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "number",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
           "named": true
         }
       ]
@@ -759,10 +447,6 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
           "type": "macro",
           "named": true
         },
@@ -791,10 +475,6 @@
         },
         {
           "type": "htmlEntity",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -827,10 +507,6 @@
         {
           "type": "formula",
           "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
         }
       ]
     }
@@ -856,65 +532,11 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
           "type": "macro",
           "named": true
         },
         {
           "type": "macroHash",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "quantity",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "decimalPoint",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "reroll",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
           "named": true
         }
       ]
@@ -942,10 +564,6 @@
         },
         {
           "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "invalid",
           "named": true
         },
         {
@@ -1003,33 +621,6 @@
           "named": true
         },
         {
-          "type": "fate",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "successes",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "failures",
-          "named": true
-        },
-        {
           "type": "inlineRoll",
           "named": true
         },
@@ -1084,10 +675,6 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
           "type": "tableName",
           "named": true
         }
@@ -1100,7 +687,7 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "ability",
@@ -1108,6 +695,10 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "decimalPoint",
           "named": true
         },
         {
@@ -1123,11 +714,7 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "label",
+          "type": "inlineRoll",
           "named": true
         },
         {
@@ -1139,15 +726,15 @@
           "named": true
         },
         {
+          "type": "number",
+          "named": true
+        },
+        {
           "type": "operator",
           "named": true
         },
         {
           "type": "parenthesized",
-          "named": true
-        },
-        {
-          "type": "quantity",
           "named": true
         },
         {
@@ -1175,14 +762,6 @@
   },
   {
     "type": "macroHash",
-    "named": true
-  },
-  {
-    "type": "number",
-    "named": true
-  },
-  {
-    "type": "sort",
     "named": true
   },
   {
