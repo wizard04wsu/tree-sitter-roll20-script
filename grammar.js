@@ -1075,10 +1075,10 @@ module.exports = grammar({
 		   │   this script doesn't allow for those.
 		   └─────────────────────────────*/
 		
-		_integer_or_inlineRoll: $ => choice(
+		_integer_or_inlineRoll: $ => prec.right(repeat1(choice(
 			alias($.__integer, $.number),
 			$._inlineRoll,
-		),
+		))),
 		
 		_modifier_comparison_strict: $ => seq(
 			/[<=>]/,
@@ -1148,24 +1148,50 @@ module.exports = grammar({
 				/[aAdD]/,
 			), $.sort),
 			
-			seq($._placeholders,
+			seq(
+				$._placeholders,
 				$._modifier_comparison_lazy,
 			),
 			
-			alias(seq(
-				choice(
-					$._modifier_critical_invalid,
-					$._modifier_countSuccesses_invalid,
-					$._modifier_countFailures_invalid,
-					$._modifier_exploding_invalid,
-					$._modifier_matches_invalid,
-					$._modifier_keepOrDrop_invalid,
-					$._modifier_reroll_invalid,
-					$._modifier_sort_invalid,
-				),
-				/[^@%#\[/*+\-})\]\s\r\n]*/,
-			), $.invalid),
+			alias($._diceRoll_modifier_invalid, $.invalid_diceRoll),
 		)),
+		_diceRoll_modifier_invalid: $ => prec.right(seq(
+			choice(
+				//$._modifier_critical_invalid,
+				$._modifier_countSuccesses_invalid,
+				$._modifier_countFailures_invalid,
+				$._modifier_exploding_invalid,
+				$._modifier_matches_invalid,
+				$._modifier_keepOrDrop_invalid,
+				$._modifier_reroll_invalid,
+				$._modifier_sort_invalid,
+			),
+			repeat(
+				/[^#\[/*+\-})\]\s\r\n]/,
+				//TODO:
+				//just right brace
+				//just right paren
+				//just right bracket
+			),
+		)),
+		_diceRoll_remainder_invalid: $ => seq(
+			choice(
+				/[^cC<=>fF!mMkKdDrRsS@%#\[/*+\-})\]\s\r\n]/,
+				$.__just_at,
+				$.__just_percent,
+				//TODO:
+				//just right brace
+				//just right paren
+				//just right bracket
+			),
+			repeat(
+				/[^#\[/*+\-})\]\s\r\n]/,
+				//TODO:
+				//just right brace
+				//just right paren
+				//just right bracket
+			),
+		),
 		
 		_groupRoll_modifier: $ => prec.right(1, choice(
 			alias($._modifier_countSuccesses, $.successes),
@@ -1181,29 +1207,61 @@ module.exports = grammar({
 				),
 			), $.keepOrDrop),
 			
-			seq($._placeholders,
+			seq(
+				$._placeholders,
 				$._modifier_comparison_lazy,
 			),
 			
-			alias(seq(
-				choice(
-					$._modifier_countSuccesses_invalid,
-					$._modifier_countFailures_invalid,
-					$._modifier_keepOrDrop_invalid,
-				),
-				/[^@%#\[/*+\-})\]\s\r\n]*/,
-			), $.invalid),
+			alias($._groupRoll_modifier_invalid, $.invalid),
 		)),
+		_groupRoll_modifier_invalid: $ => prec.right(seq(
+			choice(
+				$._modifier_countSuccesses_invalid,
+				$._modifier_countFailures_invalid,
+				$._modifier_keepOrDrop_invalid,
+			),
+			repeat(
+				/[^#\[/*+\-})\]\s\r\n]/,
+				//TODO:
+				//just right brace
+				//just right paren
+				//just right bracket
+			),
+		)),
+		_groupRoll_remainder_invalid: $ => seq(
+			choice(
+				/[^<=>fFkKdD@%#\[/*+\-})\]\s\r\n]/,
+				$.__just_at,
+				$.__just_percent,
+				//TODO:
+				//just right brace
+				//just right paren
+				//just right bracket
+			),
+			repeat(
+				/[^#\[/*+\-})\]\s\r\n]/,
+				//TODO:
+				//just right brace
+				//just right paren
+				//just right bracket
+			),
+		),
 		
-		_modifier_critical: $ => prec(1, seq(
-			/[cC][sSfF]/,
-			/*optional(choice(
-				$._integer_or_inlineRoll,
-				seq(/[<=>]/, $._integer_or_inlineRoll),
-				seq(/[<=>]/, $._placeholders),
-				seq($._placeholders, $._integer_or_inlineRoll),
-			)),*/
-			$._modifier_comparison_lazy,
+		_modifier_critical: $ => prec.right(1, seq(
+			/[cC]/,
+			choice(
+				seq(
+					/[sSfF]/,
+					$._modifier_comparison_lazy,
+				),
+				seq(
+					$._placeholders,
+					optional(choice(
+						$._integer_or_inlineRoll,
+						$._modifier_comparison_strict,
+					)),
+				),
+			),
 		)),
 		_modifier_critical_invalid: $ => /[cC]([sSfF][<=>]?)?/,
 		_modifier_countSuccesses: $ => prec(1, seq(
@@ -1220,24 +1278,58 @@ module.exports = grammar({
 		)),
 		_modifier_countFailures_invalid: $ => /[fF]/,
 		_modifier_exploding: $ => prec(1, seq(
-			/![!pP]?/,
-			$._modifier_comparison_lazy,
+			/!/,
+			prec.right(choice(
+				seq(
+					/[!pP]/,
+					$._modifier_comparison_lazy,
+				),
+				seq(
+					optional($._placeholders),
+					choice(
+						$._integer_or_inlineRoll,
+						$._modifier_comparison_strict,
+					),
+				),
+			)),
 		)),
 		_modifier_exploding_invalid: $ => /![!pP]?[<=>]?/,
 		_modifier_matches: $ => prec.right(1, seq(
-			/[mM][tT]?/,
-			optional($._integer_or_inlineRoll),
-			optional($._modifier_comparison_strict),
+			/[mM]/,
+			seq(
+				optional(choice(
+					/[tT]/,
+					$._placeholders,
+				)),
+				optional($._integer_or_inlineRoll),
+				optional($._modifier_comparison_strict),
+			),
 		)),
 		_modifier_matches_invalid: $ => /[mM][tT]?[<=>]?/,
 		_modifier_keepOrDrop: $ => prec(1, seq(
-			/[kKdD][hHlL]?/,
+			/[kKdD]/,
+			optional(choice(
+				/[hHlL]/,
+				$._placeholders,
+			)),
 			$._integer_or_inlineRoll,
 		)),
 		_modifier_keepOrDrop_invalid: $ => /[kKdD][hHlL]?/,
 		_modifier_reroll: $ => prec(1, seq(
-			/[rR][oO]?/,
-			$._modifier_comparison_lazy,
+			/[rR]/,
+			prec.right(choice(
+				seq(
+					/[oO]/,
+					$._modifier_comparison_lazy,
+				),
+				seq(
+					optional($._placeholders),
+					choice(
+						$._integer_or_inlineRoll,
+						$._modifier_comparison_strict,
+					),
+				),
+			)),
 		)),
 		_modifier_reroll_invalid: $ => /[rR][oO]?[<=>]?/,
 		_modifier_sort: $ => prec(1, seq(
@@ -1263,8 +1355,7 @@ module.exports = grammar({
 			alias($._diceRoll_sides, $.sides),
 			//modifiers
 			alias(repeat($._diceRoll_modifier), $.modifiers),
-			//optional(alias($._term_remainder_general_invalid, $.invalid_dr)),
-			optional(alias(/[^cC<=>fF!mMkKdDrRsS@%#\[/*+\-})\]\s\r\n][^@%#\[/*+\-})\]\s\r\n]*/, $.invalid)),
+			optional(alias($._diceRoll_remainder_invalid, $.invalid)),
 		)),
 		_diceRoll_sides: $ => choice(
 			$._number_integer,
@@ -1339,6 +1430,7 @@ module.exports = grammar({
 			$._groupRoll_content,
 			$._$braceRight,
 			alias(repeat($._groupRoll_modifier), $.modifiers),
+			optional(alias($._groupRoll_remainder_invalid, $.invalid)),
 		)),
 		_groupRoll_content: $ => seq(
 			optional(alias($._groupRoll_invalid_commas, $.invalid)),

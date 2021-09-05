@@ -381,11 +381,9 @@ Dice Roll: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 					(critical
 						(number)
 					)
-			(invalid
-				(attribute
-					(delimiter)
-					(name)
-					(delimiter)))
+					(invalid)
+				)
+			)
 		)
 	) (delimiter)))
 
@@ -413,8 +411,42 @@ Dice Roll: [[5d3_]]
 			(diceRoll
 				(count (number))
 				(delimiter)
-				(sides (number)))
-			(invalid)
+				(sides (number))
+				(invalid))
 		)
 	) (delimiter)))
 
+==================
+Dice Roll: [[5d3c_]]
+==================
+[[5d3c_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(count (number))
+				(delimiter)
+				(sides (number))
+				(modifiers
+					(invalid)))
+		)
+	) (delimiter)))
+
+==================
+Dice Roll: [[5d3cs2_]]
+==================
+[[5d3cs2_]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(diceRoll
+				(count (number))
+				(delimiter)
+				(sides (number))
+				(modifiers
+					(critical (number)))
+				(invalid))
+		)
+	) (delimiter)))
