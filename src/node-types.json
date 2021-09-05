@@ -155,21 +155,32 @@
     }
   },
   {
-    "type": "critical",
+    "type": "criticalFailure",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "ability",
+          "type": "inlineRoll",
           "named": true
         },
         {
-          "type": "attribute",
+          "type": "number",
           "named": true
-        },
+        }
+      ]
+    }
+  },
+  {
+    "type": "criticalSuccess",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
         {
           "type": "inlineRoll",
           "named": true
@@ -253,21 +264,32 @@
     }
   },
   {
-    "type": "exploding",
+    "type": "drop",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "explode",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
       "required": false,
       "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
         {
           "type": "inlineRoll",
           "named": true
@@ -287,14 +309,6 @@
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
         {
           "type": "inlineRoll",
           "named": true
@@ -507,53 +521,13 @@
     }
   },
   {
-    "type": "invalid_diceRoll",
-    "named": true,
-    "fields": {}
-  },
-  {
-    "type": "keepOrDrop",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "keep_or_drop",
+    "type": "keep",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
       "required": true,
       "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
         {
           "type": "inlineRoll",
           "named": true
@@ -628,11 +602,7 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
+          "type": "failures",
           "named": true
         },
         {
@@ -663,15 +633,19 @@
           "named": true
         },
         {
-          "type": "critical",
+          "type": "criticalFailure",
           "named": true
         },
         {
-          "type": "exploding",
+          "type": "criticalSuccess",
           "named": true
         },
         {
-          "type": "failures",
+          "type": "drop",
+          "named": true
+        },
+        {
+          "type": "explode",
           "named": true
         },
         {
@@ -679,19 +653,7 @@
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "invalid_diceRoll",
-          "named": true
-        },
-        {
-          "type": "keepOrDrop",
-          "named": true
-        },
-        {
-          "type": "keep_or_drop",
+          "type": "keep",
           "named": true
         },
         {
@@ -948,14 +910,6 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
           "type": "inlineRoll",
           "named": true
         },
@@ -1064,7 +1018,7 @@
     }
   },
   {
-    "type": "sort",
+    "type": "successes",
     "named": true,
     "fields": {},
     "children": {
@@ -1072,30 +1026,7 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "successes",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
+          "type": "failures",
           "named": true
         },
         {
@@ -1248,6 +1179,10 @@
   },
   {
     "type": "number",
+    "named": true
+  },
+  {
+    "type": "sort",
     "named": true
   },
   {
