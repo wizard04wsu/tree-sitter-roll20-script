@@ -80,8 +80,7 @@ Dice Roll: [[ df ]]
 		(term
 			(diceRoll
 				(delimiter)
-				(sides
-					(fate)))
+				(fate))
 		)
 	) (delimiter)))
 

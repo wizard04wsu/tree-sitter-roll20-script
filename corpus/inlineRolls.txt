@@ -136,9 +136,73 @@ Inline Roll: [[1*5]]
 	) (delimiter)))
 
 ==================
+Inline Roll: [[1 * 5]]
+==================
+[[1 * 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1**5]]
+==================
+[[1**5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1 ** 5]]
+==================
+[[1 ** 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
 Inline Roll: [[1/5]]
 ==================
 [[1/5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1 / 5]]
+==================
+[[1 / 5]]
 ---
 (roll20_script
 	(inlineRoll (delimiter) (formula
@@ -168,6 +232,22 @@ Inline Roll: [[1%5]]
 	) (delimiter)))
 
 ==================
+Inline Roll: [[1 % 5]]
+==================
+[[1 % 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
 Inline Roll: [[1+-5]]
 ==================
 [[1+-5]]
@@ -177,7 +257,6 @@ Inline Roll: [[1+-5]]
 		(term
 			(number)
 		)
-		(operator)
 		(operator)
 		(term
 			(number)
@@ -195,7 +274,6 @@ Inline Roll: [[1 + - 5]]
 			(number)
 		)
 		(operator)
-		(operator)
 		(term
 			(number)
 		)
@@ -211,7 +289,6 @@ Inline Roll: [[1-+5]]
 		(term
 			(number)
 		)
-		(operator)
 		(operator)
 		(term
 			(number)
@@ -229,7 +306,6 @@ Inline Roll: [[1 - + 5]]
 			(number)
 		)
 		(operator)
-		(operator)
 		(term
 			(number)
 		)
@@ -246,13 +322,6 @@ Inline Roll: [[1+ - + -+ -+-5]]
 			(number)
 		)
 		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
 		(term
 			(number)
 		)
@@ -268,13 +337,6 @@ Inline Roll: [[1 / + - + -+ -+-5]]
 		(term
 			(number)
 		)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
-		(operator)
 		(operator)
 		(operator)
 		(term

@@ -1,7 +1,4 @@
 
-const chainOf = (rule) => prec.right(repeat1(rule));
-
-
 module.exports = grammar({
 	name: 'roll20_script',
 	
@@ -140,7 +137,7 @@ module.exports = grammar({
 		  ║ Strings and Characters
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		_stringNL: $ => chainOf(choice( /[^#]|\r?\n/, $.__just_hash )),
+		_stringNL: $ => prec.right(repeat1(choice( /[^#]|\r?\n/, $.__just_hash ))),
 		
 		_wsp_inline: $ => /\s+/,
 		
@@ -574,7 +571,6 @@ module.exports = grammar({
 		
 		formula: $ => seq(
 			optional($._labels_or_wsp),
-			
 			alias($._term_first, $.term),
 			repeat(seq(
 				optional($._labels_or_wsp),
@@ -634,66 +630,62 @@ module.exports = grammar({
 		   │   the first element in a formula.
 		   └─────────────────────────────*/
 		
-		_operator: $ => choice(
+		_operator: $ => prec.right(choice(
 			$._operator_summation,
+			$._operator_multiplication,
 			seq(
 				$._operator_multiplication,
-				optional($._operator_summation),
+				$._operator_summation,
 			),
-		),
+		)),
 		
 		_operator_multiplication: $ => prec.right(1, seq(
 			alias(choice(
-				$.__just_slash,
-				seq(
-					$.__just_asterisk,
-					optional($.__just_asterisk),
-				),
+				/\/|\*\*?/,
 				$.__just_percent,
 			), $.operator),
+			optional($._labels_or_wsp),
 		)),
 		_operator_summation: $ => prec.right(choice(
-			alias($._operator_plus, $.operator),
-			alias($._operator_minus, $.operator),
+			$._operator_summation_plus,
+			$._operator_summation_minus,
+		)),
+		_operator_summation_plus: $ => prec.right(choice(
 			seq(
-				alias($._operator_plus, $.operator),
+				alias("+", $.operator),
 				optional($._labels_or_wsp),
-				alias($._operator_minus, $.operator),
-				repeat(seq(
-					optional($._labels_or_wsp),
-					alias($._operator_plus, $.operator),
-					optional($._labels_or_wsp),
-					alias($._operator_minus, $.operator),
-				)),
-				optional(seq(
-					optional($._labels_or_wsp),
-					alias($._operator_plus, $.operator),
-				)),
 			),
 			seq(
-				alias($._operator_minus, $.operator),
+				alias(seq(
+					prec.right(repeat1(seq(
+						"+",
+						optional($._labels_or_wsp),
+						"-",
+						optional($._labels_or_wsp),
+					))),
+					optional("+"),
+				), $.operator),
 				optional($._labels_or_wsp),
-				alias($._operator_plus, $.operator),
-				repeat(seq(
-					optional($._labels_or_wsp),
-					alias($._operator_minus, $.operator),
-					optional($._labels_or_wsp),
-					alias($._operator_plus, $.operator),
-				)),
-				optional(seq(
-					optional($._labels_or_wsp),
-					alias($._operator_minus, $.operator),
-				)),
 			),
 		)),
-		_operator_plus: $ => choice(
-			$.__just_plus,
-			$.__operator_positive,
-		),
-		_operator_minus: $ => choice(
-			$.__just_dash,
-			$.__operator_negative,
-		),
+		_operator_summation_minus: $ => prec.right(choice(
+			seq(
+				alias("-", $.operator),
+				optional($._labels_or_wsp),
+			),
+			seq(
+				alias(seq(
+					prec.right(repeat1(seq(
+						"-",
+						optional($._labels_or_wsp),
+						"+",
+						optional($._labels_or_wsp),
+					))),
+					optional("-"),
+				), $.operator),
+				optional($._labels_or_wsp),
+			),
+		)),
 		
 		
 		/*┌──────────────────────────────
@@ -706,7 +698,6 @@ module.exports = grammar({
 		
 		label: $ => seq(
 			$._$bracketLeft,
-//			optional(name(
 			optional(prec.right(repeat1(
 				prec(1, choice(
 					/[^@%#&\]\r\n]+/,	//new lines are not allowed
@@ -719,7 +710,6 @@ module.exports = grammar({
 					$.__just_hash,
 					$.__just_ampersand,
 				))
-//			)($)),
 			))),
 			$._$bracketRight,
 		),
