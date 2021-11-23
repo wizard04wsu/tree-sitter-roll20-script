@@ -157,12 +157,15 @@ module.exports = grammar({
 			), $.operator)),
 			$._number_signable,
 		),
-		_number_signed_IR_PH: $ => seq(
+		_number_IR_PH_signed: $ => seq(
 			optional(alias(choice(
 				$.__operator_positive,
 				$.__operator_negative,
 			), $.operator)),
-			$._number_signable_IR_PH,
+			choice(
+				$._number_IR_PH_signable,
+				$._number_IR_PH_repeat1,
+			),
 		),
 		
 		_number: $ => choice(
@@ -170,73 +173,102 @@ module.exports = grammar({
 			$._number_fraction,
 		),
 		_number_IR_PH: $ => choice(
-			$._number_signable_IR_PH,
-			$._number_fraction_IR_PH,
+			$._number_IR_PH_signable,
+			$._number_IR_PH_fraction,
 		),
 		
 		_number_signable: $ => prec.right(seq(
 			$.__integer,
 			optional($._number_fraction),
 		)),
-		_number_signable_IR_PH: $ => prec.right(seq(
-			prec.right(repeat1(choice(
-				alias($.__integer, $.number),
-				$.inlineRoll,
-				$._placeholders,
-			))),
-			optional($._number_fraction_IR_PH),
+		_number_IR_PH_signable: $ => prec.right(seq(
+			choice(
+				$._number_IR_PH_integer,
+				seq(
+					alias($._number_type_float, $.number),
+					repeat($._number_IR_PH_extraInteger_after),
+				),
+				seq(
+					$._number_IR_PH_repeat1,
+					repeat($._number_IR_PH_extraInteger_before),
+					choice(
+						$._number_IR_PH_integer,
+						seq(
+							alias($._number_type_float, $.number),
+							repeat($._number_IR_PH_extraInteger_after),
+						),
+						seq(
+							alias($._number_type_fraction, $.number),
+							repeat($._number_IR_PH_extraInteger_after),
+						),
+						seq(
+							alias($._number_IR_PH_decimalPoint, $.number),
+							$._number_IR_PH_repeat1,
+							optional(seq(
+								alias($.__integer, $.number),
+								repeat($._number_IR_PH_extraInteger_after),
+							)),
+						),
+					),
+				),
+			),
+			repeat($._IR_PH),
 		)),
+		
+		_number_type_float: $ => seq(
+			$.__integer,
+			$._number_IR_PH_decimalPoint,
+			$.__integer,
+		),
+		_number_type_fraction: $ => seq(
+			$._number_IR_PH_decimalPoint,
+			$.__integer,
+		),
+		
+		_number_IR_PH_integer: $ => prec.right(seq(
+			alias($.__integer, $.number),
+			repeat($._number_IR_PH_extraInteger_after),
+		)),
+		
+		_number_IR_PH_extraInteger_after: $ => seq(
+			$._number_IR_PH_repeat1,
+			alias($.__integer, $.number),
+		),
+		_number_IR_PH_extraInteger_before: $ => prec.right(seq(
+			alias($.__integer, $.number),
+			$._number_IR_PH_repeat1,
+		)),
+		_number_IR_PH_repeat1: $ => prec.right(repeat1($._IR_PH)),
+		
+		_number_IR_PH_decimalPoint: $ => alias($.__decimal_point, $.decimalPoint),
 		
 		_number_fraction: $ => seq(
 			alias($.__decimal_point, $.decimalPoint),
 			$.__integer,
 		),
-		_number_fraction_IR_PH: $ => choice(
-			seq(
-				alias(seq(
-					alias($.__decimal_point, $.decimalPoint),
-					$.__integer,
-				), $.number),
-				optional(seq(
-					choice(
-						$.inlineRoll,
-						$._placeholders,
-					),
-					repeat(choice(
+		_number_IR_PH_fraction: $ => seq(
+			choice(
+				seq(
+					alias($._number_type_fraction, $.number),
+					repeat(seq(
+						$._number_IR_PH_repeat1,
 						$.__integer,
-						$.inlineRoll,
-						$._placeholders,
 					)),
-				)),
-			),
-			seq(
-				alias($.__decimal_point, $.decimalPoint),
-				optional(seq(
-					choice(
-						$.inlineRoll,
-						$._placeholders,
-					),
-					repeat(choice(
+				),
+				seq(
+					alias($._number_IR_PH_decimalPoint, $.number),
+					$._number_IR_PH_repeat1,
+					optional(seq(
 						$.__integer,
-						$.inlineRoll,
-						$._placeholders,
+						repeat(seq(
+							$._number_IR_PH_repeat1,
+							$.__integer,
+						)),
 					)),
-				)),
+				),
 			),
+			repeat($._IR_PH),
 		),
-		
-		_number_integer: $ => prec.right(repeat1(
-			prec.right(1, choice(
-				$.__integer,
-				$._placeholders,
-				$.inlineRoll,
-			))
-		)),
-		_number_integer_IR_PH: $ => prec.right(repeat1(choice(
-			alias($.__integer, $.number),
-			$.inlineRoll,
-			$._placeholders,
-		))),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -251,6 +283,7 @@ module.exports = grammar({
 		   │   accessed from within a script.
 		   └─────────────────────────────*/
 		
+		//property names & character names
 		_propertyName: $ => repeat1(choice(
 			/[^@%#&}|\r\n]+/,
 			$._macro_and_wsp,
@@ -310,17 +343,12 @@ module.exports = grammar({
 				seq(
 					$._selector,
 					$._$pipe,
-					choice(
-						alias($._propertyName, $.name),
-						seq(
-							alias($._propertyName, $.name),
-							$._$pipe,
-							alias("max", $.keyword),
-						),
-						alias($._propertyName, $.name),
-					),
+					alias($._propertyName, $.name),
+					optional(seq(
+						$._$pipe,
+						alias("max", $.keyword),
+					)),
 				),
-				$._selector,
 			),
 			$._$braceRight,
 		)),
@@ -335,6 +363,7 @@ module.exports = grammar({
 		   │   character sequences "@{" and "%{".
 		   │ • cannot include attributes, abilities, or macros.
 		   │ 
+		   │ %{name}
 		   │ %{selected|name}
 		   │ %{target|name}
 		   │ %{character|name}
@@ -349,7 +378,6 @@ module.exports = grammar({
 					$._$pipe,
 					alias($._propertyName, $.name),
 				),
-				$._selector,
 			),
 			$._$braceRight,
 		)),
@@ -575,7 +603,6 @@ module.exports = grammar({
 			repeat(seq(
 				optional($._labels_or_wsp),
 				$._operator,
-				optional($._labels_or_wsp),
 				alias($._term, $.term),
 			)),
 			optional($._labels_or_wsp),
@@ -584,8 +611,8 @@ module.exports = grammar({
 		_term_first: $ => prec.right(choice(
 			prec(1, seq(
 				prec.right(choice(
-					$._number_signed_IR_PH,
-					$._number_fraction_IR_PH,
+					$._number_IR_PH_signed,
+					$._number_IR_PH_fraction,
 					$.diceRoll,
 					$.groupRoll,
 					$.rollQuery,
@@ -630,62 +657,38 @@ module.exports = grammar({
 		   │   the first element in a formula.
 		   └─────────────────────────────*/
 		
-		_operator: $ => prec.right(choice(
-			$._operator_summation,
-			$._operator_multiplication,
-			seq(
-				$._operator_multiplication,
+		_operator: $ => prec.right(seq(
+			alias(choice(
 				$._operator_summation,
-			),
+				$._operator_multiplication,
+				seq(
+					$._operator_multiplication,
+					$._operator_summation,
+				),
+			), $.operator),
 		)),
 		
 		_operator_multiplication: $ => prec.right(1, seq(
-			alias(choice(
+			choice(
 				/\/|\*\*?/,
 				$.__just_percent,
-			), $.operator),
+			),
 			optional($._labels_or_wsp),
 		)),
 		_operator_summation: $ => prec.right(choice(
 			$._operator_summation_plus,
 			$._operator_summation_minus,
 		)),
-		_operator_summation_plus: $ => prec.right(choice(
-			seq(
-				alias("+", $.operator),
-				optional($._labels_or_wsp),
-			),
-			seq(
-				alias(seq(
-					prec.right(repeat1(seq(
-						"+",
-						optional($._labels_or_wsp),
-						"-",
-						optional($._labels_or_wsp),
-					))),
-					optional("+"),
-				), $.operator),
-				optional($._labels_or_wsp),
-			),
-		)),
-		_operator_summation_minus: $ => prec.right(choice(
-			seq(
-				alias("-", $.operator),
-				optional($._labels_or_wsp),
-			),
-			seq(
-				alias(seq(
-					prec.right(repeat1(seq(
-						"-",
-						optional($._labels_or_wsp),
-						"+",
-						optional($._labels_or_wsp),
-					))),
-					optional("-"),
-				), $.operator),
-				optional($._labels_or_wsp),
-			),
-		)),
+		_operator_summation_plus: $ => seq(
+			"+",
+			optional($._labels_or_wsp),
+			optional($._operator_summation_minus),
+		),
+		_operator_summation_minus: $ => seq(
+			"-",
+			optional($._labels_or_wsp),
+			optional($._operator_summation_plus),
+		),
 		
 		
 		/*┌──────────────────────────────
@@ -765,6 +768,21 @@ module.exports = grammar({
 		  ║ Rolls
 		  ╚════════════════════════════════════════════════════════════*/
 		
+		_roll_integer: $ => prec.right(choice(
+			seq(
+				$._number_IR_PH_integer,
+				repeat($._IR_PH),
+			),
+			prec(1, seq(
+				$._number_IR_PH_repeat1,
+				optional(seq(
+					$._number_IR_PH_integer,
+					repeat($._IR_PH),
+				)),
+			)),
+		)),
+		
+		
 		/*┌──────────────────────────────
 		  │ Roll Modifiers
 		  └┬─────────────────────────────*/
@@ -773,12 +791,14 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		_diceRoll_modifiers: $ => repeat1(prec.right(choice(
-			alias($._number_integer, $.number),
+			alias($.__integer, $.number),
 			/[aAcCdDfFhHkKlLmMoOpPrRsStT<=>!]+/,
+			$.inlineRoll,
+			$._placeholders,
 		))),
 		
 		_groupRoll_modifiers: $ => repeat1(prec.right(choice(
-			alias($._number_integer, $.number),
+			alias($.__integer, $.number),
 			/[dDfFhHkKlL<=>]+/,
 		))),
 		
@@ -787,14 +807,14 @@ module.exports = grammar({
 		  │ Dice Roll
 		  └──────────────────────────────*/
 		
-		diceRoll: $ => prec.right(1, seq(
+		diceRoll: $ => prec.right(2, seq(
 			//number of dice to roll
-			optional(alias($._number_integer_IR_PH, $.count)),
+			optional(alias($._roll_integer, $.count)),
 			//keyword (the letter 'd')
 			$._$diceRoll,
 			//sides per die
 			choice(
-				alias($._number_integer_IR_PH, $.sides),
+				alias($._roll_integer, $.sides),
 				alias(/[fF]/, $.fate),
 			),
 			//modifiers
@@ -808,7 +828,7 @@ module.exports = grammar({
 		
 		tableRoll: $ => prec.right(seq(
 			//number of "dice"
-			optional(alias($._number_integer_IR_PH, $.count)),
+			optional(alias($._roll_integer, $.count)),
 			//keyword ("t[")
 			$._$tableRoll,
 			//table name
@@ -889,5 +909,10 @@ module.exports = grammar({
 		_$parenRight: $ => alias($.__just_rightParen, $.delimiter),
 		
 		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Miscellaneous
+		  ╚════════════════════════════════════════════════════════════*/
+		
+		_IR_PH: $ => choice($.inlineRoll, $._placeholders),
 	},
 });

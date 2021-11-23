@@ -120,6 +120,22 @@ Inline Roll: [[1+5]]
 	) (delimiter)))
 
 ==================
+Inline Roll: [[1 + 5]]
+==================
+[[1 + 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
 Inline Roll: [[1*5]]
 ==================
 [[1*5]]
@@ -299,6 +315,38 @@ Inline Roll: [[1-+5]]
 Inline Roll: [[1 - + 5]]
 ==================
 [[1 - + 5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1+-+5]]
+==================
+[[1+-+5]]
+---
+(roll20_script
+	(inlineRoll (delimiter) (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	) (delimiter)))
+
+==================
+Inline Roll: [[1-+-5]]
+==================
+[[1-+-5]]
 ---
 (roll20_script
 	(inlineRoll (delimiter) (formula
