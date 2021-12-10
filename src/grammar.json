@@ -630,22 +630,30 @@
       "type": "CHOICE",
       "members": [
         {
-          "type": "ALIAS",
+          "type": "PREC",
+          "value": 1,
           "content": {
-            "type": "STRING",
-            "value": "target"
-          },
-          "named": true,
-          "value": "token"
+            "type": "ALIAS",
+            "content": {
+              "type": "STRING",
+              "value": "target"
+            },
+            "named": true,
+            "value": "token"
+          }
         },
         {
-          "type": "ALIAS",
+          "type": "PREC",
+          "value": 1,
           "content": {
-            "type": "STRING",
-            "value": "selected"
-          },
-          "named": true,
-          "value": "token"
+            "type": "ALIAS",
+            "content": {
+              "type": "STRING",
+              "value": "selected"
+            },
+            "named": true,
+            "value": "token"
+          }
         },
         {
           "type": "ALIAS",
@@ -1044,7 +1052,7 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^@%\\[({\\/*+\\-})\\] \\r\\n]+"
+              "value": "[^@%|\\[({\\/*+\\-})\\] \\r\\n]+"
             },
             {
               "type": "SYMBOL",

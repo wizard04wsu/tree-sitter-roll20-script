@@ -294,8 +294,9 @@ module.exports = grammar({
 			$.__just_ampersand,
 		)),
 		_selector: $ => choice(
-			alias("target", $.token),
-			alias("selected", $.token),
+			//prec(1, alias(/target|selected/, $.token)),
+			prec(1, alias("target", $.token)),
+			prec(1, alias("selected", $.token)),
 			alias($._propertyName, $.character),
 		),
 		
@@ -465,7 +466,7 @@ module.exports = grammar({
 			alias($._macro_name_safe, $.name),
 		),
 		_macro_name_safe: $ => prec.right(repeat1(choice(
-			/[^@%\[({/*+\-})\] \r\n]+/,
+			/[^@%|\[({/*+\-})\] \r\n]+/,
 			$.attribute,
 			$.ability,
 			$.__just_at,

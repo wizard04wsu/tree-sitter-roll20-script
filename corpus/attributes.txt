@@ -48,6 +48,17 @@ Attribute: @{c|a|max}
 		(keyword) (delimiter)))
 
 ==================
+Attribute: @{c|a |max}
+==================
+@{c|a |max}
+---
+(roll20_script
+	(attribute (delimiter)
+		(character) (delimiter)
+		(name) (delimiter)
+		(keyword) (delimiter)))
+
+==================
 Attribute: @{ c | a |max}
 ==================
 @{ c | a |max}
