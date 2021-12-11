@@ -1,19 +1,19 @@
 {
-	"name": "tree-sitter-roll20-script",
-	"version": "0.0.0",
-	"description": "Tree-sitter grammar for macros on Roll20.net",
-	"main": "index.js",
-	"repository": "https://github.com/wizard04wsu/tree-sitter-roll20-script",
-	"keywords": [
-		"grammar",
-		"syntax"
-	],
-	"author": "Andy Harrison",
-	"license": "MIT",
-	"devDependencies": {
-		"tree-sitter-cli": "^0.16.9"
-	},
-	"dependencies": {
-		"nan": "^2.14.2"
-	}
+  "name": "tree-sitter-roll20-script",
+  "version": "0.0.0",
+  "description": "Tree-sitter grammar for macros on Roll20.net",
+  "main": "bindings/node",
+  "repository": "https://github.com/wizard04wsu/tree-sitter-roll20-script",
+  "keywords": [
+    "grammar",
+    "syntax"
+  ],
+  "author": "Andy Harrison",
+  "license": "MIT",
+  "devDependencies": {
+    "tree-sitter-cli": "^0.16.9"
+  },
+  "dependencies": {
+    "nan": "^2.14.2"
+  }
 }
