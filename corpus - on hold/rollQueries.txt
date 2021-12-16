@@ -1,0 +1,216 @@
+==================
+Roll Query: Valid: ?{|}
+==================
+?{|}
+---
+(script
+	(rollQuery))
+
+==================
+Roll Query: Valid: ?{||}
+==================
+?{||}
+---
+(script
+	(rollQuery))
+
+==================
+Roll Query: Valid: ?{p|}
+==================
+?{p|}
+---
+(script
+	(rollQuery
+		(prompt)))
+
+==================
+Roll Query: Valid: ?{|d}
+==================
+?{|d}
+---
+(script
+	(rollQuery
+		(defaultValue)))
+
+==================
+Roll Query: Valid: ?{p|d}
+==================
+?{p|d}
+---
+(script
+	(rollQuery
+		(prompt)
+		(defaultValue)))
+
+==================
+Roll Query: Valid: ?{p|a|b}
+==================
+?{p|a|b}
+---
+(script
+	(rollQuery
+		(prompt)
+		(option
+			(optionName))
+		(option
+			(optionName))))
+
+==================
+Roll Query: Valid: ?{p|a,A|b,B}
+==================
+?{p|a,A|b,B}
+---
+(script
+	(rollQuery
+		(prompt)
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName)
+			(optionValue))))
+
+==================
+Roll Query: Valid: ?{|a|b,?{p&#124;b&#125;c}
+==================
+?{|a|b,?{p&#124;b&#125;c}
+---
+(script
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue
+				(rollQuery
+					(prompt)
+					(defaultValue))))))
+
+==================
+Roll Query: Valid: ?{ Pr@%&mpt | default value }
+==================
+?{ Pr@%&mpt | default value }
+---
+(script
+	(rollQuery
+		(prompt)
+		(defaultValue)))
+
+==================
+Roll Query: Valid: ?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
+==================
+?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }
+---
+(script
+	(rollQuery
+		(prompt)
+		(defaultValue
+			(attribute
+				(delimiter)
+				(attributeName)
+				(delimiter))
+			(ability
+				(delimiter)
+				(characterName)
+				(abilityName)
+				(delimiter)))))
+
+==================
+Roll Query: Valid: ?{|a|b,c|d|}
+==================
+?{|a|b,c|d|}
+---
+(script
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName))))
+
+==================
+Roll Query: Valid: ?{|a,b|c||d|e,f}
+==================
+?{|a,b|c||d|e,f}
+---
+(script
+	(rollQuery
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue))))
+
+==================
+Roll Query: Valid: ?{|a,|,|,b}
+==================
+?{|a,|,|,b}
+---
+(script
+	(rollQuery
+		(option
+			(optionName))
+		(option)
+		(option
+			(optionValue))))
+
+==================
+Roll Query: Valid: ?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}
+==================
+?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}
+---
+(script
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName))))
+
+==================
+Roll Query: Valid: 
+?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f&vert;g&rcub;|,}
+---
+(script
+	(rollQuery
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option)))
+==================
+
