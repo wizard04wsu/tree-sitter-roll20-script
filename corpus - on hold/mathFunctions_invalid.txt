@@ -3,7 +3,7 @@ Math Function: [[abs()]]
 ==================
 [[abs()]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid (name) (delimiter) (delimiter))
@@ -15,7 +15,7 @@ Math Function: [[abs( )]]
 ==================
 [[abs( )]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid (name) (delimiter) (delimiter))
@@ -27,7 +27,7 @@ Math Function: [[-abs(5)]]
 ==================
 [[-abs(5)]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -44,7 +44,7 @@ Math Function: [[x(5)]]
 ==================
 [[x(5)]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -61,7 +61,7 @@ Math Function: [[x()]]
 ==================
 [[x()]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -79,7 +79,7 @@ Math Function: [[abs(5
 ==================
 [[abs(5
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(invalid (delimiter))
 		(formula
@@ -96,7 +96,7 @@ Math Function: [[abs(
 ==================
 [[abs(
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(invalid (delimiter))
 		(formula

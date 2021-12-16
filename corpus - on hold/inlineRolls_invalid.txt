@@ -3,7 +3,7 @@ Inline Roll: [[]]
 ==================
 [[]]
 ---
-(roll20_script
+(script
 	(invalid (delimiter) (delimiter)))
 		
 ==================
@@ -11,7 +11,7 @@ Inline Roll: [[ ]]
 ==================
 [[ ]]
 ---
-(roll20_script
+(script
 	(invalid (delimiter) (delimiter)))
 
 ==================
@@ -19,7 +19,7 @@ Inline Roll: [[x]]
 ==================
 [[x]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -31,7 +31,7 @@ Inline Roll: [[ x ]]
 ==================
 [[ x ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -48,7 +48,7 @@ Inline Roll: [[- 5]]
 ==================
 [[- 5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -61,7 +61,7 @@ Inline Roll: [[-+5]]
 ==================
 [[-+5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -75,7 +75,7 @@ Inline Roll: [[+-5]]
 ==================
 [[+-5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -89,7 +89,7 @@ Inline Roll: [[- - -5]]
 ==================
 [[- - -5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -104,7 +104,7 @@ Inline Roll: [[*5]]
 ==================
 [[*5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -117,7 +117,7 @@ Inline Roll: [[%5]]
 ==================
 [[%5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid)
@@ -135,7 +135,7 @@ Inline Roll: [[1--5]]
 ==================
 [[1--5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -152,7 +152,7 @@ Inline Roll: [[1 - - 5]]
 ==================
 [[1 - - 5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -169,7 +169,7 @@ Inline Roll: [[1 - / + - + -+ -+-5]]
 ==================
 [[1 - / + - + -+ -+-5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -199,7 +199,7 @@ Inline Roll: [[ [[]] ]]
 ==================
 [[ [[]] ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(invalid (delimiter) (delimiter))
@@ -216,7 +216,7 @@ Inline Roll: [[5]
 ==================
 [[5]
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(invalid (delimiter))
 		(formula
@@ -231,7 +231,7 @@ Inline Roll: [[5
 ==================
 [[5
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(invalid (delimiter))
 		(formula
@@ -245,6 +245,6 @@ Inline Roll: [[
 ==================
 [[
 ---
-(roll20_script
+(script
 	(invalid (delimiter)))
 

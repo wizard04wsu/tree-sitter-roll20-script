@@ -3,285 +3,65 @@ Ability: %{a}
 ==================
 %{a}
 ---
-(roll20_script
-	(ability (delimiter)
-		(name) (delimiter)))
+(script
+	(ability
+		(ability_identifier)))
 
 ==================
 Ability: %{ a }
 ==================
 %{ a }
 ---
-(roll20_script
-	(ability (delimiter)
-		(name) (delimiter)))
+(script
+	(ability
+		(ability_identifier)))
 
 ==================
 Ability: %{c|a}
 ==================
 %{c|a}
 ---
-(roll20_script
-	(ability (delimiter)
-		(character) (delimiter)
-		(name) (delimiter)))
+(script
+	(ability
+		(character_identifier)
+		(ability_identifier)))
 
 ==================
 Ability: %{ c | a }
 ==================
 %{ c | a }
 ---
-(roll20_script
-	(ability (delimiter)
-		(character) (delimiter)
-		(name) (delimiter)))
+(script
+	(ability
+		(character_identifier)
+		(ability_identifier)))
 
 ==================
 Ability: %{selected|a}
 ==================
 %{selected|a}
 ---
-(roll20_script
-	(ability (delimiter)
-		(token) (delimiter)
-		(name) (delimiter)))
+(script
+	(ability
+		(character_token_identifier)
+		(ability_identifier)))
 
 ==================
 Ability: %{target|a}
 ==================
 %{target|a}
 ---
-(roll20_script
-	(ability (delimiter)
-		(token) (delimiter)
-		(name) (delimiter)))
-
-
-
-
-
-
-==================
-Ability: %{#m }
-==================
-%{#m }
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{a#a a}
-==================
-%{a#a a}
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{#c |#a }
-==================
-%{#c |#a }
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{c#c c|a#a a}
-==================
-%{c#c c|a#a a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
+(script
+	(ability
+		(character_token_identifier)
+		(ability_identifier)))
 
 ==================
 Ability: %{cc c |a}
 ==================
 %{cc c |a}
 ---
-(roll20_script
- 	(ability (delimiter)
-		(character)
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{c#c c |a}
-==================
-%{c#c c |a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{c#c #c |a}
-==================
-%{c#c #c |a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name))
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{cc #c |a}
-==================
-%{cc #c |a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{c#c c|a}
-==================
-%{c#c c|a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{c#c #c|a}
-==================
-%{c#c #c|a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name))
-			(macroHash))
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{#c c|a}
-==================
-%{#c c|a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character
-			(macro (delimiter) (name)))
-		(delimiter)
-		(name)
-		(delimiter)))
-
-==================
-Ability: %{#a a}
-==================
-%{#a a}
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{a#a a}
-==================
-%{a#a a}
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{a#a #a }
-==================
-%{a#a #a }
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macro (delimiter) (name))
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{#a #a }
-==================
-%{#a #a }
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macro (delimiter) (name))
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{a#a}
-==================
-%{a#a}
----
-(roll20_script
- 	(ability (delimiter)
-		(name
-			(macroHash))
-		(delimiter)))
-
-==================
-Ability: %{c|a#a }
-==================
-%{c|a#a }
----
-(roll20_script
- 	(ability (delimiter)
-		(character)
-		(delimiter)
-		(name
-			(macro (delimiter) (name)))
-		(delimiter)))
-
-==================
-Ability: %{c|a#a}
-==================
-%{c|a#a}
----
-(roll20_script
- 	(ability (delimiter)
-		(character)
-		(delimiter)
-		(name
-			(macroHash))
-		(delimiter)))
+(script
+ 	(ability
+		(character_identifier)
+		(ability_identifier)))

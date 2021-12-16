@@ -3,7 +3,7 @@ Dice Roll: [[ d6c@{s}5cs>5s_c@{f}3 ]]
 ==================
 [[ d6c@{s}5cs>5s_c@{f}3 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -31,7 +31,7 @@ Number: Valid with Invalid Remainder: [[5d_]]
 ==================
 [[5d_]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -44,7 +44,7 @@ Dice Roll: [[5d3_]]
 ==================
 [[5d3_]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -60,7 +60,7 @@ Dice Roll: [[5d3c_]]
 ==================
 [[5d3c_]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -77,7 +77,7 @@ Dice Roll: [[5d3cs2_]]
 ==================
 [[5d3cs2_]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
