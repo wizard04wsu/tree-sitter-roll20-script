@@ -3,7 +3,7 @@ Math Function: [[abs(5)]]
 ==================
 [[abs(5)]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(function (name) (delimiter) (formula
@@ -19,7 +19,7 @@ Math Function: [[ abs( 5 ) ]]
 ==================
 [[ abs( 5 ) ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(function (name) (delimiter) (formula
@@ -35,7 +35,7 @@ Math Function: [[ceil(5)]]
 ==================
 [[ceil(5)]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(function (name) (delimiter) (formula
@@ -51,7 +51,7 @@ Math Function: [[floor(5)]]
 ==================
 [[floor(5)]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(function (name) (delimiter) (formula
@@ -67,7 +67,7 @@ Math Function: [[round(5)]]
 ==================
 [[round(5)]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(function (name) (delimiter) (formula

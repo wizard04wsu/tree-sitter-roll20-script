@@ -3,7 +3,7 @@ Number: [[5]]
 ==================
 [[5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -15,7 +15,7 @@ Number: [[ 5 ]]
 ==================
 [[ 5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -27,7 +27,7 @@ Number: [[42]]
 ==================
 [[42]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -39,7 +39,7 @@ Number: [[ 42 ]]
 ==================
 [[ 42 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number)
@@ -51,7 +51,7 @@ Number: [[5.5]]
 ==================
 [[5.5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number (decimalPoint))
@@ -63,7 +63,7 @@ Number: [[ 5.5 ]]
 ==================
 [[ 5.5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number (decimalPoint))
@@ -75,7 +75,7 @@ Number: [[42.42]]
 ==================
 [[42.42]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number (decimalPoint))
@@ -87,7 +87,7 @@ Number: [[ 42.42 ]]
 ==================
 [[ 42.42 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number (decimalPoint))
@@ -99,7 +99,7 @@ Number: [[-5]]
 ==================
 [[-5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -112,7 +112,7 @@ Number: [[ -5 ]]
 ==================
 [[ -5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -125,7 +125,7 @@ Number: [[-42.42]]
 ==================
 [[-42.42]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -138,7 +138,7 @@ Number: [[ -42.42 ]]
 ==================
 [[ -42.42 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -151,7 +151,7 @@ Number: [[+5]]
 ==================
 [[+5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -164,7 +164,7 @@ Number: [[ +5 ]]
 ==================
 [[ +5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -177,7 +177,7 @@ Number: [[+42.42]]
 ==================
 [[+42.42]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -190,7 +190,7 @@ Number: [[ +42.42 ]]
 ==================
 [[ +42.42 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(operator)
@@ -203,7 +203,7 @@ Number: [[.5]]
 ==================
 [[.5]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number (decimalPoint))
@@ -215,7 +215,7 @@ Number: [[ .5 ]]
 ==================
 [[ .5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(number (decimalPoint))
@@ -232,7 +232,7 @@ Number: [[5d6]]
 ==================
 [[5d6]]
 ---
-(roll20_script
+(script
  	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll

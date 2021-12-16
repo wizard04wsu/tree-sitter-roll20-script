@@ -3,135 +3,140 @@ Macro: ##
 ==================
 ##
 ---
-(roll20_script
-	(macro (delimiter) (name)))
+(script
+	(macro
+		(name)))
 		
 ==================
 Macro: #m
 ==================
 #m
 ---
-(roll20_script
-	(macro (delimiter) (name)))
+(script
+	(macro (name)))
 		
 ==================
 Macro: #m#
 ==================
 #m#
 ---
-(roll20_script
-	(macro (delimiter) (name)))
+(script
+	(macro
+		(name)))
 		
 ==================
 Macro: #m#m
 ==================
 #m#m
 ---
-(roll20_script
-	(macro (delimiter) (name)))
+(script
+	(macro
+		(name)))
 		
 ==================
 Macro: # #m
 ==================
 # #m
 ---
-(roll20_script
-	(macro (delimiter) (name)))
+(script
+	(macro (name)))
 		
 ==================
 Macro: #m #
 ==================
 #m #
 ---
-(roll20_script
-	(macro (delimiter) (name)))
+(script
+	(macro (name)))
 		
 ==================
 Macro: #m #m
 ==================
 #m #m
 ---
-(roll20_script
-	(macro (delimiter) (name))
-	(macro (delimiter) (name)))
+(script
+	(macro (name))
+	(macro (name)))
 		
 ==================
 Macro: #m@{a}
 ==================
 #m@{a}
 ---
-(roll20_script
-	(macro (delimiter)
+(script
+	(macro
 		(name
-			(attribute (delimiter)
-				(name) (delimiter)))))
+			(attribute
+				(attribute_identifier))))))
 
 ==================
 Macro: #m@{a}m
 ==================
 #m@{a}m
 ---
-(roll20_script
-	(macro (delimiter)
+(script
+	(macro
 		(name
-			(attribute (delimiter)
-				(name) (delimiter)))))
+			(attribute
+				(attribute_identifier))))))
 
 ==================
 Macro: #m@{c|a}
 ==================
 #m@{c|a}
 ---
-(roll20_script
-	(macro (delimiter)
+(script
+	(macro
 		(name
-			(attribute (delimiter)
-				(character) (delimiter)
-				(name) (delimiter)))))
+			(attribute
+				(character_identifier)
+				(attribute_identifier))))))
 
 ==================
 Macro: #m@{c|a}m
 ==================
 #m@{c|a}m
 ---
-(roll20_script
-	(macro (delimiter)
+(script
+	(macro
 		(name
-			(attribute (delimiter)
-				(character) (delimiter)
-				(name) (delimiter)))))
+			(attribute
+				(character_identifier)
+				(attribute_identifier))))))
 
 ==================
 Macro: #m[@{a}
 ==================
 #m[@{a}
 ---
-(roll20_script
-	(macroHash)
-	(attribute (delimiter)
-		(name) (delimiter)))
+(script
+	(macro
+		(name
+			(attribute
+				(attribute_identifier))))))
 
 ==================
 Macro: #m]]@{a}
 ==================
 #m]]@{a}
 ---
-(roll20_script
-	(macroHash)
-	(attribute (delimiter)
-		(name) (delimiter)))
+(script
+	(macro
+		(name
+			(attribute
+				(attribute_identifier))))))
 
 ==================
 Macro: #
 ==================
 #
 ---
-(roll20_script)
+(script)
 
 ==================
 Macro: # #
 ==================
 # #
 ---
-(roll20_script)
+(script)
 

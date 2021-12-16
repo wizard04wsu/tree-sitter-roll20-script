@@ -3,7 +3,7 @@ Dice Roll: [[d20]]
 ==================
 [[d20]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -17,7 +17,7 @@ Dice Roll: [[ d20 ]]
 ==================
 [[ d20 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -31,7 +31,7 @@ Dice Roll: [[ D20 ]]
 ==================
 [[ D20 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -45,7 +45,7 @@ Dice Roll: [[10d20]]
 ==================
 [[10d20]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -60,7 +60,7 @@ Dice Roll: [[ 10d20 ]]
 ==================
 [[ 10d20 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -75,7 +75,7 @@ Dice Roll: [[ df ]]
 ==================
 [[ df ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -89,7 +89,7 @@ Dice Roll: [[ @{a}d@{a} ]]
 ==================
 [[ @{a}d@{a} ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -112,7 +112,7 @@ Dice Roll: [[ %{b|a}d%{b|a} ]]
 ==================
 [[ %{b|a}d%{b|a} ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -139,7 +139,7 @@ Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 ==================
 [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(delimiter)
 		(formula
@@ -185,7 +185,7 @@ Dice Roll: [[ d6c@{s}5 ]]
 ==================
 [[ d6c@{s}5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(delimiter)
 		(formula
@@ -206,7 +206,7 @@ Dice Roll: [[ d6r5r~5 ]]
 ==================
 [[ d6r5r=5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(delimiter)
 		(formula
@@ -224,7 +224,7 @@ Dice Roll: [[ d6r5 ]]
 ==================
 [[ d6r5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll
 		(delimiter)
 		(formula
@@ -241,7 +241,7 @@ Dice Roll: [[ d6r~5 ]]
 ==================
 [[ d6r=5 ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -257,7 +257,7 @@ Dice Roll: long one, lower case
 ==================
 [[ 4d6sar5sar=5ro5ro=5!5!=5!!5!!=5!p!p5!p=5k5kh5kl5d5dh5dl5>1>10f5>10f<5cs5cs>5cf2cf<2m5m5=5mt5mt5=5sasd ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
@@ -304,7 +304,7 @@ Dice Roll: long one, upper case
 ==================
 [[ 4D6R5R=5RO5RO=5!5!=5!!5!!=5!P!P5!P=5K5Kh5Kl5D5DH5DL5>1>10F5>10F<5CS5CS>5CF2CF<2M5M5=5MT5MT5=5SASD ]]
 ---
-(roll20_script
+(script
 	(inlineRoll (delimiter) (formula
 		(term
 			(diceRoll
