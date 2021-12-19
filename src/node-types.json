@@ -31,11 +31,7 @@
       "required": false,
       "types": [
         {
-          "type": "ambiguous",
-          "named": true
-        },
-        {
-          "type": "html_entity",
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -73,11 +69,7 @@
       "required": false,
       "types": [
         {
-          "type": "ambiguous",
-          "named": true
-        },
-        {
-          "type": "html_entity",
+          "type": "htmlEntity",
           "named": true
         },
         {
@@ -119,11 +111,7 @@
       "required": false,
       "types": [
         {
-          "type": "ambiguous",
-          "named": true
-        },
-        {
-          "type": "html_entity",
+          "type": "htmlEntity",
           "named": true
         },
         {
@@ -162,26 +150,11 @@
   {
     "type": "macro",
     "named": true,
-    "fields": {
-      "b": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "ambiguous",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
-        {
-          "type": "ambiguous",
-          "named": true
-        },
         {
           "type": "name",
           "named": true
@@ -192,28 +165,13 @@
   {
     "type": "name",
     "named": true,
-    "fields": {
-      "c": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "ambiguous",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": false,
       "types": [
         {
           "type": "ability",
-          "named": true
-        },
-        {
-          "type": "ambiguous",
           "named": true
         },
         {
@@ -230,28 +188,13 @@
   {
     "type": "script",
     "named": true,
-    "fields": {
-      "a": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "ambiguous",
-            "named": true
-          }
-        ]
-      }
-    },
+    "fields": {},
     "children": {
       "multiple": true,
       "required": false,
       "types": [
         {
           "type": "ability",
-          "named": true
-        },
-        {
-          "type": "ambiguous",
           "named": true
         },
         {
@@ -263,7 +206,7 @@
           "named": true
         },
         {
-          "type": "html_entity",
+          "type": "htmlEntity",
           "named": true
         },
         {
@@ -282,15 +225,15 @@
     "named": false
   },
   {
+    "type": "&",
+    "named": false
+  },
+  {
     "type": "@{",
     "named": false
   },
   {
-    "type": "ambiguous",
-    "named": true
-  },
-  {
-    "type": "html_entity",
+    "type": "htmlEntity",
     "named": true
   },
   {
