@@ -1,7 +1,12 @@
-function debugAlias(aliasToken, theToken, fieldName){
-	//return theToken;
-	if(fieldName === void 0) fieldName = theToken.toString();
-	//return field(fieldName, alias(theToken, aliasToken));	//TODO: <-- why does this give a parser compilation error?
+const _debugging = false;
+function debugAlias(theToken, aliasToken, fieldName){
+	if(!_debugging) return theToken;
+	if(fieldName !== void 0){
+		fieldName = fieldName.toString().replace(/^(\w+).*/, "$1");
+		if(fieldName){
+			return field(fieldName, alias(theToken, aliasToken));	//TODO: <-- why does this give a parser compilation error?
+		}
+	}
 	return alias(theToken, aliasToken);
 }
 
@@ -87,34 +92,7 @@ module.exports = grammar({
 	
 	//inline: $ => [],
 	
-	precedences: $ => [
-		//root
-		[
-		//	$._placeholder,
-		//	$._html_entity_or_text,
-		//	$._macro_inRoot_and_wsp,
-			//$._macro_inRoot,
-			//$._macro_inRoot_justText,
-			//"root_macro",
-			//"root_text",
-		],
-		//attributes and abilities
-		[
-			//"prop_html_entity",
-			//"prop_macro",
-			//"prop_text",
-		],
-		[
-		//	$.character_token_identifier,
-		//	$.ability_identifier,
-		//	$.attribute_identifier,
-		],
-		//macros
-		[
-			//"macro_placeholder",
-			//"macro_text",
-		],
-	],
+	//precedences: $ => [],
 	
 	//conflicts: $ => [],
 	
@@ -166,9 +144,13 @@ module.exports = grammar({
 		
 		script: $ => repeat(choice(
 			$._placeholder_or_text,
-			$._html_entity_or_text,
-			$._macro_inRoot_and_wsp_or_text,
-			/([^@%#&]|\r?\n)+/,
+			$._htmlEntity_or_text,
+			$._macro_inRoot_and_wsp,
+			prec(-1, seq(
+				debugAlias($._ambiguousHash, $.hash),
+				optional(" "),
+			)),
+			prec(-2, /[^@%&#]+/),
 			
 			//$.inlineRoll,
 			//$.rollQuery,
@@ -181,11 +163,11 @@ module.exports = grammar({
 		)),
 		
 		
-		_html_entity_or_text: $ => choice(
-			$.html_entity,
-			debugAlias($.ambiguous, "&"),
+		_htmlEntity_or_text: $ => choice(
+			$.htmlEntity,
+			debugAlias("&", $.ambiguous),
 		),
-		html_entity: $ => token(seq(
+		htmlEntity: $ => token(seq(
 			"&",
 			choice(
 				/[0-9a-zA-Z]+/,
@@ -197,6 +179,8 @@ module.exports = grammar({
 			";",
 		)),
 		
+		_ambiguousHash: $ => "#",
+		
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Attributes (getters), Abilities (methods)
@@ -206,7 +190,7 @@ module.exports = grammar({
 		
 		_placeholder_or_text: $ => choice(
 			$._placeholder,
-			debugAlias($.ambiguous, /[@%]/),
+			debugAlias(/[@%]/, $.ambiguous),
 		),
 		_placeholder: $ => choice(
 			$._attribute,
@@ -275,8 +259,12 @@ module.exports = grammar({
 		),
 		
 		attribute_identifier: $ => repeat1(choice(
-			$._html_entity_or_text,
-			$._macro_inProperty_and_wsp_or_text,
+			$._htmlEntity_or_text,
+			$._macro_inProperty_and_wsp,
+			prec(-1, seq(
+				debugAlias($._ambiguousHash, $.hash),
+				optional(" "),
+			)),
 			token(choice(
 				/\{+/,
 				/\{*[@%]+/,
@@ -325,7 +313,7 @@ module.exports = grammar({
 		),
 		
 		ability_identifier: $ => repeat1(choice(
-			$._html_entity_or_text,
+			$._htmlEntity_or_text,
 			token(choice(
 				/\{+/,
 				/\{*[@%]+/,
@@ -374,16 +362,12 @@ module.exports = grammar({
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		_macro_inProperty_and_wsp_or_text: $ => choice(
-			$._macro_inProperty_and_wsp,
-			debugAlias($.ambiguous, "#"),
-		),
 		_macro_inProperty_and_wsp: $ => seq(
 			alias($._macro_inProperty, $.macro),
 			" ",
 		),
 		_macro_inProperty: $ => seq(
-			debugAlias($.ambiguous, "#"),
+			debugAlias($._ambiguousHash, $.hash, "macro_start"),
 			alias($._macro_inProperty_name, $.name),
 		),
 		_macro_inProperty_name: $ => choice(
@@ -395,19 +379,19 @@ module.exports = grammar({
 		),
 		_macro_inProperty_name_recurse: $ => seq(
 			choice(
-				/\{+|\{*[@%]+/,
+				/[@%]+/,
 				seq(
-					choice(
-						/[^@%#{|} \r\n]+/,
-						repeat1(seq(
-							/\{+|\{*[@%]+/,
+					repeat1(choice(
+						/\{+/,
+						seq(
+							optional(/[@%]+/),
 							choice(
 								/[^@%#{|} \r\n]+/,
-								debugAlias($.ambiguous, "#"),
+								debugAlias($._ambiguousHash, $.hash),
 							),
-						)),
-					),
-					/\{*[@%]*/,
+						),
+					)),
+					optional(/[@%]+/),
 				),
 			),
 			optional(seq(
@@ -417,10 +401,6 @@ module.exports = grammar({
 		),
 		
 		
-		_macro_inRoot_and_wsp_or_text: $ => prec.right(choice(
-			$._macro_inRoot_and_wsp,
-			field("a", debugAlias($.ambiguous, "#")),
-		)),
 		_macro_inRoot_and_wsp: $ => seq(
 			alias($._macro_inRoot, $.macro),
 			choice(
@@ -429,7 +409,7 @@ module.exports = grammar({
 			),
 		),
 		_macro_inRoot: $ => seq(
-			field("b", debugAlias($.ambiguous, "#")),
+			debugAlias($._ambiguousHash, $.hash, "macro_start"),
 			alias($._macro_inRoot_name, $.name),
 		),
 		_macro_inRoot_name: $ => choice(
@@ -439,28 +419,28 @@ module.exports = grammar({
 				$._macro_inRoot_name_recurse,
 			),
 		),
-		_macro_inRoot_name_recurse: $ => prec.right(seq(
+		_macro_inRoot_name_recurse: $ => seq(
 			choice(
-				/\{+|\{*[@%]+/,
+				/[@%]+/,
 				seq(
-					choice(
-						/[^@%#{ \r\n]+/,
-						repeat1(seq(
-							/\{+|\{*[@%]+/,
+					repeat1(choice(
+						/\{+/,
+						seq(
+							optional(/[@%]+/),
 							choice(
 								/[^@%#{ \r\n]+/,
-								field("c", debugAlias($.ambiguous, "#")),
+								debugAlias($._ambiguousHash, $.hash),
 							),
-						)),
-					),
-					/\{*[@%]*/,
+						),
+					)),
+					optional(/[@%]+/),
 				),
 			),
 			optional(seq(
 				repeat1($._placeholder),
 				optional($._macro_inRoot_name_recurse),
 			)),
-		)),
+		),
 		
 		
 	},
