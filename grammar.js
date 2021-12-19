@@ -150,7 +150,7 @@ module.exports = grammar({
 				debugAlias($._ambiguousHash, $.hash),
 				optional(" "),
 			)),
-			prec(-2, /[^@%&#]+/),
+			//prec(-2, /[^@%&#]+/),
 			
 			//$.inlineRoll,
 			//$.rollQuery,
@@ -165,7 +165,7 @@ module.exports = grammar({
 		
 		_htmlEntity_or_text: $ => choice(
 			$.htmlEntity,
-			debugAlias("&", $.ambiguous),
+			debugAlias("&", $.ambiguousAmpersand),
 		),
 		htmlEntity: $ => token(seq(
 			"&",
@@ -190,7 +190,8 @@ module.exports = grammar({
 		
 		_placeholder_or_text: $ => choice(
 			$._placeholder,
-			debugAlias(/[@%]/, $.ambiguous),
+			debugAlias("@", $.ambiguousAt),
+			debugAlias("%", $.ambiguousPercent),
 		),
 		_placeholder: $ => choice(
 			$._attribute,

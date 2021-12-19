@@ -42,6 +42,14 @@
                 }
               ]
             }
+          },
+          {
+            "type": "PREC",
+            "value": -2,
+            "content": {
+              "type": "PATTERN",
+              "value": "[^@%&#]+"
+            }
           }
         ]
       }
@@ -109,8 +117,12 @@
           "name": "_placeholder"
         },
         {
-          "type": "PATTERN",
-          "value": "[@%]"
+          "type": "STRING",
+          "value": "@"
+        },
+        {
+          "type": "STRING",
+          "value": "%"
         }
       ]
     },
