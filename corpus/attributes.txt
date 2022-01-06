@@ -119,7 +119,7 @@ Attribute: @{#m }
 (script
  	(attribute
 		(attribute_identifier
-			(macro (name)))))
+			(hash))))
 
 ==================
 Attribute: @{a#a a}
@@ -129,7 +129,7 @@ Attribute: @{a#a a}
 (script
  	(attribute
 		(attribute_identifier
-			(macro (name)))))
+			(hash))))
 
 ==================
 Attribute: @{#c |#a }
@@ -139,9 +139,9 @@ Attribute: @{#c |#a }
 (script
  	(attribute
 		(character_identifier
-			(macro (name)))
+			(hash))
 		(attribute_identifier
-			(macro (name)))))
+			(hash))))
 
 ==================
 Attribute: @{c#c c|a#a a}
@@ -151,6 +151,6 @@ Attribute: @{c#c c|a#a a}
 (script
  (attribute
 	 (character_identifier
-		 (macro (name)))
+		 (hash))
 	 (attribute_identifier
-		 (macro (name)))))
+		 (hash))))

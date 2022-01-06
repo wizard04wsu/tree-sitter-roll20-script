@@ -69,11 +69,11 @@
       "required": false,
       "types": [
         {
-          "type": "htmlEntity",
+          "type": "hash",
           "named": true
         },
         {
-          "type": "macro",
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -111,11 +111,11 @@
       "required": false,
       "types": [
         {
-          "type": "htmlEntity",
+          "type": "hash",
           "named": true
         },
         {
-          "type": "macro",
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -148,22 +148,26 @@
     }
   },
   {
-    "type": "macro",
+    "type": "inlineRoll",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": true,
+      "multiple": true,
+      "required": false,
       "types": [
         {
-          "type": "name",
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "number",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "name",
+    "type": "label",
     "named": true,
     "fields": {},
     "children": {
@@ -180,6 +184,41 @@
         },
         {
           "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "number",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
           "named": true
         }
       ]
@@ -206,34 +245,45 @@
           "named": true
         },
         {
+          "type": "hash",
+          "named": true
+        },
+        {
           "type": "htmlEntity",
           "named": true
         },
         {
-          "type": "macro",
+          "type": "inlineRoll",
           "named": true
         }
       ]
     }
   },
   {
-    "type": " ",
-    "named": false
-  },
-  {
-    "type": "%",
-    "named": false
+    "type": "term",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "%{",
     "named": false
   },
   {
-    "type": "&",
-    "named": false
-  },
-  {
-    "type": "@",
+    "type": ".",
     "named": false
   },
   {
@@ -241,7 +291,31 @@
     "named": false
   },
   {
+    "type": "[",
+    "named": false
+  },
+  {
+    "type": "[[",
+    "named": false
+  },
+  {
+    "type": "]",
+    "named": false
+  },
+  {
+    "type": "]]",
+    "named": false
+  },
+  {
+    "type": "hash",
+    "named": true
+  },
+  {
     "type": "htmlEntity",
+    "named": true
+  },
+  {
+    "type": "operator",
     "named": true
   },
   {
