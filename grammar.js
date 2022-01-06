@@ -1,10 +1,10 @@
-const _debugging = false;
+const _debugging = true;
 function debugAlias(theToken, aliasToken, fieldName){
 	if(!_debugging) return theToken;
 	if(fieldName !== void 0){
 		fieldName = fieldName.toString().replace(/^(\w+).*/, "$1");
 		if(fieldName){
-			return field(fieldName, alias(theToken, aliasToken));	//TODO: <-- why does this give a parser compilation error?
+			return field(fieldName, alias(theToken, aliasToken));
 		}
 	}
 	return alias(theToken, aliasToken);
@@ -143,16 +143,11 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		script: $ => repeat(choice(
-			$._placeholder_or_text,
-			$._htmlEntity_or_text,
-			$._macro_inRoot_and_wsp,
-			prec(-1, seq(
-				debugAlias($._ambiguousHash, $.hash),
-				optional(" "),
-			)),
-			//prec(-2, /[^@%&#]+/),
+			$._IrPh,	//attributes, abilities, inline rolls
+			$.hash,
+			$.htmlEntity,
+			/./,
 			
-			//$.inlineRoll,
 			//$.rollQuery,
 			
 			//TODO:
@@ -162,11 +157,8 @@ module.exports = grammar({
 			//tracker
 		)),
 		
+		_wsp: $ => /\s+/,
 		
-		_htmlEntity_or_text: $ => choice(
-			$.htmlEntity,
-			debugAlias("&", $.ambiguousAmpersand),
-		),
 		htmlEntity: $ => token(seq(
 			"&",
 			choice(
@@ -179,8 +171,6 @@ module.exports = grammar({
 			";",
 		)),
 		
-		_ambiguousHash: $ => "#",
-		
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Attributes (getters), Abilities (methods)
@@ -188,11 +178,6 @@ module.exports = grammar({
 		 /*│ In this grammar, these are collectively referred to as "placeholders".
 		   └───────────────────────────────────────────────────────────*/
 		
-		_placeholder_or_text: $ => choice(
-			$._placeholder,
-			debugAlias("@", $.ambiguousAt),
-			debugAlias("%", $.ambiguousPercent),
-		),
 		_placeholder: $ => choice(
 			$._attribute,
 			$.ability,
@@ -260,24 +245,20 @@ module.exports = grammar({
 		),
 		
 		attribute_identifier: $ => repeat1(choice(
-			$._htmlEntity_or_text,
-			$._macro_inProperty_and_wsp,
-			prec(-1, seq(
-				debugAlias($._ambiguousHash, $.hash),
-				optional(" "),
-			)),
+			$.htmlEntity,
+			$.hash,
 			token(choice(
 				/\{+/,
 				/\{*[@%]+/,
 				seq(
 					choice(
-						/[^@%#&{|}\r\n]+/,
+						/[^@%#{|}\r\n]+/,
 						repeat1(seq(
 							choice(
 								/\{+/,
 								/\{*[@%]+/,
 							),
-							/[^@%#&{|}\r\n]+/,
+							/[^@%#{|}\r\n]+/,
 						)),
 					),
 					/\{*[@%]*/,
@@ -314,19 +295,19 @@ module.exports = grammar({
 		),
 		
 		ability_identifier: $ => repeat1(choice(
-			$._htmlEntity_or_text,
+			$.htmlEntity,
 			token(choice(
 				/\{+/,
 				/\{*[@%]+/,
 				seq(
 					choice(
-						/[^@%&{|}\r\n]+/,
+						/[^@%{|}\r\n]+/,
 						repeat1(seq(
 							choice(
 								/\{+/,
 								/\{*[@%]+/,
 							),
-							/[^@%&{|}\r\n]+/,
+							/[^@%{|}\r\n]+/,
 						)),
 					),
 					/\{*[@%]*/,
@@ -338,10 +319,10 @@ module.exports = grammar({
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Macros
 		  ╚╤═══════════════════════════════════════════════════════════*/
-		 /*│ This grammar will just pick out the hash characters that could
-		   │   refer to a macro. It's impossible to know whether they actually
-		   │   do, since we can't check a name against the list of defined
-		   │   macros.
+		 /*│ This grammar will just pick out hash characters, which might
+		   │   refer to a macro. It's impossible to know whether a valid macro
+		   │   name actually does refer to a macro, since we can't check a name
+		   │   against the list of defined macros.
 		   │ 
 		   │ For example, "&#124;_" could refer to:
 		   │ • an ampersand followed by a macro named "124;_".
@@ -363,85 +344,225 @@ module.exports = grammar({
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		_macro_inProperty_and_wsp: $ => seq(
-			alias($._macro_inProperty, $.macro),
-			" ",
-		),
-		_macro_inProperty: $ => seq(
-			debugAlias($._ambiguousHash, $.hash, "macro_start"),
-			alias($._macro_inProperty_name, $.name),
-		),
-		_macro_inProperty_name: $ => choice(
-			repeat1($._placeholder),
-			seq(
-				repeat($._placeholder),
-				$._macro_inProperty_name_recurse,
-			),
-		),
-		_macro_inProperty_name_recurse: $ => seq(
-			choice(
-				/[@%]+/,
-				seq(
-					repeat1(choice(
-						/\{+/,
-						seq(
-							optional(/[@%]+/),
-							choice(
-								/[^@%#{|} \r\n]+/,
-								debugAlias($._ambiguousHash, $.hash),
-							),
-						),
-					)),
-					optional(/[@%]+/),
-				),
-			),
-			optional(seq(
-				repeat1($._placeholder),
-				optional($._macro_inProperty_name_recurse),
-			)),
+		hash: $ => "#",
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Inline Rolls
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ An inline roll may be used as a root element or in place of a
+		   │   number, and contains its own formula. When evaluated, it is
+		   │   reduced to a number.
+		   └─────────────────────────────*/
+		
+		inlineRoll: $ => seq(
+			"[[",
+//			$.formula,
+repeat(choice(
+$.number,
+$._labels,
+)),
+			"]]",
 		),
 		
 		
-		_macro_inRoot_and_wsp: $ => seq(
-			alias($._macro_inRoot, $.macro),
-			choice(
-				/ |\r?\n/,
-				$.__EOF,
-			),
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Numbers
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Numbers are combined with attributes, abilities, and inline rolls.
+		   └───────────────────────────────────────────────────────────*/
+		
+		_IrPh: $ => choice($.inlineRoll, $._placeholder),
+		
+		number: $ => choice(
+			$._number_signable,
+			$._number_unsignable,
 		),
-		_macro_inRoot: $ => seq(
-			debugAlias($._ambiguousHash, $.hash, "macro_start"),
-			alias($._macro_inRoot_name, $.name),
-		),
-		_macro_inRoot_name: $ => choice(
-			repeat1($._placeholder),
+		_number_signable: $ => prec.right(choice(
 			seq(
-				repeat($._placeholder),
-				$._macro_inRoot_name_recurse,
-			),
-		),
-		_macro_inRoot_name_recurse: $ => seq(
-			choice(
-				/[@%]+/,
-				seq(
+				repeat($._IrPh),
+				/\d+/,
+				repeat(seq(
+					$._IrPh,
+					/\d+/,
+				)),
+				optional($._IrPh),
+				optional(seq(
+					".",
 					repeat1(choice(
-						/\{+/,
-						seq(
-							optional(/[@%]+/),
-							choice(
-								/[^@%#{ \r\n]+/,
-								debugAlias($._ambiguousHash, $.hash),
-							),
-						),
+						/\d+/,
+						$._IrPh,
 					)),
-					optional(/[@%]+/),
-				),
+				)),
 			),
-			optional(seq(
-				repeat1($._placeholder),
-				optional($._macro_inRoot_name_recurse),
+			seq(
+				repeat1($._IrPh),
+				".",
+				repeat1(choice(
+					/\d+/,
+					$._IrPh,
+				)),
+			),
+		)),
+		_number_unsignable: $ => prec.right(choice(
+			seq(
+				".",
+				repeat1(choice(
+					/\d+/,
+					$._IrPh,
+				)),
+			),
+		)),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Formulas
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Used within an inline roll and within nested elements (i.e., within
+		   │   nested inline rolls, parentheses, math functions, or group rolls).
+		   │
+		   │ A formula consisting of only whitespace and/or labels is invalid. 
+		   │ 
+		   │ Labels can only be the first items in a formula if the following
+		   │   item is a dice roll or table roll (or attribute/ability/macro
+		   │   that evaluates to one of those).
+		   │   This implementation does not check for that.
+		   └─────────────────────────────*/
+		
+		formula: $ => seq(
+			optional($._labels),
+			alias($._term_first, $.term),
+/*			repeat(seq(
+				optional($._labels),
+				$._operator,
+				alias($._term, $.term),
 			)),
+*/			optional($._labels),
 		),
+		
+		_term_first: $ => choice(
+			seq(
+				choice(
+					seq(
+						optional(alias(/[+-]/, $.operator)),
+						alias($._number_signable, $.number),
+					),
+					alias($._number_unsignable, $.number),
+/*					$.diceRoll,
+					$.groupRoll,
+					$.rollQuery,
+					$.parenthesized,
+					$.function,
+					$.tableRoll,
+*/				),
+//				optional($._macro_and_wsp),
+			),
+//			prec(1, $._macro_and_wsp),
+		),
+		
+/*		_term: $ => choice(
+			prec(1, seq(
+				prec.right(choice(
+					$.number,	//numbers, attributes, abilities, and inline rolls
+					$.diceRoll,
+					$.groupRoll,
+					seq(
+						choice(
+							$.rollQuery,
+							$.parenthesized,
+							$.function,
+							$.tableRoll,
+						),
+						optional($._placeholders),
+					),
+				)),
+				optional($._macro_and_wsp),
+			)),
+			prec(1, $._macro_and_wsp),
+		),
+*/		
+		
+		/*┌──────────────────────────────
+		  │ Operator
+		  └┬─────────────────────────────*/
+		 /*│ `+-` and `-+` are evaluated as subtraction.
+		   │ 
+		   │ The only place a unary negative/positive operator can be is as a
+		   │   prefix of a number, attribute, ability, or inline roll that is
+		   │   the first element in a formula.
+		   └─────────────────────────────*/
+		
+/*		_operator: $ => prec.right(seq(
+			alias(choice(
+				$._operator_summation,
+				$._operator_multiplication,
+				seq(
+					$._operator_multiplication,
+					$._operator_summation,
+				),
+			), $.operator),
+		)),
+		
+		_operator_multiplication: $ => prec.right(1, seq(
+			choice(
+				/\/|\*\*?/,
+				$.__just_percent,
+			),
+			optional($._labels),
+		)),
+		_operator_summation: $ => prec.right(choice(
+			$._operator_summation_plus,
+			$._operator_summation_minus,
+		)),
+		_operator_summation_plus: $ => seq(
+			"+",
+			optional($._labels),
+			optional($._operator_summation_minus),
+		),
+		_operator_summation_minus: $ => seq(
+			"-",
+			optional($._labels),
+			optional($._operator_summation_plus),
+		),
+*/		
+		
+		/*┌──────────────────────────────
+		  │ Inline Label
+		  └┬─────────────────────────────*/
+		 /*│ An inline label:
+		   │ • cannot contain new lines or closing square brackets.
+		   │ • can include attributes, abilities, and macros.
+		   └─────────────────────────────*/
+		
+		label: $ => seq(
+			"[",
+			optional(seq(
+				choice(
+					/[^\[\]\r\n]/,
+					$._placeholder,
+					$.hash,
+					$.htmlEntity,
+				),
+				repeat(choice(
+						/[^\]\r\n]/,
+						$._placeholder,
+						$.hash,
+						$.htmlEntity,
+				)),
+			)),
+			"]",
+		),
+		
+		_labels: $ => prec.right(choice(
+			$._wsp,
+			seq(
+				optional($._wsp),
+				repeat1(seq(
+					$.label,
+					optional($._wsp),
+				)),
+			),
+		)),
 		
 		
 	},
