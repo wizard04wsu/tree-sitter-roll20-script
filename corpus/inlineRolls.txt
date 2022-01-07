@@ -678,3 +678,61 @@ Inline Roll: [[ 1 %5%{a} ]]
 					(ability_identifier)))
 		)
 	)))
+
+
+
+
+
+
+==================
+Inline Roll Labels: [[ [] 5 ]]
+==================
+[[ [] 5 ]]
+---
+(script
+	(inlineRoll (formula
+		(label)
+		(term
+			(number)
+		)
+	)))
+
+==================
+Inline Roll Labels: [[ [a] 5 ]]
+==================
+[[ [a] 5 ]]
+---
+(script
+	(inlineRoll (formula
+		(label (labelText))
+		(term
+			(number)
+		)
+	)))
+
+==================
+Inline Roll Labels: [[ 5 [] ]]
+==================
+[[ 5 [] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(label)
+	)))
+
+==================
+Inline Roll Labels: [[ 5 [a] ]]
+==================
+[[ 5 [a] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(label (labelText))
+	)))
+

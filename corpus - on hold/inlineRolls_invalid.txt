@@ -248,3 +248,26 @@ Inline Roll: [[
 (script
 	(invalid (delimiter)))
 
+
+
+
+==================
+Inline Roll Labels: [[ [] ]]
+==================
+[[ [] ]]
+---
+(script
+	(inlineRoll (formula
+		(label)
+	)))
+
+==================
+Inline Roll Labels: [[ [a] ]]
+==================
+[[ [a] ]]
+---
+(script
+	(inlineRoll (formula
+		(label (labelText))
+	)))
+

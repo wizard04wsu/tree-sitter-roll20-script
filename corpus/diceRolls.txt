@@ -1,0 +1,230 @@
+==================
+Dice Roll: [[d20]]
+==================
+[[d20]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(sides))
+		)
+	)))
+
+==================
+Dice Roll: [[ d20 ]]
+==================
+[[ d20 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(sides))
+		)
+	)))
+
+==================
+Dice Roll: [[ D20 ]]
+==================
+[[ D20 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(sides))
+		)
+	)))
+
+==================
+Dice Roll: [[10d20]]
+==================
+[[10d20]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(count)
+				(sides))
+		)
+	)))
+
+==================
+Dice Roll: [[ 10d20 ]]
+==================
+[[ 10d20 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(count)
+				(sides))
+		)
+	)))
+
+==================
+Dice Roll: [[ df ]]
+==================
+[[ df ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(fate))
+		)
+	)))
+
+==================
+Dice Roll: [[ @{a}d@{a} ]]
+==================
+[[ @{a}d@{a} ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(count
+					(attribute
+						(attribute_identifier)))
+				(sides
+					(attribute
+						(attribute_identifier))))
+		)
+	)))
+
+==================
+Dice Roll: [[ %{b|a}d%{b|a} ]]
+==================
+[[ %{b|a}d%{b|a} ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(count
+					(ability
+						(character_identifier)
+						(ability_identifier)))
+				(sides
+					(ability
+						(character_identifier)
+						(ability_identifier))))
+		)
+	)))
+
+==================
+Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
+==================
+[[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(diceRoll
+					(count
+						(attribute
+							(attribute_identifier))
+						(ability
+							(character_identifier)
+							(ability_identifier)))
+					(sides
+						(attribute
+							(attribute_identifier))
+						(ability
+							(character_identifier)
+							(ability_identifier)))
+					(modifiers
+						(attribute
+							(attribute_identifier))
+						(attribute
+							(attribute_identifier))))))))
+
+==================
+Dice Roll: [[ d6c@{s}5 ]]
+==================
+[[ d6c@{s}5 ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(diceRoll
+					(sides)
+					(modifiers
+						(attribute
+							(attribute_identifier))))))))
+
+==================
+Dice Roll: [[ d6r5r~5 ]]
+==================
+[[ d6r5r=5 ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(diceRoll
+					(sides)
+					(modifiers))))))
+
+==================
+Dice Roll: [[ d6r5 ]]
+==================
+[[ d6r5 ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(diceRoll
+					(sides)
+					(modifiers))))))
+
+==================
+Dice Roll: [[ d6r~5 ]]
+==================
+[[ d6r=5 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(sides)
+				(modifiers))
+		)
+	)))
+
+==================
+Dice Roll: long one, lower case
+==================
+[[ 4d6sar5sar=5ro5ro=5!5!=5!!5!!=5!p!p5!p=5k5kh5kl5d5dh5dl5>1>10f5>10f<5cs5cs>5cf2cf<2m5m5=5mt5mt5=5sasd ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(count)
+				(sides)
+				(modifiers))
+		)
+	)))
+
+==================
+Dice Roll: long one, upper case
+==================
+[[ 4D6R5R=5RO5RO=5!5!=5!!5!!=5!P!P5!P=5K5Kh5Kl5D5DH5DL5>1>10F5>10F<5CS5CS>5CF2CF<2M5M5=5MT5MT5=5SASD ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(diceRoll
+				(count)
+				(sides)
+				(modifiers))
+		)
+	)))

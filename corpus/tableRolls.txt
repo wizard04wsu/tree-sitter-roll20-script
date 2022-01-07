@@ -1,0 +1,104 @@
+==================
+Table Roll: [[t[n]]]
+==================
+[[t[n]]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(tableName))))))
+
+==================
+Table Roll: [[ t[n] ]]
+==================
+[[ t[n] ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(tableName))))))
+
+==================
+Table Roll: [[2t[n]]]
+==================
+[[2t[n]]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(count)
+					(tableName))))))
+
+==================
+Table Roll: [[ 2t[n] ]]
+==================
+[[ 2t[n] ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(count)
+					(tableName))))))
+
+==================
+Table Roll: [[ t[n@{a}n] ]]
+==================
+[[ t[n@{a}n] ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(tableName
+						(attribute
+							(attribute_identifier))))))))
+
+==================
+Table Roll: [[ t[@{a}] ]]
+==================
+[[ t[@{a}] ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(tableName
+						(attribute
+							(attribute_identifier))))))))
+
+==================
+Table Roll: [[ t[@{a]b}] ]]
+==================
+[[ t[@{a]b}] ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(tableName
+						(attribute
+							(attribute_identifier))))))))
+
+==================
+Table Roll: [[ t[@ab] ]]
+==================
+[[ t[@ab] ]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(tableRoll
+					(tableName))))))
+

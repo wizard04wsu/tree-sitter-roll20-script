@@ -384,29 +384,25 @@ module.exports = grammar({
 		
 		_IrPh: $ => choice($.inlineRoll, $._placeholder),
 		
+		_integer: $ => prec.right(repeat1(choice(
+			/\d+/,
+			$._IrPh,
+		))),
+		
 		number: $ => choice(
 			$._number_signable,
 			$._number_unsignable,
 		),
 		_number_signable: $ => prec.right(seq(
-			repeat1(choice(
-				/\d+/,
-				$._IrPh,
-			)),
+			$._integer,
 			optional(seq(
 				".",
-				repeat1(choice(
-					/\d+/,
-					$._IrPh,
-				)),
+				$._integer,
 			)),
 		)),
 		_number_unsignable: $ => prec.right(seq(
 			".",
-			repeat1(choice(
-				/\d+/,
-				$._IrPh,
-			)),
+			$._integer,
 		)),
 		
 		
@@ -456,12 +452,12 @@ module.exports = grammar({
 						alias($._number_signable, $.number),	//numbers, attributes, abilities, and inline rolls
 					),
 					alias($._number_unsignable, $.number),	//numbers, attributes, abilities, and inline rolls
-//					$.diceRoll,
-//					$.groupRoll,
-//					$.rollQuery,
 					$.parenthesized,
 					$.function,
-//					$.tableRoll,
+					$.diceRoll,
+					$.groupRoll,
+					$.tableRoll,
+//					$.rollQuery,
 				),
 				optional($._macro),
 			),
@@ -472,14 +468,14 @@ module.exports = grammar({
 			seq(
 				choice(
 					$.number,	//numbers, attributes, abilities, and inline rolls
-//					$.diceRoll,
-//					$.groupRoll,
+					$.diceRoll,
+					$.groupRoll,
 					seq(
 						choice(
-//							$.rollQuery,
 							$.parenthesized,
 							$.function,
-//							$.tableRoll,
+							$.tableRoll,
+//							$.rollQuery,
 						),
 						optional($._placeholder),
 					),
@@ -543,21 +539,23 @@ module.exports = grammar({
 		
 		label: $ => seq(
 			"[",
-			optional(seq(
-				choice(
-					/[^\[\]\r\n]/,
+			optional($.labelText),
+			"]",
+		),
+		
+		labelText: $ => seq(
+			choice(
+				/[^#\[\]\r\n]/,
+				$._placeholder,
+				$.hash,
+				$.htmlEntity,
+			),
+			repeat(choice(
+					/[^#\]\r\n]/,
 					$._placeholder,
 					$.hash,
 					$.htmlEntity,
-				),
-				repeat(choice(
-						/[^\]\r\n]/,
-						$._placeholder,
-						$.hash,
-						$.htmlEntity,
-				)),
 			)),
-			"]",
 		),
 		
 		_labels: $ => prec.right(choice(
@@ -569,6 +567,77 @@ module.exports = grammar({
 					optional($._wsp),
 				)),
 			),
+		)),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Rolls
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Roll modifiers can be injected with attributes, abilities, and
+		   │   inline rolls. This script does not parse the modifiers.
+		   └─────────────────────────────*/
+		
+		/*┌──────────────────────────────
+		  │ Dice Roll
+		  └──────────────────────────────*/
+		
+		diceRoll: $ => seq(
+			optional(alias($._integer, $.count)),
+			/[dD]/,
+			choice(
+				alias($._integer, $.sides),
+				alias(/[fF]/, $.fate),
+			),
+			optional(alias($._diceRoll_modifiers, $.modifiers)),
+		),
+		
+		_diceRoll_modifiers: $ => repeat1(choice(
+			$._integer,
+			/[aAcCdDfFhHkKlLmMoOpPrRsStT<=>!]+/,
+		)),
+		
+		
+		/*┌──────────────────────────────
+		  │ Group Roll
+		  └──────────────────────────────*/
+		
+		groupRoll: $ => seq(
+			"{",
+			$.formula,
+			repeat(seq(
+				",",
+				$.formula,
+			)),
+			"}",
+			optional(alias($._groupRoll_modifiers, $.modifiers)),
+		),
+		
+		_groupRoll_modifiers: $ => repeat1(choice(
+			$._integer,
+			/[dDfFhHkKlL<=>]+/,
+		)),
+		
+		
+		/*┌──────────────────────────────
+		  │ Table Roll
+		  └┬─────────────────────────────*/
+		 /*│ A table name:
+		   │ • cannot contain new lines or closing square brackets.
+		   │ • can include attributes, abilities, and macros.
+		   └─────────────────────────────*/
+		
+		tableRoll: $ => seq(
+			optional(alias($._integer, $.count)),
+			/[tT]\[/,
+			$.tableName,
+			"]",
+		),
+		
+		tableName: $ => repeat1(choice(
+			/[^#\]\r\n]/,
+			$._placeholder,
+			$.hash,
+			$.htmlEntity,
 		)),
 		
 		
