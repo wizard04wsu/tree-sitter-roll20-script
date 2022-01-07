@@ -82,9 +82,7 @@ function decrementDepth(){
 module.exports = grammar({
 	name: "roll20_script",
 	
-	externals: $ => [
-		$.__EOF,
-	],
+	//externals: $ => [],
 	
 	extras: $ => [],
 	
@@ -92,7 +90,12 @@ module.exports = grammar({
 	
 	//inline: $ => [],
 	
-	//precedences: $ => [],
+	precedences: $ => [
+		[
+			"multiplication",
+			"summation",
+		],
+	],
 	
 	//conflicts: $ => [],
 	
@@ -346,6 +349,17 @@ module.exports = grammar({
 		
 		hash: $ => "#",
 		
+		_macro: $ => prec.right(seq(
+			$.hash,
+			repeat1(choice(
+				$._placeholder,
+				/[^@%&{|}\[\]() \r\n]+/,
+					//some of these characters can technically be used in a macro name,
+					// but this implementation will assume they're all invalid
+			)),
+			optional(choice( $._wsp, /\r?\n/ )),	//making whitespace optional for the same reason
+		)),
+		
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Inline Rolls
@@ -357,11 +371,7 @@ module.exports = grammar({
 		
 		inlineRoll: $ => seq(
 			"[[",
-//			$.formula,
-repeat(choice(
-$.number,
-$._labels,
-)),
+			$.formula,
 			"]]",
 		),
 		
@@ -378,40 +388,25 @@ $._labels,
 			$._number_signable,
 			$._number_unsignable,
 		),
-		_number_signable: $ => prec.right(choice(
-			seq(
-				repeat($._IrPh),
+		_number_signable: $ => prec.right(seq(
+			repeat1(choice(
 				/\d+/,
-				repeat(seq(
-					$._IrPh,
-					/\d+/,
-				)),
-				optional($._IrPh),
-				optional(seq(
-					".",
-					repeat1(choice(
-						/\d+/,
-						$._IrPh,
-					)),
-				)),
-			),
-			seq(
-				repeat1($._IrPh),
+				$._IrPh,
+			)),
+			optional(seq(
 				".",
 				repeat1(choice(
 					/\d+/,
 					$._IrPh,
 				)),
-			),
+			)),
 		)),
-		_number_unsignable: $ => prec.right(choice(
-			seq(
-				".",
-				repeat1(choice(
-					/\d+/,
-					$._IrPh,
-				)),
-			),
+		_number_unsignable: $ => prec.right(seq(
+			".",
+			repeat1(choice(
+				/\d+/,
+				$._IrPh,
+			)),
 		)),
 		
 		
@@ -432,12 +427,25 @@ $._labels,
 		formula: $ => seq(
 			optional($._labels),
 			alias($._term_first, $.term),
-/*			repeat(seq(
-				optional($._labels),
-				$._operator,
+			optional($._labels),
+			repeat(seq(
+				choice(
+					seq(
+						alias($._operator_summation, $.operator),
+						optional($._labels),
+					),
+					seq(
+						alias($._operator_multiplication, $.operator),
+						optional($._labels),
+						optional(seq(
+							alias($._operator_summation, $.operator),
+							optional($._labels),
+						)),
+					),
+				),
 				alias($._term, $.term),
+				optional($._labels),
 			)),
-*/			optional($._labels),
 		),
 		
 		_term_first: $ => choice(
@@ -445,9 +453,9 @@ $._labels,
 				choice(
 					seq(
 						optional(alias(/[+-]/, $.operator)),
-						alias($._number_signable, $.number),
+						alias($._number_signable, $.number),	//numbers, attributes, abilities, and inline rolls
 					),
-					alias($._number_unsignable, $.number),
+					alias($._number_unsignable, $.number),	//numbers, attributes, abilities, and inline rolls
 /*					$.diceRoll,
 					$.groupRoll,
 					$.rollQuery,
@@ -455,16 +463,16 @@ $._labels,
 					$.function,
 					$.tableRoll,
 */				),
-//				optional($._macro_and_wsp),
+				optional($._macro),
 			),
-//			prec(1, $._macro_and_wsp),
+			$._macro,
 		),
 		
-/*		_term: $ => choice(
-			prec(1, seq(
-				prec.right(choice(
+		_term: $ => choice(
+			seq(
+				choice(
 					$.number,	//numbers, attributes, abilities, and inline rolls
-					$.diceRoll,
+/*					$.diceRoll,
 					$.groupRoll,
 					seq(
 						choice(
@@ -475,12 +483,12 @@ $._labels,
 						),
 						optional($._placeholders),
 					),
-				)),
-				optional($._macro_and_wsp),
-			)),
-			prec(1, $._macro_and_wsp),
+*/				),
+				optional($._macro),
+			),
+			$._macro,
 		),
-*/		
+		
 		
 		/*┌──────────────────────────────
 		  │ Operator
@@ -488,43 +496,18 @@ $._labels,
 		 /*│ `+-` and `-+` are evaluated as subtraction.
 		   │ 
 		   │ The only place a unary negative/positive operator can be is as a
-		   │   prefix of a number, attribute, ability, or inline roll that is
-		   │   the first element in a formula.
+		   │   prefix of a number that is the first element in a formula, or
+		   │   right after a multiplication-type operator.
 		   └─────────────────────────────*/
 		
-/*		_operator: $ => prec.right(seq(
-			alias(choice(
-				$._operator_summation,
-				$._operator_multiplication,
-				seq(
-					$._operator_multiplication,
-					$._operator_summation,
-				),
-			), $.operator),
-		)),
-		
-		_operator_multiplication: $ => prec.right(1, seq(
-			choice(
-				/\/|\*\*?/,
-				$.__just_percent,
-			),
-			optional($._labels),
-		)),
-		_operator_summation: $ => prec.right(choice(
+		_operator_multiplication: $ => prec.right("multiplication", /[\/%]|\*\*?/),
+		_operator_summation: $ => prec.right("summation", choice(
 			$._operator_summation_plus,
 			$._operator_summation_minus,
 		)),
-		_operator_summation_plus: $ => seq(
-			"+",
-			optional($._labels),
-			optional($._operator_summation_minus),
-		),
-		_operator_summation_minus: $ => seq(
-			"-",
-			optional($._labels),
-			optional($._operator_summation_plus),
-		),
-*/		
+		_operator_summation_plus: $ => /\+(\s*\-(\s*\+\s*\-)*(\s*\+)?)?/,
+		_operator_summation_minus: $ => /\-(\s*\+(\s*\-\s*\+)*(\s*\-)?)?/,
+		
 		
 		/*┌──────────────────────────────
 		  │ Inline Label
