@@ -4,11 +4,11 @@ Inline Roll: [[5]]
 [[5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ 5 ]]
@@ -16,11 +16,11 @@ Inline Roll: [[ 5 ]]
 [[ 5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 
 
@@ -33,12 +33,12 @@ Inline Roll: [[-5]]
 [[-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ -5 ]]
@@ -46,12 +46,12 @@ Inline Roll: [[ -5 ]]
 [[ -5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[+5]]
@@ -59,12 +59,12 @@ Inline Roll: [[+5]]
 [[+5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 
 
@@ -77,7 +77,7 @@ Inline Roll: [[1-5]]
 [[1-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -85,7 +85,7 @@ Inline Roll: [[1-5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 - 5]]
@@ -93,7 +93,7 @@ Inline Roll: [[1 - 5]]
 [[1 - 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -101,7 +101,7 @@ Inline Roll: [[1 - 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1+5]]
@@ -109,7 +109,7 @@ Inline Roll: [[1+5]]
 [[1+5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -117,7 +117,7 @@ Inline Roll: [[1+5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 + 5]]
@@ -125,7 +125,7 @@ Inline Roll: [[1 + 5]]
 [[1 + 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -133,7 +133,7 @@ Inline Roll: [[1 + 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1*5]]
@@ -141,7 +141,7 @@ Inline Roll: [[1*5]]
 [[1*5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -149,7 +149,7 @@ Inline Roll: [[1*5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 * 5]]
@@ -157,7 +157,7 @@ Inline Roll: [[1 * 5]]
 [[1 * 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -165,7 +165,7 @@ Inline Roll: [[1 * 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1**5]]
@@ -173,7 +173,7 @@ Inline Roll: [[1**5]]
 [[1**5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -181,7 +181,7 @@ Inline Roll: [[1**5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 ** 5]]
@@ -189,7 +189,7 @@ Inline Roll: [[1 ** 5]]
 [[1 ** 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -197,7 +197,7 @@ Inline Roll: [[1 ** 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1/5]]
@@ -205,7 +205,7 @@ Inline Roll: [[1/5]]
 [[1/5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -213,7 +213,7 @@ Inline Roll: [[1/5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 / 5]]
@@ -221,7 +221,7 @@ Inline Roll: [[1 / 5]]
 [[1 / 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -229,7 +229,7 @@ Inline Roll: [[1 / 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1%5]]
@@ -237,7 +237,7 @@ Inline Roll: [[1%5]]
 [[1%5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -245,7 +245,7 @@ Inline Roll: [[1%5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 % 5]]
@@ -253,7 +253,7 @@ Inline Roll: [[1 % 5]]
 [[1 % 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -261,7 +261,7 @@ Inline Roll: [[1 % 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1+-5]]
@@ -269,7 +269,7 @@ Inline Roll: [[1+-5]]
 [[1+-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -277,7 +277,7 @@ Inline Roll: [[1+-5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 + - 5]]
@@ -285,7 +285,7 @@ Inline Roll: [[1 + - 5]]
 [[1 + - 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -293,7 +293,7 @@ Inline Roll: [[1 + - 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1-+5]]
@@ -301,7 +301,7 @@ Inline Roll: [[1-+5]]
 [[1-+5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -309,7 +309,7 @@ Inline Roll: [[1-+5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 - + 5]]
@@ -317,7 +317,7 @@ Inline Roll: [[1 - + 5]]
 [[1 - + 5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -325,7 +325,7 @@ Inline Roll: [[1 - + 5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1+-+5]]
@@ -333,7 +333,7 @@ Inline Roll: [[1+-+5]]
 [[1+-+5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -341,7 +341,7 @@ Inline Roll: [[1+-+5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1-+-5]]
@@ -349,7 +349,7 @@ Inline Roll: [[1-+-5]]
 [[1-+-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -357,7 +357,7 @@ Inline Roll: [[1-+-5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1+ - + -+ -+-5]]
@@ -365,7 +365,7 @@ Inline Roll: [[1+ - + -+ -+-5]]
 [[1+ - + -+ -+-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -373,7 +373,7 @@ Inline Roll: [[1+ - + -+ -+-5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[1 / + - + -+ -+-5]]
@@ -381,7 +381,7 @@ Inline Roll: [[1 / + - + -+ -+-5]]
 [[1 / + - + -+ -+-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
@@ -390,7 +390,7 @@ Inline Roll: [[1 / + - + -+ -+-5]]
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 
 
@@ -403,12 +403,13 @@ Inline Roll: [[@{a}]]
 [[@{a}]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(attribute (delimiter)
-				(name) (delimiter))
+			(number
+				(attribute
+					(attribute_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ @{a} ]]
@@ -416,12 +417,13 @@ Inline Roll: [[ @{a} ]]
 [[ @{a} ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(attribute (delimiter)
-				(name) (delimiter))
+			(number
+				(attribute
+					(attribute_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[@{c|a}]]
@@ -429,13 +431,14 @@ Inline Roll: [[@{c|a}]]
 [[@{c|a}]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(attribute (delimiter)
-				(character) (delimiter)
-				(name) (delimiter))
+			(number
+				(attribute
+					(character_identifier)
+					(attribute_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[%{a}]]
@@ -443,12 +446,13 @@ Inline Roll: [[%{a}]]
 [[%{a}]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(ability (delimiter)
-				(name) (delimiter))
+			(number
+				(ability
+					(ability_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ %{a} ]]
@@ -456,12 +460,13 @@ Inline Roll: [[ %{a} ]]
 [[ %{a} ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(ability (delimiter)
-				(name) (delimiter))
+			(number
+				(ability
+					(ability_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[%{c|a}]]
@@ -469,13 +474,14 @@ Inline Roll: [[%{c|a}]]
 [[%{c|a}]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(ability (delimiter)
-				(character) (delimiter)
-				(name) (delimiter))
+			(number
+				(ability
+					(character_identifier)
+					(ability_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 
 
@@ -488,11 +494,11 @@ Inline Roll: [[#m]]
 [[#m]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(macroHash)
+			(hash)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[#m ]]
@@ -500,11 +506,11 @@ Inline Roll: [[#m ]]
 [[#m ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(macro (delimiter) (name))
+			(hash)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ #m]]
@@ -512,11 +518,11 @@ Inline Roll: [[ #m]]
 [[ #m]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(macroHash)
+			(hash)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ #m ]]
@@ -524,11 +530,11 @@ Inline Roll: [[ #m ]]
 [[ #m ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(macro (delimiter) (name))
+			(hash)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[#m ]]@{a}]]
@@ -536,13 +542,13 @@ Inline Roll: [[#m ]]@{a}]]
 [[#m ]]@{a}]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(macro (delimiter) (name))
+			(hash)
 		)
-	) (delimiter))
-	(attribute (delimiter)
-		(name) (delimiter)))
+	))
+	(attribute
+		(attribute_identifier)))
 
 ==================
 Inline Roll: [[#m]]@{a}]]
@@ -550,13 +556,26 @@ Inline Roll: [[#m]]@{a}]]
 [[#m]]@{a}]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(macroHash)
+			(hash)
 		)
-	) (delimiter))
-	(attribute (delimiter)
-		(name) (delimiter)))
+	))
+	(attribute
+		(attribute_identifier)))
+
+==================
+Inline Roll: [[5#m ]]
+==================
+[[5#m ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+			(hash)
+		)
+	)))
 
 
 
@@ -569,15 +588,16 @@ Inline Roll: [[ [[5]] ]]
 [[ [[5]] ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(inlineRoll (delimiter) (formula
-				(term
-					(number)
-				)
-			) (delimiter))
+			(number
+				(inlineRoll (formula
+					(term
+						(number)
+					)
+				)))
 		)
-	) (delimiter)))
+	)))
 
 
 ==================
@@ -586,19 +606,20 @@ Inline Roll: [[ @{a}[[5]]%{b} ]]
 [[ @{a}[[5]]%{b} ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(attribute (delimiter)
-				(name) (delimiter))
-			(inlineRoll (delimiter) (formula
-				(term
-					(number)
-				)
-			) (delimiter))
-			(ability (delimiter)
-				(name) (delimiter))
+			(number
+				(attribute
+					(attribute_identifier))
+				(inlineRoll (formula
+					(term
+						(number)
+					)
+				))
+				(ability
+					(ability_identifier)))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Inline Roll: [[ -@{a}[[5]]%{b} ]]
@@ -606,17 +627,54 @@ Inline Roll: [[ -@{a}[[5]]%{b} ]]
 [[ -@{a}[[5]]%{b} ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
-			(attribute (delimiter)
-				(name) (delimiter))
-			(inlineRoll (delimiter) (formula
-				(term
-					(number)
-				)
-			) (delimiter))
-			(ability (delimiter)
-				(name) (delimiter))
+			(number
+				(attribute
+					(attribute_identifier))
+				(inlineRoll (formula
+					(term
+						(number)
+					)
+				))
+				(ability
+					(ability_identifier)))
 		)
-	) (delimiter)))
+	)))
+
+==================
+Inline Roll: [[ %{a}%5 ]]
+==================
+[[ %{a}%5 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number
+				(ability
+					(ability_identifier)))
+		)
+		(operator)
+		(term
+			(number)
+		)
+	)))
+
+==================
+Inline Roll: [[ 1 %5%{a} ]]
+==================
+[[ 1 %5%{a} ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number
+				(ability
+					(ability_identifier)))
+		)
+	)))
