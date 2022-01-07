@@ -19,12 +19,12 @@
             "name": "htmlEntity"
           },
           {
-            "type": "PATTERN",
-            "value": "."
-          },
-          {
             "type": "SYMBOL",
             "name": "rollQuery"
+          },
+          {
+            "type": "PATTERN",
+            "value": "."
           }
         ]
       }
@@ -39,7 +39,7 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "STRING",
+            "type": "PATTERN",
             "value": "&"
           },
           {
@@ -488,16 +488,16 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "[["
+          "type": "SYMBOL",
+          "name": "_$inlineRoll_start"
         },
         {
           "type": "SYMBOL",
           "name": "formula"
         },
         {
-          "type": "STRING",
-          "value": "]]"
+          "type": "SYMBOL",
+          "name": "_$inlineRoll_end"
         }
       ]
     },
@@ -959,16 +959,16 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "("
+          "type": "SYMBOL",
+          "name": "_$leftParen"
         },
         {
           "type": "SYMBOL",
           "name": "formula"
         },
         {
-          "type": "STRING",
-          "value": ")"
+          "type": "SYMBOL",
+          "name": "_$rightParen"
         }
       ]
     },
@@ -1027,8 +1027,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "["
+          "type": "SYMBOL",
+          "name": "_$leftBracket"
         },
         {
           "type": "CHOICE",
@@ -1043,8 +1043,8 @@
           ]
         },
         {
-          "type": "STRING",
-          "value": "]"
+          "type": "SYMBOL",
+          "name": "_$rightBracket"
         }
       ]
     },
@@ -1056,7 +1056,35 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^#\\[\\]\\r\\n]"
+              "value": "[^#\\[\\]\\r\\n{|,}()&]"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$leftBrace"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$pipe"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$comma"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$rightBrace"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$leftParen"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$rightParen"
+            },
+            {
+              "type": "SYMBOL",
+              "name": "_$ampersand"
             },
             {
               "type": "SYMBOL",
@@ -1079,7 +1107,35 @@
             "members": [
               {
                 "type": "PATTERN",
-                "value": "[^#\\]\\r\\n]"
+                "value": "[^#\\]\\r\\n{|,}()&]"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$leftBrace"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$pipe"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$comma"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$rightBrace"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$leftParen"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$rightParen"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_$ampersand"
               },
               {
                 "type": "SYMBOL",
@@ -1238,8 +1294,8 @@
       "type": "SEQ",
       "members": [
         {
-          "type": "STRING",
-          "value": "{"
+          "type": "SYMBOL",
+          "name": "_$leftBrace"
         },
         {
           "type": "SYMBOL",
@@ -1251,8 +1307,8 @@
             "type": "SEQ",
             "members": [
               {
-                "type": "STRING",
-                "value": ","
+                "type": "SYMBOL",
+                "name": "_$comma"
               },
               {
                 "type": "SYMBOL",
@@ -1262,8 +1318,8 @@
           }
         },
         {
-          "type": "STRING",
-          "value": "}"
+          "type": "SYMBOL",
+          "name": "_$rightBrace"
         },
         {
           "type": "CHOICE",
@@ -1321,16 +1377,16 @@
           ]
         },
         {
-          "type": "PATTERN",
-          "value": "[tT]\\["
+          "type": "SYMBOL",
+          "name": "_$tableRoll_start"
         },
         {
           "type": "SYMBOL",
           "name": "tableName"
         },
         {
-          "type": "STRING",
-          "value": "]"
+          "type": "SYMBOL",
+          "name": "_$rightBracket"
         }
       ]
     },
@@ -1341,7 +1397,35 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^#\\]\\r\\n]"
+            "value": "[^#\\]\\r\\n{|,}()&]"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$leftBrace"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$pipe"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$comma"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$rightBrace"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$leftParen"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$rightParen"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_$ampersand"
           },
           {
             "type": "SYMBOL",
@@ -1362,15 +1446,24 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "SYMBOL",
+          "name": "_$rollQuery_start"
+        },
+        {
           "type": "STRING",
-          "value": "?{"
+          "value": ""
         },
         {
           "type": "CHOICE",
           "members": [
             {
-              "type": "SYMBOL",
-              "name": "prompt"
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_queryText_pdv"
+              },
+              "named": true,
+              "value": "prompt"
             },
             {
               "type": "SEQ",
@@ -1379,8 +1472,13 @@
                   "type": "CHOICE",
                   "members": [
                     {
-                      "type": "SYMBOL",
-                      "name": "prompt"
+                      "type": "ALIAS",
+                      "content": {
+                        "type": "SYMBOL",
+                        "name": "_queryText_pdv"
+                      },
+                      "named": true,
+                      "value": "prompt"
                     },
                     {
                       "type": "BLANK"
@@ -1388,8 +1486,8 @@
                   ]
                 },
                 {
-                  "type": "STRING",
-                  "value": "|"
+                  "type": "SYMBOL",
+                  "name": "_$pipe"
                 },
                 {
                   "type": "CHOICE",
@@ -1398,8 +1496,13 @@
                       "type": "CHOICE",
                       "members": [
                         {
-                          "type": "SYMBOL",
-                          "name": "defaultValue"
+                          "type": "ALIAS",
+                          "content": {
+                            "type": "SYMBOL",
+                            "name": "_queryText_pdv"
+                          },
+                          "named": true,
+                          "value": "defaultValue"
                         },
                         {
                           "type": "SEQ",
@@ -1408,8 +1511,13 @@
                               "type": "CHOICE",
                               "members": [
                                 {
-                                  "type": "SYMBOL",
-                                  "name": "option"
+                                  "type": "ALIAS",
+                                  "content": {
+                                    "type": "SYMBOL",
+                                    "name": "_queryOption"
+                                  },
+                                  "named": true,
+                                  "value": "option"
                                 },
                                 {
                                   "type": "BLANK"
@@ -1422,15 +1530,20 @@
                                 "type": "SEQ",
                                 "members": [
                                   {
-                                    "type": "STRING",
-                                    "value": "|"
+                                    "type": "SYMBOL",
+                                    "name": "_$pipe"
                                   },
                                   {
                                     "type": "CHOICE",
                                     "members": [
                                       {
-                                        "type": "SYMBOL",
-                                        "name": "option"
+                                        "type": "ALIAS",
+                                        "content": {
+                                          "type": "SYMBOL",
+                                          "name": "_queryOption"
+                                        },
+                                        "named": true,
+                                        "value": "option"
                                       },
                                       {
                                         "type": "BLANK"
@@ -1455,48 +1568,82 @@
         },
         {
           "type": "STRING",
-          "value": "}"
+          "value": ""
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_$rightBrace"
         }
       ]
     },
     "_queryText": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "[^}|{,()&]"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_$leftBrace"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_$leftParen"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_$rightParen"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_$ampersand"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_placeholder"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "hash"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "htmlEntity"
+        }
+      ]
+    },
+    "_queryText_pdv": {
       "type": "REPEAT1",
       "content": {
         "type": "CHOICE",
         "members": [
           {
-            "type": "PATTERN",
-            "value": "[^}|]"
+            "type": "SYMBOL",
+            "name": "_queryText"
           },
           {
             "type": "SYMBOL",
-            "name": "_placeholder"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "hash"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "htmlEntity"
+            "name": "_$comma"
           }
         ]
       }
     },
-    "prompt": {
-      "type": "SYMBOL",
-      "name": "_queryText"
-    },
-    "defaultValue": {
-      "type": "SYMBOL",
-      "name": "_queryText"
-    },
-    "option": {
+    "_queryOption": {
       "type": "CHOICE",
       "members": [
         {
-          "type": "SYMBOL",
-          "name": "optionName"
+          "type": "FIELD",
+          "name": "depth_-1",
+          "content": {
+            "type": "ALIAS",
+            "content": {
+              "type": "SYMBOL",
+              "name": "_queryOptionName"
+            },
+            "named": true,
+            "value": "optionName"
+          }
         },
         {
           "type": "SEQ",
@@ -1505,8 +1652,17 @@
               "type": "CHOICE",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "optionName"
+                  "type": "FIELD",
+                  "name": "depth_-1",
+                  "content": {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_queryOptionName"
+                    },
+                    "named": true,
+                    "value": "optionName"
+                  }
                 },
                 {
                   "type": "BLANK"
@@ -1514,15 +1670,24 @@
               ]
             },
             {
-              "type": "STRING",
-              "value": ","
+              "type": "SYMBOL",
+              "name": "_$comma"
             },
             {
               "type": "CHOICE",
               "members": [
                 {
-                  "type": "SYMBOL",
-                  "name": "optionValue"
+                  "type": "FIELD",
+                  "name": "depth_-1",
+                  "content": {
+                    "type": "ALIAS",
+                    "content": {
+                      "type": "SYMBOL",
+                      "name": "_queryOptionValue"
+                    },
+                    "named": true,
+                    "value": "optionValue"
+                  }
                 },
                 {
                   "type": "BLANK"
@@ -1533,30 +1698,21 @@
         }
       ]
     },
-    "optionName": {
-      "type": "SYMBOL",
-      "name": "_queryText"
+    "_queryOptionName": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "SYMBOL",
+        "name": "_queryText"
+      }
     },
-    "optionValue": {
+    "_queryOptionValue": {
       "type": "REPEAT1",
       "content": {
         "type": "CHOICE",
         "members": [
           {
-            "type": "PATTERN",
-            "value": "[^}|,]"
-          },
-          {
             "type": "SYMBOL",
-            "name": "_placeholder"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "hash"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "htmlEntity"
+            "name": "_queryText"
           },
           {
             "type": "SYMBOL",
@@ -1564,10 +1720,99 @@
           }
         ]
       }
+    },
+    "_$leftBrace": {
+      "type": "PATTERN",
+      "value": "\\{"
+    },
+    "_$pipe": {
+      "type": "PATTERN",
+      "value": "\\|"
+    },
+    "_$comma": {
+      "type": "PATTERN",
+      "value": ","
+    },
+    "_$rightBrace": {
+      "type": "PATTERN",
+      "value": "\\}"
+    },
+    "_$leftBracket": {
+      "type": "PATTERN",
+      "value": "\\["
+    },
+    "_$rightBracket": {
+      "type": "PATTERN",
+      "value": "\\]"
+    },
+    "_$leftParen": {
+      "type": "PATTERN",
+      "value": "\\("
+    },
+    "_$rightParen": {
+      "type": "PATTERN",
+      "value": "\\)"
+    },
+    "_$slash": {
+      "type": "PATTERN",
+      "value": "\\/"
+    },
+    "_$asterisk": {
+      "type": "PATTERN",
+      "value": "\\*"
+    },
+    "_$plus": {
+      "type": "PATTERN",
+      "value": "\\+"
+    },
+    "_$dash": {
+      "type": "PATTERN",
+      "value": "\\-"
+    },
+    "_$ampersand": {
+      "type": "PATTERN",
+      "value": "&"
+    },
+    "_$d": {
+      "type": "PATTERN",
+      "value": "[dD]"
+    },
+    "_$t": {
+      "type": "PATTERN",
+      "value": "[tT]"
+    },
+    "_$questionmark": {
+      "type": "PATTERN",
+      "value": "\\?"
+    },
+    "_$period": {
+      "type": "PATTERN",
+      "value": "\\."
+    },
+    "_$inlineRoll_start": {
+      "type": "PATTERN",
+      "value": "\\[\\["
+    },
+    "_$inlineRoll_end": {
+      "type": "PATTERN",
+      "value": "\\]\\]"
+    },
+    "_$tableRoll_start": {
+      "type": "PATTERN",
+      "value": "[tT]\\["
+    },
+    "_$rollQuery_start": {
+      "type": "PATTERN",
+      "value": "\\?\\{"
     }
   },
   "extras": [],
-  "conflicts": [],
+  "conflicts": [
+    [
+      "rollQuery",
+      "_queryOption"
+    ]
+  ],
   "precedences": [
     [
       {

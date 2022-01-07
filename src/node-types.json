@@ -416,20 +416,21 @@
   {
     "type": "option",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "optionName",
-          "named": true
-        },
-        {
-          "type": "optionValue",
-          "named": true
-        }
-      ]
+    "fields": {
+      "depth_-1": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "optionName",
+            "named": true
+          },
+          {
+            "type": "optionValue",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
@@ -747,19 +748,11 @@
     }
   },
   {
+    "type": "",
+    "named": false
+  },
+  {
     "type": "%{",
-    "named": false
-  },
-  {
-    "type": "(",
-    "named": false
-  },
-  {
-    "type": ")",
-    "named": false
-  },
-  {
-    "type": ",",
     "named": false
   },
   {
@@ -767,27 +760,7 @@
     "named": false
   },
   {
-    "type": "?{",
-    "named": false
-  },
-  {
     "type": "@{",
-    "named": false
-  },
-  {
-    "type": "[",
-    "named": false
-  },
-  {
-    "type": "[[",
-    "named": false
-  },
-  {
-    "type": "]",
-    "named": false
-  },
-  {
-    "type": "]]",
     "named": false
   },
   {
@@ -812,10 +785,6 @@
   },
   {
     "type": "target",
-    "named": false
-  },
-  {
-    "type": "{",
     "named": false
   },
   {
