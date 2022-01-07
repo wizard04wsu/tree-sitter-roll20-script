@@ -4,15 +4,15 @@ Math Function: [[abs(5)]]
 [[abs(5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(function (name) (delimiter) (formula
+			(function (name) (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Math Function: [[ abs( 5 ) ]]
@@ -20,15 +20,15 @@ Math Function: [[ abs( 5 ) ]]
 [[ abs( 5 ) ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(function (name) (delimiter) (formula
+			(function (name) (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Math Function: [[ceil(5)]]
@@ -36,15 +36,15 @@ Math Function: [[ceil(5)]]
 [[ceil(5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(function (name) (delimiter) (formula
+			(function (name) (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Math Function: [[floor(5)]]
@@ -52,15 +52,15 @@ Math Function: [[floor(5)]]
 [[floor(5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(function (name) (delimiter) (formula
+			(function (name) (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Math Function: [[round(5)]]
@@ -68,12 +68,12 @@ Math Function: [[round(5)]]
 [[round(5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(function (name) (delimiter) (formula
+			(function (name) (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))

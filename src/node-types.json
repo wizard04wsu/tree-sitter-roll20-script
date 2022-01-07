@@ -171,6 +171,25 @@
     }
   },
   {
+    "type": "function",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "inlineRoll",
     "named": true,
     "fields": {},
@@ -249,6 +268,21 @@
     "fields": {}
   },
   {
+    "type": "parenthesized",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "script",
     "named": true,
     "fields": {},
@@ -304,7 +338,15 @@
           "named": true
         },
         {
+          "type": "function",
+          "named": true
+        },
+        {
           "type": "hash",
+          "named": true
+        },
+        {
+          "type": "label",
           "named": true
         },
         {
@@ -314,12 +356,24 @@
         {
           "type": "operator",
           "named": true
+        },
+        {
+          "type": "parenthesized",
+          "named": true
         }
       ]
     }
   },
   {
     "type": "%{",
+    "named": false
+  },
+  {
+    "type": "(",
+    "named": false
+  },
+  {
+    "type": ")",
     "named": false
   },
   {
@@ -352,6 +406,10 @@
   },
   {
     "type": "htmlEntity",
+    "named": true
+  },
+  {
+    "type": "name",
     "named": true
   },
   {

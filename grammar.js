@@ -433,17 +433,17 @@ module.exports = grammar({
 					seq(
 						alias($._operator_summation, $.operator),
 						optional($._labels),
+						alias($._term_unsigned, $.term),
 					),
 					seq(
 						alias($._operator_multiplication, $.operator),
 						optional($._labels),
-						optional(seq(
-							alias($._operator_summation, $.operator),
-							optional($._labels),
-						)),
+						choice(
+							alias($._term_unsigned, $.term),
+							alias($._term_signed, $.term),
+						),
 					),
 				),
-				alias($._term, $.term),
 				optional($._labels),
 			)),
 		),
@@ -456,37 +456,61 @@ module.exports = grammar({
 						alias($._number_signable, $.number),	//numbers, attributes, abilities, and inline rolls
 					),
 					alias($._number_unsignable, $.number),	//numbers, attributes, abilities, and inline rolls
-/*					$.diceRoll,
-					$.groupRoll,
-					$.rollQuery,
+//					$.diceRoll,
+//					$.groupRoll,
+//					$.rollQuery,
 					$.parenthesized,
 					$.function,
-					$.tableRoll,
-*/				),
+//					$.tableRoll,
+				),
 				optional($._macro),
 			),
 			$._macro,
 		),
 		
-		_term: $ => choice(
+		_term_unsigned: $ => choice(
 			seq(
 				choice(
 					$.number,	//numbers, attributes, abilities, and inline rolls
-/*					$.diceRoll,
-					$.groupRoll,
+//					$.diceRoll,
+//					$.groupRoll,
 					seq(
 						choice(
-							$.rollQuery,
+//							$.rollQuery,
 							$.parenthesized,
 							$.function,
-							$.tableRoll,
+//							$.tableRoll,
 						),
-						optional($._placeholders),
+						optional($._placeholder),
 					),
-*/				),
+				),
 				optional($._macro),
 			),
 			$._macro,
+		),
+		
+		_term_signed: $ => seq(
+			alias($._operator_summation, $.operator),
+			optional($._labels),
+			$._term_unsigned,
+		),
+		
+		
+		/*┌──────────────────────────────
+		  │ Parenthesized Formula
+		  └──────────────────────────────*/
+		
+		parenthesized: $ => $._parenthesized,
+		
+		_parenthesized: $ => seq(
+			"(",
+			$.formula,
+			")",
+		),
+		
+		function: $ => seq(
+			alias(/abs|ceil|floor|round/, $.name),
+			$._parenthesized,
 		),
 		
 		
