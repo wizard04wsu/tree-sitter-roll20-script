@@ -64,7 +64,7 @@ function escapeAtDepth(char, depth){
 			rxp = `${escape.char || char}|&(amp;){0,${depth-1}}(${escape.regex});`;
 		}
 		else{
-			rxp = `&(amp;){${depth-1}}(${_htmlEscapes[char].regex});`;
+			rxp = `&(amp;){${depth-1}}(${escape.regex});`;
 		}
 		rxp = new RegExp(rxp);
 		return $ => rxp;
@@ -151,7 +151,7 @@ module.exports = grammar({
 			$.htmlEntity,
 			/./,
 			
-			//$.rollQuery,
+			$.rollQuery,
 			
 			//TODO:
 			//template
@@ -457,7 +457,7 @@ module.exports = grammar({
 					$.diceRoll,
 					$.groupRoll,
 					$.tableRoll,
-//					$.rollQuery,
+					$.rollQuery,
 				),
 				optional($._macro),
 			),
@@ -475,7 +475,7 @@ module.exports = grammar({
 							$.parenthesized,
 							$.function,
 							$.tableRoll,
-//							$.rollQuery,
+							$.rollQuery,
 						),
 						optional($._placeholder),
 					),
@@ -638,6 +638,66 @@ module.exports = grammar({
 			$._placeholder,
 			$.hash,
 			$.htmlEntity,
+		)),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Roll Queries
+		  ╚════════════════════════════════════════════════════════════*/
+		
+		rollQuery: $ => seq(
+			"?{",
+			choice(
+				$.prompt,
+				seq(
+					optional($.prompt),
+					"|",
+					optional(choice(
+						$.defaultValue,
+						seq(
+							optional($.option),
+							repeat1(seq(
+								"|",
+								optional($.option),
+							)),
+						),
+					)),
+				),
+			),
+			"}",
+		),
+		
+		_queryText: $ => repeat1(choice(
+			/[^}|]/,	//new lines are allowed, but end up being removed or replaced
+			$._placeholder,
+			$.hash,
+			$.htmlEntity,
+		)),
+		
+		prompt: $ => $._queryText,
+		
+		defaultValue: $ => $._queryText,
+		
+		option: $ => choice(
+			$.optionName,
+			seq(
+				optional($.optionName),
+				",",
+				optional($.optionValue),
+			),
+		),
+		
+		optionName: $ => $._queryText,
+		
+		optionValue: $ => repeat1(choice(
+			/[^}|,]/,	//new lines are allowed
+			$._placeholder,
+			$.hash,
+			$.htmlEntity,
+			$.rollQuery,
+			//TODO:
+			//$.property,
+			//$.button,
 		)),
 		
 		
