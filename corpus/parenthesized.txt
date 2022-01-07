@@ -4,15 +4,15 @@ Parenthesized: [[(5)]]
 [[(5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(parenthesized (delimiter) (formula
+			(parenthesized (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Parenthesized: [[ ( 5 ) ]]
@@ -20,15 +20,15 @@ Parenthesized: [[ ( 5 ) ]]
 [[ ( 5 ) ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(parenthesized (delimiter) (formula
+			(parenthesized (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Parenthesized: [[(-5-5)]]
@@ -36,9 +36,9 @@ Parenthesized: [[(-5-5)]]
 [[(-5-5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(parenthesized (delimiter) (formula
+			(parenthesized (formula
 				(term
 					(operator)
 					(number)
@@ -47,9 +47,9 @@ Parenthesized: [[(-5-5)]]
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Parenthesized: [[ ( -5 - 5 ) ]]
@@ -57,9 +57,9 @@ Parenthesized: [[ ( -5 - 5 ) ]]
 [[ ( -5 - 5 ) ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(parenthesized (delimiter) (formula
+			(parenthesized (formula
 				(term
 					(operator)
 					(number)
@@ -68,9 +68,9 @@ Parenthesized: [[ ( -5 - 5 ) ]]
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Parenthesized: [[5+(5)]]
@@ -78,19 +78,19 @@ Parenthesized: [[5+(5)]]
 [[5+(5)]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
 		(operator)
 		(term
-			(parenthesized (delimiter) (formula
+			(parenthesized (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Parenthesized: [[ 5 + ( 5 ) ]]
@@ -98,16 +98,16 @@ Parenthesized: [[ 5 + ( 5 ) ]]
 [[ 5 + ( 5 ) ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
 		(operator)
 		(term
-			(parenthesized (delimiter) (formula
+			(parenthesized (formula
 				(term
 					(number)
 				)
-			) (delimiter))
+			))
 		)
-	) (delimiter)))
+	)))

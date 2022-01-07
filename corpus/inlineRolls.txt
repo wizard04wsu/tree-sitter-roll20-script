@@ -386,8 +386,8 @@ Inline Roll: [[1 / + - + -+ -+-5]]
 			(number)
 		)
 		(operator)
-		(operator)
 		(term
+			(operator)
 			(number)
 		)
 	)))
