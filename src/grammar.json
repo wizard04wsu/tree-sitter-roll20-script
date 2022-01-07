@@ -21,6 +21,10 @@
           {
             "type": "PATTERN",
             "value": "."
+          },
+          {
+            "type": "SYMBOL",
+            "name": "rollQuery"
           }
         ]
       }
@@ -809,6 +813,10 @@
                 {
                   "type": "SYMBOL",
                   "name": "tableRoll"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "rollQuery"
                 }
               ]
             },
@@ -870,6 +878,10 @@
                         {
                           "type": "SYMBOL",
                           "name": "tableRoll"
+                        },
+                        {
+                          "type": "SYMBOL",
+                          "name": "rollQuery"
                         }
                       ]
                     },
@@ -1342,6 +1354,213 @@
           {
             "type": "SYMBOL",
             "name": "htmlEntity"
+          }
+        ]
+      }
+    },
+    "rollQuery": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "?{"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SYMBOL",
+              "name": "prompt"
+            },
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "prompt"
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                },
+                {
+                  "type": "STRING",
+                  "value": "|"
+                },
+                {
+                  "type": "CHOICE",
+                  "members": [
+                    {
+                      "type": "CHOICE",
+                      "members": [
+                        {
+                          "type": "SYMBOL",
+                          "name": "defaultValue"
+                        },
+                        {
+                          "type": "SEQ",
+                          "members": [
+                            {
+                              "type": "CHOICE",
+                              "members": [
+                                {
+                                  "type": "SYMBOL",
+                                  "name": "option"
+                                },
+                                {
+                                  "type": "BLANK"
+                                }
+                              ]
+                            },
+                            {
+                              "type": "REPEAT1",
+                              "content": {
+                                "type": "SEQ",
+                                "members": [
+                                  {
+                                    "type": "STRING",
+                                    "value": "|"
+                                  },
+                                  {
+                                    "type": "CHOICE",
+                                    "members": [
+                                      {
+                                        "type": "SYMBOL",
+                                        "name": "option"
+                                      },
+                                      {
+                                        "type": "BLANK"
+                                      }
+                                    ]
+                                  }
+                                ]
+                              }
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "BLANK"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
+    "_queryText": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^}|]"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_placeholder"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "hash"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "htmlEntity"
+          }
+        ]
+      }
+    },
+    "prompt": {
+      "type": "SYMBOL",
+      "name": "_queryText"
+    },
+    "defaultValue": {
+      "type": "SYMBOL",
+      "name": "_queryText"
+    },
+    "option": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "optionName"
+        },
+        {
+          "type": "SEQ",
+          "members": [
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "optionName"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            },
+            {
+              "type": "STRING",
+              "value": ","
+            },
+            {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "optionValue"
+                },
+                {
+                  "type": "BLANK"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "optionName": {
+      "type": "SYMBOL",
+      "name": "_queryText"
+    },
+    "optionValue": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^}|,]"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_placeholder"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "hash"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "htmlEntity"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "rollQuery"
           }
         ]
       }

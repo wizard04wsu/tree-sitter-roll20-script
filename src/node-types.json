@@ -175,6 +175,37 @@
     }
   },
   {
+    "type": "defaultValue",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "diceRoll",
     "named": true,
     "fields": {},
@@ -383,6 +414,91 @@
     "fields": {}
   },
   {
+    "type": "option",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "optionName",
+          "named": true
+        },
+        {
+          "type": "optionValue",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "optionName",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "optionValue",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "parenthesized",
     "named": true,
     "fields": {},
@@ -392,6 +508,60 @@
       "types": [
         {
           "type": "formula",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "prompt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rollQuery",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "defaultValue",
+          "named": true
+        },
+        {
+          "type": "option",
+          "named": true
+        },
+        {
+          "type": "prompt",
           "named": true
         }
       ]
@@ -427,6 +597,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
           "named": true
         }
       ]
@@ -562,6 +736,10 @@
           "named": true
         },
         {
+          "type": "rollQuery",
+          "named": true
+        },
+        {
           "type": "tableRoll",
           "named": true
         }
@@ -586,6 +764,10 @@
   },
   {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": "?{",
     "named": false
   },
   {
