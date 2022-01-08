@@ -1,0 +1,212 @@
+==================
+Roll Query: [[?{|}]]
+==================
+[[?{|}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery)))))
+
+==================
+Roll Query: [[?{||}]]
+==================
+[[?{||}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery)))))
+
+==================
+Roll Query: [[?{p|}]]
+==================
+[[?{p|}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(prompt))))))
+
+==================
+Roll Query: [[?{|d}]]
+==================
+[[?{|d}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(defaultValue))))))
+
+==================
+Roll Query: [[?{p|d}]]
+==================
+[[?{p|d}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(prompt)
+		(defaultValue))))))
+
+==================
+Roll Query: [[?{p|a|b}]]
+==================
+[[?{p|a|b}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(prompt)
+		(option
+			(optionName))
+		(option
+			(optionName)))))))
+
+==================
+Roll Query: [[?{p|a,A|b,B}]]
+==================
+[[?{p|a,A|b,B}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(prompt)
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName)
+			(optionValue)))))))
+
+==================
+Roll Query: [[?{|a|b,?{p&#124;b&#125;c}]]
+==================
+[[?{|a|b,?{p&#124;b&#125;c}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue
+				(rollQuery
+					(prompt)
+					(defaultValue)))))))))
+
+==================
+Roll Query: [[?{ Pr@%&mpt | default value }]]
+==================
+[[?{ Pr@%&mpt | default value }]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(prompt)
+		(defaultValue))))))
+
+==================
+Roll Query: [[?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }]]
+==================
+[[?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(prompt)
+		(defaultValue
+			(attribute
+				(attributeName))
+			(ability
+				(characterName)
+				(abilityName))))))))
+
+==================
+Roll Query: [[?{|a|b,c|d|}]]
+==================
+[[?{|a|b,c|d|}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName)))))))
+
+==================
+Roll Query: [[?{|a,b|c||d|e,f}]]
+==================
+[[?{|a,b|c||d|e,f}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(option
+			(optionName)
+			(optionValue))
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName)
+			(optionValue)))))))
+
+==================
+Roll Query: [[?{|a,|,|,b}]]
+==================
+[[?{|a,|,|,b}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(option
+			(optionName))
+		(option)
+		(option
+			(optionValue)))))))
+
+==================
+Roll Query: [[?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}]]
+==================
+[[?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName))
+		(option
+			(optionName)))))))
+
+==================
+Roll Query: [[?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f&vert;g&rcub;|,}]]
+==================
+[[?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f&vert;g&rcub;|,}]]
+---
+(script (inlineRoll (formula (term
+	(rollQuery
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option
+			(optionValue
+				(rollQuery
+					(prompt)
+					(option
+						(optionName)
+						(optionValue)))))
+		(option))))))
+
