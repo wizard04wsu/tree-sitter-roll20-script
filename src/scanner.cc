@@ -11,14 +11,13 @@ using namespace std;
 enum TokenType {
 	INCREMENT_DEPTH,
 	DECREMENT_DEPTH,
-	NO_AMP,
 	AMP_AT_OR_ABOVE_DEPTH,
 	AMP_AT_DEPTH,
 };
 
 
 //For debugging:
-const bool debugging = true;
+const bool debugging = false;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	noChange=0,
@@ -69,7 +68,6 @@ void logValidSymbols(const bool *valid_symbols) {
 	cout << color(darkGray) //<< "Valid symbols:" << "\n"
 		 << (valid_symbols[INCREMENT_DEPTH]?"INCREMENT_DEPTH, ":"")
 		 << (valid_symbols[DECREMENT_DEPTH]?"DECREMENT_DEPTH, ":"")
-		 << (valid_symbols[NO_AMP]?"NO_AMP, ":"")
 		 << (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]?"AMP_AT_OR_ABOVE_DEPTH, ":"")
 		 << (valid_symbols[AMP_AT_DEPTH]?"AMP_AT_DEPTH, ":"")
 		 << "\n";
@@ -150,10 +148,10 @@ struct Scanner {
 			depth--;
 			return match_found(lexer, DECREMENT_DEPTH, "DECREMENT_DEPTH");
 		}
-		else if (depth <= 0 && valid_symbols[NO_AMP]) {
-			return match_found(lexer, NO_AMP, "NO_AMP (depth "+to_string(depth)+")");
-		}
-		else if (c == '&' && (valid_symbols[AMP_AT_OR_ABOVE_DEPTH] || valid_symbols[AMP_AT_DEPTH])) {
+		else if (c == '&' && (
+		 (depth >= 0 && valid_symbols[AMP_AT_OR_ABOVE_DEPTH])
+		 || (depth >= 1 && valid_symbols[AMP_AT_DEPTH])
+		)) {
 			c = advance(lexer);
 			mark_end(lexer);
 			
