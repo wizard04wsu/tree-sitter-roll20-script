@@ -183,6 +183,14 @@
       "required": false,
       "types": [
         {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
+        {
           "type": "ability",
           "named": true
         },
@@ -264,6 +272,14 @@
       "required": true,
       "types": [
         {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
+        {
           "type": "formula",
           "named": true
         },
@@ -283,6 +299,14 @@
       "required": true,
       "types": [
         {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
+        {
           "type": "formula",
           "named": true
         },
@@ -294,13 +318,44 @@
     }
   },
   {
-    "type": "inlineRoll",
+    "type": "htmlEntity",
     "named": true,
     "fields": {},
     "children": {
       "multiple": false,
       "required": true,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "inlineRoll",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "AMP_AT_OR_ABOVE_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "formula",
           "named": true
@@ -313,9 +368,17 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
-      "required": false,
+      "multiple": true,
+      "required": true,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "labelText",
           "named": true
@@ -331,6 +394,14 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "ability",
           "named": true
@@ -416,21 +487,28 @@
   {
     "type": "option",
     "named": true,
-    "fields": {
-      "depth_-1": {
-        "multiple": true,
-        "required": false,
-        "types": [
-          {
-            "type": "optionName",
-            "named": true
-          },
-          {
-            "type": "optionValue",
-            "named": true
-          }
-        ]
-      }
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
+        {
+          "type": "optionName",
+          "named": true
+        },
+        {
+          "type": "optionValue",
+          "named": true
+        }
+      ]
     }
   },
   {
@@ -441,6 +519,14 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "ability",
           "named": true
@@ -473,6 +559,14 @@
       "required": false,
       "types": [
         {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
+        {
           "type": "ability",
           "named": true
         },
@@ -504,9 +598,17 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "formula",
           "named": true
@@ -522,6 +624,14 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "ability",
           "named": true
@@ -551,8 +661,28 @@
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "AMP_AT_OR_ABOVE_DEPTH",
+          "named": true
+        },
+        {
+          "type": "DECREMENT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "INCREMENT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "defaultValue",
           "named": true
@@ -643,6 +773,14 @@
       "required": false,
       "types": [
         {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
+        {
           "type": "ability",
           "named": true
         },
@@ -673,6 +811,18 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "AMP_AT_DEPTH",
+          "named": true
+        },
+        {
+          "type": "AMP_AT_OR_ABOVE_DEPTH",
+          "named": true
+        },
+        {
+          "type": "NO_AMP",
+          "named": true
+        },
         {
           "type": "count",
           "named": true
@@ -748,10 +898,6 @@
     }
   },
   {
-    "type": "",
-    "named": false
-  },
-  {
     "type": "%{",
     "named": false
   },
@@ -760,8 +906,32 @@
     "named": false
   },
   {
+    "type": ";",
+    "named": false
+  },
+  {
     "type": "@{",
     "named": false
+  },
+  {
+    "type": "AMP_AT_DEPTH",
+    "named": true
+  },
+  {
+    "type": "AMP_AT_OR_ABOVE_DEPTH",
+    "named": true
+  },
+  {
+    "type": "DECREMENT_DEPTH",
+    "named": true
+  },
+  {
+    "type": "INCREMENT_DEPTH",
+    "named": true
+  },
+  {
+    "type": "NO_AMP",
+    "named": true
   },
   {
     "type": "fate",
@@ -769,10 +939,6 @@
   },
   {
     "type": "hash",
-    "named": true
-  },
-  {
-    "type": "htmlEntity",
     "named": true
   },
   {

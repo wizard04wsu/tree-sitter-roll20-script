@@ -12,59 +12,29 @@ function debugAlias(theToken, aliasToken, fieldName){
 
 
 
-let _depth = -1;
-
-function incrementDepth(){
-	_depth++;
-	return "";
-}
-function decrementDepth(){
-	_depth--;
-	return "";
-}
-
 function _atDepth(charRxp, htmlEscapeRxp){
-	if(_depth <= 0) return new RegExp(charRxp);
-	return new RegExp(`&(amp;){${_depth-1}}(${htmlEscapeRxp})`);
+	return $ => choice(
+		seq(
+			$.NO_AMP,
+			new RegExp(charRxp),
+		),
+		seq(
+			$.AMP_AT_DEPTH,
+			new RegExp(`(${htmlEscapeRxp});`),
+		),
+	);
 }
 function _atOrAboveDepth(charRxp, htmlEscapeRxp){
-	if(_depth <= 0) return new RegExp(charRxp);
-	return new RegExp(`${charRxp}|&(amp;){0,${_depth-1}}(${htmlEscapeRxp})`);
-}
-
-const __leftBrace 		= () => _atDepth("\\{", "#123|#[xX](00)?7[bB]|lcub|lbrace");
-const __pipe 			= () => _atDepth("\\|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine");
-const __comma 			= () => _atDepth(",", "#44|#[xX](00)?2[cC]|comma");
-const __rightBrace 		= () => _atDepth("\\}", "#125|#[xX](00)?7[dD]|rcub|rbrace");
-const __leftBracket 	= () => _atDepth("\\[", "#91|#[xX](00)?5[bB]|lsqb|lbrack");
-const __rightBracket 	= () => _atDepth("\\]", "#93|#[xX](00)?5[dD]|rsqb|rbrack");
-const __leftParen 		= () => _atDepth("\\(", "#40|#[xX](00)?28|lpar");
-const __rightParen 		= () => _atDepth("\\)", "#41|#[xX](00)?29|rpar");
-const __slash 			= () => _atDepth("/", "#47|#[xX](00)?2[fF]|sol");
-const __asterisk 		= () => _atDepth("\\*", "#42|#[xX](00)?2[aA]|ast");
-const __plus 			= () => _atDepth("\\+", "#43|#[xX](00)?2[bB]|plus");
-const __dash 			= () => _atDepth("\\-", "#45|#[xX](00)?2[dD]|dash|hyphen");
-const __ampersand 		= () => _atDepth("&", "#38|#[xX](00)?26|amp|AMP");
-const __d 				= () => _atOrAboveDepth("[dD]", "#100|#[xX](00)?64|#68|#[xX](00)?44");
-const __t 				= () => _atOrAboveDepth("[tT]", "#116|#[xX](00)?74|#84|#[xX](00)?54");
-const __questionmark 	= () => _atOrAboveDepth("\\?", "#63|#[xX](00)?3[fF]|quest");
-const __period 			= () => _atOrAboveDepth("\\.", "#46|#[xX](00)?2[eE]|period");
-
-function __inlineRoll_start(){
-	if(_depth <= 0) return /\[\[/;
-	return new RegExp(`&(amp;){${_depth-1}}\\[&(amp;){0,${_depth-1}}\\[`);
-}
-function __inlineRoll_end(){
-	if(_depth <= 0) return /\]\]/;
-	return new RegExp(`&(amp;){${_depth-1}}\\]&(amp;){0,${_depth-1}}\\]`);
-}
-function __tableRoll_start(){
-	if(_depth <= 0) return /[tT]\[/;
-	return new RegExp(`&(amp;){${_depth-1}}[tT]&(amp;){0,${_depth-1}}\\[`);
-}
-function __rollQuery_start(){
-	if(_depth <= 0) return /\?\{/;
-	return new RegExp(`&(amp;){${_depth-1}}\\?&(amp;){0,${_depth-1}}\\{`);
+	return $ => choice(
+		seq(
+			$.NO_AMP,
+			new RegExp(charRxp),
+		),
+		seq(
+			$.AMP_AT_OR_ABOVE_DEPTH,
+			new RegExp(`(${htmlEscapeRxp});`),
+		),
+	);
 }
 
 
@@ -73,9 +43,11 @@ module.exports = grammar({
 	name: "roll20_script",
 	
 	externals: $ => [
-		//$.INCREMENT_DEPTH,
-		//$.DECREMENT_DEPTH,
-		//$.AMP_SERIES,
+		$.INCREMENT_DEPTH,
+		$.DECREMENT_DEPTH,
+		$.NO_AMP,
+		$.AMP_AT_OR_ABOVE_DEPTH,
+		$.AMP_AT_DEPTH,
 	],
 	
 	extras: $ => [],
@@ -159,17 +131,17 @@ module.exports = grammar({
 		
 		_wsp: $ => /\s+/,
 		
-		htmlEntity: $ => token(seq(
-			__ampersand(),
+		htmlEntity: $ => seq(
+			$.__ampersand,
 			choice(
 				/[0-9a-zA-Z]+/,
-				seq(
+				token(seq(
 					"#",
 					/\d+|[xX][0-9a-fA-F]+/,
-				),
+				)),
 			),
 			";",
-		)),
+		),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -367,9 +339,9 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		inlineRoll: $ => seq(
-			$._$inlineRoll_start,
+			$.__inlineRoll_start,
 			$.formula,
-			$._$inlineRoll_end,
+			$.__inlineRoll_end,
 		),
 		
 		
@@ -496,9 +468,9 @@ module.exports = grammar({
 		parenthesized: $ => $._parenthesized,
 		
 		_parenthesized: $ => seq(
-			$._$leftParen,
+			$.__leftParen,
 			$.formula,
-			$._$rightParen,
+			$.__rightParen,
 		),
 		
 		function: $ => seq(
@@ -535,38 +507,40 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		label: $ => seq(
-			$._$leftBracket,
+			$.__leftBracket,
 			optional($.labelText),
-			$._$rightBracket,
+			$.__rightBracket,
 		),
 		
 		labelText: $ => seq(
 			choice(
 				/[^#\[\]\r\n{|,}()&]/,
-				$._$leftBrace,
-				$._$pipe,
-				$._$comma,
-				$._$rightBrace,
-				$._$leftParen,
-				$._$rightParen,
-				$._$ampersand,
+				$.__leftBrace,
+				$.__pipe,
+				$.__comma,
+				$.__rightBrace,
+				$.__leftParen,
+				$.__rightParen,
+				$.__ampersand,
 				$._placeholder,
 				$.hash,
 				$.htmlEntity,
 			),
-			repeat(choice(
-					/[^#\]\r\n{|,}()&]/,
-					$._$leftBrace,
-					$._$pipe,
-					$._$comma,
-					$._$rightBrace,
-					$._$leftParen,
-					$._$rightParen,
-					$._$ampersand,
-					$._placeholder,
-					$.hash,
-					$.htmlEntity,
-			)),
+			repeat($._text_label_tableRoll),
+		),
+		
+		_text_label_tableRoll: $ => choice(
+			/[^#\]\r\n{|,}()&]/,
+			$.__leftBrace,
+			$.__pipe,
+			$.__comma,
+			$.__rightBrace,
+			$.__leftParen,
+			$.__rightParen,
+			$.__ampersand,
+			$._placeholder,
+			$.hash,
+			$.htmlEntity,
 		),
 		
 		_labels: $ => prec.right(choice(
@@ -613,13 +587,13 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		groupRoll: $ => seq(
-			$._$leftBrace,
+			$.__leftBrace,
 			$.formula,
 			repeat(seq(
-				$._$comma,
+				$.__comma,
 				$.formula,
 			)),
-			$._$rightBrace,
+			$.__rightBrace,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 		),
 		
@@ -639,24 +613,12 @@ module.exports = grammar({
 		
 		tableRoll: $ => seq(
 			optional(alias($._integer, $.count)),
-			$._$tableRoll_start,
+			$.__tableRoll_start,
 			$.tableName,
-			$._$rightBracket,
+			$.__rightBracket,
 		),
 		
-		tableName: $ => repeat1(choice(
-			/[^#\]\r\n{|,}()&]/,
-			$._$leftBrace,
-			$._$pipe,
-			$._$comma,
-			$._$rightBrace,
-			$._$leftParen,
-			$._$rightParen,
-			$._$ampersand,
-			$._placeholder,
-			$.hash,
-			$.htmlEntity,
-		)),
+		tableName: $ => repeat1($._text_label_tableRoll),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -664,58 +626,58 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		rollQuery: $ => seq(
-			$._$rollQuery_start,
-			incrementDepth(),
+			$.__rollQuery_start,
+			$.INCREMENT_DEPTH,
 			choice(
-				alias($._queryText_pdv, $.prompt),
+				alias($._text_query_prompt_defaultValue, $.prompt),
 				seq(
-					optional(alias($._queryText_pdv, $.prompt)),
-					$._$pipe,
+					optional(alias($._text_query_prompt_defaultValue, $.prompt)),
+					$.__pipe,
 					optional(choice(
-						alias($._queryText_pdv, $.defaultValue),
+						alias($._text_query_prompt_defaultValue, $.defaultValue),
 						seq(
 							optional(alias($._queryOption, $.option)),
 							repeat1(seq(
-								$._$pipe,
+								$.__pipe,
 								optional(alias($._queryOption, $.option)),
 							)),
 						),
 					)),
 				),
 			),
-			decrementDepth(),
-			$._$rightBrace,
+			$.DECREMENT_DEPTH,
+			$.__rightBrace,
 		),
 		
-		_queryText: $ => choice(
+		_text_query: $ => choice(
 			/[^}|{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
-			$._$leftBrace,
-			$._$leftParen,
-			$._$rightParen,
-			$._$ampersand,
+			$.__leftBrace,
+			$.__leftParen,
+			$.__rightParen,
+			$.__ampersand,
 			$._placeholder,
 			$.hash,
 			$.htmlEntity,
 		),
 		
-		_queryText_pdv: $ => repeat1(choice(
-			$._queryText,
-			$._$comma,
+		_text_query_prompt_defaultValue: $ => repeat1(choice(
+			$._text_query,
+			$.__comma,
 		)),
 		
 		_queryOption: $ => choice(
 			alias($._queryOptionName, $.optionName),
 			seq(
 				optional(alias($._queryOptionName, $.optionName)),
-				$._$comma,
+				$.__comma,
 				optional(alias($._queryOptionValue, $.optionValue)),
 			),
 		),
 		
-		_queryOptionName: $ => repeat1($._queryText),
+		_queryOptionName: $ => repeat1($._text_query),
 		
 		_queryOptionValue: $ => repeat1(choice(
-			$._queryText,
+			$._text_query,
 			$.rollQuery,
 			//TODO:
 			//$.property,
@@ -725,28 +687,72 @@ module.exports = grammar({
 		
 		
 		
-		_$leftBrace: $ => __leftBrace(),
-		_$pipe: $ => __pipe(),
-		_$comma: $ => __comma(),
-		_$rightBrace: $ => __rightBrace(),
-		_$leftBracket: $ => __leftBracket(),
-		_$rightBracket: $ => __rightBracket(),
-		_$leftParen: $ => __leftParen(),
-		_$rightParen: $ => __rightParen(),
-		_$slash: $ => __slash(),
-		_$asterisk: $ => __asterisk(),
-		_$plus: $ => __plus(),
-		_$dash: $ => __dash(),
-		_$ampersand: $ => __ampersand(),
-		_$d: $ => __d(),
-		_$t: $ => __t(),
-		_$questionmark: $ => __questionmark(),
-		_$period: $ => __period(),
+		__leftBrace: 		_atDepth("\\{", "#123|#[xX](00)?7[bB]|lcub|lbrace"),
+		__pipe: 			_atDepth("\\|", "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"),
+		__comma: 			_atDepth(",", "#44|#[xX](00)?2[cC]|comma"),
+		__rightBrace: 		_atDepth("\\}", "#125|#[xX](00)?7[dD]|rcub|rbrace"),
+		__leftBracket: 		_atDepth("\\[", "#91|#[xX](00)?5[bB]|lsqb|lbrack"),
+		__rightBracket: 	_atDepth("\\]", "#93|#[xX](00)?5[dD]|rsqb|rbrack"),
+		__leftParen: 		_atDepth("\\(", "#40|#[xX](00)?28|lpar"),
+		__rightParen: 		_atDepth("\\)", "#41|#[xX](00)?29|rpar"),
+		__slash: 			_atDepth("/", "#47|#[xX](00)?2[fF]|sol"),
+		__asterisk: 		_atDepth("\\*", "#42|#[xX](00)?2[aA]|ast"),
+		__plus: 			_atDepth("\\+", "#43|#[xX](00)?2[bB]|plus"),
+		__dash: 			_atDepth("\\-", "#45|#[xX](00)?2[dD]|dash|hyphen"),
+		__ampersand: 		_atDepth("&", "#38|#[xX](00)?26|amp|AMP"),
+		__d: 				_atOrAboveDepth("[dD]", "#100|#[xX](00)?64|#68|#[xX](00)?44"),
+		__t: 				_atOrAboveDepth("[tT]", "#116|#[xX](00)?74|#84|#[xX](00)?54"),
+		__questionmark: 	_atOrAboveDepth("\\?", "#63|#[xX](00)?3[fF]|quest"),
+		__period: 			_atOrAboveDepth("\\.", "#46|#[xX](00)?2[eE]|period"),
 		
-		_$inlineRoll_start: $ => __inlineRoll_start(),
-		_$inlineRoll_end: $ => __inlineRoll_end(),
-		_$tableRoll_start: $ => __tableRoll_start(),
-		_$rollQuery_start: $ => __rollQuery_start(),
+		__inlineRoll_start: $ => choice(
+			seq(
+				$.NO_AMP,
+				/\[\[/,
+			),
+			seq(
+				$.AMP_AT_DEPTH,
+				/(#91|#[xX](00)?5[bB]|lsqb|lbrack);/,
+				$.AMP_AT_OR_ABOVE_DEPTH,
+				/\[|(#91|#[xX](00)?5[bB]|lsqb|lbrack);/,
+			),
+		),
+		__inlineRoll_end: $ => choice(
+			seq(
+				$.NO_AMP,
+				/\]\]/,
+			),
+			seq(
+				$.AMP_AT_DEPTH,
+				/(#93|#[xX](00)?5[dD]|rsqb|rbrack);/,
+				$.AMP_AT_OR_ABOVE_DEPTH,
+				/\]|(#93|#[xX](00)?5[dD]|rsqb|rbrack);/,
+			),
+		),
+		__tableRoll_start: $ => choice(
+			seq(
+				$.NO_AMP,
+				/[tT]\[/,
+			),
+			seq(
+				$.AMP_AT_DEPTH,
+				/(#116|#[xX](00)?74|#84|#[xX](00)?54);/,
+				$.AMP_AT_OR_ABOVE_DEPTH,
+				/\[|(#91|#[xX](00)?5[bB]|lsqb|lbrack);/,
+			),
+		),
+		__rollQuery_start: $ => choice(
+			seq(
+				$.NO_AMP,
+				/\?\{/,
+			),
+			seq(
+				$.AMP_AT_DEPTH,
+				/(#63|#[xX](00)?3[fF]|quest);/,
+				$.AMP_AT_OR_ABOVE_DEPTH,
+				/\{|(#123|#[xX](00)?7[bB]|lcub|lbrace);/,
+			),
+		),
 		
 		
 	},
