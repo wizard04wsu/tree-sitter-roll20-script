@@ -16,7 +16,7 @@
           },
           {
             "type": "SYMBOL",
-            "name": "htmlEntity"
+            "name": "_htmlEntity_or_ampersand"
           },
           {
             "type": "SYMBOL",
@@ -24,7 +24,7 @@
           },
           {
             "type": "PATTERN",
-            "value": "."
+            "value": "[^&]"
           }
         ]
       }
@@ -32,6 +32,19 @@
     "_wsp": {
       "type": "PATTERN",
       "value": "\\s+"
+    },
+    "_htmlEntity_or_ampersand": {
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__ampersand"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "htmlEntity"
+        }
+      ]
     },
     "htmlEntity": {
       "type": "SEQ",
@@ -1091,10 +1104,6 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "__ampersand"
-              },
-              {
-                "type": "SYMBOL",
                 "name": "_placeholder"
               },
               {
@@ -1103,7 +1112,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "htmlEntity"
+                "name": "_htmlEntity_or_ampersand"
               }
             ]
           },
@@ -1150,10 +1159,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "__ampersand"
-        },
-        {
-          "type": "SYMBOL",
           "name": "_placeholder"
         },
         {
@@ -1162,7 +1167,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "htmlEntity"
+          "name": "_htmlEntity_or_ampersand"
         }
       ]
     },
@@ -1426,11 +1431,7 @@
       "members": [
         {
           "type": "SYMBOL",
-          "name": "__rollQuery_start"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__INCREMENT_DEPTH"
+          "name": "__ROLLQUERY_START"
         },
         {
           "type": "CHOICE",
@@ -1547,11 +1548,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "__rightBrace"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__DECREMENT_DEPTH"
+          "name": "__ROLLQUERY_END"
         }
       ]
     },
@@ -1576,10 +1573,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "__ampersand"
-        },
-        {
-          "type": "SYMBOL",
           "name": "_placeholder"
         },
         {
@@ -1588,7 +1581,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "htmlEntity"
+          "name": "_htmlEntity_or_ampersand"
         }
       ]
     },
@@ -1701,10 +1694,6 @@
         },
         {
           "type": "SYMBOL",
-          "name": "__ampersand"
-        },
-        {
-          "type": "SYMBOL",
           "name": "_placeholder"
         },
         {
@@ -1713,7 +1702,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "htmlEntity"
+          "name": "_htmlEntity_or_ampersand"
         }
       ]
     },
@@ -2257,80 +2246,6 @@
           }
         ]
       }
-    },
-    "__rollQuery_start": {
-      "type": "PREC",
-      "value": "charPair",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "PREC",
-                "value": "charSingle",
-                "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "PATTERN",
-                      "value": "\\?"
-                    },
-                    {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "SYMBOL",
-                          "name": "__AMP_AT_OR_ABOVE_DEPTH"
-                        },
-                        {
-                          "type": "PATTERN",
-                          "value": "#63|#[xX](00)?3[fF]|quest"
-                        },
-                        {
-                          "type": "STRING",
-                          "value": ";"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              },
-              {
-                "type": "PREC",
-                "value": "charSingle",
-                "content": {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "PATTERN",
-                      "value": "\\{"
-                    },
-                    {
-                      "type": "SEQ",
-                      "members": [
-                        {
-                          "type": "SYMBOL",
-                          "name": "__AMP_AT_OR_ABOVE_DEPTH"
-                        },
-                        {
-                          "type": "PATTERN",
-                          "value": "#123|#[xX](00)?7[bB]|lcub|lbrace"
-                        },
-                        {
-                          "type": "STRING",
-                          "value": ";"
-                        }
-                      ]
-                    }
-                  ]
-                }
-              }
-            ]
-          }
-        ]
-      }
     }
   },
   "extras": [],
@@ -2365,11 +2280,11 @@
   "externals": [
     {
       "type": "SYMBOL",
-      "name": "__INCREMENT_DEPTH"
+      "name": "__ROLLQUERY_START"
     },
     {
       "type": "SYMBOL",
-      "name": "__DECREMENT_DEPTH"
+      "name": "__ROLLQUERY_END"
     },
     {
       "type": "SYMBOL",

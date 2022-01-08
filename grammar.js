@@ -89,8 +89,8 @@ module.exports = grammar({
 	name: "roll20_script",
 	
 	externals: $ => [
-		$.__INCREMENT_DEPTH,
-		$.__DECREMENT_DEPTH,
+		$.__ROLLQUERY_START,
+		$.__ROLLQUERY_END,
 		$.__AMP_AT_OR_ABOVE_DEPTH,
 		$.__AMP_AT_DEPTH,
 	],
@@ -165,7 +165,7 @@ module.exports = grammar({
 		script: $ => repeat(choice(
 			$._IrPh,	//attributes, abilities, inline rolls
 			$.hash,
-			$.htmlEntity,
+			$._htmlEntity_or_ampersand,
 			
 			$.rollQuery,
 			
@@ -175,10 +175,15 @@ module.exports = grammar({
 			//ability command button
 			//tracker
 			
-			/./,
+			/[^&]/,
 		)),
 		
 		_wsp: $ => /\s+/,
+		
+		_htmlEntity_or_ampersand: $ => choice(
+			$.__ampersand,
+			$.htmlEntity,
+		),
 		
 		htmlEntity: $ => seq(
 			$.__ampersand,
@@ -570,10 +575,9 @@ module.exports = grammar({
 				$.__rightBrace,
 				$.__leftParen,
 				$.__rightParen,
-				$.__ampersand,
 				$._placeholder,
 				$.hash,
-				$.htmlEntity,
+				$._htmlEntity_or_ampersand,
 			),
 			repeat($._text_label_or_tableRoll),
 		)),
@@ -586,10 +590,9 @@ module.exports = grammar({
 			$.__rightBrace,
 			$.__leftParen,
 			$.__rightParen,
-			$.__ampersand,
 			$._placeholder,
 			$.hash,
-			$.htmlEntity,
+			$._htmlEntity_or_ampersand,
 		),
 		
 		_labels: $ => prec.right(choice(
@@ -675,8 +678,8 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		rollQuery: $ => seq(
-			$.__rollQuery_start,
-			$.__INCREMENT_DEPTH,
+			//$.__rollQuery_start,
+			$.__ROLLQUERY_START,
 			choice(
 				alias($._text_query_prompt_or_defaultValue, $.prompt),
 				seq(
@@ -694,8 +697,8 @@ module.exports = grammar({
 					)),
 				),
 			),
-			$.__rightBrace,
-			$.__DECREMENT_DEPTH,
+			//$.__rightBrace,
+			$.__ROLLQUERY_END,
 		),
 		
 		_text_query: $ => choice(
@@ -703,10 +706,9 @@ module.exports = grammar({
 			$.__leftBrace,
 			$.__leftParen,
 			$.__rightParen,
-			$.__ampersand,
 			$._placeholder,
 			$.hash,
-			$.htmlEntity,
+			$._htmlEntity_or_ampersand,
 		),
 		
 		_text_query_prompt_or_defaultValue: $ => repeat1(choice(
@@ -731,10 +733,9 @@ module.exports = grammar({
 			$.__leftBrace,
 			$.__leftParen,
 			$.__rightParen,
-			$.__ampersand,
 			$._placeholder,
 			$.hash,
-			$.htmlEntity,
+			$._htmlEntity_or_ampersand,
 		),
 		
 		_queryOptionValue: $ => repeat1(choice(
@@ -780,12 +781,12 @@ module.exports = grammar({
 			/\[/,
 			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
 		),
-		__rollQuery_start: $ => prec("charPair", choice(
+		/*__rollQuery_start: $ => prec("charPair", choice(
 			seq(
 				_atOrAboveDepth(/\?/, /#63|#[xX](00)?3[fF]|quest/)($),
 				_atOrAboveDepth(/\{/, /#123|#[xX](00)?7[bB]|lcub|lbrace/)($),
 			),
-		)),
+		)),*/
 		
 		
 	},

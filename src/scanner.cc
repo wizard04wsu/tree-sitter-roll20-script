@@ -9,15 +9,15 @@ using namespace std;
 
 
 enum TokenType {
-	INCREMENT_DEPTH,
-	DECREMENT_DEPTH,
+	ROLLQUERY_START,
+	ROLLQUERY_END,
 	AMP_AT_OR_ABOVE_DEPTH,
 	AMP_AT_DEPTH,
 };
 
 
 //For debugging:
-const bool debugging = false;
+const bool debugging = true;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	noChange=0,
@@ -66,8 +66,8 @@ void logFunction(string functionName) { log(color(magenta)+functionName); }
 void logValidSymbols(const bool *valid_symbols) {
 	if (!debugging || !log_valid_symbols) return;
 	cout << color(darkGray) //<< "Valid symbols:" << "\n"
-		 << (valid_symbols[INCREMENT_DEPTH]?"INCREMENT_DEPTH, ":"")
-		 << (valid_symbols[DECREMENT_DEPTH]?"DECREMENT_DEPTH, ":"")
+		 << (valid_symbols[ROLLQUERY_START]?"ROLLQUERY_START, ":"")
+		 << (valid_symbols[ROLLQUERY_END]?"ROLLQUERY_END, ":"")
 		 << (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]?"AMP_AT_OR_ABOVE_DEPTH, ":"")
 		 << (valid_symbols[AMP_AT_DEPTH]?"AMP_AT_DEPTH, ":"")
 		 << "\n";
@@ -88,10 +88,34 @@ void mark_end(TSLexer *lexer) {
 }
 
 
+int getAmps(TSLexer *lexer, int depth) {
+	string entityName = "";
+	int amps = 0;
+	int max = depth == -1 ? 0 : depth;
+	char c = lexer->lookahead;
+	
+	while (amps < max) {
+		while (c != ';' && c != 0 && entityName.length() < 50) {
+			entityName += c;
+			c = advance(lexer);
+		}
+		if (c == ';' && regex_match(entityName, regex("amp|AMP|#38|#[xX](00)?26"))) {
+			c = advance(lexer);
+			mark_end(lexer);
+			amps++;
+		}
+		else {
+			break;
+		}
+	}
+	
+	return amps;
+}
+
 struct Scanner {
 	Scanner() {}
 	
-	unsigned depth = -1;
+	int depth = -1;
 
 	void logTokenType(TSLexer *lexer, string tokenType, bool noMatch = false) {
 		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
@@ -137,44 +161,92 @@ struct Scanner {
 		char c = lexer->lookahead;
 		mark_end(lexer);
 		
-		unsigned amps = depth-1;
+		int amps = 0;
 		string entityName = "";
 		
-		if (valid_symbols[INCREMENT_DEPTH]) {
-			depth++;
-			return match_found(lexer, INCREMENT_DEPTH, "INCREMENT_DEPTH");
-		}
-		else if (valid_symbols[DECREMENT_DEPTH]) {
-			depth--;
-			return match_found(lexer, DECREMENT_DEPTH, "DECREMENT_DEPTH");
-		}
-		else if (c == '&' && (
-		 (depth >= 0 && valid_symbols[AMP_AT_OR_ABOVE_DEPTH])
-		 || (depth >= 1 && valid_symbols[AMP_AT_DEPTH])
-		)) {
-			c = advance(lexer);
-			mark_end(lexer);
-			
-			while (amps > 0) {
-				while (c != ';' && c != 0) {
+		if (c == '&') {
+			if (depth >= 0 && valid_symbols[ROLLQUERY_START]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				amps = getAmps(lexer, depth);
+				while (c != ';' && c != 0 && entityName.length() < 50) {
 					entityName += c;
 					c = advance(lexer);
 				}
-				if (c == ';' && regex_match(entityName, regex("amp|AMP|#38|#[xX](00)?26"))) {
+				if (c == ';' && regex_match(entityName, regex("#63|#[xX](00)?3[fF]|quest"))) {
 					c = advance(lexer);
 					mark_end(lexer);
-					amps--;
-				}
-				else {
-					break;
+					
+					if (c == '&') {
+						advance(lexer);
+						mark_end(lexer);
+						
+						entityName = "";
+						amps = getAmps(lexer, depth);
+						while (c != ';' && c != 0 && entityName.length() < 50) {
+							entityName += c;
+							c = advance(lexer);
+						}
+						if (c == ';' && regex_match(entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
+							advance(lexer);
+							mark_end(lexer);
+							
+							depth++;
+							return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START (depth "+to_string(depth)+")");
+						}
+					}
+					else if (c == '{') {
+						advance(lexer);
+						mark_end(lexer);
+						
+						depth++;
+						return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START (depth "+to_string(depth)+")");
+					}
 				}
 			}
-			
-			if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]) {
-				return match_found(lexer, AMP_AT_OR_ABOVE_DEPTH, "AMP_AT_OR_ABOVE_DEPTH (depth "+to_string(depth)+")");
+			else if (depth > 0 && valid_symbols[ROLLQUERY_END]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				amps = getAmps(lexer, depth);
+				while (c != ';' && c != 0 && entityName.length() < 50) {
+					entityName += c;
+					c = advance(lexer);
+				}
+				if (c == ';' && amps == depth-1 && regex_match(entityName, regex("#125|#[xX](00)?7[dD]|rcub|rbrace"))) {
+					c = advance(lexer);
+					mark_end(lexer);
+					
+					depth--;
+					return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END (depth "+to_string(depth)+")");
+				}
 			}
-			else if (valid_symbols[AMP_AT_DEPTH] && amps == 0) {
-				return match_found(lexer, AMP_AT_DEPTH, "AMP_AT_DEPTH (depth "+to_string(depth)+")");
+			else if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH] || valid_symbols[AMP_AT_DEPTH]) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				amps = getAmps(lexer, depth);
+				if (amps >= depth && valid_symbols[AMP_AT_DEPTH]) {
+					return match_found(lexer, AMP_AT_DEPTH, "AMP_AT_DEPTH (depth "+to_string(depth)+")");
+				}
+				else if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]) {
+					return match_found(lexer, AMP_AT_OR_ABOVE_DEPTH, "AMP_AT_OR_ABOVE_DEPTH (depth "+to_string(depth)+")");
+				}
+			}
+		}
+		else if (c == '?') {
+			if (valid_symbols[ROLLQUERY_START]) {
+				//TODO
+			}
+		}
+		else if (c == '}') {
+			if (valid_symbols[ROLLQUERY_END] && depth == 0) {
+				advance(lexer);
+				mark_end(lexer);
+				
+				depth--;
+				return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END (depth "+to_string(depth)+")");
 			}
 		}
 		
