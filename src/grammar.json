@@ -47,42 +47,8 @@
       ]
     },
     "htmlEntity": {
-      "type": "SEQ",
-      "members": [
-        {
-          "type": "SYMBOL",
-          "name": "__ampersand"
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "PATTERN",
-              "value": "[0-9a-zA-Z]+"
-            },
-            {
-              "type": "TOKEN",
-              "content": {
-                "type": "SEQ",
-                "members": [
-                  {
-                    "type": "STRING",
-                    "value": "#"
-                  },
-                  {
-                    "type": "PATTERN",
-                    "value": "\\d+|[xX][0-9a-fA-F]+"
-                  }
-                ]
-              }
-            }
-          ]
-        },
-        {
-          "type": "STRING",
-          "value": ";"
-        }
-      ]
+      "type": "SYMBOL",
+      "name": "__HTML_ENTITY"
     },
     "_placeholder": {
       "type": "CHOICE",
@@ -1467,7 +1433,7 @@
                 },
                 {
                   "type": "SYMBOL",
-                  "name": "__pipe"
+                  "name": "__ROLLQUERY_PIPE"
                 },
                 {
                   "type": "CHOICE",
@@ -1511,7 +1477,7 @@
                                 "members": [
                                   {
                                     "type": "SYMBOL",
-                                    "name": "__pipe"
+                                    "name": "__ROLLQUERY_PIPE"
                                   },
                                   {
                                     "type": "CHOICE",
@@ -1993,34 +1959,17 @@
       }
     },
     "__ampersand": {
-      "type": "PREC",
-      "value": "charSingle",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "PATTERN",
-            "value": "&"
-          },
-          {
-            "type": "SEQ",
-            "members": [
-              {
-                "type": "SYMBOL",
-                "name": "__AMP_AT_DEPTH"
-              },
-              {
-                "type": "PATTERN",
-                "value": "#38|#[xX](00)?26|amp|AMP"
-              },
-              {
-                "type": "STRING",
-                "value": ";"
-              }
-            ]
-          }
-        ]
-      }
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "__AMP_AT_DEPTH"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "__AMP_AT_OR_ABOVE_DEPTH"
+        }
+      ]
     },
     "__inlineRoll_start": {
       "type": "PREC",
@@ -2284,6 +2233,10 @@
     },
     {
       "type": "SYMBOL",
+      "name": "__ROLLQUERY_PIPE"
+    },
+    {
+      "type": "SYMBOL",
       "name": "__ROLLQUERY_END"
     },
     {
@@ -2293,6 +2246,10 @@
     {
       "type": "SYMBOL",
       "name": "__AMP_AT_DEPTH"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__HTML_ENTITY"
     }
   ],
   "inline": [],
