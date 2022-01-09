@@ -14,6 +14,7 @@ const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 enum TokenType {
 	ROLLQUERY_START,
 	ROLLQUERY_PIPE,
+	ROLLQUERY_COMMA,
 	ROLLQUERY_END,
 	AMP_AT_OR_ABOVE_DEPTH,
 	AMP_AT_DEPTH,
@@ -22,7 +23,7 @@ enum TokenType {
 
 
 //For debugging:
-const bool debugging = true;
+const bool debugging = false;
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	noChange=0,
@@ -73,6 +74,7 @@ void logValidSymbols(const bool *valid_symbols) {
 	cout << color(darkGray) //<< "Valid symbols:" << "\n"
 		 << (valid_symbols[ROLLQUERY_START]?"ROLLQUERY_START, ":"")
 		 << (valid_symbols[ROLLQUERY_PIPE]?"ROLLQUERY_PIPE, ":"")
+		 << (valid_symbols[ROLLQUERY_COMMA]?"ROLLQUERY_COMMA, ":"")
 		 << (valid_symbols[ROLLQUERY_END]?"ROLLQUERY_END, ":"")
 		 << (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]?"AMP_AT_OR_ABOVE_DEPTH, ":"")
 		 << (valid_symbols[AMP_AT_DEPTH]?"AMP_AT_DEPTH, ":"")
@@ -176,7 +178,7 @@ struct Scanner {
 			c = advance(lexer);
 			mark_end(lexer);
 			
-			if (valid_symbols[HTML_ENTITY] || valid_symbols[ROLLQUERY_START] || valid_symbols[ROLLQUERY_PIPE] || valid_symbols[ROLLQUERY_END]) {
+			if (valid_symbols[HTML_ENTITY] || valid_symbols[ROLLQUERY_START] || valid_symbols[ROLLQUERY_PIPE] || valid_symbols[ROLLQUERY_COMMA] || valid_symbols[ROLLQUERY_END]) {
 				ampCount = getAmps(lexer, depth, entityName);
 				c = lexer->lookahead;
 				
@@ -193,6 +195,10 @@ struct Scanner {
 						depth--;
 						log(color(magenta)+"Depth decremented: "+to_string(depth));
 						return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END");
+					}
+					
+					else if (valid_symbols[ROLLQUERY_COMMA] && depth > 0 && regex_match(entityName, regex("#44|#[xX](00)?2[cC]|comma"))) {
+						return match_found(lexer, ROLLQUERY_COMMA, "ROLLQUERY_COMMA");
 					}
 					
 					else if (valid_symbols[ROLLQUERY_PIPE] && depth > 0 && regex_match(entityName, regex("#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))) {
@@ -259,6 +265,15 @@ struct Scanner {
 				depth--;
 				log(color(magenta)+"Depth decremented: "+to_string(depth));
 				return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END");
+			}
+		}
+		
+		else if (c == ',') {
+			c = advance(lexer);
+			mark_end(lexer);
+			
+			if (valid_symbols[ROLLQUERY_COMMA] && depth == 0) {
+				return match_found(lexer, ROLLQUERY_COMMA, "ROLLQUERY_COMMA");
 			}
 		}
 		
