@@ -91,6 +91,7 @@ module.exports = grammar({
 	externals: $ => [
 		$.__ROLLQUERY_START,
 		$.__ROLLQUERY_PIPE,
+		$.__ROLLQUERY_COMMA,
 		$.__ROLLQUERY_END,
 		$.__AMP_AT_OR_ABOVE_DEPTH,
 		$.__AMP_AT_DEPTH,
@@ -710,7 +711,7 @@ module.exports = grammar({
 			alias($._queryOptionName, $.optionName),
 			seq(
 				optional(alias($._queryOptionName, $.optionName)),
-				$.__comma,
+				$.__ROLLQUERY_COMMA,
 				optional(alias($._queryOptionValue, $.optionValue)),
 			),
 		)),

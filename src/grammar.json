@@ -1604,7 +1604,7 @@
               },
               {
                 "type": "SYMBOL",
-                "name": "__comma"
+                "name": "__ROLLQUERY_COMMA"
               },
               {
                 "type": "CHOICE",
@@ -2234,6 +2234,10 @@
     {
       "type": "SYMBOL",
       "name": "__ROLLQUERY_PIPE"
+    },
+    {
+      "type": "SYMBOL",
+      "name": "__ROLLQUERY_COMMA"
     },
     {
       "type": "SYMBOL",
