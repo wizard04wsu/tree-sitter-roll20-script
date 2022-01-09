@@ -4,11 +4,11 @@ Number: [[5]]
 [[5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ 5 ]]
@@ -16,11 +16,11 @@ Number: [[ 5 ]]
 [[ 5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[42]]
@@ -28,11 +28,11 @@ Number: [[42]]
 [[42]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ 42 ]]
@@ -40,11 +40,11 @@ Number: [[ 42 ]]
 [[ 42 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[5.5]]
@@ -52,11 +52,11 @@ Number: [[5.5]]
 [[5.5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ 5.5 ]]
@@ -64,11 +64,11 @@ Number: [[ 5.5 ]]
 [[ 5.5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[42.42]]
@@ -76,11 +76,11 @@ Number: [[42.42]]
 [[42.42]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ 42.42 ]]
@@ -88,11 +88,11 @@ Number: [[ 42.42 ]]
 [[ 42.42 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[-5]]
@@ -100,12 +100,12 @@ Number: [[-5]]
 [[-5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ -5 ]]
@@ -113,12 +113,12 @@ Number: [[ -5 ]]
 [[ -5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[-42.42]]
@@ -126,12 +126,12 @@ Number: [[-42.42]]
 [[-42.42]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ -42.42 ]]
@@ -139,12 +139,12 @@ Number: [[ -42.42 ]]
 [[ -42.42 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[+5]]
@@ -152,12 +152,12 @@ Number: [[+5]]
 [[+5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ +5 ]]
@@ -165,12 +165,12 @@ Number: [[ +5 ]]
 [[ +5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
 			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[+42.42]]
@@ -178,12 +178,12 @@ Number: [[+42.42]]
 [[+42.42]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ +42.42 ]]
@@ -191,12 +191,12 @@ Number: [[ +42.42 ]]
 [[ +42.42 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
 			(operator)
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[.5]]
@@ -204,11 +204,11 @@ Number: [[.5]]
 [[.5]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
 ==================
 Number: [[ .5 ]]
@@ -216,28 +216,9 @@ Number: [[ .5 ]]
 [[ .5 ]]
 ---
 (script
-	(inlineRoll (delimiter) (formula
+	(inlineRoll (formula
 		(term
-			(number (decimalPoint))
+			(number)
 		)
-	) (delimiter)))
+	)))
 
-
-
-
-
-
-==================
-Number: [[5d6]]
-==================
-[[5d6]]
----
-(script
- 	(inlineRoll (delimiter) (formula
-		(term
-			(diceRoll
-				(count (number))
-				(delimiter)
-				(sides (number)))
-		)
-	) (delimiter)))
