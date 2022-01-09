@@ -1,0 +1,79 @@
+==================
+Math Function: [[abs(5)]]
+==================
+[[abs(5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(function (name) (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Math Function: [[ abs( 5 ) ]]
+==================
+[[ abs( 5 ) ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(function (name) (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Math Function: [[ceil(5)]]
+==================
+[[ceil(5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(function (name) (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Math Function: [[floor(5)]]
+==================
+[[floor(5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(function (name) (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Math Function: [[round(5)]]
+==================
+[[round(5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(function (name) (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))

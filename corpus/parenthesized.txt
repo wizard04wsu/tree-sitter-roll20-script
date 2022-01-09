@@ -1,0 +1,113 @@
+==================
+Parenthesized: [[(5)]]
+==================
+[[(5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(parenthesized (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Parenthesized: [[ ( 5 ) ]]
+==================
+[[ ( 5 ) ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(parenthesized (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Parenthesized: [[(-5-5)]]
+==================
+[[(-5-5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(parenthesized (formula
+				(term
+					(operator)
+					(number)
+				)
+				(operator)
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Parenthesized: [[ ( -5 - 5 ) ]]
+==================
+[[ ( -5 - 5 ) ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(parenthesized (formula
+				(term
+					(operator)
+					(number)
+				)
+				(operator)
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Parenthesized: [[5+(5)]]
+==================
+[[5+(5)]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(parenthesized (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))
+
+==================
+Parenthesized: [[ 5 + ( 5 ) ]]
+==================
+[[ 5 + ( 5 ) ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(parenthesized (formula
+				(term
+					(number)
+				)
+			))
+		)
+	)))

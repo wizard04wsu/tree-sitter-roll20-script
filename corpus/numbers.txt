@@ -1,489 +1,224 @@
 ==================
-Signed Number: Valid: [[55.55]]
+Number: [[5]]
 ==================
-
-[[55.55]]
-
+[[5]]
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[5.5]]
+Number: [[ 5 ]]
 ==================
+[[ 5 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
+==================
+Number: [[42]]
+==================
+[[42]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
+
+==================
+Number: [[ 42 ]]
+==================
+[[ 42 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
+
+==================
+Number: [[5.5]]
+==================
 [[5.5]]
-
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[ 5.5 ]]
+Number: [[ 5.5 ]]
 ==================
-
 [[ 5.5 ]]
-
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[-5.5]]
+Number: [[42.42]]
 ==================
-
-[[-5.5]]
-
+[[42.42]]
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[ -5.5 ]]
+Number: [[ 42.42 ]]
 ==================
-
-[[ -5.5 ]]
-
+[[ 42.42 ]]
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[+5]]
+Number: [[-5]]
 ==================
+[[-5]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
 
+==================
+Number: [[ -5 ]]
+==================
+[[ -5 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
+
+==================
+Number: [[-42.42]]
+==================
+[[-42.42]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
+
+==================
+Number: [[ -42.42 ]]
+==================
+[[ -42.42 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
+
+==================
+Number: [[+5]]
+==================
 [[+5]]
-
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[ +5 ]]
+Number: [[ +5 ]]
 ==================
-
 [[ +5 ]]
-
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[.5]]
+Number: [[+42.42]]
 ==================
+[[+42.42]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
 
+==================
+Number: [[ +42.42 ]]
+==================
+[[ +42.42 ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(operator)
+			(number)
+		)
+	)))
+
+==================
+Number: [[.5]]
+==================
 [[.5]]
-
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 
 ==================
-Signed Number: Valid: [[ .5 ]]
+Number: [[ .5 ]]
 ==================
-
 [[ .5 ]]
-
 ---
-
-(roll20_script
-	(inlineRoll
-		(number)))
-
-==================
-Signed Number: Invalid: [[-.5]]
-==================
-
-[[-.5]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[ -.5 ]]
-==================
-
-[[ -.5 ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5_]]
-==================
-
-[[5_]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[ 5_ ]]
-==================
-
-[[ 5_ ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[-5_]]
-==================
-
-[[-5_]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[ -5_ ]]
-==================
-
-[[ -5_ ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5.]]
-==================
-
-[[5.]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[ 5. ]]
-==================
-
-[[ 5. ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[-5.]]
-==================
-
-[[-5.]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[ -5. ]]
-==================
-
-[[ -5. ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5._]]
-==================
-
-[[5._]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[ 5._ ]]
-==================
-
-[[ 5._ ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[-5._]]
-==================
-
-[[-5._]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[ -5._ ]]
-==================
-
-[[ -5._ ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5.5.]]
-==================
-
-[[5.5.]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5.5_]]
-==================
-
-[[5.5_]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[-5.5.]]
-==================
-
-[[-5.5.]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[-5.5_]]
-==================
-
-[[-5.5_]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[.]]
-==================
-
-[[.]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[ . ]]
-==================
-
-[[ . ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[-.]]
-==================
-
-[[-.]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[ -. ]]
-==================
-
-[[ -. ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[._]]
-==================
-
-[[._]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[ ._ ]]
-==================
-
-[[ ._ ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[-._]]
-==================
-
-[[-._]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Invalid: [[ -._ ]]
-==================
-
-[[ -._ ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5d]]
-==================
-
-[[5d]]
-
----
-
-(roll20_script
- 	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[5d_]]
-==================
-
-[[5d_]]
-
----
-
-(roll20_script
- 	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Signed Number: Valid with Invalid Remainder: [[-5d6]]
-==================
-
-[[-5d6]]
-
----
-
-(roll20_script
- 	(inlineRoll
-		(number)
-		(invalid)))
-
-==================
-Inline Roll: Valid: [[5d6]]
-==================
-
-[[5d6]]
-
----
-
-(roll20_script
- 	(inlineRoll
-		(diceRoll
-			(count)
-			(sides))))
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+	)))
 

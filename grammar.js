@@ -1,216 +1,225 @@
-let depth = 0;
-let escapes = {
-	htmlCharacter: "[a-zA-Z\\d]+|#\\d+|#[xX]([a-fA-F\\d]{2}){1,2}",
-	
-	questionMark: "quest|#63|#[xX](00)?3[fF]",
-	equals: "equals|#61|#[xX](00)?3[dD]",
-	leftBracket: "lsqb|lbrack|#91|#[xX](00)?5[bB]",
-	rightBracket: "rsqb|rbrack|#93|#[xX](00)?5[dD]?",
-	plus: "plus|#43|#[xX](00)?2[bB]",
-	minus: "hyphen|dash|#8208|#[xX]2010",
-	digit: "#4[89]|#5[0-7]|#[xX](00)?3[0-9]",
-	
-	leftBrace: "lbrace|lcub|#123|#[xX](00)?7[bB]",
-	rightBrace: "rbrace|rcub|#125|#[xX](00)?7[dD]",
-	pipe: "verbar|vert|VerticalLine|#124|#[xX](00)?7[cC]",
-	comma: "comma|#44|#[xX](00)?2[cC]",
-	ampersand: "amp|AMP|#38|#[xX](00)?26",
-	at: "commat|#64|#[xX](00)?40",
-	percent: "percnt|#37|#[xX](00)?25",
-	hash: "num|#35|#[xX](00)?23",
-	leftParen: "lpar|#40|#[xX](00)?28",
-	rightParen: "rpar|#41|#[xX](00)?29",
-	tilde: "#126|#[xX](00)?7[eE]",
-};
-
-const escapedAtDepth = (escapeString) => {
-	return RegExp("&(("+escapes.ampersand+");){" + (depth) + "}(" + escapeString + ");");
-};
-const unescapedAtDepth = (char, escapeString) => {
-	if(!depth) return RegExp(char);
-	return RegExp("&(("+escapes.ampersand+");){" + (depth-1) + "}(" + escapeString + ");");
-};
-const unescapedAtDepthOrAbove = (char, escapeString) => {
-	if(!depth) return RegExp(char);
-	return RegExp(char + "|&(("+escapes.ampersand+");){0," + (depth-1) + "}(" + escapeString + ");");
-};
+const _debugging = true;
+function debugAlias(theToken, aliasToken, fieldName){
+	if(!_debugging) return theToken;
+	if(fieldName !== void 0){
+		fieldName = fieldName.toString().replace(/^(\w+).*/, "$1");
+		if(fieldName){
+			return field(fieldName, alias(theToken, aliasToken));
+		}
+	}
+	return alias(theToken, aliasToken);
+}
 
 
-const chainOf = (rule) => prec.right(repeat1(rule));
 
+function _atDepth(rxpChar, rxpHtmlEscape){
+	return $ => prec("charSingle", choice(
+		rxpChar,
+		seq(
+			$.__AMP_AT_DEPTH,
+			rxpHtmlEscape,
+			";",
+		),
+	));
+}
+function _atOrAboveDepth(rxpChar, rxpHtmlEscape){
+	return $ => prec("charSingle", choice(
+		rxpChar,
+		seq(
+			$.__AMP_AT_OR_ABOVE_DEPTH,
+			rxpHtmlEscape,
+			";",
+		),
+	));
+}
+function _atDepth_pair(rxpPair, rxpChar1, rxpHtmlEscape1, rxpChar2, rxpHtmlEscape2){
+	return $ => prec("charPair", choice(
+		seq(
+			rxpPair,
+		),
+		seq(
+			choice(
+				rxpChar1,
+				seq(
+					$.__AMP_AT_DEPTH,
+					rxpHtmlEscape1,
+					";",
+				),
+			),
+			choice(
+				rxpChar2,
+				seq(
+					$.__AMP_AT_DEPTH,
+					rxpHtmlEscape2,
+					";",
+				),
+			),
+		),
+	));
+}
+function _atOrAboveDepth_pair(rxpPair, rxpChar1, rxpHtmlEscape1, rxpChar2, rxpHtmlEscape2){
+	return $ => prec("charPair", choice(
+		seq(
+			rxpPair,
+		),
+		seq(
+			choice(
+				rxpChar1,
+				seq(
+					$.__AMP_AT_OR_ABOVE_DEPTH,
+					rxpHtmlEscape1,
+					";",
+				),
+			),
+			choice(
+				rxpChar2,
+				seq(
+					$.__AMP_AT_OR_ABOVE_DEPTH,
+					rxpHtmlEscape2,
+					";",
+				),
+			),
+		),
+	));
+}
 
-const queryBegin = () => {
-	if(!depth) return /\?\{/;
-	return RegExp("\\?\\{|&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.questionMark+");&(("+escapes.ampersand+");){0,"+(depth-1)+"}("+escapes.leftBrace+");");
-};
 
 
 module.exports = grammar({
-	name: 'roll20_script',
+	name: "roll20_script",
 	
 	externals: $ => [
-		$.__EOF,					// (no content) determines if there are no more tokens
-		
-		$.__attribute_start,		// returns "@" if it begins an attribute
-		$.__just_at,				// returns "@" if it does *not* begin an attribute
-		
-		$.__ability_start,			// returns "%" if it begins an ability
-		$.__just_percent,			// returns "%" if it does *not* begin an ability
-		
-		$.__diceRoll_start,			// returns "d" or "D" if it begins a dice roll
-		$.__just_d,					// returns "d" or "D" if it does *not* begin a dice roll
-		
-		$.__tableRoll_start,		// returns "t" or "T" if it begins a table roll
-		$.__just_t,					// returns "t" or "T" if it does *not* begin a table roll
+		$.__ROLLQUERY_START,
+		$.__ROLLQUERY_PIPE,
+		$.__ROLLQUERY_COMMA,
+		$.__ROLLQUERY_END,
+		$.__AMP_AT_OR_ABOVE_DEPTH,
+		$.__AMP_AT_DEPTH,
+		$.__HTML_ENTITY,
 	],
 	
-	extras: $ => [
-		//(manually handle whitespace)
+	extras: $ => [],
+	
+	//supertypes: $ => [],
+	
+	//inline: $ => [],
+	
+	precedences: $ => [
+		[
+			"multiplication",
+			"summation",
+		],
+		[
+			"charPair",
+			"charSingle",
+		],
 	],
 	
-	conflicts: $ => [],
-	
-	inline: $ => [
-		$.formula,
+	conflicts: $ => [
+		[ $.rollQuery, $._queryOption, ],
 	],
+	
+	//word: $ => $.___,
 	
 	rules: {
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Start rule
-		  ╚╤═══════════════════════════════════════════════════════════
-		   │ Roll20 seems to evaluate script elements in this order:
+		  ║ General Notes
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Roll20 appears to evaluate script elements in this order:
 		   │ 1. abilities
-		   │ 2. attributes
-		   │ 3. macros
-		   │ 4. attributes (again)
-		   │ 5. formulas (most-nested first)
+		   │ 2. macros (skip ones that have an attribute in their name)
+		   │ 3. attributes
+		   │ 4. repeat steps 1 to 3 if necessary
+		   │ 5. roll queries
+		   │    a. prompt for a value or a choice from a dropdown box
+		   │    b. if a dropdown box was used, unescape HTML character entities
+		   │       in the option value (once)
+		   │    c. repeat step 5 if needed
+		   │ 6. inline rolls (most deeply nested first)
+		   │    a. group rolls (most deeply nested first)
+		   │       i. rolls (dice, table)
+		   │       ii. repeat step 6.a if needed
+		   │    b. remaining rolls (dice, table)
+		   │    c. math (order of operations is below)
+		   │    d. repeat step 6 if needed
+		   │ 7. remaining group rolls (most deeply nested first)
+		   │    a. rolls (dice, table)
+		   │    b. repeat step 7 if needed
+		   │ 8. remaining rolls (dice, table)
+		   │ 9. math
+		   │ 
+		   │ Order of math operations:
+		   │ 1. parentheses (most deeply nested first)
+		   │    a. floor/ceil/abs/round functions (most deeply nested first)
+		   │       i.   exponentiation
+		   │       ii.  multiplication, division, modulus
+		   │       iii. addition, subtraction
+		   │       iv.  repeat step 1.a as needed
+		   │    b. repeat step 1 as needed
+		   │ 3. unescape HTML character entities (again)
 		   └───────────────────────────────────────────────────────────*/
 		
-		roll20_script: $ => prec.right(repeat(
-			choice(
-				$._stringNL,
-				$.attribute,
-				$.ability,
-				$._macro_spaceNL,
-				$._inlineRoll,
-				//TODO:
-				//query
-				//template
-				//property
-				//button	//ability command button
-				//tracker
-			),
-		)),
-		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Strings and Special Characters
+		  ║ Start Rule, Basics
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		/*┌──────────────────────────────
-		  │ Strings
-		  └──────────────────────────────*/
+		script: $ => repeat(choice(
+			$._IrPh,	//attributes, abilities, inline rolls
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			
+			$.rollQuery,
+			
+			//TODO:
+			//template
+			//property
+			//ability command button
+			//tracker
+			
+			/[^&]/,
+		)),
 		
-		_string: $ => chainOf(/.|# /),
-		_stringNL: $ => chainOf(/.|# |#?\r?\n/),
+		_wsp: $ => /\s+/,
 		
-		_wsp_inline: $ => /\s+/,
+		_htmlEntity_or_ampersand: $ => choice(
+			$.__ampersand,
+			$.htmlEntity,
+		),
 		
-		
-		/*┌──────────────────────────────
-		  │ Special Characters
-		  └──────────────────────────────*/
-		
-		_questionMark: $ => unescapedAtDepthOrAbove("\\?", escapes.questionMark),
-		_leftBrace: $ => unescapedAtDepthOrAbove("\\{", escapes.leftBrace),
-		_equals: $ => unescapedAtDepthOrAbove("=", escapes.equals),
-		_leftBracket: $ => unescapedAtDepthOrAbove("\\[", escapes.leftBracket),
-		_rightBracket: $ => unescapedAtDepthOrAbove("\\]", escapes.rightBracket),
-		_plus: $ => unescapedAtDepthOrAbove("\\+", escapes.plus),
-		_minus: $ => unescapedAtDepthOrAbove("\\-", escapes.minus),
-		_leftParen: $ => unescapedAtDepthOrAbove("\\(", escapes.leftParen),
-		_rightParen: $ => unescapedAtDepthOrAbove("\\)", escapes.rightParen),
-		_tilde: $ => unescapedAtDepthOrAbove("~", escapes.tilde),
-		
-		_rightBrace: $ => unescapedAtDepth("\\}", escapes.rightBrace),
-		_pipe: $ => unescapedAtDepth("\\|", escapes.pipe),
-		_comma: $ => unescapedAtDepth(",", escapes.comma),
-		_ampersand: $ => unescapedAtDepth("&", escapes.ampersand),
-		_at: $ => unescapedAtDepth("@", escapes.at),
-		_percent: $ => unescapedAtDepth("%", escapes.percent),
-		_hash: $ => unescapedAtDepth("#", escapes.hash),
-		
-		_escapedCharacter: $ => escapedAtDepth(escapes.htmlCharacter),
+		htmlEntity: $ => $.__HTML_ENTITY,
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Attributes, Abilities, and Macros
-		  ╚════════════════════════════════════════════════════════════
+		  ║ Attributes (getters), Abilities (methods)
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ In this grammar, these are collectively referred to as "placeholders".
+		   └───────────────────────────────────────────────────────────*/
 		
-		/*┌──────────────────────────────
-		  │ helper rules
-		  └┬─────────────────────────────
-		   │ Note that the website sometimes allows special characters in
-		   │   names, even though it would prevent the property from being
-		   │   accessed from within a script.
-		   └─────────────────────────────*/
+		_placeholder: $ => choice(
+			$._attribute,
+			$.ability,
+		),
 		
-		_tokenSelector: $ => choice(
-			alias("selected", $.token),
-			alias("target", $.token),
+		character_token_identifier: $ => choice(
+			field("target", "target"),
+			field("selected", "selected"),
 		),
-		_propertyName: $ => choice(
-			/[@%]/,
-			seq(
-				prec.right(repeat1(choice(
-					/[^|}\r\n@%]+/,
-					/[@%]+[^|}\r\n@%{]/,
-					alias(/[@%]\{/, $.invalid),
-				))),
-				optional(/[@%]/),
-			),
-		),
-		_propertyNameWithMacros: $ => choice(
-			/[@%#]/,
-			seq(
-				prec.right(repeat1(choice(
-					/[^|}\r\n@%#]+/,
-					/[@%]+[^|}\r\n@%#{]/,
-					seq( optional(/[@%]/), alias($._macroInsideAttributeName, $.macro), " " ),
-					"# ",
-					alias(/[@%]\{/, $.invalid),
-				))),
-				optional(choice(
-					/[@%#]/,
-					alias($._macroInsideAttributeName, ""),
-				)),
-			),
-		),
-		_selector: $ => choice(
-			$._tokenSelector,
-			alias($._propertyName, $.characterName),
-		),
-		_selectorWithMacros: $ => prec(1, choice(
-			$._tokenSelector,
-			alias($._propertyNameWithMacros, $.characterName),
-		)),
-		
-		_placeholders: $ => prec.right(repeat1(choice( $.attribute, $.ability ))),
 		
 		
 		/*┌──────────────────────────────
 		  │ Attribute
-		  └┬─────────────────────────────
-		   │ For an attribute, the character name and/or attribute name:
+		  └┬─────────────────────────────*/
+		 /*│ For an attribute, the character name and/or attribute name:
 		   │ • can contain spaces and tabs.
 		   │ • cannot contain new lines, pipes, closing curly braces, or the
 		   │   character sequences "@{" and "%{".
-		   │ • cannot be injected with attributes or abilities.
-		   │ • can be injected with macros, but the space required after each
-		   │   macro name must also be part of the character/attribute
-		   │   name itself. (So the name has to have a space in it for each
-		   │   macro you want to inject.)
+		   │ • cannot include attributes or abilities.
+		   │ • can include macros, but the space required after each macro name
+		   │   must also be part of the character/attribute name itself. (So the
+		   │   name has to have a space in it for each macro you want to
+		   │   include.)
 		   │ • can contain hash characters that do not reference an existing
 		   │   macro.
 		   │ 
@@ -223,448 +232,398 @@ module.exports = grammar({
 		   │ @{characterName|attributeName|max}
 		   └─────────────────────────────*/
 		
-		attribute: $ => choice(
-			alias($._attribute_empty, $.invalid),
-			seq(
-				$.__attribute_start,
-				"{",
-				$._attribute,
-				"}",
-			),
-			alias("@{", $.invalid),
-		),
-		_attribute_empty: $ => seq( $.__attribute_start, "{}" ),
 		_attribute: $ => choice(
-			alias($._propertyNameWithMacros, $.attributeName),
-			seq(
-				$._selectorWithMacros,
-				"|",
-				choice(
-					alias($._propertyNameWithMacros, $.attributeName),
-					seq(
-						alias($._propertyNameWithMacros, $.attributeName),
-						"|",
-						choice(
-							alias("max", $.keyword),
-							alias(/max[^}]+/, $.invalid),
-							alias(chainOf(/[^}]/), $.invalid),
-						),
-					),
-					seq(
-						alias($._propertyNameWithMacros, $.attributeName),
-						alias("|", $.invalid),
-					),
-					alias(chainOf(/[^}]/), $.invalid),
-				),
-			),
-			seq(
-				$._selectorWithMacros,
-				alias("|", $.invalid),
-			),
-			alias(chainOf(/[^}]/), $.invalid),
+			$.attribute,
+			alias($._attribute_of_character, $.attribute),
+			alias($._attribute_of_character_maximum, $.attribute_maximum),
 		),
+		attribute: $ => seq(
+			"@{",
+			$.attribute_identifier,
+			"}",
+		),
+		_attribute_of_character: $ => seq(
+			"@{",
+			choice(
+				$.character_token_identifier,
+				alias($.attribute_identifier, $.character_identifier),
+			),
+			"|",
+			$.attribute_identifier,
+			"}",
+		),
+		_attribute_of_character_maximum: $ => seq(
+			"@{",
+			choice(
+				$.character_token_identifier,
+				alias($.attribute_identifier, $.character_identifier),
+			),
+			"|",
+			$.attribute_identifier,
+			"|max}",
+		),
+		
+		attribute_identifier: $ => repeat1(choice(
+			$.htmlEntity,
+			$.hash,
+			token(choice(
+				/\{+/,
+				/\{*[@%]+/,
+				seq(
+					choice(
+						/[^@%#{|}\r\n]+/,
+						repeat1(seq(
+							choice(
+								/\{+/,
+								/\{*[@%]+/,
+							),
+							/[^@%#{|}\r\n]+/,
+						)),
+					),
+					/\{*[@%]*/,
+				),
+			)),
+		)),
 		
 		
 		/*┌──────────────────────────────
 		  │ Ability
-		  └┬─────────────────────────────
-		   │ For an ability, the character name and/or ability name:
+		  └┬─────────────────────────────*/
+		 /*│ For an ability, the character name and/or ability name:
 		   │ • can contain spaces, tabs, and hash characters.
 		   │ • cannot contain new lines, pipes, closing curly braces, or the
 		   │   character sequences "@{" and "%{".
-		   │ • cannot be injected with attributes, abilities, or macros.
+		   │ • cannot include attributes, abilities, or macros.
 		   │ 
 		   │ %{selected|abilityName}
 		   │ %{target|abilityName}
 		   │ %{characterName|abilityName}
 		   └─────────────────────────────*/
 		
-		ability: $ => choice(
-			alias($._ability_empty, $.invalid),
-			seq(
-				$.__ability_start,
-				"{",
-				$._ability,
-				"}",
-			),
-			alias("%{", $.invalid),
-		),
-		_ability_empty: $ => seq( $.__ability_start, "{}" ),
-		_ability: $ => choice(
-			alias($._propertyName, $.abilityName),
-			seq(
-				$._selector,
-				"|",
+		ability: $ => seq(
+			"%{",
+			optional(seq(
 				choice(
-					alias($._propertyName, $.abilityName),
-					alias(seq(
-						alias($._propertyName, ""),
-						chainOf(/[^}]/),
-					), $.invalid),
-					alias(chainOf(/[^}]/), $.invalid),
+					$.character_token_identifier,
+					alias($.ability_identifier, $.character_identifier),
 				),
-			),
-			seq(
-				$._selector,
-				alias("|", $.invalid),
-			),
-			alias(chainOf(/[^}]/), $.invalid),
+				"|",
+			)),
+			alias($.ability_identifier, $.ability_identifier),
+			"}",
 		),
 		
+		ability_identifier: $ => repeat1(choice(
+			$.htmlEntity,
+			token(choice(
+				/\{+/,
+				/\{*[@%]+/,
+				seq(
+					choice(
+						/[^@%{|}\r\n]+/,
+						repeat1(seq(
+							choice(
+								/\{+/,
+								/\{*[@%]+/,
+							),
+							/[^@%{|}\r\n]+/,
+						)),
+					),
+					/\{*[@%]*/,
+				),
+			)),
+		)),
 		
-		/*┌──────────────────────────────
-		  │ Macro
-		  └┬─────────────────────────────
-		   │ For a macro, the macro name:
-		   │ • cannot contain spaces, new lines, pipes, closing curly braces, or the
-		   │   character sequence "%{".
-		   │ • cannot be injected with macros.
-		   │ • can be injected with attributes and abilities.
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Macros
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ This grammar will just pick out hash characters, which might
+		   │   refer to a macro. It's impossible to know whether a valid macro
+		   │   name actually does refer to a macro, since we can't check a name
+		   │   against the list of defined macros.
+		   │ 
+		   │ For example, "&#124;_" could refer to:
+		   │ • an ampersand followed by a macro named "124;_".
+		   │ • a HTML entity of a pipe, followed by an underscore.
+		   │ If the macro is defined, Roll20 will go with the first option.
+		   │   Otherwise, Roll20 sticks with the second option.
+		   │ 
+		   │ The macro name:
+		   │ • cannot contain spaces, new lines, or  the character sequences
+		   │  "@{" and "%{".
+		   │ • if inside a roll query, cannot contain pipes or closing curly
+		   │   braces.
+		   │ • cannot include macros.
+		   │ • can include attributes and abilities.
 		   │ 
 		   │ To call the macro, its name must be followed by either a space or
-		   │   a new line. Exception: the space or new line isn't required if it
-		   │   would be the last character in the script.
+		   │   a new line, or be at the end of the script.
 		   │ 
 		   │ #macroName 
 		   └─────────────────────────────*/
 		
-		_macro_space: $ => prec(1, seq( $.macro, choice( " ", $.__EOF ) )),
-		_macro_spaceNL: $ => prec(1, seq( $.macro, choice( / |\r?\n/, $.__EOF ) )),
-		macro: $ => seq( "#", $.macroName ),
-		macroName: $ => prec.right(repeat1(choice( $.attribute, $.__just_at, /[^ \r\n@]+/ ))),
-		_macroInsideAttributeName: $ => seq( "#", alias($._macroNameInsideAttributeName, $.macroName) ),
-		_macroNameInsideAttributeName: $ => choice(
-			"@",
-			seq(
-				prec.right(repeat1( /[^ \r\n@]+|@+[^ \r\n@{]/ )),
-				optional("@"),
-			),
+		hash: $ => "#",
+		
+		_macro: $ => prec.right(seq(
+			$.hash,
+			repeat1(choice(
+				$._placeholder,
+				/[^@%&{|}\[\]() \r\n]+/,
+					//some of these characters can technically be used in a macro name,
+					// but this implementation will assume they're all invalid
+			)),
+			optional(choice( $._wsp, /\r?\n/ )),	//making whitespace optional for the same reason
+		)),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Inline Rolls
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ An inline roll may be used as a root element or in place of a
+		   │   number, and contains its own formula. When evaluated, it is
+		   │   reduced to a number.
+		   └─────────────────────────────*/
+		
+		inlineRoll: $ => seq(
+			$.__inlineRoll_start,
+			$.formula,
+			$.__inlineRoll_end,
 		),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Formulas
-		  ╚════════════════════════════════════════════════════════════*/
-		 
-		/*┌──────────────────────────────
-		  │ helper rules
-		  └──────────────────────────────*/
+		  ║ Numbers
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Numbers are combined with attributes, abilities, and inline rolls.
+		   └───────────────────────────────────────────────────────────*/
 		
-		/*_wsp_and_more: $ => seq(
-			repeat($.label),
-			$._wsp_possibility,
-			repeat(choice(
-				$._wsp_possibility,
-				$.label,
+		_IrPh: $ => choice($.inlineRoll, $._placeholder),
+		
+		_integer: $ => prec.right(repeat1(choice(
+			/\d+/,
+			$._IrPh,
+		))),
+		
+		number: $ => choice(
+			$._number_signable,
+			$._number_unsignable,
+		),
+		_number_signable: $ => prec.right(seq(
+			$._integer,
+			optional(seq(
+				".",
+				$._integer,
 			)),
-		),*/
-		/*_wsp_possibility: $ => choice(
-			$._wsp_inline,
-			$.attribute,
-			$.ability,
-			$._macro_space,
-		),*/
+		)),
+		_number_unsignable: $ => prec.right(seq(
+			".",
+			$._integer,
+		)),
 		
 		
-		/*┌──────────────────────────────
-		  │ Formula
-		  └┬─────────────────────────────
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Formulas
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Used within an inline roll and within nested elements (i.e., within
+		   │   nested inline rolls, parentheses, math functions, or group rolls).
+		   │
 		   │ A formula consisting of only whitespace and/or labels is invalid. 
 		   │ 
 		   │ Labels can only be the first items in a formula if the following
 		   │   item is a dice roll or table roll (or attribute/ability/macro
 		   │   that evaluates to one of those).
-		   │   This implementation does not detect that.
+		   │   This implementation does not check for that.
 		   └─────────────────────────────*/
 		
-		formula: $ => $._expression_first,
-		
-		_expression_first: $ => prec.right(choice(
-			seq(
-				optional($._labels_and_wsp),
-				$._element_first,
-				optional($._labels_and_wsp),
-			),
-			seq(
-				optional($._labels_and_wsp),
-				$._expression_first_pair,
-			),
-		)),
-		_expression_next: $ => prec.right(choice(
-			seq(
-				$._element_next,
-				optional($._labels_and_wsp),
-			),
-			$._expression_next_pair,
-		)),
-		
-		_expression_first_pair: $ => seq(
-			$._element_first,
-			choice(
-				seq(
-					optional($._labels_and_wsp),
-					$._operator,
-					optional($._labels_and_wsp),
-					$._expression_next,
+		formula: $ => prec.right(seq(
+			optional($._labels),
+			alias($._term_first, $.term),
+			optional($._labels),
+			repeat(seq(
+				choice(
+					seq(
+						alias($._operator_summation, $.operator),
+						optional($._labels),
+						alias($._term_unsigned, $.term),
+					),
+					seq(
+						alias($._operator_multiplication, $.operator),
+						optional($._labels),
+						choice(
+							alias($._term_unsigned, $.term),
+							alias($._term_signed, $.term),
+						),
+					),
 				),
-				seq(
-					$._labels_and_wsp,
-					alias($._expression_next, $.invalid),
-				),
-			),
-		),
-		_expression_next_pair: $ => seq(
-			$._element_next,
-			choice(
-				seq(
-					optional($._labels_and_wsp),
-					$._operator,
-					optional($._labels_and_wsp),
-					$._expression_next,
-				),
-				seq(
-					$._labels_and_wsp,
-					alias($._expression_next, $.invalid),
-				),
-			),
-		),
-		
-		_element_first: $ => prec.right(2, choice(
-			$._element_inlineRoll,
-			$._element_parenthetical,
-			$._element_groupRoll,
-			$._element_diceRoll,
-			$._element_tableRoll,
-			$._element_number_signed,
-			//TODO: query
-			seq(
-				$._placeholders,
-				optional($._macro_space),
-			),
-			$._macro_space,
-			$._element_invalid,
-		)),
-		_element_next: $ => prec.right(1, choice(
-			$._element_inlineRoll,
-			$._element_parenthetical,
-			$._element_groupRoll,
-			$._element_diceRoll,
-			$._element_tableRoll,
-			$._element_number_unsigned,
-			//TODO: query
-			seq(
-				$._placeholders,
-				optional($._macro_space),
-			),
-			$._macro_space,
-			$._element_invalid,
-		)),
-		
-		_element_invalid: $ => seq(
-			optional($._placeholders),
-			alias($._element_invalid_2, $.invalid),
-			optional($._macro_space),
-		),
-		_element_invalid_2: $ => seq(
-			$._element_invalid_begin,
-			optional($._element_invalid_remainder),
-		),
-		_element_invalid_begin: $ => choice(
-											//-------------------------------------------
-											// doesn't    |  so it's *not* one of
-											// match this |  these potentially valid things
-			/[^@%#\d.dDtT\[({*/+\-\s]/,		//-------------------------------------------
-											// @          |  attribute
-											// %          |  ability
-											// #          |  macro
-											// digit      |  number, dice roll, table roll
-											// .          |  number
-											// d or D     |  dice roll
-											// t or T     |  table roll (TODO)
-											// [          |  label or inline roll
-											// (          |  parenthetical
-											// {          |  group roll
-											// * or /     |  operator
-											// + or -     |  operator, first number
-											// \s         |  whitespace
-			
-											//-------------------------------------------
-											// matches    |  so it's an *invalid*
-											// this       |  one of these
-											//-------------------------------------------
-			$.__just_at,					// @          |  attribute
-			$.__just_percent,				// %          |  ability
-			$.__just_d,						// d or D     |  dice roll
-			//TODO
-		),
-		_element_invalid_remainder: $ => seq(
-											//-------------------------------------------
-											// doesn't    |  so it's *not* the start of
-											// match this |  this other thing
-			/[^@%#\[({*/+\-\s})\]]/,		//-------------------------------------------
-											// @          |  attribute
-											// %          |  ability
-											// #          |  macro
-											// [          |  label or inline roll
-											// (          |  parenthetical
-											// {          |  group roll
-											// * / + -    |  operator
-											// \s         |  whitespace
-											//-------------------------------------------
-											// doesn't    |  so it's *not* the end of a
-											// match this |  parent container
-											//-------------------------------------------
-											// {          |  group roll
-											// (          |  parenthetical
-											// [          |  label or inline roll
-			
-			repeat(choice(
-				$._placeholders,
-				/[^@%#\[({*/+\-\s})\]]/,
+				optional($._labels),
 			)),
+		)),
+		
+		_term_first: $ => choice(
+			seq(
+				choice(
+					seq(
+						optional(alias(/[+-]/, $.operator)),
+						alias($._number_signable, $.number),	//numbers, attributes, abilities, and inline rolls
+					),
+					alias($._number_unsignable, $.number),	//numbers, attributes, abilities, and inline rolls
+					$.parenthesized,
+					$.function,
+					$.diceRoll,
+					$.groupRoll,
+					$.tableRoll,
+					$.rollQuery,
+				),
+				optional($._macro),
+			),
+			$._macro,
+		),
+		
+		_term_unsigned: $ => choice(
+			seq(
+				choice(
+					$.number,	//numbers, attributes, abilities, and inline rolls
+					$.diceRoll,
+					$.groupRoll,
+					seq(
+						choice(
+							$.parenthesized,
+							$.function,
+							$.tableRoll,
+							$.rollQuery,
+						),
+						optional($._placeholder),
+					),
+				),
+				optional($._macro),
+			),
+			$._macro,
+		),
+		
+		_term_signed: $ => seq(
+			alias($._operator_summation, $.operator),
+			optional($._labels),
+			$._term_unsigned,
+		),
+		
+		
+		/*┌──────────────────────────────
+		  │ Parenthesized Formula
+		  └──────────────────────────────*/
+		
+		parenthesized: $ => $._parenthesized,
+		
+		_parenthesized: $ => seq(
+			$.__leftParen,
+			$.formula,
+			$.__rightParen,
+		),
+		
+		function: $ => seq(
+			alias(/abs|ceil|floor|round/, $.name),
+			$._parenthesized,
 		),
 		
 		
 		/*┌──────────────────────────────
 		  │ Operator
-		  └┬─────────────────────────────
-		   │ `+-` and `-+` are evaluated as subtraction.
+		  └┬─────────────────────────────*/
+		 /*│ `+-` and `-+` are evaluated as subtraction.
 		   │ 
 		   │ The only place a unary negative/positive operator can be is as a
-		   │   prefix of a number that is the first element in a formula.
+		   │   prefix of a number that is the first element in a formula, or
+		   │   right after a multiplication-type operator.
 		   └─────────────────────────────*/
 		
-		_operator: $ => seq(
-			$.operator,
-			optional(alias($._invalid_operators, $.invalid)),
-		),
-		operator: $ => seq( /[*/%]|\*\*|\+(\s*-)?|-(\s*\+)?/ ),
-		_invalid_operators: $ => repeat1(alias($.operator, "")),
+		_operator_multiplication: $ => prec.right("multiplication", /[\/%]|\*\*?/),
+		_operator_summation: $ => prec.right("summation", choice(
+			$._operator_summation_plus,
+			$._operator_summation_minus,
+		)),
+		_operator_summation_plus: $ => /\+(\s*\-(\s*\+\s*\-)*(\s*\+)?)?/,
+		_operator_summation_minus: $ => /\-(\s*\+(\s*\-\s*\+)*(\s*\-)?)?/,
 		
 		
 		/*┌──────────────────────────────
 		  │ Inline Label
-		  └┬─────────────────────────────
-		   │ An inline label:
+		  └┬─────────────────────────────*/
+		 /*│ An inline label:
 		   │ • cannot contain new lines or closing square brackets.
 		   │ • can include attributes, abilities, and macros.
 		   └─────────────────────────────*/
 		
 		label: $ => seq(
-			$._leftBracket,
-			repeat(choice(
-				/[^@%#&\[\r\n\]]+/,
-				$.attribute,
-				$.ability,
-				$._macro_space,
-				$._escapedCharacter,
-				$._at,
-				$._percent,
-				$._hash,
-				$._ampersand,
-			)),
-			$._rightBracket,
+			$.__leftBracket,
+			optional($.labelText),
+			$.__rightBracket,
 		),
 		
-		_labels_and_wsp: $ => prec.right(choice(
-			$._wsp_inline,
-			seq(
-				optional($._wsp_inline),
-				repeat1(seq( $.label, optional($._wsp_inline) )),
+		labelText: $ => prec.right(seq(
+			choice(
+				/[^#\[\]\r\n{|,}()&]/,
+				$.__leftBrace,
+				$.__pipe,
+				$.__comma,
+				$.__rightBrace,
+				$.__leftParen,
+				$.__rightParen,
+				$._placeholder,
+				$.hash,
+				$._htmlEntity_or_ampersand,
 			),
+			repeat($._text_label_or_tableRoll),
 		)),
 		
-		
-		/*┌──────────────────────────────
-		  │ Inline Roll
-		  └┬─────────────────────────────
-		   │ An inline roll may be used as an element inside a formula, and
-		   │   contains its own formula. When evaluated, it is simplified for
-		   │   use in its parent formula: labels are removed and it is
-		   │   reduced to a single value.
-		   └─────────────────────────────*/
-		
-		_element_inlineRoll: $ => seq(
-			optional($._placeholders),
-			$._inlineRoll,
-			optional($._placeholders),
-			optional(alias($._element_invalid_remainder, $.invalid)),
-			optional($._macro_space),
+		_text_label_or_tableRoll: $ => choice(
+			/[^#\]\r\n{|,}()&]/,
+			$.__leftBrace,
+			$.__pipe,
+			$.__comma,
+			$.__rightBrace,
+			$.__leftParen,
+			$.__rightParen,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
 		),
 		
-		_inlineRoll: $ => choice(
-			$.inlineRoll,
-			alias(/\[\[\s*\]\]/, $.invalid),
-		),
-		inlineRoll: $ => seq(
-			/\[\[\s*/,
-			choice(
-				$.formula,
-				alias($._labels_and_wsp, $.invalid),
+		_labels: $ => prec.right(choice(
+			$._wsp,
+			seq(
+				optional($._wsp),
+				repeat1(seq(
+					$.label,
+					optional($._wsp),
+				)),
 			),
-			/\s*\]\]/,
-		),
-		
-		
-		/*┌──────────────────────────────
-		  │ Parenthetical / Math Function
-		  └┬─────────────────────────────
-		   │ A parenthetical may be used as an element inside a formula, and
-		   │   contains its own formula. Parentheticals are not simplified
-		   │   like nested inline rolls are.
-		   └─────────────────────────────*/
-		
-		_element_parenthetical: $ => seq(
-			optional($._placeholders),
-			$._parenthetical,
-			optional($._placeholders),
-			optional(alias($._element_invalid_remainder, $.invalid)),
-			optional($._macro_space),
-		),
-		
-		_parenthetical: $ => choice(
-			$.parenthetical,
-			alias(/(abs|ceil|floor|round)?\(\s*\)/, $.invalid),
-		),
-		parenthetical: $ => seq(
-			optional(alias(/abs|ceil|floor|round/, $.functionName)),
-			/\(\s*/,
-			choice(
-				$.formula,
-				alias($._labels_and_wsp, $.invalid),
-			),
-			/\s*\)/,
-		),
+		)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Rolls
-		  ╚════════════════════════════════════════════════════════════*/
-		 
-		/*┌──────────────────────────────
-		  │ Roll Modifiers
-		  └┬─────────────────────────────
-		   │ Roll modifiers can be injected with attributes and abilities.
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ Roll modifiers can be injected with attributes, abilities, and
+		   │   inline rolls. This script does not parse the modifiers.
 		   └─────────────────────────────*/
 		
-		_shared_modifier: $ => prec(1, choice(
-			alias(/[kK][hHlL]?\d+/, $.keep),
-			alias(/[dD][hHlL]?\d+/, $.drop),
-			alias(/[<=>]\d+/, $.successes),
-			alias(/[<=>]\d+[fF][<=>]?\d+/, $.successesMinusFailures),
+		/*┌──────────────────────────────
+		  │ Dice Roll
+		  └──────────────────────────────*/
+		
+		diceRoll: $ => prec.right(seq(
+			optional(alias($._integer, $.count)),
+			/[dD]/,
+			choice(
+				alias($._integer, $.sides),
+				alias(/[fF]/, $.fate),
+			),
+			optional(alias($._diceRoll_modifiers, $.modifiers)),
 		)),
-		_diceRoll_modifier: $ => prec(1, choice(
-			alias(/[rR][<=>]?\d+/, $.reroll),
-			alias(/[rR][oO][<=>]?\d+/, $.reroll_once),
-			alias(/!([<=>]?\d+)?/, $.exploding),
-			alias(/!!([<=>]?\d+)?/, $.compounding),
-			alias(/![pP]([<=>]?\d+)?/, $.penetrating),
-			$._shared_modifier,
-			alias(/[cC][Ss][<=>]?\d+/, $.criticalSuccess),
-			alias(/[cC][fF][<=>]?\d+/, $.criticalFailure),
-			alias(/[mM]\d*([<=>]\d+)?/, $.showMatches),
-			alias(/[mM][tT]\d*([<=>]\d+)?/, $.countMatches),
-			alias(/[sS][aAdD]/, $.sort),
+		
+		_diceRoll_modifiers: $ => repeat1(choice(
+			$._integer,
+			/[aAcCdDfFhHkKlLmMoOpPrRsStT<=>!]+/,
 		)),
 		
 		
@@ -672,231 +631,154 @@ module.exports = grammar({
 		  │ Group Roll
 		  └──────────────────────────────*/
 		
-		_element_groupRoll: $ => seq(
-			optional($._placeholders),
-			$._groupRoll,
-			optional($._macro_space),
-		),
-		
-		_groupRoll: $ => choice(
-			$.groupRoll,
-			alias($._groupRoll_invalid, $.invalid),
-		),
 		groupRoll: $ => prec.right(seq(
-			$._leftBrace,
-			optional(alias($._groupRoll_invalid_commas, $.invalid)),
+			$.__leftBrace,
 			$.formula,
 			repeat(seq(
-				$._comma,
-				optional(alias($._groupRoll_invalid_commas, $.invalid)),
+				$.__comma,
 				$.formula,
 			)),
-			optional(alias($._groupRoll_invalid_commas, $.invalid)),
-			$._rightBrace,
+			$.__rightBrace,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
-			optional(alias($._element_invalid_remainder, $.invalid)),
 		)),
+		
 		_groupRoll_modifiers: $ => repeat1(choice(
-				$._shared_modifier,
-				$._placeholders,
-				/[dfhklDFHKL<=>\d]/,	//potentially valid
+			$._integer,
+			/[dDfFhHkKlL<=>]+/,
 		)),
-		_groupRoll_invalid: $ => seq(
-			$._leftBrace,
-			/\s*(,\s*)*/,
-			$._rightBrace,
-			optional(alias($._groupRoll_modifiers, $.modifiers)),
-			optional($._groupRoll_invalid_remainder),
-		),
-		_groupRoll_invalid_commas: $ => prec.right(repeat1(prec.right(choice($._labels_and_wsp, $._comma)))),
-		_groupRoll_invalid_remainder: $ => seq(
-			/[^@%#\[({*/+\-\s})\]dfhklDFHKL<=>\d]/,	//definitely invalid
-			//treat the rest as invalid
-			optional($._element_invalid_remainder),
-		),
-		
-		
-		/*┌──────────────────────────────
-		  │ Dice Roll
-		  └──────────────────────────────*/
-		
-		_element_diceRoll: $ => seq(
-			$.diceRoll,
-			//any invalid stuff on the end
-			optional(alias($._diceRoll_invalid_remainder, $.invalid)),
-			//macro (optional)
-			optional($._macro_space),
-		),
-		
-		diceRoll: $ => prec.right(seq(
-			//count: number of dice (optional)
-			optional(alias($._unsigned_integer_with_placeholders, $.count)),
-			//keyword (the letter 'd')
-			$.__diceRoll_start,
-			//sides: number of sides per die
-			alias($._diceRoll_sides, $.sides),
-			//modifiers (optional)
-			optional(alias($._diceRoll_modifiers, $.modifiers)),
-		)),
-		_diceRoll_sides: $ => choice(
-			/\d+|[fF]/,
-			$.attribute,
-			$.ability,
-		),
-		_diceRoll_modifiers: $ => repeat1(choice(
-			$._diceRoll_modifier,
-			$._placeholders,
-			/[acdfhklmoprstACDFHKLMOPRST<=>\d!]/,	//potentially valid
-		)),
-		_diceRoll_invalid_remainder: $ => seq(
-			/[^@%#\[({*/+\-\s})\]acdfhklmoprstACDFHKLMOPRST<=>\d!]/,	//definitely invalid
-			//treat the rest as invalid
-			optional($._element_invalid_remainder),
-		),
 		
 		
 		/*┌──────────────────────────────
 		  │ Table Roll
-		  └──────────────────────────────*/
-		
-		_element_tableRoll: $ => seq(
-			$.tableRoll,
-			//attributes and abilities (optional)
-			optional($._placeholders),
-			//any invalid stuff on the end
-			optional(alias($._element_invalid_remainder, $.invalid)),
-			//macro (optional)
-			optional($._macro_space),
-		),
+		  └┬─────────────────────────────*/
+		 /*│ A table name:
+		   │ • cannot contain new lines or closing square brackets.
+		   │ • can include attributes, abilities, and macros.
+		   └─────────────────────────────*/
 		
 		tableRoll: $ => seq(
-			//count: number of "dice" (optional)
-			optional(alias($._unsigned_integer_with_placeholders, $.count)),
-			//keyword (the letter 't')
+			optional(alias($._integer, $.count)),
 			$.__tableRoll_start,
-			$._leftBracket,
-			//table name
-			alias(repeat1(
-				choice(
-					/[^@%#&\]]+/,
-					$.attribute,
-					$.ability,
-					prec(1, "@{"),
-					prec(1, "%{"),
-					$._macro_space,
-					$._at,
-					$._percent,
-					$._hash,
-					$._ampersand,
-				),
-			), $.tableName),
-			$._rightBracket,
+			$.tableName,
+			$.__rightBracket,
 		),
+		
+		tableName: $ => prec.right(repeat1($._text_label_or_tableRoll)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Numbers
-		  ╚╤═══════════════════════════════════════════════════════════
-		   │ Numbers can be injected with attributes and abilities.
-		   └───────────────────────────────────────────────────────────*/
+		  ║ Roll Queries
+		  ╚════════════════════════════════════════════════════════════*/
 		
-		/*┌──────────────────────────────
-		  │ Signed Number
-		  └──────────────────────────────*/
-		
-		_element_number_signed: $ => choice(
-			$._element_number_unsigned,
-			seq(
-				choice(
-					//valid: -5  -5.5
-					//both: -5_  -5.5_
-					seq(
-						choice(
-							alias($._element_number_signed_integer, $.number),	// -5
-							alias($._element_number_signed_decimal, $.number),	// -5.5
+		rollQuery: $ => seq(
+			$.__ROLLQUERY_START,
+			choice(
+				alias($._text_query_prompt_or_defaultValue, $.prompt),
+				seq(
+					optional(alias($._text_query_prompt_or_defaultValue, $.prompt)),
+					$.__ROLLQUERY_PIPE,
+					optional(choice(
+						alias($._text_query_prompt_or_defaultValue, $.defaultValue),
+						seq(
+							optional(alias($._queryOption, $.option)),
+							repeat1(seq(
+								$.__ROLLQUERY_PIPE,
+								optional(alias($._queryOption, $.option)),
+							)),
 						),
-						optional(alias($._number_invalid_remainder, $.invalid)),	// _
-					),
-					
-					//both: -5.  -5._
-					seq(
-						alias($._element_number_signed_integer, $.number),	// -5
-						alias($._number_invalid_decimal, $.invalid),	// .  ._
-					),
-					
-					//invalid:  -.5  -_  -.  -._
-					alias($._element_number_signed_invalid, $.invalid),	// -.5  -_  -.  -._
+					)),
 				),
-				optional($._macro_space),
 			),
+			$.__ROLLQUERY_END,
 		),
 		
-		_sign: $ => /[+-]/,
+		_text_query: $ => choice(
+			/[^}|{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
+			$.__leftBrace,
+			$.__leftParen,
+			$.__rightParen,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+		),
 		
-		_element_number_signed_integer: $ => prec.left(seq(	// -5
-			$._sign,
-			$._unsigned_integer_with_placeholders
+		_text_query_prompt_or_defaultValue: $ => repeat1(choice(
+			$._text_query,
+			$.__comma,
 		)),
-		_element_number_signed_decimal: $ => seq(	// -5.5
-			$._element_number_signed_integer,
-			".",
-			$._unsigned_integer_with_placeholders,
-		),
-		_element_number_signed_invalid: $ => seq(
-			$._sign,
-			choice(
-				$._number_predicate,	// -.5
-				$._number_invalid_remainder,	// -_
-				$._number_invalid_decimal,	// -.  -._
+		
+		_queryOption: $ => prec.right(choice(
+			alias($._queryOptionName, $.optionName),
+			seq(
+				optional(alias($._queryOptionName, $.optionName)),
+				$.__ROLLQUERY_COMMA,
+				optional(alias($._queryOptionValue, $.optionValue)),
 			),
+		)),
+		
+		_queryOptionName: $ => repeat1($._text_query),
+		
+		_text_queryOptionValue: $ => choice(
+			/[^}|?{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
+			$.__questionmark,
+			$.__leftBrace,
+			$.__leftParen,
+			$.__rightParen,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
 		),
 		
+		_queryOptionValue: $ => repeat1(choice(
+			$._text_queryOptionValue,
+			$.rollQuery,
+			//TODO:
+			//$.property,
+			//$.button,
+		)),
 		
-		/*┌──────────────────────────────
-		  │ Unsigned Number
-		  └──────────────────────────────*/
 		
-		_element_number_unsigned: $ => seq(
-			choice(
-				//valid: 5  5.5  .5
-				//both: 5_  5.5_  .5_
-				seq(
-					choice(
-						alias($._unsigned_integer_with_placeholders, $.number),
-						alias($._unsigned_decimal_with_placeholders, $.number),
-						alias($._number_predicate, $.number),
-					),
-					optional(alias($._number_invalid_remainder, $.invalid)),
-				),
-				
-				//both: 5.  5._
-				seq(
-					alias($._unsigned_integer_with_placeholders, $.number),
-					alias($._number_invalid_decimal, $.invalid),
-				),
-				
-				//invalid: .  ._
-				alias($._number_invalid_decimal, $.invalid),
+		
+		
+		__questionmark: 	_atDepth(/\?/, /#63|#[xX](00)?3[fF]|quest/),
+		__leftBrace: 		_atDepth(/\{/, /#123|#[xX](00)?7[bB]|lcub|lbrace/),
+		__pipe: 			_atDepth(/\|/, /#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine/),
+		__comma: 			_atDepth(/,/, /#44|#[xX](00)?2[cC]|comma/),
+		__rightBrace: 		_atDepth(/\}/, /#125|#[xX](00)?7[dD]|rcub|rbrace/),
+		__leftBracket: 		_atDepth(/\[/, /#91|#[xX](00)?5[bB]|lsqb|lbrack/),
+		__rightBracket: 	_atDepth(/\]/, /#93|#[xX](00)?5[dD]|rsqb|rbrack/),
+		__leftParen: 		_atDepth(/\(/, /#40|#[xX](00)?28|lpar/),
+		__rightParen: 		_atDepth(/\)/, /#41|#[xX](00)?29|rpar/),
+		
+		__ampersand: $ => choice( $.__AMP_AT_DEPTH, $.__AMP_AT_OR_ABOVE_DEPTH, ),
+		
+		__inlineRoll_start: _atOrAboveDepth_pair(
+			/\[\[/,
+			/\[/,
+			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
+			/\[/,
+			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
+		),
+		__inlineRoll_end: _atDepth_pair(
+			/\]\]/,
+			/\]/,
+			/#93|#[xX](00)?5[dD]|rsqb|rbrack/,
+			/\]/,
+			/#93|#[xX](00)?5[dD]|rsqb|rbrack/,
+		),
+		__tableRoll_start: _atOrAboveDepth_pair(
+			/[tT]\[/,
+			/[tT]/,
+			/#116|#[xX](00)?74|#84|#[xX](00)?54/,
+			/\[/,
+			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
+		),
+		/*__rollQuery_start: $ => prec("charPair", choice(
+			seq(
+				_atOrAboveDepth(/\?/, /#63|#[xX](00)?3[fF]|quest/)($),
+				_atOrAboveDepth(/\{/, /#123|#[xX](00)?7[bB]|lcub|lbrace/)($),
 			),
-			optional($._macro_space),
-		),
-		
-		_number_invalid_decimal: $ => seq( ".", optional($._number_invalid_remainder) ),	// .  ._
-		_number_invalid_remainder: $ => seq(	// _
-			/[^@%#\[({*/+\-\s})\]\d]/,	//definitely invalid
-			//treat the rest as invalid
-			optional($._element_invalid_remainder),
-		),
-		
-		_unsigned_integer_with_placeholders: $ => repeat1(choice(	// 5
-			/\d+/,
-			$._placeholders,
-		)),
-		_number_predicate: $ => seq( ".", $._unsigned_integer_with_placeholders ),	// .5
-		_unsigned_decimal_with_placeholders: $ => prec(1, seq(	// 5.5
-			$._unsigned_integer_with_placeholders,
-			$._number_predicate,
-		)),
+		)),*/
 		
 		
 	},

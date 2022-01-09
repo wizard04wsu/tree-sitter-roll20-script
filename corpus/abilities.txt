@@ -1,108 +1,67 @@
 ==================
-Valid Abilities
+Ability: %{a}
 ==================
+%{a}
+---
+(script
+	(ability
+		(ability_identifier)))
 
+==================
+Ability: %{ a }
+==================
+%{ a }
+---
+(script
+	(ability
+		(ability_identifier)))
+
+==================
+Ability: %{c|a}
+==================
 %{c|a}
+---
+(script
+	(ability
+		(character_identifier)
+		(ability_identifier)))
+
+==================
+Ability: %{ c | a }
+==================
+%{ c | a }
+---
+(script
+	(ability
+		(character_identifier)
+		(ability_identifier)))
+
+==================
+Ability: %{selected|a}
+==================
 %{selected|a}
+---
+(script
+	(ability
+		(character_token_identifier)
+		(ability_identifier)))
+
+==================
+Ability: %{target|a}
+==================
 %{target|a}
-
 ---
-
-(roll20_script
+(script
 	(ability
-		(characterName)
-		(abilityName))
-	(ability
-		(token)
-		(abilityName))
-	(ability
-		(token)
-		(abilityName)))
+		(character_token_identifier)
+		(ability_identifier)))
 
 ==================
-Invalid Abilities
+Ability: %{cc c |a}
 ==================
-
-%{}
-%{|}
-%{||}
-%{c|}
-%{|a}
-%{c||}
-%{|a|}
-%{c|a|}
-
+%{cc c |a}
 ---
-
-(roll20_script
+(script
  	(ability
-		(invalid))
-	(ability
-		(invalid))
-	(ability
-		(invalid))
-	(ability
-		(characterName)
-		(invalid))
-	(ability
-		(invalid))
-	(ability
-		(characterName)
-		(invalid))
-	(ability
-		(invalid))
-	(ability
-		(characterName)
-		(invalid)))
-
-==================
-Invalid Abilities: no closing brace
-==================
-
-%{c
-%{c|
-%{c|a
-
----
-
-(roll20_script
-	(ability
-		(invalid))
-	(ability
-		(invalid))
-	(ability
-		(invalid)))
-
-==================
-Invalid Abilities: illegal Attribute character sequence
-==================
-
-%{x@{y}
-%{x@{y}z
-%{x@{y}z}
-%{x@{y}|
-%{x@{y}|z
-%{x@{y}|z}
-
----
-
-(roll20_script
-	(ability
-		(abilityName
-			(invalid)))
-	(ability
-		(abilityName
-			(invalid)))
-	(ability
-		(abilityName
-			(invalid)))
-	(ability
-		(abilityName
-			(invalid)))
-	(ability
-		(abilityName
-			(invalid)))
-	(ability
-		(abilityName
-			(invalid))))
-
+		(character_identifier)
+		(ability_identifier)))

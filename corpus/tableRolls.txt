@@ -1,145 +1,104 @@
 ==================
-Table Roll: Valid: [[t[n]]]
+Table Roll: [[t[n]]]
 ==================
-
 [[t[n]]]
-
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName))))
+		(formula
+			(term
+				(tableRoll
+					(tableName))))))
 
 ==================
-Table Roll: Valid: [[ t[n] ]]
+Table Roll: [[ t[n] ]]
 ==================
-
 [[ t[n] ]]
-
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName))))
+		(formula
+			(term
+				(tableRoll
+					(tableName))))))
 
 ==================
-Table Roll: Valid: [[2t[n]]]
+Table Roll: [[2t[n]]]
 ==================
-
-[[t[n]]]
-
+[[2t[n]]]
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName))))
+		(formula
+			(term
+				(tableRoll
+					(count)
+					(tableName))))))
 
 ==================
-Table Roll: Valid: [[ 2t[n] ]]
+Table Roll: [[ 2t[n] ]]
 ==================
-
-[[ t[n] ]]
-
+[[ 2t[n] ]]
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName))))
+		(formula
+			(term
+				(tableRoll
+					(count)
+					(tableName))))))
 
 ==================
-Table Roll: Valid: [[ t[n@{a}n] ]]
+Table Roll: [[ t[n@{a}n] ]]
 ==================
-
 [[ t[n@{a}n] ]]
-
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName
-				(attribute
-					(attributeName))))))
+		(formula
+			(term
+				(tableRoll
+					(tableName
+						(attribute
+							(attribute_identifier))))))))
 
 ==================
-Table Roll: Valid: [[ t[@{a}] ]]
+Table Roll: [[ t[@{a}] ]]
 ==================
-
 [[ t[@{a}] ]]
-
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName
-				(attribute
-					(attributeName))))))
+		(formula
+			(term
+				(tableRoll
+					(tableName
+						(attribute
+							(attribute_identifier))))))))
 
 ==================
-Table Roll: Valid: [[ t[@{a]b}] ]]
+Table Roll: [[ t[@{a]b}] ]]
 ==================
-
-[[ t[@{a}] ]]
-
+[[ t[@{a]b}] ]]
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName
-				(attribute
-					(attributeName))))))
-
+		(formula
+			(term
+				(tableRoll
+					(tableName
+						(attribute
+							(attribute_identifier))))))))
 
 ==================
-Table Roll: Valid: [[ t[@{ab] ]]
+Table Roll: [[ t[@ab] ]]
 ==================
-
-[[ t[@{a}] ]]
-
+[[ t[@ab] ]]
 ---
-
-(roll20_script
+(script
 	(inlineRoll
-		(tableRoll
-			(tableName))))
-
-==================
-Table Roll: Valid: [[ t[@{ab] + @{a} ] ]]
-==================
-
-[[ t[@{ab] + @{a} ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(tableRoll
-			(tableName
-				(attribute
-					(attributeName
-						(invalid)))))))
-
-==================
-Table Roll: Valid: [[ t[n]@{a}_#m ]]
-==================
-
-[[ t[n]@{a}_#m ]]
-
----
-
-(roll20_script
-	(inlineRoll
-		(tableRoll
-			(tableName))
-		(attribute
-			(attributeName))
-		(invalid)
-		(macro
-			(macroName))))
+		(formula
+			(term
+				(tableRoll
+					(tableName))))))
 

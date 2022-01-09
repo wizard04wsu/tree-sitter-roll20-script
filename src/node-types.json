@@ -1,24 +1,5 @@
 [
   {
-    "type": "",
-    "named": false,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "macroName",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "ability",
     "named": true,
     "fields": {},
@@ -27,26 +8,22 @@
       "required": true,
       "types": [
         {
-          "type": "abilityName",
+          "type": "ability_identifier",
           "named": true
         },
         {
-          "type": "characterName",
+          "type": "character_identifier",
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "token",
+          "type": "character_token_identifier",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "abilityName",
+    "type": "ability_identifier",
     "named": true,
     "fields": {},
     "children": {
@@ -54,7 +31,7 @@
       "required": false,
       "types": [
         {
-          "type": "invalid",
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -69,30 +46,22 @@
       "required": true,
       "types": [
         {
-          "type": "attributeName",
+          "type": "attribute_identifier",
           "named": true
         },
         {
-          "type": "characterName",
+          "type": "character_identifier",
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "keyword",
-          "named": true
-        },
-        {
-          "type": "token",
+          "type": "character_token_identifier",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "attributeName",
+    "type": "attribute_identifier",
     "named": true,
     "fields": {},
     "children": {
@@ -100,18 +69,41 @@
       "required": false,
       "types": [
         {
-          "type": "invalid",
+          "type": "hash",
           "named": true
         },
         {
-          "type": "macro",
+          "type": "htmlEntity",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "characterName",
+    "type": "attribute_maximum",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute_identifier",
+          "named": true
+        },
+        {
+          "type": "character_identifier",
+          "named": true
+        },
+        {
+          "type": "character_token_identifier",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "character_identifier",
     "named": true,
     "fields": {},
     "children": {
@@ -119,14 +111,40 @@
       "required": false,
       "types": [
         {
-          "type": "invalid",
+          "type": "hash",
           "named": true
         },
         {
-          "type": "macro",
+          "type": "htmlEntity",
           "named": true
         }
       ]
+    }
+  },
+  {
+    "type": "character_token_identifier",
+    "named": true,
+    "fields": {
+      "selected": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "selected",
+            "named": false
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "target",
+            "named": false
+          }
+        ]
+      }
     }
   },
   {
@@ -143,6 +161,45 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "defaultValue",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -161,6 +218,10 @@
           "named": true
         },
         {
+          "type": "fate",
+          "named": true
+        },
+        {
           "type": "modifiers",
           "named": true
         },
@@ -172,51 +233,15 @@
     }
   },
   {
-    "type": "groupRoll",
+    "type": "formula",
     "named": true,
     "fields": {},
     "children": {
       "multiple": true,
-      "required": false,
+      "required": true,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "diceRoll",
-          "named": true
-        },
-        {
-          "type": "groupRoll",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
           "type": "label",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "modifiers",
-          "named": true
-        },
-        {
-          "type": "number",
           "named": true
         },
         {
@@ -224,133 +249,65 @@
           "named": true
         },
         {
-          "type": "parenthetical",
-          "named": true
-        },
-        {
-          "type": "tableRoll",
+          "type": "term",
           "named": true
         }
       ]
     }
+  },
+  {
+    "type": "function",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        },
+        {
+          "type": "name",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "groupRoll",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        },
+        {
+          "type": "modifiers",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "htmlEntity",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "inlineRoll",
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
-      "required": false,
+      "multiple": false,
+      "required": true,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "diceRoll",
-          "named": true
-        },
-        {
-          "type": "groupRoll",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "operator",
-          "named": true
-        },
-        {
-          "type": "parenthetical",
-          "named": true
-        },
-        {
-          "type": "tableRoll",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "invalid",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "diceRoll",
-          "named": true
-        },
-        {
-          "type": "groupRoll",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "modifiers",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "operator",
-          "named": true
-        },
-        {
-          "type": "parenthetical",
-          "named": true
-        },
-        {
-          "type": "tableRoll",
+          "type": "formula",
           "named": true
         }
       ]
@@ -361,6 +318,21 @@
     "named": true,
     "fields": {},
     "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "labelText",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "labelText",
+    "named": true,
+    "fields": {},
+    "children": {
       "multiple": true,
       "required": false,
       "types": [
@@ -373,37 +345,15 @@
           "named": true
         },
         {
-          "type": "macro",
+          "type": "attribute_maximum",
           "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "macro",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": false,
-      "required": true,
-      "types": [
+        },
         {
-          "type": "macroName",
+          "type": "hash",
           "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "macroName",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
+        },
         {
-          "type": "attribute",
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -426,59 +376,11 @@
           "named": true
         },
         {
-          "type": "compounding",
+          "type": "attribute_maximum",
           "named": true
         },
         {
-          "type": "countMatches",
-          "named": true
-        },
-        {
-          "type": "criticalFailure",
-          "named": true
-        },
-        {
-          "type": "criticalSuccess",
-          "named": true
-        },
-        {
-          "type": "drop",
-          "named": true
-        },
-        {
-          "type": "exploding",
-          "named": true
-        },
-        {
-          "type": "keep",
-          "named": true
-        },
-        {
-          "type": "penetrating",
-          "named": true
-        },
-        {
-          "type": "reroll",
-          "named": true
-        },
-        {
-          "type": "reroll_once",
-          "named": true
-        },
-        {
-          "type": "showMatches",
-          "named": true
-        },
-        {
-          "type": "sort",
-          "named": true
-        },
-        {
-          "type": "successes",
-          "named": true
-        },
-        {
-          "type": "successesMinusFailures",
+          "type": "inlineRoll",
           "named": true
         }
       ]
@@ -499,6 +401,14 @@
         {
           "type": "attribute",
           "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
         }
       ]
     }
@@ -509,7 +419,7 @@
     "fields": {}
   },
   {
-    "type": "parenthetical",
+    "type": "option",
     "named": true,
     "fields": {},
     "children": {
@@ -517,62 +427,18 @@
       "required": false,
       "types": [
         {
-          "type": "ability",
+          "type": "optionName",
           "named": true
         },
         {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "diceRoll",
-          "named": true
-        },
-        {
-          "type": "functionName",
-          "named": true
-        },
-        {
-          "type": "groupRoll",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        },
-        {
-          "type": "macro",
-          "named": true
-        },
-        {
-          "type": "number",
-          "named": true
-        },
-        {
-          "type": "operator",
-          "named": true
-        },
-        {
-          "type": "parenthetical",
-          "named": true
-        },
-        {
-          "type": "tableRoll",
+          "type": "optionValue",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "roll20_script",
+    "type": "optionName",
     "named": true,
     "fields": {},
     "children": {
@@ -588,15 +454,158 @@
           "named": true
         },
         {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "optionValue",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "parenthesized",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "prompt",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rollQuery",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "defaultValue",
+          "named": true
+        },
+        {
+          "type": "option",
+          "named": true
+        },
+        {
+          "type": "prompt",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "script",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
           "type": "inlineRoll",
           "named": true
         },
         {
-          "type": "invalid",
-          "named": true
-        },
-        {
-          "type": "macro",
+          "type": "rollQuery",
           "named": true
         }
       ]
@@ -607,7 +616,7 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": false,
       "types": [
         {
@@ -616,6 +625,14 @@
         },
         {
           "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
           "named": true
         }
       ]
@@ -638,7 +655,15 @@
           "named": true
         },
         {
-          "type": "macro",
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
           "named": true
         }
       ]
@@ -664,16 +689,67 @@
     }
   },
   {
-    "type": " ",
-    "named": false
-  },
-  {
-    "type": "#",
-    "named": false
-  },
-  {
-    "type": "# ",
-    "named": false
+    "type": "term",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "diceRoll",
+          "named": true
+        },
+        {
+          "type": "function",
+          "named": true
+        },
+        {
+          "type": "groupRoll",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "number",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        },
+        {
+          "type": "parenthesized",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
+        },
+        {
+          "type": "tableRoll",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "%{",
@@ -684,7 +760,7 @@
     "named": false
   },
   {
-    "type": "@",
+    "type": ";",
     "named": false
   },
   {
@@ -692,83 +768,31 @@
     "named": false
   },
   {
-    "type": "compounding",
+    "type": "fate",
     "named": true
   },
   {
-    "type": "countMatches",
+    "type": "hash",
     "named": true
   },
   {
-    "type": "criticalFailure",
+    "type": "name",
     "named": true
   },
   {
-    "type": "criticalSuccess",
-    "named": true
-  },
-  {
-    "type": "drop",
-    "named": true
-  },
-  {
-    "type": "exploding",
-    "named": true
-  },
-  {
-    "type": "functionName",
-    "named": true
-  },
-  {
-    "type": "keep",
-    "named": true
-  },
-  {
-    "type": "keyword",
-    "named": true
-  },
-  {
-    "type": "penetrating",
-    "named": true
-  },
-  {
-    "type": "reroll",
-    "named": true
-  },
-  {
-    "type": "reroll_once",
-    "named": true
-  },
-  {
-    "type": "showMatches",
-    "named": true
-  },
-  {
-    "type": "sort",
-    "named": true
-  },
-  {
-    "type": "successes",
-    "named": true
-  },
-  {
-    "type": "successesMinusFailures",
-    "named": true
-  },
-  {
-    "type": "token",
-    "named": true
-  },
-  {
-    "type": "{",
+    "type": "selected",
     "named": false
   },
   {
-    "type": "{}",
+    "type": "target",
     "named": false
   },
   {
     "type": "|",
+    "named": false
+  },
+  {
+    "type": "|max}",
     "named": false
   },
   {
