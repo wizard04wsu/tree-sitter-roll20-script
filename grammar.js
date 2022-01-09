@@ -90,9 +90,11 @@ module.exports = grammar({
 	
 	externals: $ => [
 		$.__ROLLQUERY_START,
+		$.__ROLLQUERY_PIPE,
 		$.__ROLLQUERY_END,
 		$.__AMP_AT_OR_ABOVE_DEPTH,
 		$.__AMP_AT_DEPTH,
+		$.__HTML_ENTITY,
 	],
 	
 	extras: $ => [],
@@ -185,17 +187,7 @@ module.exports = grammar({
 			$.htmlEntity,
 		),
 		
-		htmlEntity: $ => seq(
-			$.__ampersand,
-			choice(
-				/[0-9a-zA-Z]+/,
-				token(seq(
-					"#",
-					/\d+|[xX][0-9a-fA-F]+/,
-				)),
-			),
-			";",
-		),
+		htmlEntity: $ => $.__HTML_ENTITY,
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -678,26 +670,24 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		rollQuery: $ => seq(
-			//$.__rollQuery_start,
 			$.__ROLLQUERY_START,
 			choice(
 				alias($._text_query_prompt_or_defaultValue, $.prompt),
 				seq(
 					optional(alias($._text_query_prompt_or_defaultValue, $.prompt)),
-					$.__pipe,
+					$.__ROLLQUERY_PIPE,
 					optional(choice(
 						alias($._text_query_prompt_or_defaultValue, $.defaultValue),
 						seq(
 							optional(alias($._queryOption, $.option)),
 							repeat1(seq(
-								$.__pipe,
+								$.__ROLLQUERY_PIPE,
 								optional(alias($._queryOption, $.option)),
 							)),
 						),
 					)),
 				),
 			),
-			//$.__rightBrace,
 			$.__ROLLQUERY_END,
 		),
 		
@@ -758,7 +748,8 @@ module.exports = grammar({
 		__rightBracket: 	_atDepth(/\]/, /#93|#[xX](00)?5[dD]|rsqb|rbrack/),
 		__leftParen: 		_atDepth(/\(/, /#40|#[xX](00)?28|lpar/),
 		__rightParen: 		_atDepth(/\)/, /#41|#[xX](00)?29|rpar/),
-		__ampersand: 		_atDepth(/&/, /#38|#[xX](00)?26|amp|AMP/),
+		
+		__ampersand: $ => choice( $.__AMP_AT_DEPTH, $.__AMP_AT_OR_ABOVE_DEPTH, ),
 		
 		__inlineRoll_start: _atOrAboveDepth_pair(
 			/\[\[/,
