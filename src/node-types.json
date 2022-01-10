@@ -23,6 +23,33 @@
     }
   },
   {
+    "type": "abilityCommandButton",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "ability_identifier",
+          "named": true
+        },
+        {
+          "type": "character_identifier",
+          "named": true
+        },
+        {
+          "type": "character_token_identifier",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "ability_identifier",
     "named": true,
     "fields": {},
@@ -30,6 +57,22 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
         {
           "type": "htmlEntity",
           "named": true
@@ -110,6 +153,18 @@
       "multiple": true,
       "required": false,
       "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
         {
           "type": "hash",
           "named": true
@@ -481,6 +536,10 @@
           "named": true
         },
         {
+          "type": "abilityCommandButton",
+          "named": true
+        },
+        {
           "type": "attribute",
           "named": true
         },
@@ -582,6 +641,10 @@
       "types": [
         {
           "type": "ability",
+          "named": true
+        },
+        {
+          "type": "abilityCommandButton",
           "named": true
         },
         {

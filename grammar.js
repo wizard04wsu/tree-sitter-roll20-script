@@ -89,13 +89,31 @@ module.exports = grammar({
 	name: "roll20_script",
 	
 	externals: $ => [
+		$.__ANYTHING,	//to prevent problems when the scanner tries to error correct with conflicts
+		
+		$.__AMP_AT_OR_ABOVE_DEPTH,
+		$.__AMP_AT_DEPTH,
+		
+		$.__HTML_ENTITY,
+		
 		$.__ROLLQUERY_START,
 		$.__ROLLQUERY_PIPE,
 		$.__ROLLQUERY_COMMA,
 		$.__ROLLQUERY_END,
-		$.__AMP_AT_OR_ABOVE_DEPTH,
-		$.__AMP_AT_DEPTH,
-		$.__HTML_ENTITY,
+		
+		$.__LABEL_START,
+		$.__LABEL_END,
+		
+		$.__BUTTON_START,
+		$.__BUTTON_PIPE,
+		$.__BUTTON_END,
+		
+		$.__GROUPROLL_START,
+		$.__GROUPROLL_COMMA,
+		$.__GROUPROLL_END,
+		
+		$.__TABLEROLL_START,
+		$.__TABLEROLL_END,
 	],
 	
 	extras: $ => [],
@@ -172,10 +190,11 @@ module.exports = grammar({
 			
 			$.rollQuery,
 			
+			$.abilityCommandButton,
+			
 			//TODO:
 			//template
 			//property
-			//ability command button
 			//tracker
 			
 			/[^&]/,
@@ -309,7 +328,7 @@ module.exports = grammar({
 				),
 				"|",
 			)),
-			alias($.ability_identifier, $.ability_identifier),
+			$.ability_identifier,
 			"}",
 		),
 		
@@ -333,6 +352,51 @@ module.exports = grammar({
 				),
 			)),
 		)),
+		
+		
+		/*┌──────────────────────────────
+		  │ Ability Command Button
+		  └┬─────────────────────────────*/
+		 /*│ Ability Command Buttons can be used to call abilities (or sheet
+		   │ button rolls) from a clickable button in the text chat.
+		   │ 
+		   │ For an ability command button, the character name and/or ability
+		   │ name:
+		   │ • can contain spaces, tabs, and hash characters.
+		   │ • cannot contain new lines, pipes, or closing curly braces.
+		   │ • can include attributes, abilities, or macros.
+		   │ 
+		   │ [label](~abilityName)
+		   │ [label](~selected|abilityName)
+		   │ [label](~target|abilityName)
+		   │ [label](~characterName|abilityName)
+		   │ [label](~characterID|abilityName)
+		   └─────────────────────────────*/
+		
+		abilityCommandButton: $ => seq(
+			$.label,
+			$.__BUTTON_START,
+			optional(seq(
+				choice(
+					$.character_token_identifier,
+					alias($._acb_identifier_text, $.character_identifier),
+				),
+				$.__BUTTON_PIPE,
+			)),
+			alias($._acb_identifier_text, $.ability_identifier),
+			$.__BUTTON_END,
+		),
+		
+		_acb_identifier_text: $ => prec.right(repeat1(choice(
+			/[^#\r\n|,})&]/,
+			$.__pipe,
+			$.__comma,
+			$.__rightBrace,
+			$.__rightParen,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+		))),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -554,20 +618,14 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		label: $ => seq(
-			$.__leftBracket,
+			$.__LABEL_START,
 			optional($.labelText),
-			$.__rightBracket,
+			$.__LABEL_END,
 		),
 		
 		labelText: $ => prec.right(seq(
 			choice(
-				/[^#\[\]\r\n{|,}()&]/,
-				$.__leftBrace,
-				$.__pipe,
-				$.__comma,
-				$.__rightBrace,
-				$.__leftParen,
-				$.__rightParen,
+				/[^#&\r\n\[\]]/,
 				$._placeholder,
 				$.hash,
 				$._htmlEntity_or_ampersand,
@@ -576,13 +634,7 @@ module.exports = grammar({
 		)),
 		
 		_text_label_or_tableRoll: $ => choice(
-			/[^#\]\r\n{|,}()&]/,
-			$.__leftBrace,
-			$.__pipe,
-			$.__comma,
-			$.__rightBrace,
-			$.__leftParen,
-			$.__rightParen,
+			/[^#&\r\n\[\]]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
@@ -632,13 +684,13 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		groupRoll: $ => prec.right(seq(
-			$.__leftBrace,
+			$.__GROUPROLL_START,
 			$.formula,
 			repeat(seq(
-				$.__comma,
+				$.__GROUPROLL_COMMA,
 				$.formula,
 			)),
-			$.__rightBrace,
+			$.__GROUPROLL_END,
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 		)),
 		
@@ -658,9 +710,9 @@ module.exports = grammar({
 		
 		tableRoll: $ => seq(
 			optional(alias($._integer, $.count)),
-			$.__tableRoll_start,
+			$.__TABLEROLL_START,
 			$.tableName,
-			$.__rightBracket,
+			$.__TABLEROLL_END,
 		),
 		
 		tableName: $ => prec.right(repeat1($._text_label_or_tableRoll)),
@@ -719,8 +771,7 @@ module.exports = grammar({
 		_queryOptionName: $ => repeat1($._text_query),
 		
 		_text_queryOptionValue: $ => choice(
-			/[^}|?{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
-			$.__questionmark,
+			/[^}|{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
 			$.__leftBrace,
 			$.__leftParen,
 			$.__rightParen,
@@ -732,21 +783,20 @@ module.exports = grammar({
 		_queryOptionValue: $ => repeat1(choice(
 			$._text_queryOptionValue,
 			$.rollQuery,
+			$.abilityCommandButton,
 			//TODO:
 			//$.property,
-			//$.button,
 		)),
 		
 		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Delimiters and Special Characters
+		  ╚════════════════════════════════════════════════════════════*/
 		
-		
-		__questionmark: 	_atDepth(/\?/, /#63|#[xX](00)?3[fF]|quest/),
 		__leftBrace: 		_atDepth(/\{/, /#123|#[xX](00)?7[bB]|lcub|lbrace/),
 		__pipe: 			_atDepth(/\|/, /#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine/),
 		__comma: 			_atDepth(/,/, /#44|#[xX](00)?2[cC]|comma/),
 		__rightBrace: 		_atDepth(/\}/, /#125|#[xX](00)?7[dD]|rcub|rbrace/),
-		__leftBracket: 		_atDepth(/\[/, /#91|#[xX](00)?5[bB]|lsqb|lbrack/),
-		__rightBracket: 	_atDepth(/\]/, /#93|#[xX](00)?5[dD]|rsqb|rbrack/),
 		__leftParen: 		_atDepth(/\(/, /#40|#[xX](00)?28|lpar/),
 		__rightParen: 		_atDepth(/\)/, /#41|#[xX](00)?29|rpar/),
 		
@@ -766,19 +816,6 @@ module.exports = grammar({
 			/\]/,
 			/#93|#[xX](00)?5[dD]|rsqb|rbrack/,
 		),
-		__tableRoll_start: _atOrAboveDepth_pair(
-			/[tT]\[/,
-			/[tT]/,
-			/#116|#[xX](00)?74|#84|#[xX](00)?54/,
-			/\[/,
-			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
-		),
-		/*__rollQuery_start: $ => prec("charPair", choice(
-			seq(
-				_atOrAboveDepth(/\?/, /#63|#[xX](00)?3[fF]|quest/)($),
-				_atOrAboveDepth(/\{/, /#123|#[xX](00)?7[bB]|lcub|lbrace/)($),
-			),
-		)),*/
 		
 		
 	},
