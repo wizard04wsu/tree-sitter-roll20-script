@@ -142,148 +142,81 @@ struct HtmlEntity {
 	string remainder = "";
 };
 
-// Gets the HTML entity (starting after the '&') at the specified depth (or above).
-// If the HTML entity is a level above that specified, it may act as a special character.
+string getNextEntityName(TSLexer *lexer, string &remainder){
+	
+	string entityName = "";
+	char c = lexer->lookahead;
+	
+	while (c != ';' && c != 0 && entityName.length() < MAX_ENTITY_NAME_LENGTH) {
+		if (!regex_match(string({c}), regex("[#\\da-zA-Z;]"))) break;
+		entityName += c;
+		c = advance(lexer);
+	}
+	
+	if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][\\da-fA-F]+))"))) {
+		c = advance(lexer);
+		
+		return entityName+";";
+	}
+	
+	remainder = entityName;
+	return "";
+	
+}
+
+HtmlEntity continueGettingHtmlEntity(TSLexer *lexer, HtmlEntity &obj){
+	
+	//TODO
+	
+	return obj;
+	
+}
+
 HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 	
 	HtmlEntity obj;
 	unsigned ampCount = 0;
-	string entityName;
+	unsigned offset = 2;
+	string prevEntityName = "";
+	string entityName = "";
+	string remainder = "";
 	char c = lexer->lookahead;
 	
-	if (depth <= 1) {
-		
-		//-------------------------------------------
-		//too shallow; HTML entities will never act as special characters at these depths
-		//-------------------------------------------
-		
-		obj.depth = depth;
-		
-		//-------------------------------------------
-		//get the entity name following the ampersand
-		//-------------------------------------------
-		
-		entityName = "";
-		while (c != ';' && c != 0 && entityName.length() < 50) {
-			if (!regex_match(string({c}), regex("[#\\da-zA-Z;]"))) break;
-			entityName += c;
-			c = advance(lexer);
-		}
-		
-		if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][\\da-fA-F]+))"))) {
-			
-			c = advance(lexer);
-			
-			obj.entityName = entityName;
-		}
-		else {
-			//didn't find a semicolon; it's just an ampersand
-			
-			log(color(brightGreen)+"!0> "+entityName);
-			obj.remainder = entityName;
-		}
-		
-		if (obj.entityName != "") {
-			log(color(green)+"at depth "+to_string(obj.depth)+": "+obj.amps+obj.entityName+";");
-		}else{
-			log(color(green)+"just an ampersand; remainder: "+obj.remainder);
-		}
-		return obj;
-		
-	}
+	if (depth < 2) offset = depth;
 	
-	//-------------------------------------------
-	//collect the "amp;" names as we go down to `depth`
-	//-------------------------------------------
-	
-	while (ampCount+1 < depth) {
+	while (ampCount+offset <= depth) {
 		
-		entityName = "";
-		while (c != ';' && c != 0 && entityName.length() < 50) {
-			if (!regex_match(string({c}), regex("[#\\da-zA-Z;]"))) break;
-			entityName += c;
-			c = advance(lexer);
-		}
+		prevEntityName = entityName;
+		entityName = getNextEntityName(lexer, remainder);
 		
-		if (c == ';' && regex_match(entityName, regex("amp|AMP|#38|#[xX](00)?26"))) {
-			
-			c = advance(lexer);
+		if (regex_match(entityName, regex("(amp|AMP|#38|#[xX](00)?26);"))) {
 			mark_end(lexer);
 			
-			obj.amps += "amp;";
+			obj.amps += entityName;
 			ampCount++;
 		}
 		else {
-			//ran out of "amp;" names before we got to `depth`
-			log(color(brightGreen)+"!> "+entityName);
-			
-			if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][\\da-fA-F]+))"))) {
-				//follwed by an entity name
-				
-				c = advance(lexer);
+			if (entityName != "") {
 				mark_end(lexer);
-				
-				obj.entityName = entityName;
-				obj.depth = ampCount+2;
+				obj.entityName = entityName.substr(0, entityName.length()-1);
 			}
 			else if (ampCount > 0) {
 				//not followed by an entity name, so use the last "amp;"
 				
 				ampCount--;
 				
-				obj.entityName = "amp";
-				obj.depth = ampCount+2;
+				obj.entityName = prevEntityName;
+				obj.remainder = remainder;
 			}
 			else {
-				//it's just an ampersand
-				
-				obj.remainder = entityName;
+				obj.remainder = remainder;
 			}
 			
-			if (obj.entityName != "") {
-				log(color(green)+"at depth "+to_string(obj.depth)+": "+obj.amps+obj.entityName+";");
-			}else{
-				log(color(green)+"just an ampersand; remainder: "+obj.remainder);
-			}
-			return obj;
+			obj.depth = depth + ampCount;
+			
+			break;
 		}
 		
-		
-		//-------------------------------------------
-		//get the entity name following the ampersand or semicolon
-		//-------------------------------------------
-		
-		entityName = "";
-		while (c != ';' && c != 0 && entityName.length() < 50) {
-			if (!regex_match(string({c}), regex("[#\\da-zA-Z;]"))) break;
-			entityName += c;
-			c = advance(lexer);
-		}
-		
-		log(color(brightGreen)+"entityName: "+entityName);
-		if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][\\da-fA-F]+))"))) {
-			//follwed by an entity name
-			
-			c = advance(lexer);
-			mark_end(lexer);
-			
-			obj.entityName = entityName;
-			obj.depth = ampCount+2;
-		}
-		else if (ampCount > 0) {
-			//not followed by an entity name, so use the last "amp;"
-			
-			ampCount--;
-			
-			obj.entityName = "amp";
-			obj.depth = ampCount+2;
-		}
-		else {
-			//it's just an ampersand
-			
-			obj.remainder = entityName;
-		}
-			
 	}
 	
 	if (obj.entityName != "") {
@@ -393,7 +326,6 @@ struct Scanner {
 			initialResult = getHtmlEntity(lexer, nest.depth());
 			
 			if (initialResult.entityName != ""
-			 && initialResult.depth == nest.depth()
 			 && (
 			 valid_symbols[ROLLQUERY_START]
 			 || valid_symbols[GROUPROLL_START]
@@ -421,14 +353,14 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth == nest.depth() && regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
+						if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
 							mark_end(lexer);
 							
 							nest.push("|,}");
 							return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
 						}
 					}
-					else if (c == '{') {
+					else if (c == '{' && nest.isSafe(c)) {
 						c = advance(lexer);
 						mark_end(lexer);
 						
@@ -474,7 +406,7 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth == nest.depth() && regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
+						if (regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
 							mark_end(lexer);
 							
 							nest.push("|)");
@@ -500,7 +432,7 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth == nest.depth() && regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
+						if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
 							mark_end(lexer);
 							
 							nest.push("]");
@@ -585,17 +517,22 @@ struct Scanner {
 				}
 				
 				if (valid_symbols[HTML_ENTITY]) {
-					mark_end(lexer);
+					if (result.entityName == "amp" && result.remainder == "") {
+						continueGettingHtmlEntity(lexer, result);
+					}
 					
 					return match_found(lexer, HTML_ENTITY, "HTML_ENTITY");
 				}
 			}
 			
 			else if (initialResult.entityName != "" && valid_symbols[HTML_ENTITY]) {
-				mark_end(lexer);
+				if (result.entityName == "amp" && result.remainder == "") {
+					continueGettingHtmlEntity(lexer, result);
+				}
 				
 				return match_found(lexer, HTML_ENTITY, "HTML_ENTITY");
 			}
+			
 			
 			
 			if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH] || valid_symbols[AMP_AT_DEPTH]) {
@@ -626,7 +563,7 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth == nest.depth() && regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
+						if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
 							mark_end(lexer);
 							
 							nest.push("|,}");
@@ -691,7 +628,7 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth == nest.depth() && regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
+						if (regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
 							mark_end(lexer);
 							
 							nest.push("|)");
@@ -721,7 +658,7 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth == nest.depth() && regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
+						if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
 							mark_end(lexer);
 							
 							nest.push("]");
