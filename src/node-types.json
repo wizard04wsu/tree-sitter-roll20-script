@@ -225,6 +225,10 @@
         {
           "type": "inlineRoll",
           "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
         }
       ]
     }
@@ -437,6 +441,10 @@
         {
           "type": "inlineRoll",
           "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
         }
       ]
     }
@@ -463,6 +471,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
           "named": true
         }
       ]
@@ -697,6 +709,10 @@
         {
           "type": "inlineRoll",
           "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
         }
       ]
     }
@@ -804,10 +820,6 @@
           "named": true
         },
         {
-          "type": "rollQuery",
-          "named": true
-        },
-        {
           "type": "tableRoll",
           "named": true
         }
@@ -820,10 +832,6 @@
   },
   {
     "type": ".",
-    "named": false
-  },
-  {
-    "type": ";",
     "named": false
   },
   {

@@ -3,6 +3,7 @@
 #include <regex>	//regex, regex_match
 #include <stack>
 #include <unordered_set>
+#include <unordered_map>
 #include <iostream>	//cout
 
 namespace {
@@ -10,37 +11,75 @@ namespace {
 using namespace std;
 
 
-const bool DEBUGGING = false;
+const bool DEBUGGING = true;
 const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 
 
 enum TokenType {
-	ANYTHING,
-	
-	AMP_AT_OR_ABOVE_DEPTH,
-	AMP_AT_DEPTH,
-		
-	HTML_ENTITY,
-		
 	ROLLQUERY_START,
-	ROLLQUERY_PIPE,
-	ROLLQUERY_COMMA,
 	ROLLQUERY_END,
+		
+	INLINEROLL_START,
+	INLINEROLL_END,
 		
 	LABEL_START,
 	LABEL_END,
 		
 	BUTTON_START,
-	BUTTON_PIPE,
 	BUTTON_END,
 		
 	GROUPROLL_START,
-	GROUPROLL_COMMA,
 	GROUPROLL_END,
 		
 	TABLEROLL_START,
 	TABLEROLL_END,
+	
+	PIPE,
+	COMMA,
+	LEFT_BRACE,
+	RIGHT_BRACE,
+	LEFT_PAREN,
+	RIGHT_PAREN,
+	
+	HTML_ENTITY,
+		
+	AMPERSAND,
+		
+	ANYTHING,
 };
+
+unordered_map<int, string> symbol_strings({
+	{ ROLLQUERY_START, "ROLLQUERY_START" },
+	{ ROLLQUERY_END, "ROLLQUERY_END" },
+		
+	{ INLINEROLL_START, "INLINEROLL_START" },
+	{ INLINEROLL_END, "INLINEROLL_END" },
+		
+	{ LABEL_START, "LABEL_START" },
+	{ LABEL_END, "LABEL_END" },
+		
+	{ BUTTON_START, "BUTTON_START" },
+	{ BUTTON_END, "BUTTON_END" },
+		
+	{ GROUPROLL_START, "GROUPROLL_START" },
+	{ GROUPROLL_END, "GROUPROLL_END" },
+		
+	{ TABLEROLL_START, "TABLEROLL_START" },
+	{ TABLEROLL_END, "TABLEROLL_END" },
+	
+	{ PIPE, "PIPE" },
+	{ COMMA, "COMMA" },
+	{ LEFT_BRACE, "LEFT_BRACE" },
+	{ RIGHT_BRACE, "RIGHT_BRACE" },
+	{ LEFT_PAREN, "LEFT_PAREN" },
+	{ RIGHT_PAREN, "RIGHT_PAREN" },
+	
+	{ HTML_ENTITY, "HTML_ENTITY" },
+		
+	{ AMPERSAND, "AMPERSAND" },
+		
+	{ ANYTHING, "ANYTHING" },
+});
 
 
 //For debugging:
@@ -91,33 +130,11 @@ void logEntity(string character) { log(color(cyan)+"  Entity of '"+character+"'"
 void logFunction(string functionName) { log(color(magenta)+functionName); }
 void logValidSymbols(const bool *valid_symbols) {
 	if (!DEBUGGING || !log_valid_symbols) return;
-	cout << color(darkGray) //<< "Valid symbols:" << "\n"
-		 << (valid_symbols[ANYTHING]?"ANYTHING, ":"")
-		 
-		 << (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]?"AMP_AT_OR_ABOVE_DEPTH, ":"")
-		 << (valid_symbols[AMP_AT_DEPTH]?"AMP_AT_DEPTH, ":"")
-		
-		 << (valid_symbols[HTML_ENTITY]?"HTML_ENTITY, ":"")
-		
-		 << (valid_symbols[ROLLQUERY_START]?"ROLLQUERY_START, ":"")
-		 << (valid_symbols[ROLLQUERY_PIPE]?"ROLLQUERY_PIPE, ":"")
-		 << (valid_symbols[ROLLQUERY_COMMA]?"ROLLQUERY_COMMA, ":"")
-		 << (valid_symbols[ROLLQUERY_END]?"ROLLQUERY_END, ":"")
-		
-		 << (valid_symbols[LABEL_START]?"LABEL_START, ":"")
-		 << (valid_symbols[LABEL_END]?"LABEL_END, ":"")
-		
-		 << (valid_symbols[BUTTON_START]?"BUTTON_START, ":"")
-		 << (valid_symbols[BUTTON_PIPE]?"BUTTON_PIPE, ":"")
-		 << (valid_symbols[BUTTON_END]?"BUTTON_END, ":"")
-		
-		 << (valid_symbols[GROUPROLL_START]?"GROUPROLL_START, ":"")
-		 << (valid_symbols[GROUPROLL_COMMA]?"GROUPROLL_COMMA, ":"")
-		 << (valid_symbols[GROUPROLL_END]?"GROUPROLL_END, ":"")
-		
-		 << (valid_symbols[TABLEROLL_START]?"TABLEROLL_START, ":"")
-		 << (valid_symbols[TABLEROLL_END]?"TABLEROLL_END, ":"")
-		 << "\n";
+	string str = color(darkGray);
+	for (auto it = symbol_strings.begin(); it != symbol_strings.end(); ++it) {
+		str += (valid_symbols[it->first] ? it->second+", " : "");
+	}
+	cout << str + "\n";
 }
 
 
@@ -136,10 +153,16 @@ void mark_end(TSLexer *lexer) {
 
 
 struct HtmlEntity {
-	unsigned depth = 0;
-	string amps = "&";
-	string entityName = "";
-	string remainder = "";
+	unsigned encodedDepth = 0;	//Depth it would need to be at now if it was a character at depth 1.
+								//Like this: starting as a character at depth 1, encode it each time
+								// it gets encapsulated in a roll query/group roll/etcetera (i.e., each
+								// time its depth is incremented). Add 1 since depths 0 & 1 act the same.
+	bool atDepth = false;		//Does the encoded depth equal the current depth?
+	string amps = "&";			//First ampersand followed by a possible chain of "amp;"
+								// strings before the actual entity name.
+	string entityName = "";		//Entity name (not including the following ';').
+	string remainder = "";		//Final characters that were consumed but did not end up
+								// being part of the entity.
 };
 
 string getNextEntityName(TSLexer *lexer, string &remainder){
@@ -156,7 +179,7 @@ string getNextEntityName(TSLexer *lexer, string &remainder){
 	if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][\\da-fA-F]+))"))) {
 		c = advance(lexer);
 		
-		return entityName+";";
+		return entityName;
 	}
 	
 	remainder = entityName;
@@ -164,14 +187,7 @@ string getNextEntityName(TSLexer *lexer, string &remainder){
 	
 }
 
-HtmlEntity continueGettingHtmlEntity(TSLexer *lexer, HtmlEntity &obj){
-	
-	//TODO
-	
-	return obj;
-	
-}
-
+//(when called, lexer->lookahead should be the character after '&')
 HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 	
 	HtmlEntity obj;
@@ -189,22 +205,20 @@ HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 		prevEntityName = entityName;
 		entityName = getNextEntityName(lexer, remainder);
 		
-		if (regex_match(entityName, regex("(amp|AMP|#38|#[xX](00)?26);"))) {
+		if (regex_match(entityName, regex("amp|AMP|#38|#[xX](00)?26"))) {
 			mark_end(lexer);
-			
-			obj.amps += entityName;
+			obj.amps += entityName+";";
 			ampCount++;
 		}
 		else {
 			if (entityName != "") {
 				mark_end(lexer);
-				obj.entityName = entityName.substr(0, entityName.length()-1);
+				obj.entityName = entityName;
 			}
 			else if (ampCount > 0) {
 				//not followed by an entity name, so use the last "amp;"
 				
 				ampCount--;
-				
 				obj.entityName = prevEntityName;
 				obj.remainder = remainder;
 			}
@@ -212,18 +226,13 @@ HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 				obj.remainder = remainder;
 			}
 			
-			obj.depth = depth + ampCount;
+			obj.encodedDepth = depth - (ampCount+1) + (depth > 0 ? 1 : 0);
+			if (obj.encodedDepth == depth) obj.atDepth = true;
 			
 			break;
 		}
-		
 	}
 	
-	if (obj.entityName != "") {
-		log(color(green)+"at depth "+to_string(obj.depth)+": "+obj.amps+obj.entityName+";");
-	}else{
-		log(color(green)+"just an ampersand; remainder: "+obj.remainder);
-	}
 	return obj;
 	
 }
@@ -249,7 +258,7 @@ public:
 	}
 	
 	unsigned pop(){
-		unsafeChars.pop();
+		if (unsafeChars.size() > 0) unsafeChars.pop();
 		return this->depth();
 	}
 	
@@ -265,10 +274,14 @@ public:
 struct Scanner {
 	Scanner() {}
 	
+	TSLexer *lexer;
+	const bool *valid_symbols;
+	
 	NestedElements nest;
 	
-	void logTokenType(TSLexer *lexer, string tokenType, bool noMatch = false) {
-		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
+	
+	void logTokenType(TSLexer *lexer, int symbol, bool noMatch = false) {
+		log(color(yellow)+"Result set to "+color(brightYellow)+symbol_strings[symbol]);
 		if (noMatch) {
 			//consume an extra character
 			log_consumed += lexer->lookahead;
@@ -290,20 +303,74 @@ struct Scanner {
 		}
 	}
 	
-	bool match_found(TSLexer *lexer, int symbol, string tokenType) {
-		logTokenType(lexer, tokenType);
-		lexer->result_symbol = symbol;
-		return true;
-	}
-	
 	bool no_match(TSLexer *lexer) {
-		logTokenType(lexer, "(no match)", true);
+		log(color(yellow)+"Result set to "+color(brightYellow)+"(no match)");
+		
+		//consume an extra character
+		log_consumed += lexer->lookahead;
+		lexer->advance(lexer, false);
+		
+		unsigned consumed_length = max(int(log_marked), int(log_consumed.length()-1));
+		log("  "
+			+color(gray)+log_consumed.substr(0, consumed_length)
+			+color(cyan)+log_consumed.substr(consumed_length)
+			+color(cyan)+string({char(lexer->lookahead)})
+		);
+		
 		return false;
 	}
 	
 	
+	bool match_at_depth(HtmlEntity entity, int symbol, char encodedChar, string rxp) {
+		log(color(green)+entity.amps+entity.entityName+"; [ "+symbol_strings[symbol]+" ] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
+		log(color(green)+"    "+to_string(valid_symbols[symbol])+" "+to_string(nest.isSafe(encodedChar))+" "+to_string(entity.encodedDepth <= nest.depth())+" "+to_string(regex_match(entity.entityName, regex(rxp))));
+		return (
+			valid_symbols[symbol]
+			&& (
+				entity.atDepth
+				|| (
+					entity.encodedDepth < nest.depth()
+					&& nest.isSafe(encodedChar)
+				)
+			)
+			&& regex_match(entity.entityName, regex(rxp))
+		);
+	}
+	template <int N>
+	bool match_at_depth(HtmlEntity entity, const int (&symbols)[N], char encodedChar, string rxp) {
+		string logstr = color(green)+entity.amps+entity.entityName+"; [ ";
+		for (int i=0; i<N; i++) { logstr += symbol_strings[symbols[i]]+", "; }
+		log(logstr+"] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
+		for (int i=0; i<N; i++) {
+			if (valid_symbols[symbols[i]]) {
+				return (
+					(
+						entity.atDepth
+						|| (
+							entity.encodedDepth < nest.depth()
+							&& nest.isSafe(encodedChar)
+						)
+					)
+					&& regex_match(entity.entityName, regex(rxp))
+				);
+			}
+		}
+		return false;
+	}
 	
-	bool scan(TSLexer *lexer, const bool *valid_symbols){
+	bool match_found(int symbol) {
+		logTokenType(lexer, symbol);
+		lexer->result_symbol = symbol;
+		return true;
+	}
+	
+	
+	
+	bool scan(TSLexer *theLexer, const bool *theValidSymbols){
+		
+		lexer = theLexer;
+		valid_symbols = theValidSymbols;
+		
 		log_marked = 0;
 		log_consumed = "";
 		log(color(brightMagenta)+"Scanner.scan");
@@ -323,425 +390,361 @@ struct Scanner {
 			c = advance(lexer);
 			mark_end(lexer);
 			
-			initialResult = getHtmlEntity(lexer, nest.depth());
+			result = getHtmlEntity(lexer, nest.depth());
 			
-			if (initialResult.entityName != ""
-			 && (
-			 valid_symbols[ROLLQUERY_START]
-			 || valid_symbols[GROUPROLL_START]
-			 || valid_symbols[LABEL_START]
-			 || valid_symbols[BUTTON_START]
-			 || valid_symbols[TABLEROLL_START]
-			 || valid_symbols[ROLLQUERY_END]
-			 || valid_symbols[GROUPROLL_END]
-			 || valid_symbols[LABEL_END]
-			 || valid_symbols[TABLEROLL_END]
-			 || valid_symbols[BUTTON_END]
-			 || valid_symbols[ROLLQUERY_PIPE]
-			 || valid_symbols[ROLLQUERY_COMMA]
-			 || valid_symbols[GROUPROLL_COMMA])) {
-				
-				result = initialResult;
+			if (result.entityName == "") {
+				if (valid_symbols[AMPERSAND] && nest.isSafe('&'))
+					return match_found(AMPERSAND);
+			}
+			else {
 				c = lexer->lookahead;
 				
-				if (regex_match(result.entityName, regex("#63|#[xX](00)?3[fF]|quest"))
-				 && valid_symbols[ROLLQUERY_START]) {
-					
+				if (match_at_depth(result, ROLLQUERY_START, '?', "#63|#[xX](00)?3[fF]|quest")) {
 					if (c == '&') {
 						c = advance(lexer);
 						
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
+						if (match_at_depth(result, ROLLQUERY_START, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
 							mark_end(lexer);
-							
 							nest.push("|,}");
-							return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+							return match_found(ROLLQUERY_START);
 						}
 					}
 					else if (c == '{' && nest.isSafe(c)) {
 						c = advance(lexer);
 						mark_end(lexer);
-						
 						nest.push("|,}");
-						return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+						return match_found(ROLLQUERY_START);
 					}
 				}
 				
-				else if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))
-				 && valid_symbols[GROUPROLL_START]) {
-					nest.push(",}");
-					return match_found(lexer, GROUPROLL_START, "GROUPROLL_START");
-				}
-				
-				else if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))
-				 && valid_symbols[LABEL_START]) {
-					
+				else if (match_at_depth(result, {INLINEROLL_START, LABEL_START}, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
 					if (c == '&') {
 						c = advance(lexer);
 						
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (result.depth < nest.depth() || (result.depth == nest.depth() && !regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack")))) {
-							
-							nest.push("]");
-							return match_found(lexer, LABEL_START, "LABEL_START");
-						}
-					}
-					
-					else if (c != '[' && nest.isSafe(c)) {
-						nest.push("]");
-						return match_found(lexer, LABEL_START, "LABEL_START");
-					}
-				}
-				
-				else if (regex_match(result.entityName, regex("#40|#[xX](00)?28|lpar"))
-				 && valid_symbols[BUTTON_START]) {
-					
-					if (c == '&') {
-						c = advance(lexer);
-						
-						result = getHtmlEntity(lexer, nest.depth());
-						c = lexer->lookahead;
-						
-						if (regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
+						if (match_at_depth(result, INLINEROLL_START, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
 							mark_end(lexer);
-							
-							nest.push("|)");
-							return match_found(lexer, BUTTON_START, "BUTTON_START");
+							return match_found(INLINEROLL_START);
+						}
+						else if (valid_symbols[LABEL_START]) {
+							nest.push("]");
+							return match_found(LABEL_START);
 						}
 					}
-					
+					else if (c == '[' && valid_symbols[INLINEROLL_START] && nest.isSafe(c)) {
+						return match_found(INLINEROLL_START);
+					}
+					else if (valid_symbols[LABEL_START] && nest.isSafe(c)) {
+						nest.push("]");
+						return match_found(LABEL_START);
+					}
+				}
+				
+				else if (match_at_depth(result, BUTTON_START, '(', "#40|#[xX](00)?28|lpar")) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity(lexer, nest.depth());
+						c = lexer->lookahead;
+						
+						if (match_at_depth(result, BUTTON_START, '~', "#126|#[xX](00)?7[eE]")) {
+							mark_end(lexer);
+							nest.push("|)");
+							return match_found(BUTTON_START);
+						}
+					}
 					else if (c == '~' && nest.isSafe(c)) {
 						c = advance(lexer);
 						mark_end(lexer);
-						
 						nest.push("|)");
-						return match_found(lexer, BUTTON_START, "BUTTON_START");
+						return match_found(BUTTON_START);
 					}
 				}
 				
-				else if (regex_match(result.entityName, regex("#116|#[xX](00)?74|#84|#[xX](00)?54"))
-				 && valid_symbols[TABLEROLL_START]) {
-					
+				else if (match_at_depth(result, GROUPROLL_START, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+					nest.push(",}");
+					return match_found(GROUPROLL_START);
+				}
+				
+				else if (match_at_depth(result, TABLEROLL_START, 't', "#116|#[xX](00)?74")
+				 || match_at_depth(result, TABLEROLL_START, 'T', "#84|#[xX](00)?54")) {
 					if (c == '&') {
 						c = advance(lexer);
 						
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
+						if (match_at_depth(result, TABLEROLL_START, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
 							mark_end(lexer);
-							
 							nest.push("]");
-							return match_found(lexer, TABLEROLL_START, "TABLEROLL_START");
+							return match_found(TABLEROLL_START);
 						}
 					}
-					
 					else if (c == '[' && nest.isSafe(c)) {
 						c = advance(lexer);
 						mark_end(lexer);
-						
 						nest.push("]");
-						return match_found(lexer, TABLEROLL_START, "TABLEROLL_START");
+						return match_found(TABLEROLL_START);
 					}
 				}
 				
-				else if (regex_match(result.entityName, regex("#125|#[xX](00)?7[dD]|rcub|rbrace"))
-				 && (valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END])) {
-					
-					if (valid_symbols[ROLLQUERY_END] && nest.isUnsafe('}') && !valid_symbols[ANYTHING]) {
-						mark_end(lexer);
-						
+				else if (match_at_depth(result, {ROLLQUERY_END, GROUPROLL_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
+					if (!valid_symbols[ANYTHING]) {
 						nest.pop();
-						return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END");
-					}
-					
-					else if (valid_symbols[GROUPROLL_END] && nest.isUnsafe('}') && !valid_symbols[ANYTHING]) {
-						mark_end(lexer);
-						
-						nest.pop();
-						return match_found(lexer, GROUPROLL_END, "GROUPROLL_END");
+						if (valid_symbols[ROLLQUERY_END]) return match_found(ROLLQUERY_END);
+						if (valid_symbols[GROUPROLL_END]) return match_found(GROUPROLL_END);
 					}
 				}
 				
-				else if (regex_match(result.entityName, regex("#93|#[xX](00)?5[dD]|rsqb|rbrack"))
-				 && (valid_symbols[LABEL_END] || valid_symbols[TABLEROLL_END])) {
-					
-					if (valid_symbols[LABEL_END] && nest.isUnsafe(']')) {
-						mark_end(lexer);
-						
+				else if (match_at_depth(result, {INLINEROLL_END, LABEL_END, TABLEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+					if (valid_symbols[LABEL_END]) {
 						nest.pop();
-						return match_found(lexer, LABEL_END, "LABEL_END");
+						return match_found(LABEL_END);
 					}
-					
-					else if (valid_symbols[TABLEROLL_END] && nest.isUnsafe(']')) {
-						mark_end(lexer);
-						
+					else if (valid_symbols[TABLEROLL_END]) {
 						nest.pop();
-						return match_found(lexer, TABLEROLL_END, "TABLEROLL_END");
+						return match_found(TABLEROLL_END);
+					}
+					else if (valid_symbols[INLINEROLL_END]) {
+						if (c == '&') {
+							c = advance(lexer);
+							
+							result = getHtmlEntity(lexer, nest.depth());
+							c = lexer->lookahead;
+							
+							if (match_at_depth(result, INLINEROLL_END, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+								mark_end(lexer);
+								nest.pop();
+								return match_found(INLINEROLL_END);
+							}
+						}
+						else if (c == ']' && nest.isSafe(c)) {
+							nest.pop();
+							return match_found(INLINEROLL_END);
+						}
 					}
 				}
 				
-				else if (regex_match(result.entityName, regex("#41|#[xX](00)?29|rpar"))
-				 && valid_symbols[BUTTON_END] && nest.isUnsafe(')')) {
-					 mark_end(lexer);
-					 
+				else if (match_at_depth(result, BUTTON_END, ')', "#41|#[xX](00)?29|rpar")) {
 					nest.pop();
-					return match_found(lexer, BUTTON_END, "BUTTON_END");
+					return match_found(BUTTON_END);
 				}
 				
-				else if (regex_match(result.entityName, regex("#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))
-				 && valid_symbols[ROLLQUERY_PIPE] && nest.isUnsafe('|')) {
-					 mark_end(lexer);
-					 
-					return match_found(lexer, ROLLQUERY_PIPE, "ROLLQUERY_PIPE");
-				}
+				else if (match_at_depth(result, PIPE, '|', "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))
+					return match_found(PIPE);
 				
-				else if (regex_match(result.entityName, regex("#44|#[xX](00)?2[cC]|comma"))
-				 && (valid_symbols[ROLLQUERY_COMMA] || valid_symbols[GROUPROLL_COMMA])) {
-					
-					if (valid_symbols[ROLLQUERY_COMMA] && nest.isUnsafe(',')) {
-						mark_end(lexer);
-						
-						return match_found(lexer, ROLLQUERY_COMMA, "ROLLQUERY_COMMA");
-					}
-					
-					else if (valid_symbols[GROUPROLL_COMMA] && nest.isUnsafe(',')) {
-						mark_end(lexer);
-						
-						return match_found(lexer, GROUPROLL_COMMA, "GROUPROLL_COMMA");
-					}
-				}
+				else if (match_at_depth(result, COMMA, ',', "#44|#[xX](00)?2[cC]|comma"))
+					return match_found(COMMA);
+				
+				else if (match_at_depth(result, LEFT_BRACE, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace"))
+					return match_found(LEFT_BRACE);
+				
+				else if (match_at_depth(result, RIGHT_BRACE, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
+					return match_found(RIGHT_BRACE);
+				
+				else if (match_at_depth(result, LEFT_PAREN, '(', "#40|#[xX](00)?28|lpar"))
+					return match_found(LEFT_PAREN);
+				
+				else if (match_at_depth(result, RIGHT_PAREN, ')', "#41|#[xX](00)?29|rpar"))
+					return match_found(RIGHT_PAREN);
+				
 				
 				if (valid_symbols[HTML_ENTITY]) {
-					if (result.entityName == "amp" && result.remainder == "") {
-						continueGettingHtmlEntity(lexer, result);
-					}
-					
-					return match_found(lexer, HTML_ENTITY, "HTML_ENTITY");
-				}
-			}
-			
-			else if (initialResult.entityName != "" && valid_symbols[HTML_ENTITY]) {
-				if (result.entityName == "amp" && result.remainder == "") {
-					continueGettingHtmlEntity(lexer, result);
-				}
-				
-				return match_found(lexer, HTML_ENTITY, "HTML_ENTITY");
-			}
-			
-			
-			
-			if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH] || valid_symbols[AMP_AT_DEPTH]) {
-				
-				result = initialResult;
-				
-				if (result.depth == nest.depth() && valid_symbols[AMP_AT_DEPTH]) {
-					return match_found(lexer, AMP_AT_DEPTH, "AMP_AT_DEPTH");
-				}
-				
-				else if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]) {
-					return match_found(lexer, AMP_AT_OR_ABOVE_DEPTH, "AMP_AT_OR_ABOVE_DEPTH");
+					return match_found(HTML_ENTITY);
 				}
 			}
 		}
 		
 		else if (nest.isSafe(c)) {
-			
-			if (c == '?') {
+			if (c == '?' && valid_symbols[ROLLQUERY_START]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[ROLLQUERY_START]) {
+				if (c == '&') {
+					c = advance(lexer);
 					
-					if (c == '&') {
-						c = advance(lexer);
-						
-						result = getHtmlEntity(lexer, nest.depth());
-						c = lexer->lookahead;
-						
-						if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
-							mark_end(lexer);
-							
-							nest.push("|,}");
-							return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
-						}
-					}
+					result = getHtmlEntity(lexer, nest.depth());
+					c = lexer->lookahead;
 					
-					else if (c == '{' && nest.isSafe(c)) {
-						c = advance(lexer);
+					if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
 						mark_end(lexer);
-						
 						nest.push("|,}");
-						return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+						return match_found(ROLLQUERY_START);
 					}
 				}
-			}
-			
-			else if (c == '{') {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				if (valid_symbols[GROUPROLL_START]) {
-					nest.push(",}");
-					return match_found(lexer, GROUPROLL_START, "GROUPROLL_START");
+				else if (c == '{' && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					nest.push("|,}");
+					return match_found(ROLLQUERY_START);
 				}
 			}
-			
-			else if (c == '[') {
+			else if (c == '[' && (valid_symbols[INLINEROLL_START] || valid_symbols[LABEL_START])) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[LABEL_START]) {
+				if (c == '&') {
+					c = advance(lexer);
 					
-					if (c == '&') {
-						c = advance(lexer);
-						
-						result = getHtmlEntity(lexer, nest.depth());
-						c = lexer->lookahead;
-						
-						if (result.depth < nest.depth() || (result.depth == nest.depth() && !regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack")))) {
-							nest.push("]");
-							return match_found(lexer, LABEL_START, "LABEL_START");
+					result = getHtmlEntity(lexer, nest.depth());
+					c = lexer->lookahead;
+					
+					if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
+						if (valid_symbols[INLINEROLL_START]) {
+							return match_found(INLINEROLL_START);
 						}
 					}
-					
-					else if (c != '[' && nest.isSafe(c)) {
+					else if (valid_symbols[LABEL_START]) {
 						nest.push("]");
-						return match_found(lexer, LABEL_START, "LABEL_START");
+						return match_found(LABEL_START);
 					}
 				}
+				else if (c == '[' && valid_symbols[INLINEROLL_START] && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					return match_found(INLINEROLL_START);
+				}
+				else if (c != '[' && valid_symbols[LABEL_START]) {
+					nest.push("]");
+					return match_found(LABEL_START);
+				}
 			}
-			
-			else if (c == '(') {
+			else if (c == '(' && valid_symbols[BUTTON_START]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[BUTTON_START]) {
+				if (c == '&') {
+					c = advance(lexer);
 					
-					if (c == '&') {
-						c = advance(lexer);
-						
-						result = getHtmlEntity(lexer, nest.depth());
-						c = lexer->lookahead;
-						
-						if (regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
-							mark_end(lexer);
-							
-							nest.push("|)");
-							return match_found(lexer, BUTTON_START, "BUTTON_START");
-						}
-					}
+					result = getHtmlEntity(lexer, nest.depth());
+					c = lexer->lookahead;
 					
-					else if (c == '~' && nest.isSafe(c)) {
-						c = advance(lexer);
+					if (regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
 						mark_end(lexer);
-						
 						nest.push("|)");
-						return match_found(lexer, BUTTON_START, "BUTTON_START");
+						return match_found(BUTTON_START);
 					}
 				}
+				else if (c == '~' && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					nest.push("|)");
+					return match_found(BUTTON_START);
+				}
 			}
-			
-			else if (c == 't' || c == 'T') {
+			else if (c == '{' && valid_symbols[GROUPROLL_START]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				nest.push(",}");
+				return match_found(GROUPROLL_START);
+			}
+			else if ((c == 't' || c == 'T') && valid_symbols[TABLEROLL_START]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
-				if (valid_symbols[TABLEROLL_START]) {
+				if (c == '&') {
+					c = advance(lexer);
 					
-					if (c == '&') {
-						c = advance(lexer);
-						
-						result = getHtmlEntity(lexer, nest.depth());
-						c = lexer->lookahead;
-						
-						if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
-							mark_end(lexer);
-							
-							nest.push("]");
-							return match_found(lexer, TABLEROLL_START, "TABLEROLL_START");
-						}
-					}
+					result = getHtmlEntity(lexer, nest.depth());
+					c = lexer->lookahead;
 					
-					else if (c == '[' && nest.isSafe(c)) {
-						c = advance(lexer);
+					if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
 						mark_end(lexer);
-						
 						nest.push("]");
-						return match_found(lexer, TABLEROLL_START, "TABLEROLL_START");
+						return match_found(TABLEROLL_START);
 					}
+				}
+				else if (c == '[' && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					nest.push("]");
+					return match_found(TABLEROLL_START);
 				}
 			}
 			
 			else if (c == '}') {
-				c = advance(lexer);
-				mark_end(lexer);
-				
-				if (valid_symbols[ROLLQUERY_END] && !valid_symbols[ANYTHING]) {
+				if ((valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END])
+				 && !valid_symbols[ANYTHING]) {
+					c = advance(lexer);
+					mark_end(lexer);
 					nest.pop();
-					return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END");
+					if (valid_symbols[ROLLQUERY_END])
+						return match_found(ROLLQUERY_END);
+					if (valid_symbols[GROUPROLL_END])
+						return match_found(GROUPROLL_END);
 				}
-				
-				else if (valid_symbols[GROUPROLL_END] && !valid_symbols[ANYTHING]) {
-					nest.pop();
-					return match_found(lexer, GROUPROLL_END, "GROUPROLL_END");
+				else if (valid_symbols[RIGHT_BRACE]) {
+					c = advance(lexer);
+					mark_end(lexer);
+					return match_found(RIGHT_BRACE);
 				}
 			}
-			
-			else if (c == ']') {
+			else if (c == ']' && (valid_symbols[INLINEROLL_END] || valid_symbols[LABEL_END]
+			 || valid_symbols[TABLEROLL_END])) {
 				c = advance(lexer);
 				mark_end(lexer);
 				
 				if (valid_symbols[LABEL_END]) {
 					nest.pop();
-					return match_found(lexer, LABEL_END, "LABEL_END");
+					return match_found(LABEL_END);
 				}
-				
 				else if (valid_symbols[TABLEROLL_END]) {
 					nest.pop();
-					return match_found(lexer, TABLEROLL_END, "TABLEROLL_END");
+					return match_found(TABLEROLL_END);
+				}
+				else if (c == '&') {
+					c = advance(lexer);
+					
+					result = getHtmlEntity(lexer, nest.depth());
+					c = lexer->lookahead;
+					
+					if (match_at_depth(result, INLINEROLL_END, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+						return match_found(INLINEROLL_END);
+					}
+				}
+				else if (c == ']' && valid_symbols[INLINEROLL_END] && nest.isSafe(']')) {
+					c = advance(lexer);
+					mark_end(lexer);
+					return match_found(INLINEROLL_END);
 				}
 			}
-			
-			else if (c == ')') {
+			else if (c == ')' && valid_symbols[BUTTON_END]) {
 				c = advance(lexer);
 				mark_end(lexer);
-				
-				if (valid_symbols[BUTTON_END]) {
-					nest.pop();
-					return match_found(lexer, BUTTON_END, "BUTTON_END");
-				}
+				nest.pop();
+				return match_found(BUTTON_END);
 			}
 			
-			else if (c == ',') {
+			else if (c == '|' && valid_symbols[PIPE]) {
 				c = advance(lexer);
 				mark_end(lexer);
-				
-				if (valid_symbols[ROLLQUERY_COMMA]) {
-					return match_found(lexer, ROLLQUERY_COMMA, "ROLLQUERY_COMMA");
-				}
-				
-				else if (valid_symbols[GROUPROLL_COMMA]) {
-					return match_found(lexer, GROUPROLL_COMMA, "GROUPROLL_COMMA");
-				}
+				return match_found(PIPE);
 			}
-			
-			else if (c == '|') {
+			else if (c == ',' && valid_symbols[COMMA]) {
 				c = advance(lexer);
 				mark_end(lexer);
-				
-				if (valid_symbols[ROLLQUERY_PIPE]) {
-					return match_found(lexer, ROLLQUERY_PIPE, "ROLLQUERY_PIPE");
-				}
-				
-				else if (valid_symbols[BUTTON_PIPE]) {
-					return match_found(lexer, BUTTON_PIPE, "BUTTON_PIPE");
-				}
+				return match_found(COMMA);
 			}
-			
+			else if (c == '{' && valid_symbols[LEFT_BRACE]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(LEFT_BRACE);
+			}
+			else if (c == '(' && valid_symbols[LEFT_PAREN]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(LEFT_PAREN);
+			}
+			else if (c == ')' && valid_symbols[RIGHT_PAREN]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(RIGHT_PAREN);
+			}
 		}
 		
 		return no_match(lexer);

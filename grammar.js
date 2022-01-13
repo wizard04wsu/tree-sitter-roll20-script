@@ -12,108 +12,40 @@ function debugAlias(theToken, aliasToken, fieldName){
 
 
 
-function _atDepth(rxpChar, rxpHtmlEscape){
-	return $ => prec("charSingle", choice(
-		rxpChar,
-		seq(
-			$.__AMP_AT_DEPTH,
-			rxpHtmlEscape,
-			";",
-		),
-	));
-}
-function _atOrAboveDepth(rxpChar, rxpHtmlEscape){
-	return $ => prec("charSingle", choice(
-		rxpChar,
-		seq(
-			$.__AMP_AT_OR_ABOVE_DEPTH,
-			rxpHtmlEscape,
-			";",
-		),
-	));
-}
-function _atDepth_pair(rxpPair, rxpChar1, rxpHtmlEscape1, rxpChar2, rxpHtmlEscape2){
-	return $ => prec("charPair", choice(
-		seq(
-			rxpPair,
-		),
-		seq(
-			choice(
-				rxpChar1,
-				seq(
-					$.__AMP_AT_DEPTH,
-					rxpHtmlEscape1,
-					";",
-				),
-			),
-			choice(
-				rxpChar2,
-				seq(
-					$.__AMP_AT_DEPTH,
-					rxpHtmlEscape2,
-					";",
-				),
-			),
-		),
-	));
-}
-function _atOrAboveDepth_pair(rxpPair, rxpChar1, rxpHtmlEscape1, rxpChar2, rxpHtmlEscape2){
-	return $ => prec("charPair", choice(
-		seq(
-			rxpPair,
-		),
-		seq(
-			choice(
-				rxpChar1,
-				seq(
-					$.__AMP_AT_OR_ABOVE_DEPTH,
-					rxpHtmlEscape1,
-					";",
-				),
-			),
-			choice(
-				rxpChar2,
-				seq(
-					$.__AMP_AT_OR_ABOVE_DEPTH,
-					rxpHtmlEscape2,
-					";",
-				),
-			),
-		),
-	));
-}
-
-
-
 module.exports = grammar({
 	name: "roll20_script",
 	
 	externals: $ => [
-		$.__ANYTHING,	//to prevent problems when the scanner tries to error correct with conflicts
-		
-		$.__AMP_AT_OR_ABOVE_DEPTH,
-		$.__AMP_AT_DEPTH,
-		
-		$.__HTML_ENTITY,
-		
 		$.__ROLLQUERY_START,
-		$.__ROLLQUERY_PIPE,
-		$.__ROLLQUERY_COMMA,
 		$.__ROLLQUERY_END,
+		
+		$.__INLINEROLL_START,
+		$.__INLINEROLL_END,
 		
 		$.__LABEL_START,
 		$.__LABEL_END,
 		
 		$.__BUTTON_START,
-		$.__BUTTON_PIPE,
 		$.__BUTTON_END,
 		
 		$.__GROUPROLL_START,
-		$.__GROUPROLL_COMMA,
 		$.__GROUPROLL_END,
 		
 		$.__TABLEROLL_START,
 		$.__TABLEROLL_END,
+		
+		$.__PIPE,
+		$.__COMMA,
+		$.__LEFT_BRACE,
+		$.__RIGHT_BRACE,
+		$.__LEFT_PAREN,
+		$.__RIGHT_PAREN,
+		
+		$.__HTML_ENTITY,
+		
+		$.__AMPERSAND,
+		
+		$.__ANYTHING,	//to prevent problems when the scanner tries to error correct with conflicts
 	],
 	
 	extras: $ => [],
@@ -126,10 +58,6 @@ module.exports = grammar({
 		[
 			"multiplication",
 			"summation",
-		],
-		[
-			"charPair",
-			"charSingle",
 		],
 	],
 	
@@ -184,11 +112,11 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		script: $ => repeat(choice(
-			$._IrPh,	//attributes, abilities, inline rolls
+			$._placeholder,	//attributes, abilities
+			$.inlineRoll,
+			$.rollQuery,
 			$.hash,
 			$._htmlEntity_or_ampersand,
-			
-			$.rollQuery,
 			
 			$.abilityCommandButton,
 			
@@ -203,7 +131,7 @@ module.exports = grammar({
 		_wsp: $ => /\s+/,
 		
 		_htmlEntity_or_ampersand: $ => choice(
-			$.__ampersand,
+			$.__AMPERSAND,
 			$.htmlEntity,
 		),
 		
@@ -381,7 +309,7 @@ module.exports = grammar({
 					$.character_token_identifier,
 					alias($._acb_identifier_text, $.character_identifier),
 				),
-				$.__BUTTON_PIPE,
+				$.__PIPE,
 			)),
 			alias($._acb_identifier_text, $.ability_identifier),
 			$.__BUTTON_END,
@@ -389,10 +317,10 @@ module.exports = grammar({
 		
 		_acb_identifier_text: $ => prec.right(repeat1(choice(
 			/[^#\r\n|,})&]/,
-			$.__pipe,
-			$.__comma,
-			$.__rightBrace,
-			$.__rightParen,
+			$.__PIPE,
+			$.__COMMA,
+			$.__RIGHT_BRACE,
+			$.__RIGHT_PAREN,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
@@ -450,9 +378,9 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		inlineRoll: $ => seq(
-			$.__inlineRoll_start,
+			$.__INLINEROLL_START,
 			$.formula,
-			$.__inlineRoll_end,
+			$.__INLINEROLL_END,
 		),
 		
 		
@@ -462,11 +390,11 @@ module.exports = grammar({
 		 /*│ Numbers are combined with attributes, abilities, and inline rolls.
 		   └───────────────────────────────────────────────────────────*/
 		
-		_IrPh: $ => choice($.inlineRoll, $._placeholder),
-		
 		_integer: $ => prec.right(repeat1(choice(
 			/\d+/,
-			$._IrPh,
+			$._placeholder,
+			$.inlineRoll,
+			$.rollQuery,
 		))),
 		
 		number: $ => choice(
@@ -537,7 +465,6 @@ module.exports = grammar({
 					$.diceRoll,
 					$.groupRoll,
 					$.tableRoll,
-					$.rollQuery,
 				),
 				optional($._macro),
 			),
@@ -555,7 +482,6 @@ module.exports = grammar({
 							$.parenthesized,
 							$.function,
 							$.tableRoll,
-							$.rollQuery,
 						),
 						optional($._placeholder),
 					),
@@ -579,9 +505,9 @@ module.exports = grammar({
 		parenthesized: $ => $._parenthesized,
 		
 		_parenthesized: $ => seq(
-			$.__leftParen,
+			$.__LEFT_PAREN,
 			$.formula,
-			$.__rightParen,
+			$.__RIGHT_PAREN,
 		),
 		
 		function: $ => seq(
@@ -687,7 +613,7 @@ module.exports = grammar({
 			$.__GROUPROLL_START,
 			$.formula,
 			repeat(seq(
-				$.__GROUPROLL_COMMA,
+				$.__COMMA,
 				$.formula,
 			)),
 			$.__GROUPROLL_END,
@@ -725,16 +651,16 @@ module.exports = grammar({
 		rollQuery: $ => seq(
 			$.__ROLLQUERY_START,
 			choice(
-				alias($._text_query_prompt_or_defaultValue, $.prompt),
+				alias($._text_query_pd, $.prompt),
 				seq(
-					optional(alias($._text_query_prompt_or_defaultValue, $.prompt)),
-					$.__ROLLQUERY_PIPE,
+					optional(alias($._text_query_pd, $.prompt)),
+					$.__PIPE,
 					optional(choice(
-						alias($._text_query_prompt_or_defaultValue, $.defaultValue),
+						alias($._text_query_pd, $.defaultValue),
 						seq(
 							optional(alias($._queryOption, $.option)),
 							repeat1(seq(
-								$.__ROLLQUERY_PIPE,
+								$.__PIPE,
 								optional(alias($._queryOption, $.option)),
 							)),
 						),
@@ -746,76 +672,38 @@ module.exports = grammar({
 		
 		_text_query: $ => choice(
 			/[^}|{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
-			$.__leftBrace,
-			$.__leftParen,
-			$.__rightParen,
+			$.__LEFT_BRACE,
+			$.__RIGHT_BRACE,
+			$.__LEFT_PAREN,
+			$.__RIGHT_PAREN,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
 		),
 		
-		_text_query_prompt_or_defaultValue: $ => repeat1(choice(
+		_text_query_pd: $ => repeat1(choice(
 			$._text_query,
-			$.__comma,
+			$.__COMMA,
 		)),
 		
 		_queryOption: $ => prec.right(choice(
 			alias($._queryOptionName, $.optionName),
 			seq(
 				optional(alias($._queryOptionName, $.optionName)),
-				$.__ROLLQUERY_COMMA,
+				$.__COMMA,
 				optional(alias($._queryOptionValue, $.optionValue)),
 			),
 		)),
 		
 		_queryOptionName: $ => repeat1($._text_query),
 		
-		_text_queryOptionValue: $ => choice(
-			/[^}|{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
-			$.__leftBrace,
-			$.__leftParen,
-			$.__rightParen,
-			$._placeholder,
-			$.hash,
-			$._htmlEntity_or_ampersand,
-		),
-		
 		_queryOptionValue: $ => repeat1(choice(
-			$._text_queryOptionValue,
+			$._text_query,
 			$.rollQuery,
 			$.abilityCommandButton,
 			//TODO:
 			//$.property,
 		)),
-		
-		
-		/*╔════════════════════════════════════════════════════════════
-		  ║ Delimiters and Special Characters
-		  ╚════════════════════════════════════════════════════════════*/
-		
-		__leftBrace: 		_atDepth(/\{/, /#123|#[xX](00)?7[bB]|lcub|lbrace/),
-		__pipe: 			_atDepth(/\|/, /#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine/),
-		__comma: 			_atDepth(/,/, /#44|#[xX](00)?2[cC]|comma/),
-		__rightBrace: 		_atDepth(/\}/, /#125|#[xX](00)?7[dD]|rcub|rbrace/),
-		__leftParen: 		_atDepth(/\(/, /#40|#[xX](00)?28|lpar/),
-		__rightParen: 		_atDepth(/\)/, /#41|#[xX](00)?29|rpar/),
-		
-		__ampersand: $ => choice( $.__AMP_AT_DEPTH, $.__AMP_AT_OR_ABOVE_DEPTH, ),
-		
-		__inlineRoll_start: _atOrAboveDepth_pair(
-			/\[\[/,
-			/\[/,
-			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
-			/\[/,
-			/#91|#[xX](00)?5[bB]|lsqb|lbrack/,
-		),
-		__inlineRoll_end: _atDepth_pair(
-			/\]\]/,
-			/\]/,
-			/#93|#[xX](00)?5[dD]|rsqb|rbrack/,
-			/\]/,
-			/#93|#[xX](00)?5[dD]|rsqb|rbrack/,
-		),
 		
 		
 	},

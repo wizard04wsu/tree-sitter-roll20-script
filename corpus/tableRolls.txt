@@ -23,9 +23,9 @@ Table Roll: [[ t[n] ]]
 					(tableName))))))
 
 ==================
-Table Roll: [[2t[n]]]
+Table Roll: [[1t[n]]]
 ==================
-[[2t[n]]]
+[[1t[n]]]
 ---
 (script
 	(inlineRoll
@@ -36,9 +36,9 @@ Table Roll: [[2t[n]]]
 					(tableName))))))
 
 ==================
-Table Roll: [[ 2t[n] ]]
+Table Roll: [[ 1t[n] ]]
 ==================
-[[ 2t[n] ]]
+[[ 1t[n] ]]
 ---
 (script
 	(inlineRoll
