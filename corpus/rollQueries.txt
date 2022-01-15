@@ -442,3 +442,78 @@ Roll Query: [[?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f
 
 
 
+
+==================
+Roll Query: [[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;}]]
+==================
+[[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;}]]
+---
+(script (inlineRoll (formula (term
+	(number
+		(rollQuery
+			(prompt)
+			(defaultValue
+				(htmlEntity)
+				(htmlEntity)
+				(htmlEntity)
+				(htmlEntity))))))))
+
+==================
+Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;}]]
+==================
+[[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;}]]
+---
+(script (inlineRoll (formula (term
+	(number
+		(rollQuery
+			(prompt)
+			(defaultValue
+				(htmlEntity)
+				(htmlEntity)
+				(htmlEntity)
+				(htmlEntity))))))))
+
+==================
+Roll Query: [[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;|}]]
+==================
+[[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;|}]]
+---
+(script (inlineRoll (formula (term
+	(number
+		(rollQuery
+			(prompt)
+			(option
+				(optionName)
+				(optionValue
+					(rollQuery
+						(prompt)
+						(option
+							(optionName)
+							(optionValue))
+						(option
+							(optionName)))))))))))
+
+==================
+Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;|}]]
+==================
+[[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;|}]]
+---
+(script (inlineRoll (formula (term
+	(number
+		(rollQuery
+			(prompt)
+			(option
+				(optionName
+					(htmlEntity)
+					(htmlEntity)
+					(htmlEntity)
+					(htmlEntity)))))))))
+
+
+
+
+
+
+
+
+

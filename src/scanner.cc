@@ -347,9 +347,9 @@ struct Scanner {
 		bool validSymbolFound = false;
 		int persp = entity.perspective(nest.depth());
 		string logstr = color(regex_match(entity.entityName, regex(rxp)) ? brightGreen : darkRed)+entity.str+"  "+
-			color(nest.isSafe(encodedChar)?brightGreen:persp==1?darkYellow:darkRed)+"("+string({encodedChar})+")"+
+			color(nest.isSafe(encodedChar)?brightGreen:darkRed)+"("+string({encodedChar})+")"+
 			color(green)+"  perspective: "+
-			color(persp==1?brightGreen:persp<1&&nest.isSafe(encodedChar)?brightGreen:darkRed)+
+			color(persp==0?brightGreen:darkRed)+
 			to_string(persp)+color(green)+"  [ ";
 		for (int i=0; i<N; i++) {
 			if (i > 0) logstr += color(green)+", ";
@@ -360,13 +360,8 @@ struct Scanner {
 		
 		return (
 			validSymbolFound
-			&& (
-				entity.perspective(nest.depth()) == 1
-				|| (
-					entity.perspective(nest.depth()) < 1
-					&& nest.isSafe(encodedChar)
-				)
-			)
+			&& entity.perspective(nest.depth()) <= 0
+			&& nest.isSafe(encodedChar)
 			&& regex_match(entity.entityName, regex(rxp))
 		);
 	}
@@ -472,10 +467,16 @@ struct Scanner {
 					}
 				}
 				
+				else if (match_at_depth(result, {LEFT_PAREN}, '(', "#40|#[xX](00)?28|lpar"))
+					return match_found(LEFT_PAREN);
+				
 				else if (match_at_depth(result, {GROUPROLL_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
 					nest.push(",}");
 					return match_found(GROUPROLL_START);
 				}
+				
+				else if (match_at_depth(result, {LEFT_BRACE}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace"))
+					return match_found(LEFT_BRACE);
 				
 				else if (match_at_depth(result, {TABLEROLL_START}, 't', "#116|#[xX](00)?74")
 				 || match_at_depth(result, {TABLEROLL_START}, 'T', "#84|#[xX](00)?54")) {
@@ -506,6 +507,9 @@ struct Scanner {
 						if (valid_symbols[GROUPROLL_END]) return match_found(GROUPROLL_END);
 					}
 				}
+				
+				else if (match_at_depth(result, {RIGHT_BRACE}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
+					return match_found(RIGHT_BRACE);
 				
 				else if (match_at_depth(result, {INLINEROLL_END, LABEL_END, TABLEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
 					if (valid_symbols[LABEL_END]) {
@@ -541,23 +545,14 @@ struct Scanner {
 					return match_found(BUTTON_END);
 				}
 				
+				else if (match_at_depth(result, {RIGHT_PAREN}, ')', "#41|#[xX](00)?29|rpar"))
+					return match_found(RIGHT_PAREN);
+				
 				else if (match_at_depth(result, {PIPE}, '|', "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))
 					return match_found(PIPE);
 				
 				else if (match_at_depth(result, {COMMA}, ',', "#44|#[xX](00)?2[cC]|comma"))
 					return match_found(COMMA);
-				
-				else if (match_at_depth(result, {LEFT_BRACE}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace"))
-					return match_found(LEFT_BRACE);
-				
-				else if (match_at_depth(result, {RIGHT_BRACE}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
-					return match_found(RIGHT_BRACE);
-				
-				else if (match_at_depth(result, {LEFT_PAREN}, '(', "#40|#[xX](00)?28|lpar"))
-					return match_found(LEFT_PAREN);
-				
-				else if (match_at_depth(result, {RIGHT_PAREN}, ')', "#41|#[xX](00)?29|rpar"))
-					return match_found(RIGHT_PAREN);
 				
 				
 				if (valid_symbols[HTML_ENTITY]) {
@@ -643,11 +638,21 @@ struct Scanner {
 					return match_found(BUTTON_START);
 				}
 			}
+			else if (c == '(' && valid_symbols[LEFT_PAREN]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(LEFT_PAREN);
+			}
 			else if (c == '{' && valid_symbols[GROUPROLL_START]) {
 				c = advance(lexer);
 				mark_end(lexer);
 				nest.push(",}");
 				return match_found(GROUPROLL_START);
+			}
+			else if (c == '{' && valid_symbols[LEFT_BRACE]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(LEFT_BRACE);
 			}
 			else if ((c == 't' || c == 'T') && valid_symbols[TABLEROLL_START]) {
 				c = advance(lexer);
@@ -725,6 +730,11 @@ struct Scanner {
 				nest.pop();
 				return match_found(BUTTON_END);
 			}
+			else if (c == ')' && valid_symbols[RIGHT_PAREN]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(RIGHT_PAREN);
+			}
 			
 			else if (c == '|' && valid_symbols[PIPE]) {
 				c = advance(lexer);
@@ -735,21 +745,6 @@ struct Scanner {
 				c = advance(lexer);
 				mark_end(lexer);
 				return match_found(COMMA);
-			}
-			else if (c == '{' && valid_symbols[LEFT_BRACE]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				return match_found(LEFT_BRACE);
-			}
-			else if (c == '(' && valid_symbols[LEFT_PAREN]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				return match_found(LEFT_PAREN);
-			}
-			else if (c == ')' && valid_symbols[RIGHT_PAREN]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				return match_found(RIGHT_PAREN);
 			}
 		}
 		
