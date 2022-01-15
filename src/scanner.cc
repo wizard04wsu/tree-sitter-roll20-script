@@ -19,7 +19,7 @@ namespace {
 using namespace std;
 
 
-const bool DEBUGGING = false;
+const bool DEBUGGING = true;
 const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 
 
@@ -160,16 +160,21 @@ void mark_end(TSLexer *lexer) {
 
 
 struct HtmlEntity {
-	unsigned encodedDepth = 0;	//Depth it would need to be at now if it was a character at depth 1.
-								//Like this: starting as a character at depth 1, encode it each time
-								// it gets encapsulated in a roll query/group roll/etcetera (i.e., each
-								// time its depth is incremented). Add 1 since depths 0 & 1 act the same.
-	bool atDepth = false;		//Does the encoded depth equal the current depth?
-	string amps = "&";			//First ampersand followed by a possible chain of "amp;"
-								// strings before the actual entity name.
-	string entityName = "";		//Entity name (not including the following ';').
-	string remainder = "";		//Final characters that were consumed but did not end up
-								// being part of the entity.
+	string str = "&";			//the '&', a possible chain of "amp;" strings, the final
+								// entity name/code, and the following ';'
+	
+	string entityName = "";		//just the final name/code, not including the following ';'
+	
+	string remainder = "";		//final characters that were traversed but did not end up
+								// being part of the entity
+	
+	unsigned timesEncoded = 0;	//number of times the represented character was encoded
+	unsigned foundAtDepth;		//the current depth when this entity was encountered
+	
+	//how many levels below `fromDepth` would you have to go for the entity to be interpreted as a character
+	int perspective(unsigned fromDepth){
+		return foundAtDepth + timesEncoded - fromDepth;
+	}
 };
 
 string getNextEntityName(TSLexer *lexer, string &remainder){
@@ -197,52 +202,37 @@ string getNextEntityName(TSLexer *lexer, string &remainder){
 //(when called, lexer->lookahead should be the character after '&')
 HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 	
-	HtmlEntity obj;
-	unsigned ampCount = 0;
-	unsigned offset = 2;
-	string prevEntityName = "";
-	string entityName = "";
-	string remainder = "";
 	regex rxp_amp = regex("amp|AMP|#38|#[xX](00)?26");
-	char c = lexer->lookahead;
 	
-	if (depth < 2) offset = depth;
+	//unsigned maxDecodings = max(0, depth-1);	//if it's not a character after this many decodings,
+	unsigned maxDecodings = (0>=depth-1)?0:depth-1;	//if it's not a character after this many decodings,
+												// it will always be interpreted as an HTML entity
 	
-	while (ampCount+offset <= depth) {
+	HtmlEntity obj;
+	obj.foundAtDepth = depth;
+	
+	
+	while (obj.timesEncoded <= maxDecodings) {
 		
-		prevEntityName = entityName;
-		entityName = getNextEntityName(lexer, remainder);
+		obj.entityName = getNextEntityName(lexer, obj.remainder);
 		
-		if (regex_match(entityName, rxp_amp)) {
+		if (obj.entityName != "") {
 			mark_end(lexer);
-			obj.amps += entityName+";";
-			ampCount++;
+			obj.str += obj.entityName+";";
+			obj.timesEncoded++;
+			
+			if (!regex_match(obj.entityName, rxp_amp)) {
+				//it's an entity for something besides an ampersand
+				return obj;
+			}
 		}
 		else {
-			if (entityName != "") {
-				mark_end(lexer);
-				obj.entityName = entityName;
-			}
-			else if (ampCount > 0) {
-				//not followed by an entity name, so use the last "amp;"
-				
-				ampCount--;
-				obj.entityName = prevEntityName;
-				obj.remainder = remainder;
-			}
-			else {
-				obj.remainder = remainder;
-			}
-			
-			obj.encodedDepth = depth - (ampCount+1) + (depth > 0 ? 1 : 0);
-			if (obj.encodedDepth == depth) obj.atDepth = true;
-			
-			break;
+			//it's either an entity for an ampersand, or it's just an ampersand character
+			return obj;
 		}
 	}
 	
 	return obj;
-	
 }
 
 
@@ -352,64 +342,33 @@ struct Scanner {
 	}
 	
 	
-	bool match_at_depth(HtmlEntity entity, int symbol, char encodedChar, string rxp) {
-		log(color(green)+entity.amps+entity.entityName+"; [ "+color(brightGreen)+symbol_strings[symbol]+color(green)+" ] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
-		
-		log(color(green)+"    symbol "+
-			(valid_symbols[symbol]?"":"not ")+"accepted, '"+
-			string({encodedChar})+"' is "+(nest.isSafe(encodedChar)?"safe to use here":"reserved")+", will"+
-			(entity.encodedDepth <= nest.depth()?"":" not")+" be fully decoded when evaluated, "+
-			(regex_match(entity.entityName, regex(rxp))?"matches":"doesn't match")+" the regexp");
+	template <int N>
+	bool match_at_depth(HtmlEntity entity, const int (&symbols)[N], char encodedChar, string rxp) {
+		bool validSymbolFound = false;
+		int persp = entity.perspective(nest.depth());
+		string logstr = color(regex_match(entity.entityName, regex(rxp)) ? brightGreen : darkRed)+entity.str+"  "+
+			color(nest.isSafe(encodedChar)?brightGreen:persp==1?darkYellow:darkRed)+"("+string({encodedChar})+")"+
+			color(green)+"  perspective: "+
+			color(persp==1?brightGreen:persp<1&&nest.isSafe(encodedChar)?brightGreen:darkRed)+
+			to_string(persp)+color(green)+"  [ ";
+		for (int i=0; i<N; i++) {
+			if (i > 0) logstr += color(green)+", ";
+			logstr += color(valid_symbols[symbols[i]] ? brightGreen : darkRed)+symbol_strings[symbols[i]];
+			validSymbolFound = validSymbolFound || valid_symbols[symbols[i]];
+		}
+		log(logstr+color(green)+" ]");
 		
 		return (
-			valid_symbols[symbol]
+			validSymbolFound
 			&& (
-				(
-					entity.atDepth
-					&& nest.depth() > 1
-				)
+				entity.perspective(nest.depth()) == 1
 				|| (
-					entity.encodedDepth < nest.depth()
+					entity.perspective(nest.depth()) < 1
 					&& nest.isSafe(encodedChar)
 				)
 			)
 			&& regex_match(entity.entityName, regex(rxp))
 		);
-	}
-	template <int N>
-	bool match_at_depth(HtmlEntity entity, const int (&symbols)[N], char encodedChar, string rxp) {
-		for (int i=0; i<N; i++) {
-			string logstr = color(green)+entity.amps+entity.entityName+"; [ ";
-			for (int j=0; j<N; j++) {
-				logstr += (i==j?color(brightGreen):"")+
-					symbol_strings[symbols[j]]+
-					(i==j?color(green):"")+", ";
-			}
-			log(logstr+"] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
-			log(color(green)+"    symbol "+
-				(valid_symbols[symbols[i]]?"":"not ")+"accepted, '"+
-				string({encodedChar})+"' is "+(nest.isSafe(encodedChar)?"safe to use here":"reserved")+", will"+
-				(entity.encodedDepth <= nest.depth()?"":" not")+" be fully decoded when evaluated, "+
-				(regex_match(entity.entityName, regex(rxp))?"matches":"doesn't match")+" the regexp");
-			
-			if (valid_symbols[symbols[i]]) {
-				return (
-					(
-						(
-							entity.atDepth
-							&& nest.depth() > 1
-						)
-						|| (
-							entity.encodedDepth < nest.depth()
-							&& nest.isSafe(encodedChar)
-						)
-					)
-					&& regex_match(entity.entityName, regex(rxp))
-				);
-			}
-		}
-		
-		return false;
 	}
 	
 	
@@ -446,14 +405,14 @@ struct Scanner {
 			else {
 				c = lexer->lookahead;
 				
-				if (match_at_depth(result, ROLLQUERY_START, '?', "#63|#[xX](00)?3[fF]|quest")) {
+				if (match_at_depth(result, {ROLLQUERY_START}, '?', "#63|#[xX](00)?3[fF]|quest")) {
 					if (c == '&') {
 						c = advance(lexer);
 						
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (match_at_depth(result, ROLLQUERY_START, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+						if (match_at_depth(result, {ROLLQUERY_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
 							mark_end(lexer);
 							nest.push("|,}");
 							return match_found(ROLLQUERY_START);
@@ -474,7 +433,7 @@ struct Scanner {
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (match_at_depth(result, INLINEROLL_START, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
+						if (match_at_depth(result, {INLINEROLL_START}, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
 							mark_end(lexer);
 							return match_found(INLINEROLL_START);
 						}
@@ -492,14 +451,14 @@ struct Scanner {
 					}
 				}
 				
-				else if (match_at_depth(result, BUTTON_START, '(', "#40|#[xX](00)?28|lpar")) {
+				else if (match_at_depth(result, {BUTTON_START}, '(', "#40|#[xX](00)?28|lpar")) {
 					if (c == '&') {
 						c = advance(lexer);
 						
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (match_at_depth(result, BUTTON_START, '~', "#126|#[xX](00)?7[eE]")) {
+						if (match_at_depth(result, {BUTTON_START}, '~', "#126|#[xX](00)?7[eE]")) {
 							mark_end(lexer);
 							nest.push("|)");
 							return match_found(BUTTON_START);
@@ -513,20 +472,20 @@ struct Scanner {
 					}
 				}
 				
-				else if (match_at_depth(result, GROUPROLL_START, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+				else if (match_at_depth(result, {GROUPROLL_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
 					nest.push(",}");
 					return match_found(GROUPROLL_START);
 				}
 				
-				else if (match_at_depth(result, TABLEROLL_START, 't', "#116|#[xX](00)?74")
-				 || match_at_depth(result, TABLEROLL_START, 'T', "#84|#[xX](00)?54")) {
+				else if (match_at_depth(result, {TABLEROLL_START}, 't', "#116|#[xX](00)?74")
+				 || match_at_depth(result, {TABLEROLL_START}, 'T', "#84|#[xX](00)?54")) {
 					if (c == '&') {
 						c = advance(lexer);
 						
 						result = getHtmlEntity(lexer, nest.depth());
 						c = lexer->lookahead;
 						
-						if (match_at_depth(result, TABLEROLL_START, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
+						if (match_at_depth(result, {TABLEROLL_START}, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
 							mark_end(lexer);
 							nest.push("]");
 							return match_found(TABLEROLL_START);
@@ -564,7 +523,7 @@ struct Scanner {
 							result = getHtmlEntity(lexer, nest.depth());
 							c = lexer->lookahead;
 							
-							if (match_at_depth(result, INLINEROLL_END, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+							if (match_at_depth(result, {INLINEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
 								mark_end(lexer);
 								nest.pop();
 								return match_found(INLINEROLL_END);
@@ -577,27 +536,27 @@ struct Scanner {
 					}
 				}
 				
-				else if (match_at_depth(result, BUTTON_END, ')', "#41|#[xX](00)?29|rpar")) {
+				else if (match_at_depth(result, {BUTTON_END}, ')', "#41|#[xX](00)?29|rpar")) {
 					nest.pop();
 					return match_found(BUTTON_END);
 				}
 				
-				else if (match_at_depth(result, PIPE, '|', "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))
+				else if (match_at_depth(result, {PIPE}, '|', "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))
 					return match_found(PIPE);
 				
-				else if (match_at_depth(result, COMMA, ',', "#44|#[xX](00)?2[cC]|comma"))
+				else if (match_at_depth(result, {COMMA}, ',', "#44|#[xX](00)?2[cC]|comma"))
 					return match_found(COMMA);
 				
-				else if (match_at_depth(result, LEFT_BRACE, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace"))
+				else if (match_at_depth(result, {LEFT_BRACE}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace"))
 					return match_found(LEFT_BRACE);
 				
-				else if (match_at_depth(result, RIGHT_BRACE, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
+				else if (match_at_depth(result, {RIGHT_BRACE}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
 					return match_found(RIGHT_BRACE);
 				
-				else if (match_at_depth(result, LEFT_PAREN, '(', "#40|#[xX](00)?28|lpar"))
+				else if (match_at_depth(result, {LEFT_PAREN}, '(', "#40|#[xX](00)?28|lpar"))
 					return match_found(LEFT_PAREN);
 				
-				else if (match_at_depth(result, RIGHT_PAREN, ')', "#41|#[xX](00)?29|rpar"))
+				else if (match_at_depth(result, {RIGHT_PAREN}, ')', "#41|#[xX](00)?29|rpar"))
 					return match_found(RIGHT_PAREN);
 				
 				
@@ -750,7 +709,7 @@ struct Scanner {
 					result = getHtmlEntity(lexer, nest.depth());
 					c = lexer->lookahead;
 					
-					if (match_at_depth(result, INLINEROLL_END, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+					if (match_at_depth(result, {INLINEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
 						return match_found(INLINEROLL_END);
 					}
 				}
