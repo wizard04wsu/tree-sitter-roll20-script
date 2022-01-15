@@ -6,12 +6,20 @@
 #include <unordered_map>
 #include <iostream>	//cout
 
+//for serialization/deserialization using cereal:
+//http://uscilab.github.io/cereal/quickstart.html
+#include <sstream>
+//#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/stack.hpp>
+#include <cereal/types/unordered_set.hpp>
+
 namespace {
 
 using namespace std;
 
 
-const bool DEBUGGING = true;
+const bool DEBUGGING = false;
 const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 
 
@@ -48,6 +56,8 @@ enum TokenType {
 	ANYTHING,
 };
 
+
+//For debugging:
 unordered_map<int, string> symbol_strings({
 	{ ROLLQUERY_START, "ROLLQUERY_START" },
 	{ ROLLQUERY_END, "ROLLQUERY_END" },
@@ -80,9 +90,6 @@ unordered_map<int, string> symbol_strings({
 		
 	{ ANYTHING, "ANYTHING" },
 });
-
-
-//For debugging:
 const bool log_valid_symbols = true;
 enum ANSI_Color {
 	noChange=0,
@@ -196,6 +203,7 @@ HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 	string prevEntityName = "";
 	string entityName = "";
 	string remainder = "";
+	regex rxp_amp = regex("amp|AMP|#38|#[xX](00)?26");
 	char c = lexer->lookahead;
 	
 	if (depth < 2) offset = depth;
@@ -205,7 +213,7 @@ HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 		prevEntityName = entityName;
 		entityName = getNextEntityName(lexer, remainder);
 		
-		if (regex_match(entityName, regex("amp|AMP|#38|#[xX](00)?26"))) {
+		if (regex_match(entityName, rxp_amp)) {
 			mark_end(lexer);
 			obj.amps += entityName+";";
 			ampCount++;
@@ -238,11 +246,9 @@ HtmlEntity getHtmlEntity(TSLexer *lexer, unsigned depth) {
 }
 
 
-class NestedElements {
+struct NestedElements {
 	
 	stack<unordered_set<char>> unsafeChars;
-	
-public:
 	
 	unsigned depth(){ return unsafeChars.size(); }
 	
@@ -269,6 +275,13 @@ public:
 	
 	bool isSafe(const char c){ return !isUnsafe(c); }
 	
+	
+	
+	template<class Archive>
+	void serialize(Archive & archive) {
+		archive(unsafeChars);
+	}
+	
 };
 
 struct Scanner {
@@ -280,30 +293,48 @@ struct Scanner {
 	NestedElements nest;
 	
 	
-	void logTokenType(TSLexer *lexer, int symbol, bool noMatch = false) {
-		log(color(yellow)+"Result set to "+color(brightYellow)+symbol_strings[symbol]);
-		if (noMatch) {
-			//consume an extra character
-			log_consumed += lexer->lookahead;
-			lexer->advance(lexer, false);
-			
-			unsigned consumed_length = max(int(log_marked), int(log_consumed.length()-1));
-			log("  "
-				+color(gray)+log_consumed.substr(0, consumed_length)
-				+color(cyan)+log_consumed.substr(consumed_length)
-				+color(cyan)+string({char(lexer->lookahead)})
-			);
+	
+	unsigned serialize(char * buffer) {
+		stringstream stream_out;
+		{
+			//cereal::JSONOutputArchive archive_out(stream_out);
+			cereal::BinaryOutputArchive archive_out(stream_out);
+			archive_out(nest);
 		}
-		else {
-			log("  "
-				+color(brightYellow)+log_consumed.substr(0, log_marked)
-				+color(gray)+log_consumed.substr(log_marked)
-				+color(cyan)+string({char(lexer->lookahead)})
-			);
+		string state2save = stream_out.str();
+		state2save.copy(&buffer[0], state2save.size());
+		return state2save.size()+1;
+	}
+	void deserialize(const char * buffer, unsigned length) {
+		if (length > 0) {
+			string state2load;
+			state2load.assign(&buffer[0], length);
+			stringstream stream_in;
+			stream_in.str(state2load);
+			{
+				//cereal::JSONInputArchive archive_in(stream_in);
+				cereal::BinaryInputArchive archive_in(stream_in);
+				archive_in(nest);
+			}
 		}
 	}
 	
-	bool no_match(TSLexer *lexer) {
+	
+	
+	bool match_found(int symbol) {
+		log(color(yellow)+"Result set to "+color(brightYellow)+symbol_strings[symbol]);
+		
+		log("  "
+			+color(brightYellow)+log_consumed.substr(0, log_marked)
+			+color(gray)+log_consumed.substr(log_marked)
+			+color(cyan)+string({char(lexer->lookahead)})
+		);
+		
+		lexer->result_symbol = symbol;
+		return true;
+	}
+	
+	bool no_match() {
 		log(color(yellow)+"Result set to "+color(brightYellow)+"(no match)");
 		
 		//consume an extra character
@@ -322,12 +353,21 @@ struct Scanner {
 	
 	
 	bool match_at_depth(HtmlEntity entity, int symbol, char encodedChar, string rxp) {
-		log(color(green)+entity.amps+entity.entityName+"; [ "+symbol_strings[symbol]+" ] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
-		log(color(green)+"    "+to_string(valid_symbols[symbol])+" "+to_string(nest.isSafe(encodedChar))+" "+to_string(entity.encodedDepth <= nest.depth())+" "+to_string(regex_match(entity.entityName, regex(rxp))));
+		log(color(green)+entity.amps+entity.entityName+"; [ "+color(brightGreen)+symbol_strings[symbol]+color(green)+" ] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
+		
+		log(color(green)+"    symbol "+
+			(valid_symbols[symbol]?"":"not ")+"accepted, '"+
+			string({encodedChar})+"' is "+(nest.isSafe(encodedChar)?"safe to use here":"reserved")+", will"+
+			(entity.encodedDepth <= nest.depth()?"":" not")+" be fully decoded when evaluated, "+
+			(regex_match(entity.entityName, regex(rxp))?"matches":"doesn't match")+" the regexp");
+		
 		return (
 			valid_symbols[symbol]
 			&& (
-				entity.atDepth
+				(
+					entity.atDepth
+					&& nest.depth() > 1
+				)
 				|| (
 					entity.encodedDepth < nest.depth()
 					&& nest.isSafe(encodedChar)
@@ -338,14 +378,27 @@ struct Scanner {
 	}
 	template <int N>
 	bool match_at_depth(HtmlEntity entity, const int (&symbols)[N], char encodedChar, string rxp) {
-		string logstr = color(green)+entity.amps+entity.entityName+"; [ ";
-		for (int i=0; i<N; i++) { logstr += symbol_strings[symbols[i]]+", "; }
-		log(logstr+"] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
 		for (int i=0; i<N; i++) {
+			string logstr = color(green)+entity.amps+entity.entityName+"; [ ";
+			for (int j=0; j<N; j++) {
+				logstr += (i==j?color(brightGreen):"")+
+					symbol_strings[symbols[j]]+
+					(i==j?color(green):"")+", ";
+			}
+			log(logstr+"] @ depth "+to_string(nest.depth())+" / encoded depth "+to_string(entity.encodedDepth));
+			log(color(green)+"    symbol "+
+				(valid_symbols[symbols[i]]?"":"not ")+"accepted, '"+
+				string({encodedChar})+"' is "+(nest.isSafe(encodedChar)?"safe to use here":"reserved")+", will"+
+				(entity.encodedDepth <= nest.depth()?"":" not")+" be fully decoded when evaluated, "+
+				(regex_match(entity.entityName, regex(rxp))?"matches":"doesn't match")+" the regexp");
+			
 			if (valid_symbols[symbols[i]]) {
 				return (
 					(
-						entity.atDepth
+						(
+							entity.atDepth
+							&& nest.depth() > 1
+						)
 						|| (
 							entity.encodedDepth < nest.depth()
 							&& nest.isSafe(encodedChar)
@@ -355,13 +408,8 @@ struct Scanner {
 				);
 			}
 		}
+		
 		return false;
-	}
-	
-	bool match_found(int symbol) {
-		logTokenType(lexer, symbol);
-		lexer->result_symbol = symbol;
-		return true;
 	}
 	
 	
@@ -373,8 +421,7 @@ struct Scanner {
 		
 		log_marked = 0;
 		log_consumed = "";
-		log(color(brightMagenta)+"Scanner.scan");
-		log(color(magenta)+"Depth: "+to_string(nest.depth()));
+		log(color(brightMagenta)+"Scanning at depth "+to_string(nest.depth()));
 		logValidSymbols(valid_symbols);
 		logLookahead(lexer);
 		
@@ -747,9 +794,12 @@ struct Scanner {
 			}
 		}
 		
-		return no_match(lexer);
+		return no_match();
 	}
+	
 };
+
+
 
 }
 
@@ -765,11 +815,15 @@ bool tree_sitter_roll20_script_external_scanner_scan(void *payload, TSLexer *lex
 	return scanner->scan(lexer, valid_symbols);
 }
 
-unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *state) {
-	return 0;
+unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *buffer) {
+	Scanner *scanner = static_cast<Scanner *>(payload);
+	return scanner->serialize(buffer);
 }
 
-void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *state, unsigned length) {}
+void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
+	Scanner *scanner = static_cast<Scanner *>(payload);
+	scanner->deserialize(buffer, length);
+}
 
 void tree_sitter_roll20_script_external_scanner_destroy(void *payload) {
 	Scanner *scanner = static_cast<Scanner *>(payload);
