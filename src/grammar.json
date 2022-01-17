@@ -49,27 +49,7 @@
           },
           {
             "type": "PATTERN",
-            "value": "[^&]"
-          }
-        ]
-      }
-    },
-    "_wsp": {
-      "type": "PATTERN",
-      "value": "\\s+"
-    },
-    "_wsp_nl": {
-      "type": "REPEAT1",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_wsp"
-          },
-          {
-            "type": "PATTERN",
-            "value": "\\r?\\n"
+            "value": "[^#&]"
           }
         ]
       }
@@ -624,7 +604,7 @@
           "members": [
             {
               "type": "PATTERN",
-              "value": "[^#|,})&]"
+              "value": "[^#&|,})]"
             },
             {
               "type": "SYMBOL",
@@ -732,18 +712,22 @@
         }
       ]
     },
-    "_ir_comment": {
+    "_ir_tooltip": {
       "type": "REPEAT1",
       "content": {
         "type": "CHOICE",
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^\\]]"
+            "value": "[^#\\]]"
           },
           {
             "type": "PATTERN",
-            "value": "\\][^\\]]"
+            "value": "\\][^#\\]]"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "hash"
           }
         ]
       }
@@ -1786,7 +1770,7 @@
       "members": [
         {
           "type": "PATTERN",
-          "value": "[^#{|,}()]"
+          "value": "[^#&{|,}()]"
         },
         {
           "type": "SYMBOL",
@@ -1995,7 +1979,7 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^#:}]"
+            "value": "[^#&:}]"
           },
           {
             "type": "SYMBOL",
@@ -2023,7 +2007,7 @@
         "members": [
           {
             "type": "PATTERN",
-            "value": "[^#}]"
+            "value": "[^#&}]"
           },
           {
             "type": "SYMBOL",
@@ -2052,13 +2036,21 @@
           "value": "{{"
         },
         {
-          "type": "ALIAS",
-          "content": {
-            "type": "SYMBOL",
-            "name": "_rt_propertyName"
-          },
-          "named": true,
-          "value": "identifier"
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "ALIAS",
+              "content": {
+                "type": "SYMBOL",
+                "name": "_rt_propertyName"
+              },
+              "named": true,
+              "value": "identifier"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         },
         {
           "type": "ALIAS",
@@ -2070,8 +2062,24 @@
           "value": "separator"
         },
         {
-          "type": "SYMBOL",
-          "name": "_script"
+          "type": "REPEAT",
+          "content": {
+            "type": "PREC_RIGHT",
+            "value": 0,
+            "content": {
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "SYMBOL",
+                  "name": "_script"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "\\r?\\n"
+                }
+              ]
+            }
+          }
         },
         {
           "type": "STRING",
@@ -2080,8 +2088,36 @@
       ]
     },
     "_rt_propertyName": {
-      "type": "PATTERN",
-      "value": "[\\da-zA-Z_]+"
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^#&=}]|\\r?\\n"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_placeholder"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "hash"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "_htmlEntity_or_ampersand"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "inlineRoll"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "abilityCommandButton"
+          }
+        ]
+      }
     }
   },
   "extras": [],

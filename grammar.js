@@ -112,11 +112,8 @@ module.exports = grammar({
 			$.hash,
 			$._htmlEntity_or_ampersand,
 			$.abilityCommandButton,
-			/[^&]/,
+			/[^#&]/,
 		)),
-		
-		_wsp: $ => /\s+/,
-		_wsp_nl: $ => repeat1(choice( $._wsp, /\r?\n/, )),
 		
 		_htmlEntity_or_ampersand: $ => choice(
 			$.__AMPERSAND,
@@ -306,7 +303,7 @@ module.exports = grammar({
 		),
 		
 		_acb_identifier_text: $ => prec.right(repeat1(choice(
-			/[^#|,})&]/,
+			/[^#&|,})]/,
 			$.__PIPE,
 			$.__COMMA,
 			$.__RIGHT_BRACE,
@@ -374,7 +371,7 @@ module.exports = grammar({
 			$.__INLINEROLL_START,
 			$.formula,
 			optional($.flag),	//in particular: &{tracker}
-			//TODO: optional(field("tooltip", alias($._ir_tooltip, $.literal))),
+			//optional(field("tooltip", alias($._ir_tooltip, $.literal))),	//TODO
 			$.__INLINEROLL_END,
 		),
 		
@@ -382,7 +379,7 @@ module.exports = grammar({
 		_ir_tooltip: $ => repeat1(choice(
 			/[^#\]]/,
 			/\][^#\]]/,
-			$.hash;
+			$.hash,
 		)),
 		
 		
@@ -673,7 +670,7 @@ module.exports = grammar({
 		),
 		
 		_rq_text: $ => choice(
-			/[^#{|,}()]/,
+			/[^#&{|,}()]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
@@ -720,7 +717,7 @@ module.exports = grammar({
 		),
 		
 		_flagName: $ => repeat1(choice(
-			/[^#:}]/,
+			/[^#&:}]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
@@ -728,7 +725,7 @@ module.exports = grammar({
 		)),
 		
 		_flagValue: $ => repeat1(choice(
-			/[^#}]/,
+			/[^#&}]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
@@ -742,13 +739,23 @@ module.exports = grammar({
 		
 		rollTemplate_property: $ => seq(
 			"{{",
-			alias($._rt_propertyName, $.identifier),
+			optional(alias($._rt_propertyName, $.identifier)),
 			alias("=", $.separator),
-			$._script,
+			repeat(prec.right(choice(
+				$._script,
+				/\r?\n/,
+			))),
 			"}}",
 		),
 		
-		_rt_propertyName: $ => /[\da-zA-Z_]+/,	//TODO
+		_rt_propertyName: $ => repeat1(choice(
+			/[^#&=}]|\r?\n/,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			$.inlineRoll,
+			$.abilityCommandButton,
+		)),
 		
 		
 	},
