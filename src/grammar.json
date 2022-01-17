@@ -9,7 +9,8 @@
           "name": "_script"
         },
         {
-          "type": "BLANK"
+          "type": "SYMBOL",
+          "name": "rollTemplate"
         }
       ]
     },
@@ -44,7 +45,11 @@
           },
           {
             "type": "PATTERN",
-            "value": "[^&]"
+            "value": "[^&}]"
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\}[^&}]"
           }
         ]
       }
@@ -1730,12 +1735,58 @@
         ]
       }
     },
+    "tracker": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "&{"
+        },
+        {
+          "type": "STRING",
+          "value": "tracker"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": ":"
+                },
+                {
+                  "type": "PATTERN",
+                  "value": "[+-]"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        }
+      ]
+    },
     "rollTemplate": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
-          "value": "&{template:"
+          "value": "&{"
+        },
+        {
+          "type": "STRING",
+          "value": "template"
+        },
+        {
+          "type": "STRING",
+          "value": ":"
         },
         {
           "type": "ALIAS",

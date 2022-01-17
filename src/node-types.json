@@ -668,6 +668,25 @@
     }
   },
   {
+    "type": "rollTemplate",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "property",
+          "named": true
+        },
+        {
+          "type": "templateName",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "script",
     "named": true,
     "fields": {},
@@ -705,6 +724,10 @@
         },
         {
           "type": "rollQuery",
+          "named": true
+        },
+        {
+          "type": "rollTemplate",
           "named": true
         }
       ]
@@ -903,11 +926,15 @@
     "named": false
   },
   {
-    "type": "&{template:",
+    "type": "&{",
     "named": false
   },
   {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": ":",
     "named": false
   },
   {
@@ -932,6 +959,14 @@
   },
   {
     "type": "target",
+    "named": false
+  },
+  {
+    "type": "template",
+    "named": false
+  },
+  {
+    "type": "tracker",
     "named": false
   },
   {

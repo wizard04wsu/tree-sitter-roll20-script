@@ -388,6 +388,7 @@ module.exports = grammar({
 			$.__INLINEROLL_END,
 		),
 		
+		//TODO
 		_ir_comment: $ => repeat1(choice(
 			/[^\]]/,
 			/\][^\]]/,
