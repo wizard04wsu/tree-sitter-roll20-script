@@ -1802,10 +1802,6 @@
     {
       "type": "SYMBOL",
       "name": "__AMPERSAND"
-    },
-    {
-      "type": "SYMBOL",
-      "name": "__ANYTHING"
     }
   ],
   "inline": [],

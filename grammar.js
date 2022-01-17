@@ -44,8 +44,6 @@ module.exports = grammar({
 		$.__HTML_ENTITY,
 		
 		$.__AMPERSAND,
-		
-		$.__ANYTHING,	//to prevent problems when the scanner tries to error correct with conflicts
 	],
 	
 	extras: $ => [],
