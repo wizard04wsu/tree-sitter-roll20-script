@@ -1,30 +1,98 @@
 #include <tree_sitter/parser.h>
 #include <string>	//string, to_string
 #include <regex>	//regex, regex_match
+#include <stack>
+#include <unordered_set>
+#include <unordered_map>
 #include <iostream>	//cout
+
+//for serialization/deserialization using cereal:
+//http://uscilab.github.io/cereal/quickstart.html
+#include <sstream>
+//#include <cereal/archives/json.hpp>
+#include <cereal/archives/binary.hpp>
+#include <cereal/types/stack.hpp>
+#include <cereal/types/unordered_set.hpp>
 
 namespace {
 
 using namespace std;
 
 
+const bool DEBUGGING = false;
 const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 
 
 enum TokenType {
 	ROLLQUERY_START,
-	ROLLQUERY_PIPE,
-	ROLLQUERY_COMMA,
 	ROLLQUERY_END,
-	AMP_AT_OR_ABOVE_DEPTH,
-	AMP_AT_DEPTH,
+		
+	INLINEROLL_START,
+	INLINEROLL_END,
+		
+	LABEL_START,
+	LABEL_END,
+		
+	BUTTON_START,
+	BUTTON_END,
+		
+	GROUPROLL_START,
+	GROUPROLL_END,
+		
+	TABLEROLL_START,
+	TABLEROLL_END,
+	
+	PIPE,
+	COMMA,
+	LEFT_BRACE,
+	RIGHT_BRACE,
+	LEFT_PAREN,
+	RIGHT_PAREN,
+	
 	HTML_ENTITY,
+		
+	AMPERSAND,
 };
+//for debugging:
+unordered_map<int, string> symbol_strings({
+	{ ROLLQUERY_START, "ROLLQUERY_START" },
+	{ ROLLQUERY_END, "ROLLQUERY_END" },
+		
+	{ INLINEROLL_START, "INLINEROLL_START" },
+	{ INLINEROLL_END, "INLINEROLL_END" },
+		
+	{ LABEL_START, "LABEL_START" },
+	{ LABEL_END, "LABEL_END" },
+		
+	{ BUTTON_START, "BUTTON_START" },
+	{ BUTTON_END, "BUTTON_END" },
+		
+	{ GROUPROLL_START, "GROUPROLL_START" },
+	{ GROUPROLL_END, "GROUPROLL_END" },
+		
+	{ TABLEROLL_START, "TABLEROLL_START" },
+	{ TABLEROLL_END, "TABLEROLL_END" },
+	
+	{ PIPE, "PIPE" },
+	{ COMMA, "COMMA" },
+	{ LEFT_BRACE, "LEFT_BRACE" },
+	{ RIGHT_BRACE, "RIGHT_BRACE" },
+	{ LEFT_PAREN, "LEFT_PAREN" },
+	{ RIGHT_PAREN, "RIGHT_PAREN" },
+	
+	{ HTML_ENTITY, "HTML_ENTITY" },
+		
+	{ AMPERSAND, "AMPERSAND" },
+});
 
 
-//For debugging:
-const bool debugging = false;
-const bool log_valid_symbols = true;
+struct HtmlEntity;
+
+
+/*╔════════════════════════════════════════════════════════════
+  ║ For debugging
+  ╚════════════════════════════════════════════════════════════*/
+
 enum ANSI_Color {
 	noChange=0,
 	
@@ -57,283 +125,717 @@ string color(ANSI_Color foreground = noChange, ANSI_Color background = noChange)
 		+(background?to_string(background+10):"")
 		+"m";
 }
-unsigned log_marked = 0;
-string log_consumed = "";
-void log(string str) {
-	if (debugging) cout << "\033[0m" << str << "\033[0m" << endl;
-}
-void logLookahead(TSLexer *lexer) {
-	char c = lexer->lookahead;
-	log(color(darkCyan)+"  Lookahead '"+color(lightCyan)+string({c})+color(darkCyan)+"'");
+string color_passFail(bool test) { return color(test ? brightGreen : darkRed); }
+
+struct DebugTools {
 	
-}
-void logEntity(string character) { log(color(cyan)+"  Entity of '"+character+"'"); }
-void logFunction(string functionName) { log(color(magenta)+functionName); }
-void logValidSymbols(const bool *valid_symbols) {
-	if (!debugging || !log_valid_symbols) return;
-	cout << color(darkGray) //<< "Valid symbols:" << "\n"
-		 << (valid_symbols[ROLLQUERY_START]?"ROLLQUERY_START, ":"")
-		 << (valid_symbols[ROLLQUERY_PIPE]?"ROLLQUERY_PIPE, ":"")
-		 << (valid_symbols[ROLLQUERY_COMMA]?"ROLLQUERY_COMMA, ":"")
-		 << (valid_symbols[ROLLQUERY_END]?"ROLLQUERY_END, ":"")
-		 << (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]?"AMP_AT_OR_ABOVE_DEPTH, ":"")
-		 << (valid_symbols[AMP_AT_DEPTH]?"AMP_AT_DEPTH, ":"")
-		 << (valid_symbols[HTML_ENTITY]?"HTML_ENTITY, ":"")
-		 << "\n";
-}
-
-
-char advance(TSLexer *lexer) {
-	if (debugging) log_consumed += lexer->lookahead;
-	lexer->advance(lexer, false);
-	logLookahead(lexer);
-	return lexer->lookahead;
-}
-void mark_end(TSLexer *lexer) {
-	lexer->mark_end(lexer);
-	char c = lexer->lookahead;
-	log(color(yellow)+"Mark end before '"+string({c})+"'");
-	if (debugging) log_marked = log_consumed.length();
-}
-
-
-int getAmps(TSLexer *lexer, int depth, string &entityName) {
-	entityName = "";
-	int ampCount = 0;
-	int max = depth == -1 ? 0 : depth;
-	char c = lexer->lookahead;
+private:
+	string consumed = "";
+	unsigned markedEndAt = 0;
 	
-	while (ampCount < max) {
-		while (c != ';' && c != 0 && entityName.length() < 50) {
-			entityName += c;
-			c = advance(lexer);
-		}
-		if (c == ';' && regex_match(entityName, regex("amp|AMP|#38|#[xX](00)?26"))) {
-			c = advance(lexer);
-			mark_end(lexer);
-			ampCount++;
-		}
-		else {
-			break;
-		}
+public:
+	void init() {
+		consumed = "";
+		markedEndAt = 0;
 	}
 	
-	return ampCount;
-}
+	
+	void log(string str) {
+		if (!DEBUGGING) return;
+		cout << "\033[0m" << str << "\033[0m" << endl;
+	}
+	
+	
+	void logValidSymbols(const bool *valid_symbols) {
+		if (!DEBUGGING) return;
+		string str = color(darkGray);
+		for (auto it = symbol_strings.begin(); it != symbol_strings.end(); ++it) {
+			str += (valid_symbols[it->first] ? it->second+", " : "");
+		}
+		log(str);
+	}
+	
+	
+	void saveLookahead(TSLexer *lexer) {
+		if (!DEBUGGING) return;
+		consumed += lexer->lookahead;
+	}
+	void logLookahead(TSLexer *lexer) {
+		if (!DEBUGGING) return;
+		log(color(darkCyan)+"  Lookahead '"+color(lightCyan)+string({char(lexer->lookahead)})+color(darkCyan)+"'");
+	}
+	void logMarkEnd(TSLexer *lexer) {
+		if (!DEBUGGING) return;
+		log(color(yellow)+"Mark end before '"+string({char(lexer->lookahead)})+"'");
+		markedEndAt = consumed.length();
+	}
+	
+	
+	void logMatchFound(TSLexer *lexer, int symbol) {
+		if (!DEBUGGING) return;
+		log(color(yellow)+"Result set to "+color(brightYellow)+symbol_strings[symbol]);
+		log("  "
+			+color(brightYellow)+consumed.substr(0, markedEndAt)
+			+color(gray)+consumed.substr(markedEndAt)
+			+color(cyan)+string({char(lexer->lookahead)})
+		);
+	}
+	void logNoMatch(TSLexer *lexer) {
+		if (!DEBUGGING) return;
+		log(color(yellow)+"Result set to "+color(brightYellow)+"(no match)");
+		unsigned consumed_length = max(int(markedEndAt), int(consumed.length()-1));
+		log("  "
+			+color(gray)+consumed.substr(0, consumed_length)
+			+color(cyan)+consumed.substr(consumed_length)
+			+color(cyan)+string({char(lexer->lookahead)})
+		);
+	}
+	
+};
+DebugTools Debug;
+
+
+/*╔════════════════════════════════════════════════════════════
+  ║ Nested Elements
+  ╚╤═══════════════════════════════════════════════════════════*/
+ /*│ Track the state of nested roll queries, group rolls, table rolls, and buttons.
+   │ This includes their depth and related special characters.
+   └─────────────────────────────*/
+
+struct NestedElements {
+	
+	stack<unordered_set<char>> unsafeChars;
+	
+	unsigned depth(){ return unsafeChars.size(); }
+	
+	unsigned push(const string specialChars){
+		unordered_set<char> uc;
+		if (unsafeChars.size() > 0) uc = unsafeChars.top();
+		unsigned i;
+		for (i=0; i<specialChars.length(); i++) {
+			uc.insert(specialChars[i]);
+		}
+		unsafeChars.push(uc);
+		return this->depth();
+	}
+	
+	unsigned pop(){
+		if (unsafeChars.size() > 0) unsafeChars.pop();
+		return this->depth();
+	}
+	
+	bool isUnsafe(const char c){
+		if (unsafeChars.size() <= 1) return false;
+		return unsafeChars.top().count(c) > 0;
+	}
+	
+	bool isSafe(const char c){ return !isUnsafe(c); }
+	
+	
+	
+	template<class Archive>
+	void serialize(Archive & archive) {
+		archive(unsafeChars);
+	}
+	
+};
+
+
+/*╔════════════════════════════════════════════════════════════
+  ║ The Scanner
+  ╚════════════════════════════════════════════════════════════*/
 
 struct Scanner {
 	Scanner() {}
 	
-	int depth = -1;
-
-	void logTokenType(TSLexer *lexer, string tokenType, bool noMatch = false) {
-		log(color(yellow)+"Result set to "+color(brightYellow)+tokenType);
-		if (noMatch) {
-			//consume an extra character
-			log_consumed += lexer->lookahead;
-			lexer->advance(lexer, false);
-			
-			unsigned consumed_length = max(int(log_marked), int(log_consumed.length()-1));
-			log("  "
-				+color(gray)+log_consumed.substr(0, consumed_length)
-				+color(cyan)+log_consumed.substr(consumed_length)
-				+color(cyan)+string({char(lexer->lookahead)})
-			);
+	TSLexer *lexer;
+	const bool *valid_symbols;
+	
+	NestedElements nest;
+	
+	
+	/*╔════════════════════════════════════════════════════════════
+	  ║ Serialize/deserialize the state of `nest`
+	  ╚════════════════════════════════════════════════════════════*/
+	
+	unsigned serialize(char * buffer) {
+		stringstream stream_out;
+		{
+			//cereal::JSONOutputArchive archive_out(stream_out);
+			cereal::BinaryOutputArchive archive_out(stream_out);
+			archive_out(nest);
 		}
-		else {
-			log("  "
-				+color(brightYellow)+log_consumed.substr(0, log_marked)
-				+color(gray)+log_consumed.substr(log_marked)
-				+color(cyan)+string({char(lexer->lookahead)})
-			);
+		string state2save = stream_out.str();
+		state2save.copy(&buffer[0], state2save.size());
+		return state2save.size()+1;
+	}
+	void deserialize(const char * buffer, unsigned length) {
+		if (length > 0) {
+			string state2load;
+			state2load.assign(&buffer[0], length);
+			stringstream stream_in;
+			stream_in.str(state2load);
+			{
+				//cereal::JSONInputArchive archive_in(stream_in);
+				cereal::BinaryInputArchive archive_in(stream_in);
+				archive_in(nest);
+			}
 		}
 	}
 	
-	bool match_found(TSLexer *lexer, int symbol, string tokenType) {
-		logTokenType(lexer, tokenType);
+	
+	/*╔════════════════════════════════════════════════════════════
+	  ║ Get an HTML entity and determine its purpose
+	  ╚════════════════════════════════════════════════════════════*/
+	
+	struct HtmlEntity {
+		string str = "&";			//the '&', a possible chain of "amp;" strings, the final
+									// entity name/code, and the following ';'
+		
+		string entityName = "";		//just the final name/code, not including the following ';'
+		
+		string remainder = "";		//final characters that were traversed but did not end up
+									// being part of the entity
+		
+		unsigned timesEncoded = 0;	//number of times the represented character was encoded
+		unsigned foundAtDepth;		//the current depth when this entity was encountered
+		
+		bool isChar(unsigned depth) { return timesEncoded == depth - 1; }
+		bool isEntity(unsigned depth) { return timesEncoded >= depth; }
+	};
+	enum UseEntityAs {
+		AS_CHARACTER,
+		AS_ENTITY,
+		AS_START,
+	};
+	
+	string getNextEntityName(TSLexer *lexer, string &remainder){
+		
+		string entityName = "";
+		char c = lexer->lookahead;
+		
+		while (c != ';' && c != 0 && entityName.length() < MAX_ENTITY_NAME_LENGTH) {
+			if (!regex_match(string({c}), regex("[#\\da-zA-Z;]"))) break;
+			entityName += c;
+			c = advance(lexer);
+		}
+		
+		if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][\\da-fA-F]+))"))) {
+			c = advance(lexer);
+			
+			return entityName;
+		}
+		
+		remainder = entityName;
+		return "";
+		
+	}
+	
+	//(when called, lexer->lookahead should be the character after '&')
+	HtmlEntity getHtmlEntity() {
+		
+		regex rxp_amp = regex("amp|AMP|#38|#[xX](00)?26");
+		
+		//if it's not a character after this many decodings, it will always be interpreted as an HTML entity
+		unsigned maxDecodings = max(0, int(nest.depth())-1);
+		
+		HtmlEntity obj;
+		obj.foundAtDepth = nest.depth();
+		
+		
+		while (obj.timesEncoded <= maxDecodings) {
+			
+			obj.entityName = getNextEntityName(lexer, obj.remainder);
+			
+			if (obj.entityName != "") {
+				mark_end(lexer);
+				obj.str += obj.entityName+";";
+				obj.timesEncoded++;
+				
+				if (!regex_match(obj.entityName, rxp_amp)) {
+					//it's an entity for something besides an ampersand
+					break;
+				}
+			}
+			else {
+				//it's either an entity for an ampersand, or it's just an ampersand character
+				break;
+			}
+		}
+		
+		return obj;
+	}
+	
+	template <int N>
+	bool checkEntity(HtmlEntity entity, const int (&symbols)[N], char encodedChar, string rxp, int useAs = AS_CHARACTER) {
+		if (DEBUGGING) {
+			string str = "" +
+				color_passFail(regex_match(entity.entityName, regex(rxp))) + entity.str + "  " +
+				color_passFail(nest.isSafe(encodedChar)) + string({encodedChar}) + "  " +
+				color_passFail(( useAs == AS_CHARACTER && entity.isChar(nest.depth()) )
+					|| ( useAs == AS_ENTITY && entity.isEntity(nest.depth()) )
+					|| ( useAs == AS_START && entity.isEntity(nest.depth()) )) +
+				(useAs==AS_CHARACTER ? "char  " :
+				useAs==AS_START ? "start " :
+				useAs==AS_ENTITY ? "entity" :
+				"n/a   ") +
+				color(green) + "  [ ";
+			
+			for (int i=0; i<N; i++) {
+				if (i > 0) str += color(green)+", ";
+				str += color_passFail(valid_symbols[symbols[i]]) + symbol_strings[symbols[i]];
+			}
+			Debug.log(str + color(green) + " ]");
+		}
+		
+		bool validSymbolFound = false;
+		for (int i=0; i<N; i++) {
+			if (valid_symbols[symbols[i]]) {
+				validSymbolFound = true;
+				break;
+			}
+		}
+		
+		return (
+			validSymbolFound
+			&& (
+				( useAs == AS_CHARACTER && entity.isChar(nest.depth()) )
+				|| ( useAs == AS_ENTITY && entity.isEntity(nest.depth()) )
+				|| ( useAs == AS_START && entity.isEntity(nest.depth()) )
+			)
+			&& regex_match(entity.entityName, regex(rxp))
+		);
+	}
+	
+	
+	/*╔════════════════════════════════════════════════════════════
+	  ║ Lexer manipulation
+	  ╚════════════════════════════════════════════════════════════*/
+	
+	char advance(TSLexer *lexer) {
+		Debug.saveLookahead(lexer);
+		lexer->advance(lexer, false);
+		Debug.logLookahead(lexer);
+		return lexer->lookahead;
+	}
+	void mark_end(TSLexer *lexer) {
+		lexer->mark_end(lexer);
+		Debug.logMarkEnd(lexer);
+	}
+	
+	bool match_found(int symbol) {
+		Debug.logMatchFound(lexer, symbol);
 		lexer->result_symbol = symbol;
 		return true;
 	}
-	
-	bool no_match(TSLexer *lexer) {
-		logTokenType(lexer, "(no match)", true);
+	bool no_match() {
+		//consume an extra character for debug log
+		Debug.saveLookahead(lexer);
+		lexer->advance(lexer, false);
+		Debug.logNoMatch(lexer);
+		
 		return false;
 	}
 	
-	bool scan(TSLexer *lexer, const bool *valid_symbols){
-		log_marked = 0;
-		log_consumed = "";
-		log(color(brightMagenta)+"Scanner.scan");
-		log(color(magenta)+"Depth: "+to_string(depth));
-		logValidSymbols(valid_symbols);
-		logLookahead(lexer);
+	
+	/*╔════════════════════════════════════════════════════════════
+	  ║ Scanning
+	  ╚════════════════════════════════════════════════════════════*/
+	
+	bool scan(TSLexer *theLexer, const bool *theValidSymbols){
+		
+		lexer = theLexer;
+		valid_symbols = theValidSymbols;
+		
+		Debug.init();
+		Debug.log(color(brightMagenta)+"Scanning at depth "+to_string(nest.depth()));
+		Debug.logValidSymbols(valid_symbols);
+		Debug.logLookahead(lexer);
+		
+		int ampCount = 0;
+		HtmlEntity initialResult;
+		HtmlEntity result;
+		string entityName = "";
 		
 		char c = lexer->lookahead;
 		mark_end(lexer);
-		
-		int ampCount = 0;
-		string entityName = "";
 		
 		if (c == '&') {
 			c = advance(lexer);
 			mark_end(lexer);
 			
-			if (valid_symbols[HTML_ENTITY] || valid_symbols[ROLLQUERY_START] || valid_symbols[ROLLQUERY_PIPE] || valid_symbols[ROLLQUERY_COMMA] || valid_symbols[ROLLQUERY_END]) {
-				ampCount = getAmps(lexer, depth, entityName);
+			result = getHtmlEntity();
+			
+			if (result.entityName == "") {
+				if (valid_symbols[AMPERSAND] && nest.isSafe('&'))
+					return match_found(AMPERSAND);
+			}
+			else {
 				c = lexer->lookahead;
 				
-				while (c != ';' && c != 0 && entityName.length() <= MAX_ENTITY_NAME_LENGTH) {
-					entityName += c;
-					c = advance(lexer);
+				if (checkEntity(result, {ROLLQUERY_START}, '?', "#63|#[xX](00)?3[fF]|quest", AS_START)) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {ROLLQUERY_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+							mark_end(lexer);
+							nest.push("|,}");
+							return match_found(ROLLQUERY_START);
+						}
+					}
+					else if (c == '{' && nest.isSafe(c)) {
+						c = advance(lexer);
+						mark_end(lexer);
+						nest.push("|,}");
+						return match_found(ROLLQUERY_START);
+					}
 				}
 				
-				if (c == ';' && regex_match(entityName, regex("([\\da-zA-Z]+|#(\\d+|[xX][0-9a-fA-F]+))"))) {
-					c = advance(lexer);
-					mark_end(lexer);
-					
-					if (valid_symbols[ROLLQUERY_END] && depth > 0 && regex_match(entityName, regex("#125|#[xX](00)?7[dD]|rcub|rbrace"))) {
-						depth--;
-						log(color(magenta)+"Depth decremented: "+to_string(depth));
-						return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END");
-					}
-					
-					else if (valid_symbols[ROLLQUERY_COMMA] && depth > 0 && regex_match(entityName, regex("#44|#[xX](00)?2[cC]|comma"))) {
-						return match_found(lexer, ROLLQUERY_COMMA, "ROLLQUERY_COMMA");
-					}
-					
-					else if (valid_symbols[ROLLQUERY_PIPE] && depth > 0 && regex_match(entityName, regex("#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))) {
-						return match_found(lexer, ROLLQUERY_PIPE, "ROLLQUERY_PIPE");
-					}
-					
-					else if (valid_symbols[ROLLQUERY_START] && depth >= 0 && regex_match(entityName, regex("#63|#[xX](00)?3[fF]|quest"))) {
+				else if (checkEntity(result, {INLINEROLL_START, LABEL_START}, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
+					if (c == '&') {
+						c = advance(lexer);
 						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {INLINEROLL_START}, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack")) {
+							mark_end(lexer);
+							return match_found(INLINEROLL_START);
+						}
+						else if (valid_symbols[LABEL_START]) {
+							nest.push("]");
+							return match_found(LABEL_START);
+						}
+					}
+					else if (c == '[' && valid_symbols[INLINEROLL_START] && nest.isSafe(c)) {
+						return match_found(INLINEROLL_START);
+					}
+					else if (valid_symbols[LABEL_START] && nest.isSafe(c)) {
+						nest.push("]");
+						return match_found(LABEL_START);
+					}
+				}
+				
+				else if (checkEntity(result, {BUTTON_START}, '(', "#40|#[xX](00)?28|lpar", AS_START)) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {BUTTON_START}, '~', "#126|#[xX](00)?7[eE]", AS_START)) {
+							mark_end(lexer);
+							nest.push("|)");
+							return match_found(BUTTON_START);
+						}
+					}
+					else if (c == '~' && nest.isSafe(c)) {
+						c = advance(lexer);
+						mark_end(lexer);
+						nest.push("|)");
+						return match_found(BUTTON_START);
+					}
+				}
+				
+				else if (checkEntity(result, {LEFT_PAREN}, '(', "#40|#[xX](00)?28|lpar"))
+					return match_found(LEFT_PAREN);
+				
+				else if (checkEntity(result, {GROUPROLL_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace", AS_START)) {
+					nest.push(",}");
+					return match_found(GROUPROLL_START);
+				}
+				
+				else if (checkEntity(result, {LEFT_BRACE}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace"))
+					return match_found(LEFT_BRACE);
+				
+				else if (checkEntity(result, {TABLEROLL_START}, 't', "#116|#[xX](00)?74", AS_START)
+				 || checkEntity(result, {TABLEROLL_START}, 'T', "#84|#[xX](00)?54", AS_START)) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {TABLEROLL_START}, '[', "#91|#[xX](00)?5[bB]|lsqb|lbrack", AS_START)) {
+							mark_end(lexer);
+							nest.push("]");
+							return match_found(TABLEROLL_START);
+						}
+					}
+					else if (c == '[' && nest.isSafe(c)) {
+						c = advance(lexer);
+						mark_end(lexer);
+						nest.push("]");
+						return match_found(TABLEROLL_START);
+					}
+				}
+				
+				else if (checkEntity(result, {ROLLQUERY_END, GROUPROLL_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
+					nest.pop();
+					if (valid_symbols[ROLLQUERY_END]) return match_found(ROLLQUERY_END);
+					if (valid_symbols[GROUPROLL_END]) return match_found(GROUPROLL_END);
+				}
+				
+				else if (checkEntity(result, {RIGHT_BRACE}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
+					return match_found(RIGHT_BRACE);
+				
+				else if (checkEntity(result, {INLINEROLL_END, LABEL_END, TABLEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+					if (valid_symbols[LABEL_END]) {
+						nest.pop();
+						return match_found(LABEL_END);
+					}
+					else if (valid_symbols[TABLEROLL_END]) {
+						nest.pop();
+						return match_found(TABLEROLL_END);
+					}
+					else if (valid_symbols[INLINEROLL_END]) {
 						if (c == '&') {
 							c = advance(lexer);
 							
-							ampCount = getAmps(lexer, depth, entityName);
+							result = getHtmlEntity();
 							c = lexer->lookahead;
 							
-							while (c != ';' && c != 0 && entityName.length() < MAX_ENTITY_NAME_LENGTH) {
-								entityName += c;
-								c = advance(lexer);
-							}
-							
-							if (c == ';' && regex_match(entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
-								c = advance(lexer);
+							if (checkEntity(result, {INLINEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
 								mark_end(lexer);
-								
-								depth++;
-								log(color(magenta)+"Depth incremented: "+to_string(depth));
-								return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+								nest.pop();
+								return match_found(INLINEROLL_END);
 							}
 						}
-						else if (c == '{') {
-							c = advance(lexer);
-							mark_end(lexer);
-							
-							depth++;
-							log(color(magenta)+"Depth incremented: "+to_string(depth));
-							return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+						else if (c == ']' && nest.isSafe(c)) {
+							nest.pop();
+							return match_found(INLINEROLL_END);
 						}
 					}
-					
-					if (valid_symbols[HTML_ENTITY]) {
-						return match_found(lexer, HTML_ENTITY, "HTML_ENTITY");
-					}
-				}
-			}
-			
-			if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH] || valid_symbols[AMP_AT_DEPTH]) {
-				ampCount = getAmps(lexer, depth, entityName);
-				c = lexer->lookahead;
-				
-				if (ampCount >= depth-1 && valid_symbols[AMP_AT_DEPTH]) {
-					return match_found(lexer, AMP_AT_DEPTH, "AMP_AT_DEPTH");
 				}
 				
-				else if (valid_symbols[AMP_AT_OR_ABOVE_DEPTH]) {
-					return match_found(lexer, AMP_AT_OR_ABOVE_DEPTH, "AMP_AT_OR_ABOVE_DEPTH");
+				else if (checkEntity(result, {BUTTON_END}, ')', "#41|#[xX](00)?29|rpar")) {
+					nest.pop();
+					return match_found(BUTTON_END);
+				}
+				
+				else if (checkEntity(result, {RIGHT_PAREN}, ')', "#41|#[xX](00)?29|rpar"))
+					return match_found(RIGHT_PAREN);
+				
+				else if (checkEntity(result, {PIPE}, '|', "#124|#[xX](00)?7[cC]|vert|verbar|VerticalLine"))
+					return match_found(PIPE);
+				
+				else if (checkEntity(result, {COMMA}, ',', "#44|#[xX](00)?2[cC]|comma"))
+					return match_found(COMMA);
+				
+				
+				if (valid_symbols[HTML_ENTITY]) {
+					return match_found(HTML_ENTITY);
 				}
 			}
 		}
 		
-		else if (c == '}') {
-			c = advance(lexer);
-			mark_end(lexer);
-			
-			if (valid_symbols[ROLLQUERY_END] && depth == 0) {
-				depth--;
-				log(color(magenta)+"Depth decremented: "+to_string(depth));
-				return match_found(lexer, ROLLQUERY_END, "ROLLQUERY_END");
-			}
-		}
-		
-		else if (c == ',') {
-			c = advance(lexer);
-			mark_end(lexer);
-			
-			if (valid_symbols[ROLLQUERY_COMMA] && depth == 0) {
-				return match_found(lexer, ROLLQUERY_COMMA, "ROLLQUERY_COMMA");
-			}
-		}
-		
-		else if (c == '|') {
-			c = advance(lexer);
-			mark_end(lexer);
-			
-			if (valid_symbols[ROLLQUERY_PIPE] && depth == 0) {
-				return match_found(lexer, ROLLQUERY_PIPE, "ROLLQUERY_PIPE");
-			}
-		}
-		
-		else if (c == '?') {
-			c = advance(lexer);
-			mark_end(lexer);
-			
-			if (valid_symbols[ROLLQUERY_START]) {
+		else if (nest.isSafe(c)) {
+			if (c == '?' && valid_symbols[ROLLQUERY_START]) {
+				c = advance(lexer);
+				mark_end(lexer);
 				
 				if (c == '&') {
 					c = advance(lexer);
 					
-					ampCount = getAmps(lexer, depth, entityName);
+					result = getHtmlEntity();
 					c = lexer->lookahead;
 					
-					while (c != ';' && c != 0 && entityName.length() < MAX_ENTITY_NAME_LENGTH) {
-						entityName += c;
-						c = advance(lexer);
-					}
-					
-					if (c == ';' && regex_match(entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
-						c = advance(lexer);
+					if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
 						mark_end(lexer);
-						
-						depth++;
-						log(color(magenta)+"Depth incremented: "+to_string(depth));
-						return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+						nest.push("|,}");
+						return match_found(ROLLQUERY_START);
 					}
 				}
-				
-				else if (c == '{') {
+				else if (c == '{' && nest.isSafe(c)) {
 					c = advance(lexer);
 					mark_end(lexer);
-					
-					depth++;
-					log(color(magenta)+"Depth incremented: "+to_string(depth));
-					return match_found(lexer, ROLLQUERY_START, "ROLLQUERY_START");
+					nest.push("|,}");
+					return match_found(ROLLQUERY_START);
 				}
+			}
+			else if (c == '[' && (valid_symbols[INLINEROLL_START] || valid_symbols[LABEL_START])) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (c == '&') {
+					c = advance(lexer);
+					
+					result = getHtmlEntity();
+					c = lexer->lookahead;
+					
+					if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
+						if (valid_symbols[INLINEROLL_START]) {
+							return match_found(INLINEROLL_START);
+						}
+					}
+					else if (valid_symbols[LABEL_START]) {
+						nest.push("]");
+						return match_found(LABEL_START);
+					}
+				}
+				else if (c == '[' && valid_symbols[INLINEROLL_START] && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					return match_found(INLINEROLL_START);
+				}
+				else if (c != '[' && valid_symbols[LABEL_START]) {
+					nest.push("]");
+					return match_found(LABEL_START);
+				}
+			}
+			else if (c == '(' && valid_symbols[BUTTON_START]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (c == '&') {
+					c = advance(lexer);
+					
+					result = getHtmlEntity();
+					c = lexer->lookahead;
+					
+					if (regex_match(result.entityName, regex("#126|#[xX](00)?7[eE]"))) {
+						mark_end(lexer);
+						nest.push("|)");
+						return match_found(BUTTON_START);
+					}
+				}
+				else if (c == '~' && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					nest.push("|)");
+					return match_found(BUTTON_START);
+				}
+			}
+			else if (c == '(' && valid_symbols[LEFT_PAREN]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(LEFT_PAREN);
+			}
+			else if (c == '{' && valid_symbols[GROUPROLL_START]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				nest.push(",}");
+				return match_found(GROUPROLL_START);
+			}
+			else if (c == '{' && valid_symbols[LEFT_BRACE]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(LEFT_BRACE);
+			}
+			else if ((c == 't' || c == 'T') && valid_symbols[TABLEROLL_START]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (c == '&') {
+					c = advance(lexer);
+					
+					result = getHtmlEntity();
+					c = lexer->lookahead;
+					
+					if (regex_match(result.entityName, regex("#91|#[xX](00)?5[bB]|lsqb|lbrack"))) {
+						mark_end(lexer);
+						nest.push("]");
+						return match_found(TABLEROLL_START);
+					}
+				}
+				else if (c == '[' && nest.isSafe(c)) {
+					c = advance(lexer);
+					mark_end(lexer);
+					nest.push("]");
+					return match_found(TABLEROLL_START);
+				}
+			}
+			
+			else if (c == '}') {
+				if ((valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END])) {
+					c = advance(lexer);
+					mark_end(lexer);
+					nest.pop();
+					if (valid_symbols[ROLLQUERY_END])
+						return match_found(ROLLQUERY_END);
+					if (valid_symbols[GROUPROLL_END])
+						return match_found(GROUPROLL_END);
+				}
+				else if (valid_symbols[RIGHT_BRACE]) {
+					c = advance(lexer);
+					mark_end(lexer);
+					return match_found(RIGHT_BRACE);
+				}
+			}
+			else if (c == ']' && (valid_symbols[INLINEROLL_END] || valid_symbols[LABEL_END]
+			 || valid_symbols[TABLEROLL_END])) {
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (valid_symbols[LABEL_END]) {
+					nest.pop();
+					return match_found(LABEL_END);
+				}
+				else if (valid_symbols[TABLEROLL_END]) {
+					nest.pop();
+					return match_found(TABLEROLL_END);
+				}
+				else if (c == '&') {
+					c = advance(lexer);
+					
+					result = getHtmlEntity();
+					c = lexer->lookahead;
+					
+					if (checkEntity(result, {INLINEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
+						return match_found(INLINEROLL_END);
+					}
+				}
+				else if (c == ']' && valid_symbols[INLINEROLL_END] && nest.isSafe(']')) {
+					c = advance(lexer);
+					mark_end(lexer);
+					return match_found(INLINEROLL_END);
+				}
+			}
+			else if (c == ')' && valid_symbols[BUTTON_END]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				nest.pop();
+				return match_found(BUTTON_END);
+			}
+			else if (c == ')' && valid_symbols[RIGHT_PAREN]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(RIGHT_PAREN);
+			}
+			
+			else if (c == '|' && valid_symbols[PIPE]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(PIPE);
+			}
+			else if (c == ',' && valid_symbols[COMMA]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(COMMA);
 			}
 		}
 		
-		return no_match(lexer);
+		return no_match();
 	}
+	
 };
 
-}
+
+
+}	//namespace
+
+
+/*╔════════════════════════════════════════════════════════════
+  ║ Tree-sitter external scanner functions
+  ╚════════════════════════════════════════════════════════════*/
 
 extern "C" {
 
 void *tree_sitter_roll20_script_external_scanner_create() {
-	log(color(noChange, brightMagenta)+"                                        ");
+	Debug.log(color(noChange, brightMagenta)+"                                        ");
 	return new Scanner();
 }
 
@@ -342,15 +844,19 @@ bool tree_sitter_roll20_script_external_scanner_scan(void *payload, TSLexer *lex
 	return scanner->scan(lexer, valid_symbols);
 }
 
-unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *state) {
-	return 0;
+unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *buffer) {
+	Scanner *scanner = static_cast<Scanner *>(payload);
+	return scanner->serialize(buffer);
 }
 
-void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *state, unsigned length) {}
+void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
+	Scanner *scanner = static_cast<Scanner *>(payload);
+	scanner->deserialize(buffer, length);
+}
 
 void tree_sitter_roll20_script_external_scanner_destroy(void *payload) {
 	Scanner *scanner = static_cast<Scanner *>(payload);
 	delete scanner;
 }
 
-}
+}	//extern "C"
