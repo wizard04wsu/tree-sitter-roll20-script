@@ -48,6 +48,10 @@ enum TokenType {
 	RIGHT_BRACE,
 	LEFT_PAREN,
 	RIGHT_PAREN,
+	COLON,
+	
+	FLAG_START,
+	FLAG_END,
 	
 	HTML_ENTITY,
 		
@@ -79,6 +83,10 @@ unordered_map<int, string> symbol_strings({
 	{ RIGHT_BRACE, "RIGHT_BRACE" },
 	{ LEFT_PAREN, "LEFT_PAREN" },
 	{ RIGHT_PAREN, "RIGHT_PAREN" },
+	{ COLON, "COLON" },
+	
+	{ FLAG_START, "FLAG_START" },
+	{ FLAG_END, "FLAG_END" },
 	
 	{ HTML_ENTITY, "HTML_ENTITY" },
 		
@@ -466,8 +474,29 @@ struct Scanner {
 			
 			result = getHtmlEntity();
 			
-			if (result.entityName == "") {
-				if (valid_symbols[AMPERSAND] && nest.isSafe('&'))
+			if (result.entityName == "" && nest.isSafe('&')) {
+				if (valid_symbols[FLAG_START]) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {FLAG_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+							mark_end(lexer);
+							nest.push(":}");
+							return match_found(FLAG_START);
+						}
+					}
+					else if (c == '{' && nest.isSafe(c)) {
+						c = advance(lexer);
+						mark_end(lexer);
+						nest.push(":}");
+						return match_found(FLAG_START);
+					}
+				}
+				
+				if (valid_symbols[AMPERSAND])
 					return match_found(AMPERSAND);
 			}
 			else {
@@ -573,10 +602,11 @@ struct Scanner {
 					}
 				}
 				
-				else if (checkEntity(result, {ROLLQUERY_END, GROUPROLL_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
+				else if (checkEntity(result, {ROLLQUERY_END, GROUPROLL_END, FLAG_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
 					nest.pop();
 					if (valid_symbols[ROLLQUERY_END]) return match_found(ROLLQUERY_END);
 					if (valid_symbols[GROUPROLL_END]) return match_found(GROUPROLL_END);
+					if (valid_symbols[FLAG_END]) return match_found(FLAG_END);
 				}
 				
 				else if (checkEntity(result, {RIGHT_BRACE}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
@@ -624,6 +654,9 @@ struct Scanner {
 				
 				else if (checkEntity(result, {COMMA}, ',', "#44|#[xX](00)?2[cC]|comma"))
 					return match_found(COMMA);
+				
+				else if (checkEntity(result, {COLON}, ':', "#58|#[xX](00)?3[aA]|colon"))
+					return match_found(COLON);
 				
 				
 				if (valid_symbols[HTML_ENTITY]) {
@@ -750,7 +783,7 @@ struct Scanner {
 			}
 			
 			else if (c == '}') {
-				if ((valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END])) {
+				if ((valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END] || valid_symbols[FLAG_END])) {
 					c = advance(lexer);
 					mark_end(lexer);
 					nest.pop();
@@ -758,6 +791,8 @@ struct Scanner {
 						return match_found(ROLLQUERY_END);
 					if (valid_symbols[GROUPROLL_END])
 						return match_found(GROUPROLL_END);
+					if (valid_symbols[FLAG_END])
+						return match_found(FLAG_END);
 				}
 				else if (valid_symbols[RIGHT_BRACE]) {
 					c = advance(lexer);
@@ -815,6 +850,11 @@ struct Scanner {
 				c = advance(lexer);
 				mark_end(lexer);
 				return match_found(COMMA);
+			}
+			else if (c == ':' && valid_symbols[COLON]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(COLON);
 			}
 		}
 		

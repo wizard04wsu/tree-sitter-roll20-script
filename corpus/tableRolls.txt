@@ -8,7 +8,7 @@ Table Roll: [[t[n]]]
 		(formula
 			(term
 				(tableRoll
-					(tableName))))))
+					(identifier))))))
 
 ==================
 Table Roll: [[ t[n] ]]
@@ -20,7 +20,7 @@ Table Roll: [[ t[n] ]]
 		(formula
 			(term
 				(tableRoll
-					(tableName))))))
+					(identifier))))))
 
 ==================
 Table Roll: [[1t[n]]]
@@ -32,8 +32,8 @@ Table Roll: [[1t[n]]]
 		(formula
 			(term
 				(tableRoll
-					(count)
-					(tableName))))))
+					(literal)
+					(identifier))))))
 
 ==================
 Table Roll: [[ 1t[n] ]]
@@ -45,8 +45,8 @@ Table Roll: [[ 1t[n] ]]
 		(formula
 			(term
 				(tableRoll
-					(count)
-					(tableName))))))
+					(literal)
+					(identifier))))))
 
 ==================
 Table Roll: [[ t[n@{a}n] ]]
@@ -58,9 +58,9 @@ Table Roll: [[ t[n@{a}n] ]]
 		(formula
 			(term
 				(tableRoll
-					(tableName
+					(identifier
 						(attribute
-							(attribute_identifier))))))))
+							(identifier))))))))
 
 ==================
 Table Roll: [[ t[@{a}] ]]
@@ -72,9 +72,9 @@ Table Roll: [[ t[@{a}] ]]
 		(formula
 			(term
 				(tableRoll
-					(tableName
+					(identifier
 						(attribute
-							(attribute_identifier))))))))
+							(identifier))))))))
 
 ==================
 Table Roll: [[ t[@{a]b}] ]]
@@ -86,9 +86,9 @@ Table Roll: [[ t[@{a]b}] ]]
 		(formula
 			(term
 				(tableRoll
-					(tableName
+					(identifier
 						(attribute
-							(attribute_identifier))))))))
+							(identifier))))))))
 
 ==================
 Table Roll: [[ t[@ab] ]]
@@ -100,5 +100,5 @@ Table Roll: [[ t[@ab] ]]
 		(formula
 			(term
 				(tableRoll
-					(tableName))))))
+					(identifier))))))
 

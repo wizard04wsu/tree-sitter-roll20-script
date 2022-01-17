@@ -7,7 +7,7 @@ Dice Roll: [[d20]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(sides))
+				(literal))
 		)
 	)))
 
@@ -20,7 +20,7 @@ Dice Roll: [[ d20 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(sides))
+				(literal))
 		)
 	)))
 
@@ -33,7 +33,7 @@ Dice Roll: [[ D20 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(sides))
+				(literal))
 		)
 	)))
 
@@ -46,8 +46,8 @@ Dice Roll: [[10d20]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(count)
-				(sides))
+				(literal)
+				(literal))
 		)
 	)))
 
@@ -60,8 +60,8 @@ Dice Roll: [[ 10d20 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(count)
-				(sides))
+				(literal)
+				(literal))
 		)
 	)))
 
@@ -74,7 +74,7 @@ Dice Roll: [[ df ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(fate))
+				(keyword))
 		)
 	)))
 
@@ -87,12 +87,12 @@ Dice Roll: [[ @{a}d@{a} ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(count
+				(literal
 					(attribute
-						(attribute_identifier)))
-				(sides
+						(identifier)))
+				(literal
 					(attribute
-						(attribute_identifier))))
+						(identifier))))
 		)
 	)))
 
@@ -105,14 +105,16 @@ Dice Roll: [[ %{b|a}d%{b|a} ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(count
+				(literal
 					(ability
-						(character_identifier)
-						(ability_identifier)))
-				(sides
+						(identifier)
+						(separator)
+						(identifier)))
+				(literal
 					(ability
-						(character_identifier)
-						(ability_identifier))))
+						(identifier)
+						(separator)
+						(identifier))))
 		)
 	)))
 
@@ -126,23 +128,25 @@ Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 		(formula
 			(term
 				(diceRoll
-					(count
+					(literal
 						(attribute
-							(attribute_identifier))
+							(identifier))
 						(ability
-							(character_identifier)
-							(ability_identifier)))
-					(sides
+							(identifier)
+							(separator)
+							(identifier)))
+					(literal
 						(attribute
-							(attribute_identifier))
+							(identifier))
 						(ability
-							(character_identifier)
-							(ability_identifier)))
+							(identifier)
+							(separator)
+							(identifier)))
 					(modifiers
 						(attribute
-							(attribute_identifier))
+							(identifier))
 						(attribute
-							(attribute_identifier))))))))
+							(identifier))))))))
 
 ==================
 Dice Roll: [[ d6c@{s}5 ]]
@@ -154,10 +158,10 @@ Dice Roll: [[ d6c@{s}5 ]]
 		(formula
 			(term
 				(diceRoll
-					(sides)
+					(literal)
 					(modifiers
 						(attribute
-							(attribute_identifier))))))))
+							(identifier))))))))
 
 ==================
 Dice Roll: [[ d6r5r~5 ]]
@@ -169,7 +173,7 @@ Dice Roll: [[ d6r5r~5 ]]
 		(formula
 			(term
 				(diceRoll
-					(sides)
+					(literal)
 					(modifiers))))))
 
 ==================
@@ -182,7 +186,7 @@ Dice Roll: [[ d6r5 ]]
 		(formula
 			(term
 				(diceRoll
-					(sides)
+					(literal)
 					(modifiers))))))
 
 ==================
@@ -194,7 +198,7 @@ Dice Roll: [[ d6r~5 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(sides)
+				(literal)
 				(modifiers))
 		)
 	)))
@@ -208,8 +212,8 @@ Dice Roll: long one, lower case
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(count)
-				(sides)
+				(literal)
+				(literal)
 				(modifiers))
 		)
 	)))
@@ -223,8 +227,8 @@ Dice Roll: long one, upper case
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(count)
-				(sides)
+				(literal)
+				(literal)
 				(modifiers))
 		)
 	)))
