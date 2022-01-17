@@ -450,6 +450,11 @@
     }
   },
   {
+    "type": "name",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "number",
     "named": true,
     "fields": {},
@@ -621,6 +626,25 @@
     }
   },
   {
+    "type": "property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "name",
+          "named": true
+        },
+        {
+          "type": "value",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "rollQuery",
     "named": true,
     "fields": {},
@@ -768,6 +792,11 @@
     }
   },
   {
+    "type": "templateName",
+    "named": true,
+    "fields": {}
+  },
+  {
     "type": "term",
     "named": true,
     "fields": {},
@@ -827,11 +856,62 @@
     }
   },
   {
+    "type": "value",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "abilityCommandButton",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "%{",
     "named": false
   },
   {
+    "type": "&{template:",
+    "named": false
+  },
+  {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": "=",
     "named": false
   },
   {
@@ -847,15 +927,15 @@
     "named": true
   },
   {
-    "type": "name",
-    "named": true
-  },
-  {
     "type": "selected",
     "named": false
   },
   {
     "type": "target",
+    "named": false
+  },
+  {
+    "type": "{{",
     "named": false
   },
   {
@@ -868,6 +948,10 @@
   },
   {
     "type": "}",
+    "named": false
+  },
+  {
+    "type": "}}",
     "named": false
   }
 ]

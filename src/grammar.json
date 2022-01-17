@@ -2,7 +2,19 @@
   "name": "roll20_script",
   "rules": {
     "script": {
-      "type": "REPEAT",
+      "type": "CHOICE",
+      "members": [
+        {
+          "type": "SYMBOL",
+          "name": "_script"
+        },
+        {
+          "type": "BLANK"
+        }
+      ]
+    },
+    "_script": {
+      "type": "REPEAT1",
       "content": {
         "type": "CHOICE",
         "members": [
@@ -1717,6 +1729,100 @@
           }
         ]
       }
+    },
+    "rollTemplate": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "&{template:"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_rt_templateName"
+          },
+          "named": true,
+          "value": "templateName"
+        },
+        {
+          "type": "STRING",
+          "value": "}"
+        },
+        {
+          "type": "REPEAT",
+          "content": {
+            "type": "SEQ",
+            "members": [
+              {
+                "type": "CHOICE",
+                "members": [
+                  {
+                    "type": "SYMBOL",
+                    "name": "_wsp"
+                  },
+                  {
+                    "type": "BLANK"
+                  }
+                ]
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_rt_property"
+                },
+                "named": true,
+                "value": "property"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "_rt_templateName": {
+      "type": "PATTERN",
+      "value": "[\\da-zA-Z_]+"
+    },
+    "_rt_property": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "{{"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_rt_propertyName"
+          },
+          "named": true,
+          "value": "name"
+        },
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_script"
+          },
+          "named": true,
+          "value": "value"
+        },
+        {
+          "type": "STRING",
+          "value": "}}"
+        }
+      ]
+    },
+    "_rt_propertyName": {
+      "type": "PATTERN",
+      "value": "[\\da-zA-Z_]+"
     }
   },
   "extras": [],

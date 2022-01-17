@@ -110,7 +110,12 @@ module.exports = grammar({
 		  ║ Start Rule, Basics
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		script: $ => repeat(choice(
+		script: $ => choice(
+			$._script,
+			$.rollTemplate,
+		),
+		
+		_script: $ => repeat1(choice(
 			$._placeholder,	//attributes, abilities
 			$.inlineRoll,
 			$.rollQuery,
@@ -119,12 +124,8 @@ module.exports = grammar({
 			
 			$.abilityCommandButton,
 			
-			//TODO:
-			//template
-			//property
-			//tracker
-			
-			/[^&]/,
+			/[^&}]/,
+			/\}[^&}]/,
 		)),
 		
 		_wsp: $ => /\s+/,
@@ -382,6 +383,7 @@ module.exports = grammar({
 		inlineRoll: $ => seq(
 			$.__INLINEROLL_START,
 			$.formula,
+			//TODO: optional($.tracker),
 			//TODO: optional(alias($._ir_comment, $.tooltip)),
 			$.__INLINEROLL_END,
 		),
@@ -699,8 +701,6 @@ module.exports = grammar({
 			$._rq_text,
 			$.rollQuery,
 			$.abilityCommandButton,
-			//TODO:
-			//$.property,
 		)),
 		
 		_rq_option: $ => prec.right(choice(
@@ -711,6 +711,55 @@ module.exports = grammar({
 				optional(alias($._rq_text_optionValue, $.optionValue)),
 			),
 		)),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Turn Tracker command
+		  ╚════════════════════════════════════════════════════════════*/
+		
+		//TODO
+		tracker: $ => seq(
+			"&{",
+			"tracker",
+			optional(seq(
+				":",
+				/[+-]/,
+			)),
+			"}",
+		),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Roll Templates
+		  ╚════════════════════════════════════════════════════════════*/
+		
+		//TODO
+		rollTemplate: $ => seq(
+			"&{",
+			"template",
+			":",
+			alias($._rt_templateName, $.templateName),
+			"}",
+			repeat(seq(
+				optional($._wsp),
+				alias($._rt_property, $.property),
+			)),
+		),
+		
+		//TODO
+		_rt_templateName: $ => /[\da-zA-Z_]+/,
+		
+		//TODO
+		_rt_property: $ => seq(
+			"{{",
+			alias($._rt_propertyName, $.name),
+			"=",
+			alias($._script, $.value),
+			"}}",
+		),
+		
+		//TODO
+		_rt_propertyName: $ => /[\da-zA-Z_]+/,
 		
 		
 	},
