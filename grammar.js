@@ -62,7 +62,7 @@ module.exports = grammar({
 	],
 	
 	conflicts: $ => [
-		[ $.rollQuery, $._queryOption, ],
+		[ $.rollQuery, $._rq_option, ],
 	],
 	
 	//word: $ => $.___,
@@ -651,17 +651,17 @@ module.exports = grammar({
 		rollQuery: $ => seq(
 			$.__ROLLQUERY_START,
 			choice(
-				alias($._text_query_pd, $.prompt),
+				alias($._rq_text_pd, $.prompt),
 				seq(
-					optional(alias($._text_query_pd, $.prompt)),
+					optional(alias($._rq_text_pd, $.prompt)),
 					$.__PIPE,
 					optional(choice(
-						alias($._text_query_pd, $.defaultValue),
+						alias($._rq_text_pd, $.defaultValue),
 						seq(
-							optional(alias($._queryOption, $.option)),
+							optional(alias($._rq_option, $.option)),
 							repeat1(seq(
 								$.__PIPE,
-								optional(alias($._queryOption, $.option)),
+								optional(alias($._rq_option, $.option)),
 							)),
 						),
 					)),
@@ -670,39 +670,38 @@ module.exports = grammar({
 			$.__ROLLQUERY_END,
 		),
 		
-		_text_query: $ => choice(
-			/[^}|{,()&]/,	//new lines are allowed, but end up being removed or replaced with a space
-			$.__LEFT_BRACE,
-			$.__RIGHT_BRACE,
-			$.__LEFT_PAREN,
-			$.__RIGHT_PAREN,
+		_rq_text: $ => choice(
+			/[^#{|,}()]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
+			$.__LEFT_BRACE,
+			$.__LEFT_PAREN,
+			$.__RIGHT_PAREN,
 		),
 		
-		_text_query_pd: $ => repeat1(choice(
-			$._text_query,
+		_rq_text_pd: $ => repeat1(choice(
+			$._rq_text,
 			$.__COMMA,
 		)),
 		
-		_queryOption: $ => prec.right(choice(
-			alias($._queryOptionName, $.optionName),
-			seq(
-				optional(alias($._queryOptionName, $.optionName)),
-				$.__COMMA,
-				optional(alias($._queryOptionValue, $.optionValue)),
-			),
-		)),
+		_rq_text_option: $ => repeat1($._rq_text),
 		
-		_queryOptionName: $ => repeat1($._text_query),
-		
-		_queryOptionValue: $ => repeat1(choice(
-			$._text_query,
+		_rq_text_optionValue: $ => repeat1(choice(
+			$._rq_text,
 			$.rollQuery,
 			$.abilityCommandButton,
 			//TODO:
 			//$.property,
+		)),
+		
+		_rq_option: $ => prec.right(choice(
+			alias($._rq_text_option, $.optionName),
+			seq(
+				optional(alias($._rq_text_option, $.optionName)),
+				$.__COMMA,
+				optional(alias($._rq_text_optionValue, $.optionValue)),
+			),
 		)),
 		
 		

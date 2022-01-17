@@ -1453,7 +1453,7 @@
               "type": "ALIAS",
               "content": {
                 "type": "SYMBOL",
-                "name": "_text_query_pd"
+                "name": "_rq_text_pd"
               },
               "named": true,
               "value": "prompt"
@@ -1468,7 +1468,7 @@
                       "type": "ALIAS",
                       "content": {
                         "type": "SYMBOL",
-                        "name": "_text_query_pd"
+                        "name": "_rq_text_pd"
                       },
                       "named": true,
                       "value": "prompt"
@@ -1492,7 +1492,7 @@
                           "type": "ALIAS",
                           "content": {
                             "type": "SYMBOL",
-                            "name": "_text_query_pd"
+                            "name": "_rq_text_pd"
                           },
                           "named": true,
                           "value": "defaultValue"
@@ -1507,7 +1507,7 @@
                                   "type": "ALIAS",
                                   "content": {
                                     "type": "SYMBOL",
-                                    "name": "_queryOption"
+                                    "name": "_rq_option"
                                   },
                                   "named": true,
                                   "value": "option"
@@ -1533,7 +1533,7 @@
                                         "type": "ALIAS",
                                         "content": {
                                           "type": "SYMBOL",
-                                          "name": "_queryOption"
+                                          "name": "_rq_option"
                                         },
                                         "named": true,
                                         "value": "option"
@@ -1565,28 +1565,12 @@
         }
       ]
     },
-    "_text_query": {
+    "_rq_text": {
       "type": "CHOICE",
       "members": [
         {
           "type": "PATTERN",
-          "value": "[^}|{,()&]"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__LEFT_BRACE"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__RIGHT_BRACE"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__LEFT_PAREN"
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__RIGHT_PAREN"
+          "value": "[^#{|,}()]"
         },
         {
           "type": "SYMBOL",
@@ -1599,17 +1583,29 @@
         {
           "type": "SYMBOL",
           "name": "_htmlEntity_or_ampersand"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "__LEFT_BRACE"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "__LEFT_PAREN"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "__RIGHT_PAREN"
         }
       ]
     },
-    "_text_query_pd": {
+    "_rq_text_pd": {
       "type": "REPEAT1",
       "content": {
         "type": "CHOICE",
         "members": [
           {
             "type": "SYMBOL",
-            "name": "_text_query"
+            "name": "_rq_text"
           },
           {
             "type": "SYMBOL",
@@ -1618,7 +1614,34 @@
         ]
       }
     },
-    "_queryOption": {
+    "_rq_text_option": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "SYMBOL",
+        "name": "_rq_text"
+      }
+    },
+    "_rq_text_optionValue": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "SYMBOL",
+            "name": "_rq_text"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "rollQuery"
+          },
+          {
+            "type": "SYMBOL",
+            "name": "abilityCommandButton"
+          }
+        ]
+      }
+    },
+    "_rq_option": {
       "type": "PREC_RIGHT",
       "value": 0,
       "content": {
@@ -1628,7 +1651,7 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
-              "name": "_queryOptionName"
+              "name": "_rq_text_option"
             },
             "named": true,
             "value": "optionName"
@@ -1643,7 +1666,7 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "_queryOptionName"
+                      "name": "_rq_text_option"
                     },
                     "named": true,
                     "value": "optionName"
@@ -1664,7 +1687,7 @@
                     "type": "ALIAS",
                     "content": {
                       "type": "SYMBOL",
-                      "name": "_queryOptionValue"
+                      "name": "_rq_text_optionValue"
                     },
                     "named": true,
                     "value": "optionValue"
@@ -1678,40 +1701,13 @@
           }
         ]
       }
-    },
-    "_queryOptionName": {
-      "type": "REPEAT1",
-      "content": {
-        "type": "SYMBOL",
-        "name": "_text_query"
-      }
-    },
-    "_queryOptionValue": {
-      "type": "REPEAT1",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "SYMBOL",
-            "name": "_text_query"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "rollQuery"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "abilityCommandButton"
-          }
-        ]
-      }
     }
   },
   "extras": [],
   "conflicts": [
     [
       "rollQuery",
-      "_queryOption"
+      "_rq_option"
     ]
   ],
   "precedences": [
