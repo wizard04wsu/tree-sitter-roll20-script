@@ -588,6 +588,22 @@
         }
       ]
     },
+    "_ir_comment": {
+      "type": "REPEAT1",
+      "content": {
+        "type": "CHOICE",
+        "members": [
+          {
+            "type": "PATTERN",
+            "value": "[^\\]]"
+          },
+          {
+            "type": "PATTERN",
+            "value": "\\][^\\]]"
+          }
+        ]
+      }
+    },
     "_integer": {
       "type": "PREC_RIGHT",
       "value": 0,
@@ -1708,6 +1724,10 @@
     [
       "rollQuery",
       "_rq_option"
+    ],
+    [
+      "formula",
+      "_ir_comment"
     ]
   ],
   "precedences": [

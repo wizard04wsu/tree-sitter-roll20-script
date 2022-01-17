@@ -61,6 +61,7 @@ module.exports = grammar({
 	
 	conflicts: $ => [
 		[ $.rollQuery, $._rq_option, ],
+		[ $.formula, $._ir_comment, ],
 	],
 	
 	//word: $ => $.___,
@@ -373,13 +374,22 @@ module.exports = grammar({
 		 /*│ An inline roll may be used as a root element or in place of a
 		   │   number, and contains its own formula. When evaluated, it is
 		   │   reduced to a number.
+		   │ 
+		   │ If there is any invalid content after the formula, it will still be
+		   │   visible in the tooltip when you hover your mouse over the total.
 		   └─────────────────────────────*/
 		
 		inlineRoll: $ => seq(
 			$.__INLINEROLL_START,
 			$.formula,
+			//TODO: optional(alias($._ir_comment, $.tooltip)),
 			$.__INLINEROLL_END,
 		),
+		
+		_ir_comment: $ => repeat1(choice(
+			/[^\]]/,
+			/\][^\]]/,
+		)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
