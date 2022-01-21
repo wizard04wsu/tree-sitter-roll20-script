@@ -32,7 +32,7 @@ Table Roll: [[1t[n]]]
 		(formula
 			(term
 				(tableRoll
-					(literal)
+					(number)
 					(identifier))))))
 
 ==================
@@ -45,7 +45,7 @@ Table Roll: [[ 1t[n] ]]
 		(formula
 			(term
 				(tableRoll
-					(literal)
+					(number)
 					(identifier))))))
 
 ==================

@@ -706,7 +706,7 @@ Inline Roll Labels: [[ [a] 5 ]]
 ---
 (script
 	(inlineRoll (formula
-		(label (literal))
+		(label (string))
 		(term
 			(number)
 		)
@@ -735,6 +735,6 @@ Inline Roll Labels: [[ 5 [a] ]]
 		(term
 			(number)
 		)
-		(label (literal))
+		(label (string))
 	)))
 

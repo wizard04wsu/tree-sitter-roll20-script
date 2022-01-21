@@ -40,7 +40,7 @@ Roll Query: [[?{p}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{p|}]]
@@ -50,7 +50,7 @@ Roll Query: [[?{p|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)))))))
 
 ==================
@@ -61,7 +61,7 @@ Roll Query: [[?{p||}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
 			(separator)))))))
 
@@ -74,7 +74,7 @@ Roll Query: [[?{|d}]]
 	(number
 		(rollQuery
 			(separator)
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{|a|}]]
@@ -86,7 +86,7 @@ Roll Query: [[?{|a|}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)))))))
 
 ==================
@@ -100,7 +100,7 @@ Roll Query: [[?{||b}]]
 			(separator)
 			(separator)
 			(option
-				(literal))))))))
+				(string))))))))
 
 ==================
 Roll Query: [[?{p|d}]]
@@ -110,9 +110,9 @@ Roll Query: [[?{p|d}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{p|a|b}]]
@@ -122,13 +122,13 @@ Roll Query: [[?{p|a|b}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal))))))))
+				(string))))))))
 
 ==================
 Roll Query: [[?{|a,A}]]
@@ -139,7 +139,7 @@ Roll Query: [[?{|a,A}]]
 	(number
 		(rollQuery
 			(separator)
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{|a,A|}]]
@@ -151,9 +151,9 @@ Roll Query: [[?{|a,A|}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal))
+				(string))
 			(separator)))))))
 
 ==================
@@ -164,17 +164,17 @@ Roll Query: [[?{p|a,A|b,B}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal))))))))
+				(string))))))))
 
 ==================
 Roll Query: [[?{|a,|,|,C}]]
@@ -186,7 +186,7 @@ Roll Query: [[?{|a,|,|,C}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator))
 			(separator)
 			(option
@@ -194,7 +194,7 @@ Roll Query: [[?{|a,|,|,C}]]
 			(separator)
 			(option
 				(separator)
-				(literal))))))))
+				(string))))))))
 
 
 
@@ -213,9 +213,9 @@ Roll Query: [[?{p@%&P|d@%&D}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{p@{a}%{b}&lt;P|d@{a}%{b}&lt;D}]]
@@ -225,14 +225,14 @@ Roll Query: [[?{p@{a}%{b}&lt;P|d@{a}%{b}&lt;D}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal
+			(string
 				(attribute
 					(identifier))
 				(ability
 					(identifier))
 				(htmlEntity))
 			(separator)
-			(literal
+			(string
 				(attribute
 					(identifier))
 				(ability
@@ -249,7 +249,7 @@ Roll Query: [[?{|a@%&A|}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)))))))
 
 ==================
@@ -262,14 +262,14 @@ Roll Query: [[?{|c@{a}%{b}&lt;,C@{a}%{b}&lt;|}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal
+				(string
 					(attribute
 						(identifier))
 					(ability
 						(identifier))
 					(htmlEntity))
 				(separator)
-				(literal
+				(string
 					(attribute
 						(identifier))
 					(ability
@@ -297,16 +297,16 @@ Roll Query: [[?{|a|b,?{p&#124;b&#125;c}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal)
+						(string)
 						(separator)
-						(literal))))))))))
+						(string))))))))))
 
 ==================
 Roll Query: [[?{ Pr@%&mpt | default value }]]
@@ -316,9 +316,9 @@ Roll Query: [[?{ Pr@%&mpt | default value }]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }]]
@@ -328,10 +328,10 @@ Roll Query: [[?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal
+			(string
 				(htmlEntity))
 			(separator)
-			(literal
+			(string
 				(attribute
 					(identifier))
 				(ability
@@ -348,9 +348,9 @@ Roll Query: [[?{p|a?{b }]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
-			(literal)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{|a|b,c|d|}]]
@@ -362,15 +362,15 @@ Roll Query: [[?{|a|b,c|d|}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)))))))
 
 ==================
@@ -383,21 +383,21 @@ Roll Query: [[?{|a,b|c||d|e,f}]]
 		(rollQuery
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)
 			(separator)
 			(option
-				(literal))
+				(string))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal))))))))
+				(string))))))))
 
 ==================
 Roll Query: [[?{|1,?{a&rcub;|2,?&lcub;b&rcub;|3,&quest;{c&rcub;|4,?{d&vert;e&comma;f&vert;g&rcub;|5,}]]
@@ -409,43 +409,43 @@ Roll Query: [[?{|1,?{a&rcub;|2,?&lcub;b&rcub;|3,&quest;{c&rcub;|4,?{d&vert;e&com
 		(rollQuery
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal))))
+						(string))))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal))))
+						(string))))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal))))
+						(string))))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal)
+						(string)
 						(separator)
 						(option
-							(literal)
+							(string)
 							(separator)
-							(literal))
+							(string))
 						(separator)
 						(option
-							(literal)))))
+							(string)))))
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator))))))))
 
 ==================
@@ -458,21 +458,21 @@ Roll Query: [[?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&ver
 		(rollQuery
 			(separator)
 			(option
-				(literal
+				(string
 					(htmlEntity)))
 			(separator)
 			(option
-				(literal
+				(string
 					(htmlEntity)
 					(htmlEntity)))
 			(separator)
 			(option
-				(literal
+				(string
 					(htmlEntity)
 					(htmlEntity)))
 			(separator)
 			(option
-				(literal
+				(string
 					(htmlEntity)
 					(htmlEntity)
 					(htmlEntity)
@@ -490,35 +490,35 @@ Roll Query: [[?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f
 			(separator)
 			(option
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal))))
+						(string))))
 			(separator)
 			(option
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal))))
+						(string))))
 			(separator)
 			(option
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal))))
+						(string))))
 			(separator)
 			(option
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal)
+						(string)
 						(separator)
 						(option
-							(literal)
+							(string)
 							(separator)
-							(literal))
+							(string))
 						(separator)
 						(option
-							(literal)))))
+							(string)))))
 			(separator)
 			(option
 				(separator))))))))
@@ -540,9 +540,9 @@ Roll Query: [[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
-			(literal
+			(string
 				(htmlEntity)
 				(htmlEntity)
 				(htmlEntity)
@@ -556,9 +556,9 @@ Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
-			(literal
+			(string
 				(htmlEntity)
 				(htmlEntity)
 				(htmlEntity)
@@ -572,22 +572,22 @@ Roll Query: [[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
 			(option
-				(literal)
+				(string)
 				(separator)
-				(literal
+				(string
 					(rollQuery
-						(literal)
+						(string)
 						(separator)
 						(option
-							(literal)
+							(string)
 							(separator)
-							(literal))
+							(string))
 						(separator)
 						(option
-							(literal)))))
+							(string)))))
 			(separator)))))))
 
 ==================
@@ -598,10 +598,10 @@ Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(literal)
+			(string)
 			(separator)
 			(option
-				(literal
+				(string
 					(htmlEntity)
 					(htmlEntity)
 					(htmlEntity)

@@ -12,61 +12,61 @@ Roll Template: &{template:atkdmg}
 ==================
 &{template:atkdmg}
 ---
-(script
+(script (rollTemplate
 	(flag
-		(identifier)
+		(keyword)
 		(separator)
-		(literal)))
+		(string))))
 
 ==================
 Roll Template: @{wtype}&{template:atkdmg}
 ==================
 @{wtype}&{template:atkdmg}
 ---
-(script
+(script (rollTemplate
 	(attribute
 		(identifier))
 	(flag
-		(identifier)
+		(keyword)
 		(separator)
-		(literal)))
+		(string))))
 
 ==================
 Roll Template: @{wtype} &{template:atkdmg}
 ==================
 @{wtype} &{template:atkdmg}
 ---
-(script
+(script (rollTemplate
 	(attribute
 		(identifier))
 	(flag
-		(identifier)
+		(keyword)
 		(separator)
-		(literal)))
+		(string))))
 
 ==================
 Roll Template: &{template:atkdmg}@{wtype}
 ==================
 &{template:atkdmg}@{wtype}
 ---
-(script
+(script (rollTemplate
 	(flag
-		(identifier)
+		(keyword)
 		(separator)
-		(literal))
+		(string))
 	(attribute
-		(identifier)))
+		(identifier))))
 
 ==================
 Roll Template: &{template:atkdmg} @{wtype}
 ==================
 &{template:atkdmg} @{wtype}
 ---
-(script
+(script (rollTemplate
 	(flag
-		(identifier)
+		(keyword)
 		(separator)
-		(literal))
+		(string))
 	(attribute
-		(identifier)))
+		(identifier))))
 

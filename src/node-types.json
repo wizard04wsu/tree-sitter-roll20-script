@@ -238,6 +238,33 @@
     }
   },
   {
+    "type": "comment",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
+        {
+          "type": "abilityCommandButton",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "diceRoll",
     "named": true,
     "fields": {
@@ -246,7 +273,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "number",
             "named": true
           }
         ]
@@ -266,7 +293,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "number",
             "named": true
           }
         ]
@@ -286,21 +313,38 @@
   {
     "type": "flag",
     "named": true,
-    "fields": {},
+    "fields": {
+      "template": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "tracker": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "literal",
-          "named": true
-        },
-        {
           "type": "separator",
+          "named": true
+        },
+        {
+          "type": "string",
           "named": true
         }
       ]
@@ -437,6 +481,10 @@
         {
           "type": "formula",
           "named": true
+        },
+        {
+          "type": "label",
+          "named": true
         }
       ]
     }
@@ -450,50 +498,7 @@
       "required": false,
       "types": [
         {
-          "type": "literal",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "literal",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "abilityCommandButton",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "rollQuery",
+          "type": "string",
           "named": true
         }
       ]
@@ -570,7 +575,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "string",
             "named": true
           }
         ]
@@ -580,7 +585,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "string",
             "named": true
           }
         ]
@@ -613,6 +618,45 @@
     }
   },
   {
+    "type": "property",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        },
+        {
+          "type": "separator",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "term",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "rollQuery",
     "named": true,
     "fields": {
@@ -621,7 +665,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "string",
             "named": true
           }
         ]
@@ -631,7 +675,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "string",
             "named": true
           }
         ]
@@ -653,19 +697,26 @@
     }
   },
   {
-    "type": "rollTemplate_property",
+    "type": "rollTemplate",
     "named": true,
-    "fields": {},
+    "fields": {
+      "rtype": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "property",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
       "types": [
         {
           "type": "ability",
-          "named": true
-        },
-        {
-          "type": "abilityCommandButton",
           "named": true
         },
         {
@@ -677,27 +728,19 @@
           "named": true
         },
         {
-          "type": "hash",
+          "type": "comment",
           "named": true
         },
         {
-          "type": "htmlEntity",
+          "type": "flag",
           "named": true
         },
         {
-          "type": "identifier",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
+          "type": "property",
           "named": true
         },
         {
           "type": "rollQuery",
-          "named": true
-        },
-        {
-          "type": "separator",
           "named": true
         }
       ]
@@ -728,7 +771,50 @@
           "named": true
         },
         {
-          "type": "flag",
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
+        },
+        {
+          "type": "rollTemplate",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "string",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "abilityCommandButton",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
           "named": true
         },
         {
@@ -746,10 +832,6 @@
         {
           "type": "rollQuery",
           "named": true
-        },
-        {
-          "type": "rollTemplate_property",
-          "named": true
         }
       ]
     }
@@ -763,7 +845,7 @@
         "required": false,
         "types": [
           {
-            "type": "literal",
+            "type": "number",
             "named": true
           }
         ]
@@ -866,10 +948,6 @@
   {
     "type": "separator",
     "named": true
-  },
-  {
-    "type": "{{",
-    "named": false
   },
   {
     "type": "}",

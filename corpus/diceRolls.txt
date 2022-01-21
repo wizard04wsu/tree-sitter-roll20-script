@@ -7,7 +7,7 @@ Dice Roll: [[d20]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal))
+				(number))
 		)
 	)))
 
@@ -20,7 +20,7 @@ Dice Roll: [[ d20 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal))
+				(number))
 		)
 	)))
 
@@ -33,7 +33,7 @@ Dice Roll: [[ D20 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal))
+				(number))
 		)
 	)))
 
@@ -46,8 +46,8 @@ Dice Roll: [[10d20]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal)
-				(literal))
+				(number)
+				(number))
 		)
 	)))
 
@@ -60,8 +60,8 @@ Dice Roll: [[ 10d20 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal)
-				(literal))
+				(number)
+				(number))
 		)
 	)))
 
@@ -87,10 +87,10 @@ Dice Roll: [[ @{a}d@{a} ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal
+				(number
 					(attribute
 						(identifier)))
-				(literal
+				(number
 					(attribute
 						(identifier))))
 		)
@@ -105,12 +105,12 @@ Dice Roll: [[ %{b|a}d%{b|a} ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal
+				(number
 					(ability
 						(identifier)
 						(separator)
 						(identifier)))
-				(literal
+				(number
 					(ability
 						(identifier)
 						(separator)
@@ -128,14 +128,14 @@ Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 		(formula
 			(term
 				(diceRoll
-					(literal
+					(number
 						(attribute
 							(identifier))
 						(ability
 							(identifier)
 							(separator)
 							(identifier)))
-					(literal
+					(number
 						(attribute
 							(identifier))
 						(ability
@@ -158,7 +158,7 @@ Dice Roll: [[ d6c@{s}5 ]]
 		(formula
 			(term
 				(diceRoll
-					(literal)
+					(number)
 					(modifiers
 						(attribute
 							(identifier))))))))
@@ -173,7 +173,7 @@ Dice Roll: [[ d6r5r~5 ]]
 		(formula
 			(term
 				(diceRoll
-					(literal)
+					(number)
 					(modifiers))))))
 
 ==================
@@ -186,7 +186,7 @@ Dice Roll: [[ d6r5 ]]
 		(formula
 			(term
 				(diceRoll
-					(literal)
+					(number)
 					(modifiers))))))
 
 ==================
@@ -198,7 +198,7 @@ Dice Roll: [[ d6r~5 ]]
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal)
+				(number)
 				(modifiers))
 		)
 	)))
@@ -212,8 +212,8 @@ Dice Roll: long one, lower case
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal)
-				(literal)
+				(number)
+				(number)
 				(modifiers))
 		)
 	)))
@@ -227,8 +227,8 @@ Dice Roll: long one, upper case
 	(inlineRoll (formula
 		(term
 			(diceRoll
-				(literal)
-				(literal)
+				(number)
+				(number)
 				(modifiers))
 		)
 	)))
