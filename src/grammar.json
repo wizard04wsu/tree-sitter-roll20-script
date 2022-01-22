@@ -10,6 +10,10 @@
         },
         {
           "type": "SYMBOL",
+          "name": "rollCommand"
+        },
+        {
+          "type": "SYMBOL",
           "name": "rollTemplate"
         }
       ]
@@ -710,6 +714,19 @@
         },
         {
           "type": "SYMBOL",
+          "name": "_inlineRoll"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "__INLINEROLL_END"
+        }
+      ]
+    },
+    "_inlineRoll": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "SYMBOL",
           "name": "formula"
         },
         {
@@ -728,10 +745,6 @@
               "type": "BLANK"
             }
           ]
-        },
-        {
-          "type": "SYMBOL",
-          "name": "__INLINEROLL_END"
         }
       ]
     },
@@ -786,6 +799,19 @@
           ]
         }
       }
+    },
+    "rollCommand": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "PATTERN",
+          "value": "\\/r(oll)?\\s+"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "_inlineRoll"
+        }
+      ]
     },
     "_integer": {
       "type": "PREC_RIGHT",

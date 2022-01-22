@@ -104,6 +104,7 @@ module.exports = grammar({
 		
 		script: $ => choice(
 			$._script,
+			$.rollCommand,
 			$.rollTemplate,
 		),
 		
@@ -369,7 +370,7 @@ module.exports = grammar({
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Inline Rolls
+		  ║ Inline Rolls and Roll Command
 		  ╚╤═══════════════════════════════════════════════════════════*/
 		 /*│ An inline roll may be used as a root element or in place of a
 		   │   number, and contains its own formula. When evaluated, it is
@@ -381,10 +382,14 @@ module.exports = grammar({
 		
 		inlineRoll: $ => seq(
 			$.__INLINEROLL_START,
+			$._inlineRoll,
+			$.__INLINEROLL_END,
+		),
+		
+		_inlineRoll: $ => seq(
 			$.formula,
 			optional(alias($.flag_tracker, $.flag)),
 			//optional(field("tooltip", alias($._ir_tooltip, $.string))),	//TODO
-			$.__INLINEROLL_END,
 		),
 		
 		//TODO
@@ -403,6 +408,11 @@ module.exports = grammar({
 			$.__LEFT_PAREN,
 			$.__RIGHT_PAREN,
 		))),
+		
+		rollCommand: $ => seq(
+			/\/r(oll)?\s+/,
+			$._inlineRoll,
+		),
 		
 		
 		/*╔════════════════════════════════════════════════════════════

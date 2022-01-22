@@ -1,0 +1,53 @@
+==================
+Roll Command: /r 5
+==================
+/r 5
+---
+(script
+	(rollCommand (formula
+		(term
+			(number)
+		)
+	)))
+
+==================
+Roll Command: /roll 5
+==================
+/roll 5
+---
+(script
+	(rollCommand (formula
+		(term
+			(number)
+		)
+	)))
+
+==================
+Roll Command: /r 1+5
+==================
+/r 1+5
+---
+(script
+	(rollCommand (formula
+		(term
+			(number)
+		)
+		(operator)
+		(term
+			(number)
+		)
+	)))
+
+==================
+Roll Command: /r 5 &{tracker}
+==================
+/r 5 &{tracker}
+---
+(script
+	(rollCommand
+		(formula
+			(term
+				(number)))
+		(flag
+			(keyword))))
+

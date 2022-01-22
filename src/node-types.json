@@ -653,6 +653,25 @@
     }
   },
   {
+    "type": "rollCommand",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "flag",
+          "named": true
+        },
+        {
+          "type": "formula",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
     "type": "rollQuery",
     "named": true,
     "fields": {
@@ -776,6 +795,10 @@
         },
         {
           "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "rollCommand",
           "named": true
         },
         {
