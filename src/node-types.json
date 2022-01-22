@@ -481,10 +481,6 @@
         {
           "type": "formula",
           "named": true
-        },
-        {
-          "type": "label",
-          "named": true
         }
       ]
     }

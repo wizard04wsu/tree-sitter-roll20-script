@@ -738,3 +738,66 @@ Inline Roll Labels: [[ 5 [a] ]]
 		(label (string))
 	)))
 
+
+
+
+
+
+
+==================
+Tracker Flag: [[5&{tracker}]]
+==================
+[[5&{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number)))
+		(flag
+			(keyword))))
+
+==================
+Tracker Flag: [[5 &{tracker}]]
+==================
+[[5 &{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number)))
+		(flag
+			(keyword))))
+
+==================
+Tracker Flag: [[5[a] &{tracker}]]
+==================
+[[5[a] &{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(label (string)))
+		(flag
+			(keyword))))
+
+==================
+Tracker Flag: [[5 + 2 [a] &{tracker}]]
+==================
+[[5 + 2 [a] &{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(operator)
+			(term
+				(number))
+			(label (string)))
+		(flag
+			(keyword))))
+

@@ -19,7 +19,7 @@ namespace {
 using namespace std;
 
 
-const bool DEBUGGING = true;
+const bool DEBUGGING = false;
 const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 
 
@@ -480,8 +480,16 @@ struct Scanner {
 			if (result.entityName == "") {
 				if (nest.isSafe('&')) {
 					
-					if (valid_symbols[FLAG_START]) {
-						if (c == '&') {
+					if (c == '{' && nest.isSafe(c)) {
+						if (valid_symbols[FLAG_START]) {
+							c = advance(lexer);
+							mark_end(lexer);
+							nest.push(":}");
+							return match_found(FLAG_START);
+						}
+					}
+					else {
+						if (c == '&' && valid_symbols[FLAG_START]) {
 							c = advance(lexer);
 							
 							result = getHtmlEntity();
@@ -493,16 +501,10 @@ struct Scanner {
 								return match_found(FLAG_START);
 							}
 						}
-						else if (c == '{' && nest.isSafe(c)) {
-							c = advance(lexer);
-							mark_end(lexer);
-							nest.push(":}");
-							return match_found(FLAG_START);
-						}
+						
+						if (valid_symbols[AMPERSAND])
+							return match_found(AMPERSAND);
 					}
-					
-					if (valid_symbols[AMPERSAND])
-						return match_found(AMPERSAND);
 					
 				}
 			}

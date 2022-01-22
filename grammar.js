@@ -382,10 +382,7 @@ module.exports = grammar({
 		inlineRoll: $ => seq(
 			$.__INLINEROLL_START,
 			$.formula,
-			optional(seq(
-				alias($.flag_tracker, $.flag),
-				optional($._labels),
-			)),
+			optional(alias($.flag_tracker, $.flag)),
 			//optional(field("tooltip", alias($._ir_tooltip, $.string))),	//TODO
 			$.__INLINEROLL_END,
 		),
@@ -630,7 +627,7 @@ module.exports = grammar({
 		
 		
 		/*┌──────────────────────────────
-		  │ Group Roll
+		  │ Grouped Rolls
 		  └──────────────────────────────*/
 		
 		groupRoll: $ => prec.right(seq(
