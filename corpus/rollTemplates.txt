@@ -1,0 +1,63 @@
+==================
+Roll Template: &{template:atkdmg}
+==================
+&{template:atkdmg}
+---
+(script (rollTemplate
+	(flag
+		(keyword)
+		(separator)
+		(string))))
+
+==================
+Roll Template: @{wtype}&{template:atkdmg}
+==================
+@{wtype}&{template:atkdmg}
+---
+(script (rollTemplate
+	(attribute
+		(identifier))
+	(flag
+		(keyword)
+		(separator)
+		(string))))
+
+==================
+Roll Template: @{wtype} &{template:atkdmg}
+==================
+@{wtype} &{template:atkdmg}
+---
+(script (rollTemplate
+	(attribute
+		(identifier))
+	(flag
+		(keyword)
+		(separator)
+		(string))))
+
+==================
+Roll Template: &{template:atkdmg}@{wtype}
+==================
+&{template:atkdmg}@{wtype}
+---
+(script (rollTemplate
+	(flag
+		(keyword)
+		(separator)
+		(string))
+	(attribute
+		(identifier))))
+
+==================
+Roll Template: &{template:atkdmg} @{wtype}
+==================
+&{template:atkdmg} @{wtype}
+---
+(script (rollTemplate
+	(flag
+		(keyword)
+		(separator)
+		(string))
+	(attribute
+		(identifier))))
+

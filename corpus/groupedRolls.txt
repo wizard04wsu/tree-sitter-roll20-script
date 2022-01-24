@@ -1,0 +1,77 @@
+==================
+Grouped Rolls: [[{4d6+3d8}kh1]]
+==================
+[[{4d6+3d8}kh1]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(groupRoll
+				(formula
+					(term
+						(diceRoll
+							(number)
+							(number))
+					)
+					(operator)
+					(term
+						(diceRoll
+							(number)
+							(number))
+					))
+				(modifiers))
+		)
+	)))
+
+==================
+Grouped Rolls: [[{4d6,3d8}kh1]]
+==================
+[[{4d6,3d8}kh1]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(groupRoll
+				(formula
+					(term
+						(diceRoll
+							(number)
+							(number))
+					))
+				(separator)
+				(formula
+					(term
+						(diceRoll
+							(number)
+							(number))
+					))
+				(modifiers))
+		)
+	)))
+
+==================
+Grouped Rolls: [[{ 4d6 , 3d8 }kh1]]
+==================
+[[{ 4d6 , 3d8 }kh1]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(groupRoll
+				(formula
+					(term
+						(diceRoll
+							(number)
+							(number))
+					))
+				(separator)
+				(formula
+					(term
+						(diceRoll
+							(number)
+							(number))
+					))
+				(modifiers))
+		)
+	)))
+

@@ -5,7 +5,8 @@ Roll Query: [[?{|}]]
 ---
 (script (inlineRoll (formula (term
 	(number
-		(rollQuery))))))
+		(rollQuery
+			(separator)))))))
 
 ==================
 Roll Query: [[?{||}]]
@@ -14,7 +15,9 @@ Roll Query: [[?{||}]]
 ---
 (script (inlineRoll (formula (term
 	(number
-		(rollQuery))))))
+		(rollQuery
+			(separator)
+			(separator)))))))
 
 ==================
 Roll Query: [[?{|,|}]]
@@ -24,7 +27,10 @@ Roll Query: [[?{|,|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(option)))))))
+			(separator)
+			(option
+				(separator))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{p}]]
@@ -34,7 +40,7 @@ Roll Query: [[?{p}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)))))))
+			(string)))))))
 
 ==================
 Roll Query: [[?{p|}]]
@@ -44,7 +50,8 @@ Roll Query: [[?{p|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)))))))
+			(string)
+			(separator)))))))
 
 ==================
 Roll Query: [[?{p||}]]
@@ -54,7 +61,9 @@ Roll Query: [[?{p||}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)))))))
+			(string)
+			(separator)
+			(separator)))))))
 
 ==================
 Roll Query: [[?{|d}]]
@@ -64,7 +73,8 @@ Roll Query: [[?{|d}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(defaultValue)))))))
+			(separator)
+			(string)))))))
 
 ==================
 Roll Query: [[?{|a|}]]
@@ -74,8 +84,10 @@ Roll Query: [[?{|a|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName))))))))
+				(string))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{||b}]]
@@ -85,8 +97,10 @@ Roll Query: [[?{||b}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
+			(separator)
 			(option
-				(optionName))))))))
+				(string))))))))
 
 ==================
 Roll Query: [[?{p|d}]]
@@ -96,8 +110,9 @@ Roll Query: [[?{p|d}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
-			(defaultValue)))))))
+			(string)
+			(separator)
+			(string)))))))
 
 ==================
 Roll Query: [[?{p|a|b}]]
@@ -107,11 +122,13 @@ Roll Query: [[?{p|a|b}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
+			(string)
+			(separator)
 			(option
-				(optionName))
+				(string))
+			(separator)
 			(option
-				(optionName))))))))
+				(string))))))))
 
 ==================
 Roll Query: [[?{|a,A}]]
@@ -121,7 +138,8 @@ Roll Query: [[?{|a,A}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(defaultValue)))))))
+			(separator)
+			(string)))))))
 
 ==================
 Roll Query: [[?{|a,A|}]]
@@ -131,9 +149,12 @@ Roll Query: [[?{|a,A|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName)
-				(optionValue))))))))
+				(string)
+				(separator)
+				(string))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{p|a,A|b,B}]]
@@ -143,13 +164,17 @@ Roll Query: [[?{p|a,A|b,B}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
+			(string)
+			(separator)
 			(option
-				(optionName)
-				(optionValue))
+				(string)
+				(separator)
+				(string))
+			(separator)
 			(option
-				(optionName)
-				(optionValue))))))))
+				(string)
+				(separator)
+				(string))))))))
 
 ==================
 Roll Query: [[?{|a,|,|,C}]]
@@ -159,11 +184,17 @@ Roll Query: [[?{|a,|,|,C}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName))
-			(option)
+				(string)
+				(separator))
+			(separator)
 			(option
-				(optionValue))))))))
+				(separator))
+			(separator)
+			(option
+				(separator)
+				(string))))))))
 
 
 
@@ -182,8 +213,9 @@ Roll Query: [[?{p@%&P|d@%&D}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
-			(defaultValue)))))))
+			(string)
+			(separator)
+			(string)))))))
 
 ==================
 Roll Query: [[?{p@{a}%{b}&lt;P|d@{a}%{b}&lt;D}]]
@@ -193,17 +225,18 @@ Roll Query: [[?{p@{a}%{b}&lt;P|d@{a}%{b}&lt;D}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt
+			(string
 				(attribute
-					(attribute_identifier))
+					(identifier))
 				(ability
-					(ability_identifier))
+					(identifier))
 				(htmlEntity))
-			(defaultValue
+			(separator)
+			(string
 				(attribute
-					(attribute_identifier))
+					(identifier))
 				(ability
-					(ability_identifier))
+					(identifier))
 				(htmlEntity))))))))
 
 ==================
@@ -214,8 +247,10 @@ Roll Query: [[?{|a@%&A|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName))))))))
+				(string))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{|c@{a}%{b}&lt;,C@{a}%{b}&lt;|}]]
@@ -225,19 +260,22 @@ Roll Query: [[?{|c@{a}%{b}&lt;,C@{a}%{b}&lt;|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName
+				(string
 					(attribute
-						(attribute_identifier))
+						(identifier))
 					(ability
-						(ability_identifier))
+						(identifier))
 					(htmlEntity))
-				(optionValue
+				(separator)
+				(string
 					(attribute
-						(attribute_identifier))
+						(identifier))
 					(ability
-						(ability_identifier))
-					(htmlEntity)))))))))
+						(identifier))
+					(htmlEntity)))
+			(separator)))))))
 
 
 
@@ -257,14 +295,18 @@ Roll Query: [[?{|a|b,?{p&#124;b&#125;c}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName))
+				(string))
+			(separator)
 			(option
-				(optionName)
-				(optionValue
+				(string)
+				(separator)
+				(string
 					(rollQuery
-						(prompt)
-						(defaultValue))))))))))
+						(string)
+						(separator)
+						(string))))))))))
 
 ==================
 Roll Query: [[?{ Pr@%&mpt | default value }]]
@@ -274,8 +316,9 @@ Roll Query: [[?{ Pr@%&mpt | default value }]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
-			(defaultValue)))))))
+			(string)
+			(separator)
+			(string)))))))
 
 ==================
 Roll Query: [[?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }]]
@@ -285,14 +328,16 @@ Roll Query: [[?{ Pr&vert;mpt | a@{b}c%{d|e}f[[5]]g&lt;h?{i }]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt
+			(string
 				(htmlEntity))
-			(defaultValue
+			(separator)
+			(string
 				(attribute
-					(attribute_identifier))
+					(identifier))
 				(ability
-					(character_identifier)
-					(ability_identifier))
+					(identifier)
+					(separator)
+					(identifier))
 				(htmlEntity))))))))
 
 ==================
@@ -303,8 +348,9 @@ Roll Query: [[?{p|a?{b }]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
-			(defaultValue)))))))
+			(string)
+			(separator)
+			(string)))))))
 
 ==================
 Roll Query: [[?{|a|b,c|d|}]]
@@ -314,13 +360,18 @@ Roll Query: [[?{|a|b,c|d|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName))
+				(string))
+			(separator)
 			(option
-				(optionName)
-				(optionValue))
+				(string)
+				(separator)
+				(string))
+			(separator)
 			(option
-				(optionName))))))))
+				(string))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{|a,b|c||d|e,f}]]
@@ -330,16 +381,23 @@ Roll Query: [[?{|a,b|c||d|e,f}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName)
-				(optionValue))
+				(string)
+				(separator)
+				(string))
+			(separator)
 			(option
-				(optionName))
+				(string))
+			(separator)
+			(separator)
 			(option
-				(optionName))
+				(string))
+			(separator)
 			(option
-				(optionName)
-				(optionValue))))))))
+				(string)
+				(separator)
+				(string))))))))
 
 ==================
 Roll Query: [[?{|1,?{a&rcub;|2,?&lcub;b&rcub;|3,&quest;{c&rcub;|4,?{d&vert;e&comma;f&vert;g&rcub;|5,}]]
@@ -349,33 +407,46 @@ Roll Query: [[?{|1,?{a&rcub;|2,?&lcub;b&rcub;|3,&quest;{c&rcub;|4,?{d&vert;e&com
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName)
-				(optionValue
+				(string)
+				(separator)
+				(string
 					(rollQuery
-						(prompt))))
+						(string))))
+			(separator)
 			(option
-				(optionName)
-				(optionValue
+				(string)
+				(separator)
+				(string
 					(rollQuery
-						(prompt))))
+						(string))))
+			(separator)
 			(option
-				(optionName)
-				(optionValue
+				(string)
+				(separator)
+				(string
 					(rollQuery
-						(prompt))))
+						(string))))
+			(separator)
 			(option
-				(optionName)
-				(optionValue
+				(string)
+				(separator)
+				(string
 					(rollQuery
-						(prompt)
+						(string)
+						(separator)
 						(option
-							(optionName)
-							(optionValue))
+							(string)
+							(separator)
+							(string))
+						(separator)
 						(option
-							(optionName)))))
+							(string)))))
+			(separator)
 			(option
-				(optionName))))))))
+				(string)
+				(separator))))))))
 
 ==================
 Roll Query: [[?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&vert;g&rcub;|}]]
@@ -385,23 +456,28 @@ Roll Query: [[?{|?{a&rcub;|?&lcub;b&rcub;|&quest;{c&rcub;|?{d&vert;e&comma;f&ver
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionName
+				(string
 					(htmlEntity)))
+			(separator)
 			(option
-				(optionName
-					(htmlEntity)
-					(htmlEntity)))
-			(option
-				(optionName
+				(string
 					(htmlEntity)
 					(htmlEntity)))
+			(separator)
 			(option
-				(optionName
+				(string
+					(htmlEntity)
+					(htmlEntity)))
+			(separator)
+			(option
+				(string
 					(htmlEntity)
 					(htmlEntity)
 					(htmlEntity)
-					(htmlEntity)))))))))
+					(htmlEntity)))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f&vert;g&rcub;|,}]]
@@ -411,28 +487,41 @@ Roll Query: [[?{|,?{a&rcub;|,?&lcub;b&rcub;|,&quest;{c&rcub;|,?{d&vert;e&comma;f
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
+			(separator)
 			(option
-				(optionValue
+				(separator)
+				(string
 					(rollQuery
-						(prompt))))
+						(string))))
+			(separator)
 			(option
-				(optionValue
+				(separator)
+				(string
 					(rollQuery
-						(prompt))))
+						(string))))
+			(separator)
 			(option
-				(optionValue
+				(separator)
+				(string
 					(rollQuery
-						(prompt))))
+						(string))))
+			(separator)
 			(option
-				(optionValue
+				(separator)
+				(string
 					(rollQuery
-						(prompt)
+						(string)
+						(separator)
 						(option
-							(optionName)
-							(optionValue))
+							(string)
+							(separator)
+							(string))
+						(separator)
 						(option
-							(optionName)))))
-			(option)))))))
+							(string)))))
+			(separator)
+			(option
+				(separator))))))))
 
 
 
@@ -451,8 +540,9 @@ Roll Query: [[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
-			(defaultValue
+			(string)
+			(separator)
+			(string
 				(htmlEntity)
 				(htmlEntity)
 				(htmlEntity)
@@ -466,8 +556,9 @@ Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
-			(defaultValue
+			(string)
+			(separator)
+			(string
 				(htmlEntity)
 				(htmlEntity)
 				(htmlEntity)
@@ -481,17 +572,23 @@ Roll Query: [[?{p1|a,?{p2&vert;C&comma;c&vert;D&rcub;|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
+			(string)
+			(separator)
 			(option
-				(optionName)
-				(optionValue
+				(string)
+				(separator)
+				(string
 					(rollQuery
-						(prompt)
+						(string)
+						(separator)
 						(option
-							(optionName)
-							(optionValue))
+							(string)
+							(separator)
+							(string))
+						(separator)
 						(option
-							(optionName)))))))))))
+							(string)))))
+			(separator)))))))
 
 ==================
 Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;|}]]
@@ -501,13 +598,15 @@ Roll Query: [[?{p1|a?{p2&vert;C&comma;c&vert;D&rcub;|}]]
 (script (inlineRoll (formula (term
 	(number
 		(rollQuery
-			(prompt)
+			(string)
+			(separator)
 			(option
-				(optionName
+				(string
 					(htmlEntity)
 					(htmlEntity)
 					(htmlEntity)
-					(htmlEntity)))))))))
+					(htmlEntity)))
+			(separator)))))))
 
 
 

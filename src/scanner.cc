@@ -48,6 +48,12 @@ enum TokenType {
 	RIGHT_BRACE,
 	LEFT_PAREN,
 	RIGHT_PAREN,
+	COLON,
+	
+	FLAG_START,
+	FLAG_END,
+	ROLLTEMPLATE_PROPERTY_START,
+	ROLLTEMPLATE_PROPERTY_END,
 	
 	HTML_ENTITY,
 		
@@ -79,6 +85,12 @@ unordered_map<int, string> symbol_strings({
 	{ RIGHT_BRACE, "RIGHT_BRACE" },
 	{ LEFT_PAREN, "LEFT_PAREN" },
 	{ RIGHT_PAREN, "RIGHT_PAREN" },
+	{ COLON, "COLON" },
+	
+	{ FLAG_START, "FLAG_START" },
+	{ FLAG_END, "FLAG_END" },
+	{ ROLLTEMPLATE_PROPERTY_START, "ROLLTEMPLATE_PROPERTY_START" },
+	{ ROLLTEMPLATE_PROPERTY_END, "ROLLTEMPLATE_PROPERTY_END" },
 	
 	{ HTML_ENTITY, "HTML_ENTITY" },
 		
@@ -452,10 +464,9 @@ struct Scanner {
 		Debug.logValidSymbols(valid_symbols);
 		Debug.logLookahead(lexer);
 		
-		int ampCount = 0;
-		HtmlEntity initialResult;
 		HtmlEntity result;
 		string entityName = "";
+		bool inRollTemplateProperty = false;
 		
 		char c = lexer->lookahead;
 		mark_end(lexer);
@@ -467,8 +478,35 @@ struct Scanner {
 			result = getHtmlEntity();
 			
 			if (result.entityName == "") {
-				if (valid_symbols[AMPERSAND] && nest.isSafe('&'))
-					return match_found(AMPERSAND);
+				if (nest.isSafe('&')) {
+					
+					if (c == '{' && nest.isSafe(c)) {
+						if (valid_symbols[FLAG_START]) {
+							c = advance(lexer);
+							mark_end(lexer);
+							nest.push(":}");
+							return match_found(FLAG_START);
+						}
+					}
+					else {
+						if (c == '&' && valid_symbols[FLAG_START]) {
+							c = advance(lexer);
+							
+							result = getHtmlEntity();
+							c = lexer->lookahead;
+							
+							if (checkEntity(result, {FLAG_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+								mark_end(lexer);
+								nest.push(":}");
+								return match_found(FLAG_START);
+							}
+						}
+						
+						if (valid_symbols[AMPERSAND])
+							return match_found(AMPERSAND);
+					}
+					
+				}
 			}
 			else {
 				c = lexer->lookahead;
@@ -506,7 +544,7 @@ struct Scanner {
 							return match_found(INLINEROLL_START);
 						}
 						else if (valid_symbols[LABEL_START]) {
-							nest.push("]");
+							//nest.push("]");
 							return match_found(LABEL_START);
 						}
 					}
@@ -514,7 +552,7 @@ struct Scanner {
 						return match_found(INLINEROLL_START);
 					}
 					else if (valid_symbols[LABEL_START] && nest.isSafe(c)) {
-						nest.push("]");
+						//nest.push("]");
 						return match_found(LABEL_START);
 					}
 				}
@@ -542,6 +580,29 @@ struct Scanner {
 				
 				else if (checkEntity(result, {LEFT_PAREN}, '(', "#40|#[xX](00)?28|lpar"))
 					return match_found(LEFT_PAREN);
+				
+				else if (checkEntity(result, {ROLLTEMPLATE_PROPERTY_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace", AS_START)) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {ROLLTEMPLATE_PROPERTY_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace")) {
+							mark_end(lexer);
+							//nest.push("}");
+							inRollTemplateProperty = true;
+							return match_found(ROLLTEMPLATE_PROPERTY_START);
+						}
+					}
+					else if (c == '{' && nest.isSafe(c)) {
+						c = advance(lexer);
+						mark_end(lexer);
+						//nest.push("}");
+						inRollTemplateProperty = true;
+						return match_found(ROLLTEMPLATE_PROPERTY_START);
+					}
+				}
 				
 				else if (checkEntity(result, {GROUPROLL_START}, '{', "#123|#[xX](00)?7[bB]|lcub|lbrace", AS_START)) {
 					nest.push(",}");
@@ -573,10 +634,34 @@ struct Scanner {
 					}
 				}
 				
-				else if (checkEntity(result, {ROLLQUERY_END, GROUPROLL_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
+				else if (checkEntity(result, {ROLLQUERY_END, GROUPROLL_END, FLAG_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
 					nest.pop();
 					if (valid_symbols[ROLLQUERY_END]) return match_found(ROLLQUERY_END);
 					if (valid_symbols[GROUPROLL_END]) return match_found(GROUPROLL_END);
+					if (valid_symbols[FLAG_END]) return match_found(FLAG_END);
+				}
+				
+				else if (checkEntity(result, {ROLLTEMPLATE_PROPERTY_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (checkEntity(result, {ROLLTEMPLATE_PROPERTY_END}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace")) {
+							mark_end(lexer);
+							//nest.pop();
+							inRollTemplateProperty = false;
+							return match_found(ROLLTEMPLATE_PROPERTY_END);
+						}
+					}
+					else if (c == '}' && nest.isSafe(c)) {
+						c = advance(lexer);
+						mark_end(lexer);
+						//nest.pop();
+						inRollTemplateProperty = false;
+						return match_found(ROLLTEMPLATE_PROPERTY_END);
+					}
 				}
 				
 				else if (checkEntity(result, {RIGHT_BRACE}, '}', "#125|#[xX](00)?7[dD]|rcub|rbrace"))
@@ -584,7 +669,7 @@ struct Scanner {
 				
 				else if (checkEntity(result, {INLINEROLL_END, LABEL_END, TABLEROLL_END}, ']', "#93|#[xX](00)?5[dD]|rsqb|rbrack")) {
 					if (valid_symbols[LABEL_END]) {
-						nest.pop();
+						//nest.pop();
 						return match_found(LABEL_END);
 					}
 					else if (valid_symbols[TABLEROLL_END]) {
@@ -624,6 +709,9 @@ struct Scanner {
 				
 				else if (checkEntity(result, {COMMA}, ',', "#44|#[xX](00)?2[cC]|comma"))
 					return match_found(COMMA);
+				
+				else if (checkEntity(result, {COLON}, ':', "#58|#[xX](00)?3[aA]|colon"))
+					return match_found(COLON);
 				
 				
 				if (valid_symbols[HTML_ENTITY]) {
@@ -682,7 +770,7 @@ struct Scanner {
 					return match_found(INLINEROLL_START);
 				}
 				else if (c != '[' && valid_symbols[LABEL_START]) {
-					nest.push("]");
+					//nest.push("]");
 					return match_found(LABEL_START);
 				}
 			}
@@ -714,16 +802,38 @@ struct Scanner {
 				mark_end(lexer);
 				return match_found(LEFT_PAREN);
 			}
-			else if (c == '{' && valid_symbols[GROUPROLL_START]) {
+			else if (c == '{') {
 				c = advance(lexer);
 				mark_end(lexer);
-				nest.push(",}");
-				return match_found(GROUPROLL_START);
-			}
-			else if (c == '{' && valid_symbols[LEFT_BRACE]) {
-				c = advance(lexer);
-				mark_end(lexer);
-				return match_found(LEFT_BRACE);
+				
+				if (valid_symbols[ROLLTEMPLATE_PROPERTY_START]) {
+					if (c == '&') {
+						c = advance(lexer);
+						
+						result = getHtmlEntity();
+						c = lexer->lookahead;
+						
+						if (regex_match(result.entityName, regex("#123|#[xX](00)?7[bB]|lcub|lbrace"))) {
+							//nest.push("}");
+							inRollTemplateProperty = true;
+							return match_found(ROLLTEMPLATE_PROPERTY_START);
+						}
+					}
+					else if (c == '{') {
+						c = advance(lexer);
+						mark_end(lexer);
+						//nest.push("}");
+						inRollTemplateProperty = true;
+						return match_found(ROLLTEMPLATE_PROPERTY_START);
+					}
+				}
+				else if (valid_symbols[GROUPROLL_START]) {
+					nest.push(",}");
+					return match_found(GROUPROLL_START);
+				}
+				else if (valid_symbols[LEFT_BRACE]) {
+					return match_found(LEFT_BRACE);
+				}
 			}
 			else if ((c == 't' || c == 'T') && valid_symbols[TABLEROLL_START]) {
 				c = advance(lexer);
@@ -750,18 +860,54 @@ struct Scanner {
 			}
 			
 			else if (c == '}') {
-				if ((valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END])) {
-					c = advance(lexer);
-					mark_end(lexer);
-					nest.pop();
-					if (valid_symbols[ROLLQUERY_END])
-						return match_found(ROLLQUERY_END);
-					if (valid_symbols[GROUPROLL_END])
-						return match_found(GROUPROLL_END);
+				c = advance(lexer);
+				mark_end(lexer);
+				
+				if (valid_symbols[ROLLQUERY_END] || valid_symbols[GROUPROLL_END]
+				 || valid_symbols[FLAG_END] || valid_symbols[ROLLTEMPLATE_PROPERTY_END]) {
+					if (valid_symbols[ROLLTEMPLATE_PROPERTY_END]) {
+						if (c == '&') {
+							c = advance(lexer);
+							
+							result = getHtmlEntity();
+							c = lexer->lookahead;
+							
+							if (regex_match(result.entityName, regex("#125|#[xX](00)?7[dD]|rcub|rbrace"))) {
+								//nest.pop();
+								inRollTemplateProperty = false;
+								return match_found(ROLLTEMPLATE_PROPERTY_END);
+							}
+						}
+						else if (c == '}') {
+							c = advance(lexer);
+							mark_end(lexer);
+							//nest.pop();
+							inRollTemplateProperty = false;
+							return match_found(ROLLTEMPLATE_PROPERTY_END);
+						}
+					}
+					else if (inRollTemplateProperty) {
+						if (c != '}') {
+							nest.pop();
+							if (valid_symbols[ROLLQUERY_END])
+								return match_found(ROLLQUERY_END);
+							if (valid_symbols[GROUPROLL_END])
+								return match_found(GROUPROLL_END);
+							if (valid_symbols[FLAG_END])
+								return match_found(FLAG_END); 
+						}
+					}
+					else {
+						nest.pop();
+						if (valid_symbols[ROLLQUERY_END])
+							return match_found(ROLLQUERY_END);
+						if (valid_symbols[GROUPROLL_END])
+							return match_found(GROUPROLL_END);
+						if (valid_symbols[FLAG_END])
+							return match_found(FLAG_END);
+					}
 				}
 				else if (valid_symbols[RIGHT_BRACE]) {
-					c = advance(lexer);
-					mark_end(lexer);
 					return match_found(RIGHT_BRACE);
 				}
 			}
@@ -771,7 +917,7 @@ struct Scanner {
 				mark_end(lexer);
 				
 				if (valid_symbols[LABEL_END]) {
-					nest.pop();
+					//nest.pop();
 					return match_found(LABEL_END);
 				}
 				else if (valid_symbols[TABLEROLL_END]) {
@@ -815,6 +961,11 @@ struct Scanner {
 				c = advance(lexer);
 				mark_end(lexer);
 				return match_found(COMMA);
+			}
+			else if (c == ':' && valid_symbols[COLON]) {
+				c = advance(lexer);
+				mark_end(lexer);
+				return match_found(COLON);
 			}
 		}
 		

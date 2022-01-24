@@ -5,7 +5,7 @@ Attribute: @{a}
 ---
 (script
 	(attribute
-		(attribute_identifier)))
+		(identifier)))
 
 ==================
 Attribute: @{ a }
@@ -14,7 +14,7 @@ Attribute: @{ a }
 ---
 (script
 	(attribute
-		(attribute_identifier)))
+		(identifier)))
 
 ==================
 Attribute: @{c|a}
@@ -23,8 +23,9 @@ Attribute: @{c|a}
 ---
 (script
 	(attribute
-		(character_identifier)
-		(attribute_identifier)))
+		(identifier)
+		(separator)
+		(identifier)))
 
 ==================
 Attribute: @{ c | a }
@@ -33,8 +34,9 @@ Attribute: @{ c | a }
 ---
 (script
 	(attribute
-		(character_identifier)
-		(attribute_identifier)))
+		(identifier)
+		(separator)
+		(identifier)))
 
 ==================
 Attribute: @{c|a|max}
@@ -43,8 +45,11 @@ Attribute: @{c|a|max}
 ---
 (script
 	(attribute_maximum
-		(character_identifier)
-		(attribute_identifier)))
+		(identifier)
+		(separator)
+		(identifier)
+		(separator)
+		(keyword)))
 
 ==================
 Attribute: @{c|a |max}
@@ -53,8 +58,11 @@ Attribute: @{c|a |max}
 ---
 (script
 	(attribute_maximum
-		(character_identifier)
-		(attribute_identifier)))
+		(identifier)
+		(separator)
+		(identifier)
+		(separator)
+		(keyword)))
 
 ==================
 Attribute: @{ c | a |max}
@@ -63,8 +71,11 @@ Attribute: @{ c | a |max}
 ---
 (script
 	(attribute_maximum
-		(character_identifier)
-		(attribute_identifier)))
+		(identifier)
+		(separator)
+		(identifier)
+		(separator)
+		(keyword)))
 
 ==================
 Attribute: @{selected|a}
@@ -73,8 +84,9 @@ Attribute: @{selected|a}
 ---
 (script
 	(attribute
-		(character_token_identifier)
-		(attribute_identifier)))
+		(keyword)
+		(separator)
+		(identifier)))
 
 ==================
 Attribute: @{selected|a|max}
@@ -83,8 +95,11 @@ Attribute: @{selected|a|max}
 ---
 (script
 	(attribute_maximum
-		(character_token_identifier)
-		(attribute_identifier)))
+		(keyword)
+		(separator)
+		(identifier)
+		(separator)
+		(keyword)))
 
 ==================
 Attribute: @{target|a}
@@ -93,8 +108,9 @@ Attribute: @{target|a}
 ---
 (script
 	(attribute
-		(character_token_identifier)
-		(attribute_identifier)))
+		(keyword)
+		(separator)
+		(identifier)))
 
 ==================
 Attribute: @{target|a|max}
@@ -103,8 +119,11 @@ Attribute: @{target|a|max}
 ---
 (script
 	(attribute_maximum
-		(character_token_identifier)
-		(attribute_identifier)))
+		(keyword)
+		(separator)
+		(identifier)
+		(separator)
+		(keyword)))
 
 
 
@@ -118,7 +137,7 @@ Attribute: @{#m }
 ---
 (script
  	(attribute
-		(attribute_identifier
+		(identifier
 			(hash))))
 
 ==================
@@ -128,7 +147,7 @@ Attribute: @{a#a a}
 ---
 (script
  	(attribute
-		(attribute_identifier
+		(identifier
 			(hash))))
 
 ==================
@@ -138,9 +157,10 @@ Attribute: @{#c |#a }
 ---
 (script
  	(attribute
-		(character_identifier
+		(identifier
 			(hash))
-		(attribute_identifier
+		(separator)
+		(identifier
 			(hash))))
 
 ==================
@@ -149,8 +169,9 @@ Attribute: @{c#c c|a#a a}
 @{c#c c|a#a a}
 ---
 (script
- (attribute
-	 (character_identifier
-		 (hash))
-	 (attribute_identifier
-		 (hash))))
+	(attribute
+		(identifier
+			(hash))
+		(separator)
+		(identifier
+			(hash))))

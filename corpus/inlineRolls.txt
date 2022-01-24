@@ -407,7 +407,7 @@ Inline Roll: [[@{a}]]
 		(term
 			(number
 				(attribute
-					(attribute_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -421,7 +421,7 @@ Inline Roll: [[ @{a} ]]
 		(term
 			(number
 				(attribute
-					(attribute_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -435,8 +435,9 @@ Inline Roll: [[@{c|a}]]
 		(term
 			(number
 				(attribute
-					(character_identifier)
-					(attribute_identifier)))
+					(identifier)
+					(separator)
+					(identifier)))
 		)
 	)))
 
@@ -450,7 +451,7 @@ Inline Roll: [[%{a}]]
 		(term
 			(number
 				(ability
-					(ability_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -464,7 +465,7 @@ Inline Roll: [[ %{a} ]]
 		(term
 			(number
 				(ability
-					(ability_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -478,8 +479,9 @@ Inline Roll: [[%{c|a}]]
 		(term
 			(number
 				(ability
-					(character_identifier)
-					(ability_identifier)))
+					(identifier)
+					(separator)
+					(identifier)))
 		)
 	)))
 
@@ -548,7 +550,7 @@ Inline Roll: [[#m ]]@{a}]]
 		)
 	))
 	(attribute
-		(attribute_identifier)))
+		(identifier)))
 
 ==================
 Inline Roll: [[#m]]@{a}]]
@@ -562,7 +564,7 @@ Inline Roll: [[#m]]@{a}]]
 		)
 	))
 	(attribute
-		(attribute_identifier)))
+		(identifier)))
 
 ==================
 Inline Roll: [[5#m ]]
@@ -610,14 +612,14 @@ Inline Roll: [[ @{a}[[5]]%{b} ]]
 		(term
 			(number
 				(attribute
-					(attribute_identifier))
+					(identifier))
 				(inlineRoll (formula
 					(term
 						(number)
 					)
 				))
 				(ability
-					(ability_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -632,14 +634,14 @@ Inline Roll: [[ -@{a}[[5]]%{b} ]]
 			(operator)
 			(number
 				(attribute
-					(attribute_identifier))
+					(identifier))
 				(inlineRoll (formula
 					(term
 						(number)
 					)
 				))
 				(ability
-					(ability_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -653,7 +655,7 @@ Inline Roll: [[ %{a}%5 ]]
 		(term
 			(number
 				(ability
-					(ability_identifier)))
+					(identifier)))
 		)
 		(operator)
 		(term
@@ -675,7 +677,7 @@ Inline Roll: [[ 1 %5%{a} ]]
 		(term
 			(number
 				(ability
-					(ability_identifier)))
+					(identifier)))
 		)
 	)))
 
@@ -704,7 +706,7 @@ Inline Roll Labels: [[ [a] 5 ]]
 ---
 (script
 	(inlineRoll (formula
-		(label (labelText))
+		(label (string))
 		(term
 			(number)
 		)
@@ -733,6 +735,195 @@ Inline Roll Labels: [[ 5 [a] ]]
 		(term
 			(number)
 		)
-		(label (labelText))
+		(label (string))
 	)))
+
+==================
+Inline Roll Labels: [[ 5 [a[{|,}()b] ]]
+==================
+[[ 5 [a] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(label (string))
+	)))
+
+
+
+
+
+
+
+==================
+Tracker Flag: [[5&{tracker}]]
+==================
+[[5&{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(flag
+				(keyword)))))
+
+==================
+Tracker Flag: [[5 &{tracker}]]
+==================
+[[5 &{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(flag
+				(keyword)))))
+
+==================
+Tracker Flag: [[5[a] &{tracker}]]
+==================
+[[5[a] &{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(label (string))
+			(flag
+				(keyword)))))
+
+==================
+Tracker Flag: [[5 + 2 [a] &{tracker}]]
+==================
+[[5 + 2 [a] &{tracker}]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(operator)
+			(term
+				(number))
+			(label (string))
+			(flag
+				(keyword)))))
+
+
+
+
+
+==================
+Tracker Flag: [[5 &{tracker} [a]]]
+==================
+[[5 &{tracker} [a]]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(flag
+				(keyword))
+			(label (string)))))
+
+==================
+Tracker Flag: [[5 &{tracker} + 5]]
+==================
+[[5 &{tracker} + 5]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(flag
+				(keyword))
+			(operator)
+			(term
+				(number)))))
+
+==================
+Tracker Flag: [[5 + &{tracker} 5]]
+==================
+[[5 + &{tracker} 5]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(operator)
+			(flag
+				(keyword))
+			(term
+				(number)))))
+
+
+
+
+
+
+==================
+Tracker Flag: [[5 + &{tracker} [[2 &{tracker}]] ]]
+==================
+[[5 + &{tracker} [[2 &{tracker}]] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number))
+		(operator)
+		(flag
+			(keyword))
+		(term
+			(number
+				(inlineRoll (formula
+					(term
+						(number))
+					(flag
+						(keyword)))))))))
+
+==================
+Tracker Flag: [[5 &{tracker} + [[2 &{tracker}]] ]]
+==================
+[[5 &{tracker} + [[2 &{tracker}]] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number))
+		(flag
+			(keyword))
+		(operator)
+		(term
+			(number
+				(inlineRoll (formula
+					(term
+						(number))
+					(flag
+						(keyword)))))))))
+
+==================
+Tracker Flag: [[5 + [[2 &{tracker}]] ]]
+==================
+[[5 + [[2 &{tracker}]] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number))
+		(operator)
+		(term
+			(number
+				(inlineRoll (formula
+					(term
+						(number))
+					(flag
+						(keyword)))))))))
 

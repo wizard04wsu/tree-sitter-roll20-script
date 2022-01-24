@@ -1,17 +1,3 @@
-const _debugging = true;
-function debugAlias(theToken, aliasToken, fieldName){
-	if(!_debugging) return theToken;
-	if(fieldName !== void 0){
-		fieldName = fieldName.toString().replace(/^(\w+).*/, "$1");
-		if(fieldName){
-			return field(fieldName, alias(theToken, aliasToken));
-		}
-	}
-	return alias(theToken, aliasToken);
-}
-
-
-
 module.exports = grammar({
 	name: "roll20_script",
 	
@@ -40,6 +26,12 @@ module.exports = grammar({
 		$.__RIGHT_BRACE,
 		$.__LEFT_PAREN,
 		$.__RIGHT_PAREN,
+		$.__COLON,
+		
+		$.__FLAG_START,
+		$.__FLAG_END,
+		$.__ROLLTEMPLATE_PROPERTY_START,
+		$.__ROLLTEMPLATE_PROPERTY_END,
 		
 		$.__HTML_ENTITY,
 		
@@ -61,7 +53,7 @@ module.exports = grammar({
 	
 	conflicts: $ => [
 		[ $.rollQuery, $._rq_option, ],
-		[ $.formula, $._ir_comment, ],
+		[ $.script, $.rollTemplate, ],
 	],
 	
 	//word: $ => $.___,
@@ -110,24 +102,31 @@ module.exports = grammar({
 		  ║ Start Rule, Basics
 		  ╚════════════════════════════════════════════════════════════*/
 		
-		script: $ => repeat(choice(
-			$._placeholder,	//attributes, abilities
-			$.inlineRoll,
-			$.rollQuery,
-			$.hash,
-			$._htmlEntity_or_ampersand,
-			
-			$.abilityCommandButton,
-			
-			//TODO:
-			//template
-			//property
-			//tracker
-			
-			/[^&]/,
+		script: $ => choice(
+			$._script,
+			$.rollCommand,
+			$.rollTemplate,
+		),
+		
+		
+		_script: $ => repeat1(choice(
+			$._script_common1,
+			$._script_common2,
+			/[^#&\s]/,
 		)),
 		
-		_wsp: $ => /\s+/,
+		_script_common1: $ => choice(
+			$._placeholder,	//attributes, abilities
+			$.rollQuery,
+			/\s/,
+		),
+		_script_common2: $ => choice(
+			$.inlineRoll,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			$.abilityCommandButton,
+		),
+		
 		
 		_htmlEntity_or_ampersand: $ => choice(
 			$.__AMPERSAND,
@@ -148,9 +147,9 @@ module.exports = grammar({
 			$.ability,
 		),
 		
-		character_token_identifier: $ => choice(
-			field("target", "target"),
-			field("selected", "selected"),
+		_character_token_identifier: $ => choice(
+			field("target", alias("target", $.keyword)),
+			field("selected", alias("selected", $.keyword)),
 		),
 		
 		
@@ -185,28 +184,30 @@ module.exports = grammar({
 		),
 		attribute: $ => seq(
 			"@{",
-			$.attribute_identifier,
+			field("attribute", alias($.attribute_identifier, $.identifier)),
 			"}",
 		),
 		_attribute_of_character: $ => seq(
 			"@{",
 			choice(
-				$.character_token_identifier,
-				alias($.attribute_identifier, $.character_identifier),
+				$._character_token_identifier,
+				field("character", alias($.attribute_identifier, $.identifier)),
 			),
-			"|",
-			$.attribute_identifier,
+			alias("|", $.separator),
+			field("attribute", alias($.attribute_identifier, $.identifier)),
 			"}",
 		),
 		_attribute_of_character_maximum: $ => seq(
 			"@{",
 			choice(
-				$.character_token_identifier,
-				alias($.attribute_identifier, $.character_identifier),
+				$._character_token_identifier,
+				field("character", alias($.attribute_identifier, $.identifier)),
 			),
-			"|",
-			$.attribute_identifier,
-			"|max}",
+			alias("|", $.separator),
+			field("attribute", alias($.attribute_identifier, $.identifier)),
+			alias("|", $.separator),
+			field("max", alias("max", $.keyword)),
+			"}",
 		),
 		
 		attribute_identifier: $ => repeat1(choice(
@@ -217,13 +218,13 @@ module.exports = grammar({
 				/\{*[@%]+/,
 				seq(
 					choice(
-						/[^@%#{|}\r\n]+/,
+						/[^@%#{|}]+/,
 						repeat1(seq(
 							choice(
 								/\{+/,
 								/\{*[@%]+/,
 							),
-							/[^@%#{|}\r\n]+/,
+							/[^@%#{|}]+/,
 						)),
 					),
 					/\{*[@%]*/,
@@ -250,12 +251,12 @@ module.exports = grammar({
 			"%{",
 			optional(seq(
 				choice(
-					$.character_token_identifier,
-					alias($.ability_identifier, $.character_identifier),
+					$._character_token_identifier,
+					field("character", alias($.ability_identifier, $.identifier)),
 				),
-				"|",
+				alias("|", $.separator),
 			)),
-			$.ability_identifier,
+			field("ability", alias($.ability_identifier, $.identifier)),
 			"}",
 		),
 		
@@ -266,13 +267,13 @@ module.exports = grammar({
 				/\{*[@%]+/,
 				seq(
 					choice(
-						/[^@%{|}\r\n]+/,
+						/[^@%{|}]+/,
 						repeat1(seq(
 							choice(
 								/\{+/,
 								/\{*[@%]+/,
 							),
-							/[^@%{|}\r\n]+/,
+							/[^@%{|}]+/,
 						)),
 					),
 					/\{*[@%]*/,
@@ -305,17 +306,17 @@ module.exports = grammar({
 			$.__BUTTON_START,
 			optional(seq(
 				choice(
-					$.character_token_identifier,
-					alias($._acb_identifier_text, $.character_identifier),
+					$._character_token_identifier,
+					field("character", alias($._acb_identifier_text, $.identifier)),
 				),
-				$.__PIPE,
+				alias($.__PIPE, $.separator),
 			)),
-			alias($._acb_identifier_text, $.ability_identifier),
+			field("ability", alias($._acb_identifier_text, $.identifier)),
 			$.__BUTTON_END,
 		),
 		
 		_acb_identifier_text: $ => prec.right(repeat1(choice(
-			/[^#\r\n|,})&]/,
+			/[^#&|,})]/,
 			$.__PIPE,
 			$.__COMMA,
 			$.__RIGHT_BRACE,
@@ -352,7 +353,7 @@ module.exports = grammar({
 		   │   a new line, or be at the end of the script.
 		   │ 
 		   │ #macroName 
-		   └─────────────────────────────*/
+		   └───────────────────────────────────────────────────────────*/
 		
 		hash: $ => "#",
 		
@@ -360,16 +361,16 @@ module.exports = grammar({
 			$.hash,
 			repeat1(choice(
 				$._placeholder,
-				/[^@%&{|}\[\]() \r\n]+/,
+				/[^@%&{|}\[\]() ]+/,
 					//some of these characters can technically be used in a macro name,
 					// but this implementation will assume they're all invalid
 			)),
-			optional(choice( $._wsp, /\r?\n/ )),	//making whitespace optional for the same reason
+			optional(/ |\r?\n/),	//making whitespace optional for the same reason
 		)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
-		  ║ Inline Rolls
+		  ║ Inline Rolls and Roll Command
 		  ╚╤═══════════════════════════════════════════════════════════*/
 		 /*│ An inline roll may be used as a root element or in place of a
 		   │   number, and contains its own formula. When evaluated, it is
@@ -377,19 +378,18 @@ module.exports = grammar({
 		   │ 
 		   │ If there is any invalid content after the formula, it will still be
 		   │   visible in the tooltip when you hover your mouse over the total.
-		   └─────────────────────────────*/
+		   └───────────────────────────────────────────────────────────*/
 		
 		inlineRoll: $ => seq(
 			$.__INLINEROLL_START,
 			$.formula,
-			//TODO: optional(alias($._ir_comment, $.tooltip)),
 			$.__INLINEROLL_END,
 		),
 		
-		_ir_comment: $ => repeat1(choice(
-			/[^\]]/,
-			/\][^\]]/,
-		)),
+		rollCommand: $ => seq(
+			/\/r(oll)?\s+/,
+			$.formula,
+		),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -434,7 +434,10 @@ module.exports = grammar({
 		   │   item is a dice roll or table roll (or attribute/ability/macro
 		   │   that evaluates to one of those).
 		   │   This implementation does not check for that.
-		   └─────────────────────────────*/
+		   │ 
+		   │ A formula cannot have more than one turn tracker flag in it, but
+		   │   this implementation does not check for that.
+		   └───────────────────────────────────────────────────────────*/
 		
 		formula: $ => prec.right(seq(
 			optional($._labels),
@@ -443,12 +446,12 @@ module.exports = grammar({
 			repeat(seq(
 				choice(
 					seq(
-						alias($._operator_summation, $.operator),
+						$._operator_summation,
 						optional($._labels),
 						alias($._term_unsigned, $.term),
 					),
 					seq(
-						alias($._operator_multiplication, $.operator),
+						$._operator_multiplication,
 						optional($._labels),
 						choice(
 							alias($._term_unsigned, $.term),
@@ -460,7 +463,7 @@ module.exports = grammar({
 			)),
 		)),
 		
-		_term_first: $ => choice(
+		_term_first: $ => prec.right(choice(
 			seq(
 				choice(
 					seq(
@@ -477,9 +480,9 @@ module.exports = grammar({
 				optional($._macro),
 			),
 			$._macro,
-		),
+		)),
 		
-		_term_unsigned: $ => choice(
+		_term_unsigned: $ => prec.right(choice(
 			seq(
 				choice(
 					$.number,	//numbers, attributes, abilities, and inline rolls
@@ -497,10 +500,10 @@ module.exports = grammar({
 				optional($._macro),
 			),
 			$._macro,
-		),
+		)),
 		
 		_term_signed: $ => seq(
-			alias($._operator_summation, $.operator),
+			$._operator_summation,
 			optional($._labels),
 			$._term_unsigned,
 		),
@@ -519,7 +522,7 @@ module.exports = grammar({
 		),
 		
 		function: $ => seq(
-			alias(/abs|ceil|floor|round/, $.name),
+			field("function_name", alias(/abs|ceil|floor|round/, $.keyword)),
 			$._parenthesized,
 		),
 		
@@ -534,11 +537,11 @@ module.exports = grammar({
 		   │   right after a multiplication-type operator.
 		   └─────────────────────────────*/
 		
-		_operator_multiplication: $ => prec.right("multiplication", /[\/%]|\*\*?/),
-		_operator_summation: $ => prec.right("summation", choice(
+		_operator_multiplication: $ => prec.right("multiplication", alias(/[\/%]|\*\*?/, $.operator)),
+		_operator_summation: $ => prec.right("summation", alias(choice(
 			$._operator_summation_plus,
 			$._operator_summation_minus,
-		)),
+		), $.operator)),
 		_operator_summation_plus: $ => /\+(\s*\-(\s*\+\s*\-)*(\s*\+)?)?/,
 		_operator_summation_minus: $ => /\-(\s*\+(\s*\-\s*\+)*(\s*\-)?)?/,
 		
@@ -553,34 +556,60 @@ module.exports = grammar({
 		
 		label: $ => seq(
 			$.__LABEL_START,
-			optional($.labelText),
+			optional(alias($._labelText, $.string)),
 			$.__LABEL_END,
 		),
 		
-		labelText: $ => prec.right(seq(
+		_labelText: $ => prec.right(seq(
 			choice(
-				/[^#&\r\n\[\]]/,
+				/[^#&\[\]{|,}()]/,
 				$._placeholder,
 				$.hash,
 				$._htmlEntity_or_ampersand,
+				$.__LEFT_BRACE,
+				$.__PIPE,
+				$.__COMMA,
+				$.__RIGHT_BRACE,
+				$.__LEFT_PAREN,
+				$.__RIGHT_PAREN,
 			),
 			repeat($._text_label_or_tableRoll),
 		)),
 		
 		_text_label_or_tableRoll: $ => choice(
-			/[^#&\r\n\[\]]/,
+			/[^#&\]{|,}()]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
+			$.__LEFT_BRACE,
+			$.__PIPE,
+			$.__COMMA,
+			$.__RIGHT_BRACE,
+			$.__LEFT_PAREN,
+			$.__RIGHT_PAREN,
 		),
 		
+		//labels and/or a turn tracker flag
 		_labels: $ => prec.right(choice(
-			$._wsp,
+			/\s+/,
 			seq(
-				optional($._wsp),
+				optional(/\s+/),
 				repeat1(seq(
 					$.label,
-					optional($._wsp),
+					optional(/\s+/),
+				)),
+			),
+			seq(
+				optional(/\s+/),
+				repeat(seq(
+					$.label,
+					optional(/\s+/),
+				)),
+				field("tracker", alias($.flag_tracker, $.flag)),
+				optional(/\s+/),
+				repeat(seq(
+					$.label,
+					optional(/\s+/),
 				)),
 			),
 		)),
@@ -591,18 +620,18 @@ module.exports = grammar({
 		  ╚╤═══════════════════════════════════════════════════════════*/
 		 /*│ Roll modifiers can be injected with attributes, abilities, and
 		   │   inline rolls. This script does not parse the modifiers.
-		   └─────────────────────────────*/
+		   └───────────────────────────────────────────────────────────*/
 		
 		/*┌──────────────────────────────
 		  │ Dice Roll
 		  └──────────────────────────────*/
 		
 		diceRoll: $ => prec.right(seq(
-			optional(alias($._integer, $.count)),
+			optional(field("count", alias($._integer, $.number))),
 			/[dD]/,
 			choice(
-				alias($._integer, $.sides),
-				alias(/[fF]/, $.fate),
+				field("sides", alias($._integer, $.number)),
+				field("fate", alias(/[fF]/, $.keyword)),
 			),
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
 		)),
@@ -614,14 +643,14 @@ module.exports = grammar({
 		
 		
 		/*┌──────────────────────────────
-		  │ Group Roll
+		  │ Grouped Rolls
 		  └──────────────────────────────*/
 		
 		groupRoll: $ => prec.right(seq(
 			$.__GROUPROLL_START,
 			$.formula,
 			repeat(seq(
-				$.__COMMA,
+				alias($.__COMMA, $.separator),
 				$.formula,
 			)),
 			$.__GROUPROLL_END,
@@ -643,13 +672,13 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		tableRoll: $ => seq(
-			optional(alias($._integer, $.count)),
+			optional(field("count", alias($._integer, $.number))),
 			$.__TABLEROLL_START,
-			$.tableName,
+			field("table_name", alias($._tableName, $.identifier)),
 			$.__TABLEROLL_END,
 		),
 		
-		tableName: $ => prec.right(repeat1($._text_label_or_tableRoll)),
+		_tableName: $ => prec.right(repeat1($._text_label_or_tableRoll)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -659,16 +688,16 @@ module.exports = grammar({
 		rollQuery: $ => seq(
 			$.__ROLLQUERY_START,
 			choice(
-				alias($._rq_text_pd, $.prompt),
+				field("prompt", alias($._rq_text_pd, $.string)),
 				seq(
-					optional(alias($._rq_text_pd, $.prompt)),
-					$.__PIPE,
+					optional(field("prompt", alias($._rq_text_pd, $.string))),
+					alias($.__PIPE, $.separator),
 					optional(choice(
-						alias($._rq_text_pd, $.defaultValue),
+						field("default_value", alias($._rq_text_pd, $.string)),
 						seq(
 							optional(alias($._rq_option, $.option)),
 							repeat1(seq(
-								$.__PIPE,
+								alias($.__PIPE, $.separator),
 								optional(alias($._rq_option, $.option)),
 							)),
 						),
@@ -679,7 +708,7 @@ module.exports = grammar({
 		),
 		
 		_rq_text: $ => choice(
-			/[^#{|,}()]/,
+			/[^#&{|,}()]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
@@ -699,18 +728,162 @@ module.exports = grammar({
 			$._rq_text,
 			$.rollQuery,
 			$.abilityCommandButton,
-			//TODO:
-			//$.property,
 		)),
 		
 		_rq_option: $ => prec.right(choice(
-			alias($._rq_text_option, $.optionName),
+			field("name", alias($._rq_text_option, $.string)),
 			seq(
-				optional(alias($._rq_text_option, $.optionName)),
-				$.__COMMA,
-				optional(alias($._rq_text_optionValue, $.optionValue)),
+				optional(field("name", alias($._rq_text_option, $.string))),
+				alias($.__COMMA, $.separator),
+				optional(field("value", alias($._rq_text_optionValue, $.string))),
 			),
 		)),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Flag
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ E.g.: &{tracker}, &{template:atkdmg}
+		   └───────────────────────────────────────────────────────────*/
+		
+		/*flag: $ => seq(
+			$.__FLAG_START,
+			alias($._flagName, $.keyword),
+			optional(seq(
+				alias(":", $.separator),
+				alias($._flagValue, $.string),
+			)),
+			$.__FLAG_END,
+		),
+		
+		_flagName: $ => repeat1(choice(
+			/[^#&:}]/,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			$.inlineRoll,
+		)),*/
+		
+		_flagValue: $ => repeat1(choice(
+			/[^#&}]/,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			$.inlineRoll,
+		)),
+		
+		
+		/*┌──────────────────────────────
+		  │ Turn Tracker flag
+		  └──────────────────────────────*/
+		
+		flag_tracker: $ => seq(
+			$.__FLAG_START,
+			field("tracker", alias("tracker", $.keyword)),
+			optional(seq(
+				alias(":", $.separator),
+				alias($._flagValue, $.string),
+			)),
+			$.__FLAG_END,
+		),
+		
+		
+		/*┌──────────────────────────────
+		  │ Roll Template flag
+		  └──────────────────────────────*/
+		
+		flag_rollTemplate: $ => seq(
+			$.__FLAG_START,
+			field("template", alias("template", $.keyword)),
+			alias(":", $.separator),
+			alias($._flagValue, $.string),
+			$.__FLAG_END,
+		),
+		
+		
+		/*╔════════════════════════════════════════════════════════════
+		  ║ Roll Templates
+		  ╚════════════════════════════════════════════════════════════*/
+		
+		rollTemplate: $ => seq(
+			repeat($._script_common1),
+			optional(seq(
+				choice(
+					alias($._script_common2, $.comment),
+					alias($._rt_property, $.property),
+					field("rtype", alias($._rt_rtype, $.property)),
+					/\r?\n/,
+				),
+				repeat(choice(
+					$._script_common1,
+					alias($._script_common2, $.comment),
+					alias($._rt_property, $.property),
+					field("rtype", alias($._rt_rtype, $.property)),
+					/\r?\n/,
+					alias(/\{?[^#&{\s]/, $.comment),
+				)),
+			)),
+			alias($.flag_rollTemplate, $.flag),
+			repeat(choice(
+				$._script_common1,
+				alias($._script_common2, $.comment),
+				alias($._rt_property, $.property),
+				field("rtype", alias($._rt_rtype, $.property)),
+				/\r?\n/,
+				alias(/\{?[^#&{\s]/, $.comment),
+			)),
+		),
+		
+		_rt_property: $ => seq(
+			$.__ROLLTEMPLATE_PROPERTY_START,
+			optional(alias($._rt_propertyName, $.identifier)),
+			alias("=", $.separator),
+			optional(alias($._rt_propertyValue, $.string)),
+			$.__ROLLTEMPLATE_PROPERTY_END,
+		),
+		_rt_propertyName: $ => repeat1(choice(
+			/[^#&=}]|\r?\n/,
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			$.inlineRoll,
+			$.abilityCommandButton,
+		)),
+		_rt_propertyValue: $ => repeat1(prec.right(choice(
+			$._script,
+			/\r?\n/,
+		))),
+		
+		_rt_rtype: $ => prec.right(seq(
+			alias($._rt_rtype_attribute, $.attribute),
+			optional($._labels),
+			repeat(seq(
+				choice(
+					seq(
+						$._operator_summation,
+						optional($._labels),
+						alias($._term_unsigned, $.term),
+					),
+					seq(
+						$._operator_multiplication,
+						optional($._labels),
+						choice(
+							alias($._term_unsigned, $.term),
+							alias($._term_signed, $.term),
+						),
+					),
+				),
+				optional($._labels),
+			)),
+			$.__INLINEROLL_END,
+			optional(/(\s|\r?\n)+/),
+			"}}",
+		)),
+		_rt_rtype_attribute: $ => seq(
+			"@{",
+			field("attribute", alias("rtype", $.identifier)),
+			"}",
+		),
 		
 		
 	},

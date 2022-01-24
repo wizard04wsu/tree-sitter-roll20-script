@@ -2,191 +2,34 @@
   {
     "type": "ability",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "ability_identifier",
-          "named": true
-        },
-        {
-          "type": "character_identifier",
-          "named": true
-        },
-        {
-          "type": "character_token_identifier",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "abilityCommandButton",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "ability_identifier",
-          "named": true
-        },
-        {
-          "type": "character_identifier",
-          "named": true
-        },
-        {
-          "type": "character_token_identifier",
-          "named": true
-        },
-        {
-          "type": "label",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "ability_identifier",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "attribute",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "attribute_identifier",
-          "named": true
-        },
-        {
-          "type": "character_identifier",
-          "named": true
-        },
-        {
-          "type": "character_token_identifier",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "attribute_identifier",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "attribute_maximum",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "attribute_identifier",
-          "named": true
-        },
-        {
-          "type": "character_identifier",
-          "named": true
-        },
-        {
-          "type": "character_token_identifier",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "character_identifier",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "character_token_identifier",
-    "named": true,
     "fields": {
+      "ability": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "character": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
       "selected": {
         "multiple": false,
         "required": false,
         "types": [
           {
-            "type": "selected",
-            "named": false
+            "type": "keyword",
+            "named": true
           }
         ]
       },
@@ -195,62 +38,215 @@
         "required": false,
         "types": [
           {
-            "type": "target",
-            "named": false
+            "type": "keyword",
+            "named": true
           }
         ]
       }
-    }
-  },
-  {
-    "type": "count",
-    "named": true,
-    "fields": {},
+    },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "rollQuery",
+          "type": "separator",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "defaultValue",
+    "type": "abilityCommandButton",
     "named": true,
-    "fields": {},
+    "fields": {
+      "ability": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "character": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "selected": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "separator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "attribute",
+    "named": true,
+    "fields": {
+      "attribute": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "character": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "selected": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "ability",
+          "type": "separator",
           "named": true
-        },
+        }
+      ]
+    }
+  },
+  {
+    "type": "attribute_maximum",
+    "named": true,
+    "fields": {
+      "attribute": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "character": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "max": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "selected": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "target": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
         {
-          "type": "attribute",
+          "type": "separator",
           "named": true
-        },
+        }
+      ]
+    }
+  },
+  {
+    "type": "comment",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": false,
+      "required": false,
+      "types": [
         {
-          "type": "attribute_maximum",
+          "type": "abilityCommandButton",
           "named": true
         },
         {
@@ -260,6 +256,10 @@
         {
           "type": "htmlEntity",
           "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
         }
       ]
     }
@@ -267,25 +267,84 @@
   {
     "type": "diceRoll",
     "named": true,
-    "fields": {},
+    "fields": {
+      "count": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      },
+      "fate": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "sides": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
-      "required": true,
+      "multiple": false,
+      "required": false,
       "types": [
-        {
-          "type": "count",
-          "named": true
-        },
-        {
-          "type": "fate",
-          "named": true
-        },
         {
           "type": "modifiers",
           "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "flag",
+    "named": true,
+    "fields": {
+      "template": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      },
+      "tracker": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "separator",
+          "named": true
         },
         {
-          "type": "sides",
+          "type": "string",
           "named": true
         }
       ]
@@ -294,7 +353,18 @@
   {
     "type": "formula",
     "named": true,
-    "fields": {},
+    "fields": {
+      "tracker": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "flag",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
@@ -317,17 +387,24 @@
   {
     "type": "function",
     "named": true,
-    "fields": {},
+    "fields": {
+      "function_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "keyword",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
         {
           "type": "formula",
-          "named": true
-        },
-        {
-          "type": "name",
           "named": true
         }
       ]
@@ -348,6 +425,10 @@
         {
           "type": "modifiers",
           "named": true
+        },
+        {
+          "type": "separator",
+          "named": true
         }
       ]
     }
@@ -356,6 +437,45 @@
     "type": "htmlEntity",
     "named": true,
     "fields": {}
+  },
+  {
+    "type": "identifier",
+    "named": true,
+    "fields": {},
+    "children": {
+      "multiple": true,
+      "required": false,
+      "types": [
+        {
+          "type": "ability",
+          "named": true
+        },
+        {
+          "type": "abilityCommandButton",
+          "named": true
+        },
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "attribute_maximum",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        }
+      ]
+    }
   },
   {
     "type": "inlineRoll",
@@ -381,38 +501,7 @@
       "required": false,
       "types": [
         {
-          "type": "labelText",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "labelText",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
+          "type": "string",
           "named": true
         }
       ]
@@ -481,94 +570,36 @@
     }
   },
   {
-    "type": "operator",
-    "named": true,
-    "fields": {}
-  },
-  {
     "type": "option",
     "named": true,
-    "fields": {},
+    "fields": {
+      "name": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      },
+      "value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": false,
       "types": [
         {
-          "type": "optionName",
-          "named": true
-        },
-        {
-          "type": "optionValue",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "optionName",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "optionValue",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
-          "named": true
-        },
-        {
-          "type": "abilityCommandButton",
-          "named": true
-        },
-        {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "hash",
-          "named": true
-        },
-        {
-          "type": "htmlEntity",
-          "named": true
-        },
-        {
-          "type": "rollQuery",
+          "type": "separator",
           "named": true
         }
       ]
@@ -590,12 +621,128 @@
     }
   },
   {
-    "type": "prompt",
+    "type": "property",
+    "named": true,
+    "fields": {
+      "tracker": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "flag",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
+      "types": [
+        {
+          "type": "attribute",
+          "named": true
+        },
+        {
+          "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "label",
+          "named": true
+        },
+        {
+          "type": "operator",
+          "named": true
+        },
+        {
+          "type": "separator",
+          "named": true
+        },
+        {
+          "type": "string",
+          "named": true
+        },
+        {
+          "type": "term",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rollCommand",
     "named": true,
     "fields": {},
     "children": {
+      "multiple": false,
+      "required": true,
+      "types": [
+        {
+          "type": "formula",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rollQuery",
+    "named": true,
+    "fields": {
+      "default_value": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      },
+      "prompt": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "string",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
       "multiple": true,
       "required": false,
+      "types": [
+        {
+          "type": "option",
+          "named": true
+        },
+        {
+          "type": "separator",
+          "named": true
+        }
+      ]
+    }
+  },
+  {
+    "type": "rollTemplate",
+    "named": true,
+    "fields": {
+      "rtype": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "property",
+            "named": true
+          }
+        ]
+      }
+    },
+    "children": {
+      "multiple": true,
+      "required": true,
       "types": [
         {
           "type": "ability",
@@ -610,34 +757,19 @@
           "named": true
         },
         {
-          "type": "hash",
+          "type": "comment",
           "named": true
         },
         {
-          "type": "htmlEntity",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "rollQuery",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "defaultValue",
+          "type": "flag",
           "named": true
         },
         {
-          "type": "option",
+          "type": "property",
           "named": true
         },
         {
-          "type": "prompt",
+          "type": "rollQuery",
           "named": true
         }
       ]
@@ -680,14 +812,22 @@
           "named": true
         },
         {
+          "type": "rollCommand",
+          "named": true
+        },
+        {
           "type": "rollQuery",
+          "named": true
+        },
+        {
+          "type": "rollTemplate",
           "named": true
         }
       ]
     }
   },
   {
-    "type": "sides",
+    "type": "string",
     "named": true,
     "fields": {},
     "children": {
@@ -699,34 +839,7 @@
           "named": true
         },
         {
-          "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
-          "type": "inlineRoll",
-          "named": true
-        },
-        {
-          "type": "rollQuery",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "tableName",
-    "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": false,
-      "types": [
-        {
-          "type": "ability",
+          "type": "abilityCommandButton",
           "named": true
         },
         {
@@ -744,6 +857,14 @@
         {
           "type": "htmlEntity",
           "named": true
+        },
+        {
+          "type": "inlineRoll",
+          "named": true
+        },
+        {
+          "type": "rollQuery",
+          "named": true
         }
       ]
     }
@@ -751,26 +872,44 @@
   {
     "type": "tableRoll",
     "named": true,
-    "fields": {},
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "count",
-          "named": true
-        },
-        {
-          "type": "tableName",
-          "named": true
-        }
-      ]
+    "fields": {
+      "count": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "number",
+            "named": true
+          }
+        ]
+      },
+      "table_name": {
+        "multiple": false,
+        "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      }
     }
   },
   {
     "type": "term",
     "named": true,
-    "fields": {},
+    "fields": {
+      "tracker": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "flag",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
@@ -839,35 +978,27 @@
     "named": false
   },
   {
-    "type": "fate",
-    "named": true
-  },
-  {
     "type": "hash",
     "named": true
   },
   {
-    "type": "name",
+    "type": "keyword",
     "named": true
   },
   {
-    "type": "selected",
-    "named": false
+    "type": "operator",
+    "named": true
   },
   {
-    "type": "target",
-    "named": false
-  },
-  {
-    "type": "|",
-    "named": false
-  },
-  {
-    "type": "|max}",
-    "named": false
+    "type": "separator",
+    "named": true
   },
   {
     "type": "}",
+    "named": false
+  },
+  {
+    "type": "}}",
     "named": false
   }
 ]

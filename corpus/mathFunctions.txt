@@ -6,7 +6,7 @@ Math Function: [[abs(5)]]
 (script
 	(inlineRoll (formula
 		(term
-			(function (name) (formula
+			(function (keyword) (formula
 				(term
 					(number)
 				)
@@ -22,7 +22,7 @@ Math Function: [[ abs( 5 ) ]]
 (script
 	(inlineRoll (formula
 		(term
-			(function (name) (formula
+			(function (keyword) (formula
 				(term
 					(number)
 				)
@@ -38,7 +38,7 @@ Math Function: [[ceil(5)]]
 (script
 	(inlineRoll (formula
 		(term
-			(function (name) (formula
+			(function (keyword) (formula
 				(term
 					(number)
 				)
@@ -54,7 +54,7 @@ Math Function: [[floor(5)]]
 (script
 	(inlineRoll (formula
 		(term
-			(function (name) (formula
+			(function (keyword) (formula
 				(term
 					(number)
 				)
@@ -70,7 +70,7 @@ Math Function: [[round(5)]]
 (script
 	(inlineRoll (formula
 		(term
-			(function (name) (formula
+			(function (keyword) (formula
 				(term
 					(number)
 				)
