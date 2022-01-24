@@ -382,36 +382,13 @@ module.exports = grammar({
 		
 		inlineRoll: $ => seq(
 			$.__INLINEROLL_START,
-			$._inlineRoll,
+			$.formula,
 			$.__INLINEROLL_END,
 		),
 		
-		_inlineRoll: $ => seq(
-			$.formula,
-			optional(alias($.flag_tracker, $.flag)),
-			//optional(field("tooltip", alias($._ir_tooltip, $.string))),	//TODO
-		),
-		
-		//TODO
-		_ir_tooltip: $ => prec(-1, repeat1(choice(
-			/*/[^#\]]/,
-			/\][^#\]]/,
-			$.hash,*/
-			/[^#&{|,}()\]]/,
-			$._placeholder,
-			$.hash,
-			$._htmlEntity_or_ampersand,
-			$.__LEFT_BRACE,
-			$.__PIPE,
-			$.__COMMA,
-			$.__RIGHT_BRACE,
-			$.__LEFT_PAREN,
-			$.__RIGHT_PAREN,
-		))),
-		
 		rollCommand: $ => seq(
 			/\/r(oll)?\s+/,
-			$._inlineRoll,
+			$.formula,
 		),
 		
 		
@@ -457,6 +434,9 @@ module.exports = grammar({
 		   │   item is a dice roll or table roll (or attribute/ability/macro
 		   │   that evaluates to one of those).
 		   │   This implementation does not check for that.
+		   │ 
+		   │ A formula cannot have more than one turn tracker flag in it, but
+		   │   this implementation does not check for that.
 		   └───────────────────────────────────────────────────────────*/
 		
 		formula: $ => prec.right(seq(
@@ -582,26 +562,52 @@ module.exports = grammar({
 		
 		_labelText: $ => prec.right(seq(
 			choice(
-				/[^#&\[\]]/,
+				/[^#&\[\]{|,}()]/,
 				$._placeholder,
 				$.hash,
 				$._htmlEntity_or_ampersand,
+				$.__LEFT_BRACE,
+				$.__PIPE,
+				$.__COMMA,
+				$.__RIGHT_BRACE,
+				$.__LEFT_PAREN,
+				$.__RIGHT_PAREN,
 			),
 			repeat($._text_label_or_tableRoll),
 		)),
 		
 		_text_label_or_tableRoll: $ => choice(
-			/[^#&\]]/,
+			/[^#&\]{|,}()]/,
 			$._placeholder,
 			$.hash,
 			$._htmlEntity_or_ampersand,
+			$.__LEFT_BRACE,
+			$.__PIPE,
+			$.__COMMA,
+			$.__RIGHT_BRACE,
+			$.__LEFT_PAREN,
+			$.__RIGHT_PAREN,
 		),
 		
+		//labels and/or a turn tracker flag
 		_labels: $ => prec.right(choice(
 			/\s+/,
 			seq(
 				optional(/\s+/),
 				repeat1(seq(
+					$.label,
+					optional(/\s+/),
+				)),
+			),
+			seq(
+				optional(/\s+/),
+				repeat(seq(
+					$.label,
+					optional(/\s+/),
+				)),
+				field("tracker", alias($.flag_tracker, $.flag)),
+				optional(/\s+/),
+				repeat(seq(
 					$.label,
 					optional(/\s+/),
 				)),

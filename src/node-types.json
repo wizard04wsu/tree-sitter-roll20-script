@@ -353,7 +353,18 @@
   {
     "type": "formula",
     "named": true,
-    "fields": {},
+    "fields": {
+      "tracker": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "flag",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
@@ -471,13 +482,9 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
-        {
-          "type": "flag",
-          "named": true
-        },
         {
           "type": "formula",
           "named": true
@@ -616,7 +623,18 @@
   {
     "type": "property",
     "named": true,
-    "fields": {},
+    "fields": {
+      "tracker": {
+        "multiple": true,
+        "required": false,
+        "types": [
+          {
+            "type": "flag",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,
@@ -657,13 +675,9 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": true,
+      "multiple": false,
       "required": true,
       "types": [
-        {
-          "type": "flag",
-          "named": true
-        },
         {
           "type": "formula",
           "named": true
@@ -884,7 +898,18 @@
   {
     "type": "term",
     "named": true,
-    "fields": {},
+    "fields": {
+      "tracker": {
+        "multiple": false,
+        "required": false,
+        "types": [
+          {
+            "type": "flag",
+            "named": true
+          }
+        ]
+      }
+    },
     "children": {
       "multiple": true,
       "required": true,

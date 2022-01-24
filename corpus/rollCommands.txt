@@ -47,7 +47,7 @@ Roll Command: /r 5 &{tracker}
 	(rollCommand
 		(formula
 			(term
-				(number)))
-		(flag
-			(keyword))))
+				(number))
+			(flag
+				(keyword)))))
 

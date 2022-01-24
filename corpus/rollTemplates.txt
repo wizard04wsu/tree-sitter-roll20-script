@@ -1,13 +1,4 @@
 ==================
-Roll Template: @{wtype}
-==================
-@{wtype}
----
-(script
-	(attribute
-		(identifier)))
-
-==================
 Roll Template: &{template:atkdmg}
 ==================
 &{template:atkdmg}

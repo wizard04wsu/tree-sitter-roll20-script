@@ -738,6 +738,19 @@ Inline Roll Labels: [[ 5 [a] ]]
 		(label (string))
 	)))
 
+==================
+Inline Roll Labels: [[ 5 [a[{|,}()b] ]]
+==================
+[[ 5 [a] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number)
+		)
+		(label (string))
+	)))
+
 
 
 
@@ -753,9 +766,9 @@ Tracker Flag: [[5&{tracker}]]
 	(inlineRoll
 		(formula
 			(term
-				(number)))
-		(flag
-			(keyword))))
+				(number))
+			(flag
+				(keyword)))))
 
 ==================
 Tracker Flag: [[5 &{tracker}]]
@@ -766,9 +779,9 @@ Tracker Flag: [[5 &{tracker}]]
 	(inlineRoll
 		(formula
 			(term
-				(number)))
-		(flag
-			(keyword))))
+				(number))
+			(flag
+				(keyword)))))
 
 ==================
 Tracker Flag: [[5[a] &{tracker}]]
@@ -780,9 +793,9 @@ Tracker Flag: [[5[a] &{tracker}]]
 		(formula
 			(term
 				(number))
-			(label (string)))
-		(flag
-			(keyword))))
+			(label (string))
+			(flag
+				(keyword)))))
 
 ==================
 Tracker Flag: [[5 + 2 [a] &{tracker}]]
@@ -797,7 +810,120 @@ Tracker Flag: [[5 + 2 [a] &{tracker}]]
 			(operator)
 			(term
 				(number))
-			(label (string)))
+			(label (string))
+			(flag
+				(keyword)))))
+
+
+
+
+
+==================
+Tracker Flag: [[5 &{tracker} [a]]]
+==================
+[[5 &{tracker} [a]]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(flag
+				(keyword))
+			(label (string)))))
+
+==================
+Tracker Flag: [[5 &{tracker} + 5]]
+==================
+[[5 &{tracker} + 5]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(flag
+				(keyword))
+			(operator)
+			(term
+				(number)))))
+
+==================
+Tracker Flag: [[5 + &{tracker} 5]]
+==================
+[[5 + &{tracker} 5]]
+---
+(script
+	(inlineRoll
+		(formula
+			(term
+				(number))
+			(operator)
+			(flag
+				(keyword))
+			(term
+				(number)))))
+
+
+
+
+
+
+==================
+Tracker Flag: [[5 + &{tracker} [[2 &{tracker}]] ]]
+==================
+[[5 + &{tracker} [[2 &{tracker}]] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number))
+		(operator)
 		(flag
-			(keyword))))
+			(keyword))
+		(term
+			(number
+				(inlineRoll (formula
+					(term
+						(number))
+					(flag
+						(keyword)))))))))
+
+==================
+Tracker Flag: [[5 &{tracker} + [[2 &{tracker}]] ]]
+==================
+[[5 &{tracker} + [[2 &{tracker}]] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number))
+		(flag
+			(keyword))
+		(operator)
+		(term
+			(number
+				(inlineRoll (formula
+					(term
+						(number))
+					(flag
+						(keyword)))))))))
+
+==================
+Tracker Flag: [[5 + [[2 &{tracker}]] ]]
+==================
+[[5 + [[2 &{tracker}]] ]]
+---
+(script
+	(inlineRoll (formula
+		(term
+			(number))
+		(operator)
+		(term
+			(number
+				(inlineRoll (formula
+					(term
+						(number))
+					(flag
+						(keyword)))))))))
 
