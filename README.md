@@ -1,5 +1,5 @@
 # Tree-sitter for Roll20 scripts
-![npm](https://img.shields.io/npm/v/tree-sitter-roll20-script) ![npm](https://img.shields.io/npm/dt/tree-sitter-roll20-script)
+[![npm](https://img.shields.io/npm/v/tree-sitter-roll20-script)](https://www.npmjs.com/package/tree-sitter-roll20-script) [![npm](https://img.shields.io/npm/dt/tree-sitter-roll20-script)](https://www.npmjs.com/package/tree-sitter-roll20-script)
 
 Tree-sitter grammar for macros, abilities, and roll templates on [Roll20](https://roll20.net/).
 
