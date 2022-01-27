@@ -1227,7 +1227,7 @@
     },
     "_operator_multiplication": {
       "type": "PREC_RIGHT",
-      "value": "multiplication",
+      "value": 1,
       "content": {
         "type": "ALIAS",
         "content": {
@@ -1240,7 +1240,7 @@
     },
     "_operator_summation": {
       "type": "PREC_RIGHT",
-      "value": "summation",
+      "value": 0,
       "content": {
         "type": "ALIAS",
         "content": {
@@ -2689,18 +2689,6 @@
     [
       "script",
       "rollTemplate"
-    ]
-  ],
-  "precedences": [
-    [
-      {
-        "type": "STRING",
-        "value": "multiplication"
-      },
-      {
-        "type": "STRING",
-        "value": "summation"
-      }
     ]
   ],
   "externals": [

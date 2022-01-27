@@ -6,3 +6,5 @@ package-lock.json
 /scanner.*
 *.log
 .node-version
+index.js
+src/binding.cc

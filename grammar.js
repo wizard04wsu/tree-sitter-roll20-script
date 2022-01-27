@@ -45,10 +45,10 @@ module.exports = grammar({
 	//inline: $ => [],
 	
 	precedences: $ => [
-		[
+		/*[
 			"multiplication",
 			"summation",
-		],
+		],*/
 	],
 	
 	conflicts: $ => [
@@ -539,8 +539,13 @@ module.exports = grammar({
 		   │   right after a multiplication-type operator.
 		   └─────────────────────────────*/
 		
-		_operator_multiplication: $ => prec.right("multiplication", alias(/[\/%]|\*\*?/, $.operator)),
+		/*_operator_multiplication: $ => prec.right("multiplication", alias(/[\/%]|\*\*?/, $.operator)),
 		_operator_summation: $ => prec.right("summation", alias(choice(
+			$._operator_summation_plus,
+			$._operator_summation_minus,
+		), $.operator)),*/
+		_operator_multiplication: $ => prec.right(1, alias(/[\/%]|\*\*?/, $.operator)),
+		_operator_summation: $ => prec.right(alias(choice(
 			$._operator_summation_plus,
 			$._operator_summation_minus,
 		), $.operator)),
