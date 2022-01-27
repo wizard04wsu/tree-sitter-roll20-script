@@ -180,7 +180,7 @@ module.exports = grammar({
 		_attribute: $ => choice(
 			$.attribute,
 			alias($._attribute_of_character, $.attribute),
-			alias($._attribute_of_character_maximum, $.attribute_maximum),
+			alias($._attribute_of_character_maximum, $.attribute),
 		),
 		attribute: $ => seq(
 			"@{",
@@ -387,7 +387,9 @@ module.exports = grammar({
 		),
 		
 		rollCommand: $ => seq(
-			/\/r(oll)?\s+/,
+			"/",
+			alias(/r(oll)?/, $.identifier),
+			/\s+/,
 			$.formula,
 		),
 		
@@ -664,7 +666,7 @@ module.exports = grammar({
 		
 		
 		/*┌──────────────────────────────
-		  │ Table Roll
+		  │ Rollable Table
 		  └┬─────────────────────────────*/
 		 /*│ A table name:
 		   │ • cannot contain new lines or closing square brackets.

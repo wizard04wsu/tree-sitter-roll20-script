@@ -44,7 +44,7 @@ Attribute: @{c|a|max}
 @{c|a|max}
 ---
 (script
-	(attribute_maximum
+	(attribute
 		(identifier)
 		(separator)
 		(identifier)
@@ -57,7 +57,7 @@ Attribute: @{c|a |max}
 @{c|a |max}
 ---
 (script
-	(attribute_maximum
+	(attribute
 		(identifier)
 		(separator)
 		(identifier)
@@ -70,7 +70,7 @@ Attribute: @{ c | a |max}
 @{ c | a |max}
 ---
 (script
-	(attribute_maximum
+	(attribute
 		(identifier)
 		(separator)
 		(identifier)
@@ -94,7 +94,7 @@ Attribute: @{selected|a|max}
 @{selected|a|max}
 ---
 (script
-	(attribute_maximum
+	(attribute
 		(keyword)
 		(separator)
 		(identifier)
@@ -118,7 +118,7 @@ Attribute: @{target|a|max}
 @{target|a|max}
 ---
 (script
-	(attribute_maximum
+	(attribute
 		(keyword)
 		(separator)
 		(identifier)

@@ -160,7 +160,7 @@
             "name": "_attribute_of_character_maximum"
           },
           "named": true,
-          "value": "attribute_maximum"
+          "value": "attribute"
         }
       ]
     },
@@ -726,8 +726,21 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "STRING",
+          "value": "/"
+        },
+        {
+          "type": "ALIAS",
+          "content": {
+            "type": "PATTERN",
+            "value": "r(oll)?"
+          },
+          "named": true,
+          "value": "identifier"
+        },
+        {
           "type": "PATTERN",
-          "value": "\\/r(oll)?\\s+"
+          "value": "\\s+"
         },
         {
           "type": "SYMBOL",

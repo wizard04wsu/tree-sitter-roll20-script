@@ -139,65 +139,9 @@
           }
         ]
       },
-      "selected": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "keyword",
-            "named": true
-          }
-        ]
-      },
-      "target": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "keyword",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": false,
-      "required": false,
-      "types": [
-        {
-          "type": "separator",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
-    "type": "attribute_maximum",
-    "named": true,
-    "fields": {
-      "attribute": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
-      "character": {
-        "multiple": false,
-        "required": false,
-        "types": [
-          {
-            "type": "identifier",
-            "named": true
-          }
-        ]
-      },
       "max": {
         "multiple": false,
-        "required": true,
+        "required": false,
         "types": [
           {
             "type": "keyword",
@@ -228,7 +172,7 @@
     },
     "children": {
       "multiple": true,
-      "required": true,
+      "required": false,
       "types": [
         {
           "type": "separator",
@@ -459,10 +403,6 @@
           "named": true
         },
         {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
           "type": "hash",
           "named": true
         },
@@ -524,10 +464,6 @@
           "named": true
         },
         {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
           "type": "inlineRoll",
           "named": true
         },
@@ -552,10 +488,6 @@
         },
         {
           "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
           "named": true
         },
         {
@@ -675,11 +607,15 @@
     "named": true,
     "fields": {},
     "children": {
-      "multiple": false,
+      "multiple": true,
       "required": true,
       "types": [
         {
           "type": "formula",
+          "named": true
+        },
+        {
+          "type": "identifier",
           "named": true
         }
       ]
@@ -753,10 +689,6 @@
           "named": true
         },
         {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
           "type": "comment",
           "named": true
         },
@@ -793,10 +725,6 @@
         },
         {
           "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
           "named": true
         },
         {
@@ -844,10 +772,6 @@
         },
         {
           "type": "attribute",
-          "named": true
-        },
-        {
-          "type": "attribute_maximum",
           "named": true
         },
         {
@@ -923,10 +847,6 @@
           "named": true
         },
         {
-          "type": "attribute_maximum",
-          "named": true
-        },
-        {
           "type": "diceRoll",
           "named": true
         },
@@ -971,6 +891,10 @@
   },
   {
     "type": ".",
+    "named": false
+  },
+  {
+    "type": "/",
     "named": false
   },
   {
