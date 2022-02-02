@@ -4,24 +4,28 @@ Grouped Rolls: [[{4d6+3d8}kh1]]
 [[{4d6+3d8}kh1]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(groupRoll
-				(formula
-					(term
-						(diceRoll
-							(number)
-							(number))
-					)
-					(operator)
-					(term
-						(diceRoll
-							(number)
-							(number))
-					))
-				(modifiers))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(groupRoll
+					(delimiter_start)
+					(formula
+						(term
+							(diceRoll
+								(count (number_constant))
+								(delimiter)
+								(sides (number_constant))))
+						(operator)
+						(term
+							(diceRoll
+								(count (number_constant))
+								(delimiter)
+								(sides (number_constant)))))
+					(delimiter_end)
+					(modifiers
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Grouped Rolls: [[{4d6,3d8}kh1]]
@@ -29,25 +33,29 @@ Grouped Rolls: [[{4d6,3d8}kh1]]
 [[{4d6,3d8}kh1]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(groupRoll
-				(formula
-					(term
-						(diceRoll
-							(number)
-							(number))
-					))
-				(separator)
-				(formula
-					(term
-						(diceRoll
-							(number)
-							(number))
-					))
-				(modifiers))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(groupRoll
+					(delimiter_start)
+					(formula
+						(term
+							(diceRoll
+								(count (number_constant))
+								(delimiter)
+								(sides (number_constant)))))
+					(separator)
+					(formula
+						(term
+							(diceRoll
+								(count (number_constant))
+								(delimiter)
+								(sides (number_constant)))))
+					(delimiter_end)
+					(modifiers
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Grouped Rolls: [[{ 4d6 , 3d8 }kh1]]
@@ -55,23 +63,27 @@ Grouped Rolls: [[{ 4d6 , 3d8 }kh1]]
 [[{ 4d6 , 3d8 }kh1]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(groupRoll
-				(formula
-					(term
-						(diceRoll
-							(number)
-							(number))
-					))
-				(separator)
-				(formula
-					(term
-						(diceRoll
-							(number)
-							(number))
-					))
-				(modifiers))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(groupRoll
+					(delimiter_start)
+					(formula
+						(term
+							(diceRoll
+								(count (number_constant))
+								(delimiter)
+								(sides (number_constant)))))
+					(separator)
+					(formula
+						(term
+							(diceRoll
+								(count (number_constant))
+								(delimiter)
+								(sides (number_constant)))))
+					(delimiter_end)
+					(modifiers
+						(number_constant)))))
+		(delimiter_end)))
 

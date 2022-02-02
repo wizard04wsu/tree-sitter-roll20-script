@@ -2,40 +2,40 @@ module.exports = grammar({
 	name: "roll20_script",
 	
 	externals: $ => [
-		$.__ROLLQUERY_START,
-		$.__ROLLQUERY_END,
+		$.__ROLLQUERY_START,	// ?{
+		$.__ROLLQUERY_END,		// }
 		
-		$.__INLINEROLL_START,
-		$.__INLINEROLL_END,
+		$.__INLINEROLL_START,	// [[
+		$.__INLINEROLL_END,		// ]]
 		
-		$.__LABEL_START,
-		$.__LABEL_END,
+		$.__LABEL_START,		// [
+		$.__LABEL_END,			// ]
 		
-		$.__BUTTON_START,
-		$.__BUTTON_END,
+		$.__BUTTON_START,		// (~
+		$.__BUTTON_END,			// )
 		
-		$.__GROUPROLL_START,
-		$.__GROUPROLL_END,
+		$.__GROUPROLL_START,	// {
+		$.__GROUPROLL_END,		// }
 		
-		$.__TABLEROLL_START,
-		$.__TABLEROLL_END,
+		$.__TABLEROLL_START,	// t[
+		$.__TABLEROLL_END,		// ]
 		
-		$.__PIPE,
-		$.__COMMA,
-		$.__LEFT_BRACE,
-		$.__RIGHT_BRACE,
-		$.__LEFT_PAREN,
-		$.__RIGHT_PAREN,
-		$.__COLON,
+		$.__PIPE,				// |
+		$.__COMMA,				// ,
+		$.__LEFT_BRACE,			// {
+		$.__RIGHT_BRACE,		// }
+		$.__LEFT_PAREN,			// (
+		$.__RIGHT_PAREN,		// )
+		$.__COLON,				// :
 		
-		$.__FLAG_START,
-		$.__FLAG_END,
-		$.__ROLLTEMPLATE_PROPERTY_START,
-		$.__ROLLTEMPLATE_PROPERTY_END,
+		$.__FLAG_START,			// &{
+		$.__FLAG_END,			// }
+		$.__ROLLTEMPLATE_PROPERTY_START,	// {{
+		$.__ROLLTEMPLATE_PROPERTY_END,		// }}
 		
 		$.__HTML_ENTITY,
 		
-		$.__AMPERSAND,
+		$.__AMPERSAND,			// &
 	],
 	
 	extras: $ => [],
@@ -112,7 +112,7 @@ module.exports = grammar({
 		_script: $ => repeat1(choice(
 			$._script_common1,
 			$._script_common2,
-			/[^#&\s]/,
+			alias(/[^#&\s]/, $.string),
 		)),
 		
 		_script_common1: $ => choice(
@@ -126,6 +126,19 @@ module.exports = grammar({
 			$._htmlEntity_or_ampersand,
 			$.abilityCommandButton,
 		),
+		
+		_word: $ => /[^@%#&?{|,}()\[\]\s]+/,
+		
+		_string_and_script: $ => repeat1(choice(
+			alias($._word, $.string),
+			alias(/[@%?]/, $.string),
+			$._placeholder,
+			$.hash,
+			$._htmlEntity_or_ampersand,
+			$.inlineRoll,
+			$.rollQuery,
+			$.abilityCommandButton,
+		)),
 		
 		
 		_htmlEntity_or_ampersand: $ => choice(
@@ -143,13 +156,13 @@ module.exports = grammar({
 		   └───────────────────────────────────────────────────────────*/
 		
 		_placeholder: $ => choice(
-			$._attribute,
+			$.attribute,
 			$.ability,
 		),
 		
-		_character_token_identifier: $ => choice(
-			field("target", alias("target", $.keyword)),
-			field("selected", alias("selected", $.keyword)),
+		character_token: $ => choice(
+			"target",
+			"selected",
 		),
 		
 		
@@ -177,37 +190,37 @@ module.exports = grammar({
 		   │ @{characterName|attributeName|max}
 		   └─────────────────────────────*/
 		
-		_attribute: $ => choice(
-			$.attribute,
-			alias($._attribute_of_character, $.attribute),
-			alias($._attribute_of_character_maximum, $.attribute),
+		attribute: $ => choice(
+			$._attribute,
+			$._attribute_of_character,
+			$._attribute_of_character_maximum,
 		),
-		attribute: $ => seq(
-			"@{",
-			field("attribute", alias($.attribute_identifier, $.identifier)),
-			"}",
+		_attribute: $ => seq(
+			alias("@{", $.delimiter_start),
+			$.attribute_identifier,
+			alias("}", $.delimiter_end),
 		),
 		_attribute_of_character: $ => seq(
-			"@{",
+			alias("@{", $.delimiter_start),
 			choice(
-				$._character_token_identifier,
-				field("character", alias($.attribute_identifier, $.identifier)),
+				$.character_token,
+				alias($.attribute_identifier, $.character_identifier),
 			),
 			alias("|", $.separator),
-			field("attribute", alias($.attribute_identifier, $.identifier)),
-			"}",
+			$.attribute_identifier,
+			alias("}", $.delimiter_end),
 		),
 		_attribute_of_character_maximum: $ => seq(
-			"@{",
+			alias("@{", $.delimiter_start),
 			choice(
-				$._character_token_identifier,
-				field("character", alias($.attribute_identifier, $.identifier)),
+				$.character_token,
+				alias($.attribute_identifier, $.character_identifier),
 			),
 			alias("|", $.separator),
-			field("attribute", alias($.attribute_identifier, $.identifier)),
+			$.attribute_identifier,
 			alias("|", $.separator),
 			field("max", alias("max", $.keyword)),
-			"}",
+			alias("}", $.delimiter_end),
 		),
 		
 		attribute_identifier: $ => repeat1(choice(
@@ -248,16 +261,16 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		ability: $ => seq(
-			"%{",
+			alias("%{", $.delimiter_start),
 			optional(seq(
 				choice(
-					$._character_token_identifier,
-					field("character", alias($.ability_identifier, $.identifier)),
+					$.character_token,
+					alias($.ability_identifier, $.character_identifier),
 				),
 				alias("|", $.separator),
 			)),
-			field("ability", alias($.ability_identifier, $.identifier)),
-			"}",
+			$.ability_identifier,
+			alias("}", $.delimiter_end),
 		),
 		
 		ability_identifier: $ => repeat1(choice(
@@ -303,16 +316,16 @@ module.exports = grammar({
 		
 		abilityCommandButton: $ => seq(
 			$.label,
-			$.__BUTTON_START,
+			alias($.__BUTTON_START, $.delimiter_start),
 			optional(seq(
 				choice(
-					$._character_token_identifier,
-					field("character", alias($._acb_identifier_text, $.identifier)),
+					$.character_token,
+					alias($._acb_identifier_text, $.character_identifier),
 				),
 				alias($.__PIPE, $.separator),
 			)),
-			field("ability", alias($._acb_identifier_text, $.identifier)),
-			$.__BUTTON_END,
+			alias($._acb_identifier_text, $.ability_identifier),
+			alias($.__BUTTON_END, $.delimiter_end),
 		),
 		
 		_acb_identifier_text: $ => prec.right(repeat1(choice(
@@ -381,14 +394,14 @@ module.exports = grammar({
 		   └───────────────────────────────────────────────────────────*/
 		
 		inlineRoll: $ => seq(
-			$.__INLINEROLL_START,
+			alias($.__INLINEROLL_START, $.delimiter_start),
 			$.formula,
-			$.__INLINEROLL_END,
+			alias($.__INLINEROLL_END, $.delimiter_end),
 		),
 		
 		rollCommand: $ => seq(
-			"/",
-			alias(/r(oll)?/, $.identifier),
+			alias("/", $.delimiter),
+			alias(/r(oll)?/, $.command_identifier),
 			/\s+/,
 			$.formula,
 		),
@@ -401,25 +414,25 @@ module.exports = grammar({
 		   └───────────────────────────────────────────────────────────*/
 		
 		_integer: $ => prec.right(repeat1(choice(
-			/\d+/,
+			alias(/\d+/, $.number_constant),
 			$._placeholder,
 			$.inlineRoll,
 			$.rollQuery,
 		))),
 		
-		number: $ => choice(
+		_number: $ => choice(
 			$._number_signable,
 			$._number_unsignable,
 		),
 		_number_signable: $ => prec.right(seq(
 			$._integer,
 			optional(seq(
-				".",
+				alias(".", $.decimal_point),
 				$._integer,
 			)),
 		)),
 		_number_unsignable: $ => prec.right(seq(
-			".",
+			alias(".", $.decimal_point),
 			$._integer,
 		)),
 		
@@ -470,9 +483,9 @@ module.exports = grammar({
 				choice(
 					seq(
 						optional(alias(/[+-]/, $.operator)),
-						alias($._number_signable, $.number),	//numbers, attributes, abilities, and inline rolls
+						$._number_signable,
 					),
-					alias($._number_unsignable, $.number),	//numbers, attributes, abilities, and inline rolls
+					$._number_unsignable,
 					$.parenthesized,
 					$.function,
 					$.diceRoll,
@@ -487,7 +500,7 @@ module.exports = grammar({
 		_term_unsigned: $ => prec.right(choice(
 			seq(
 				choice(
-					$.number,	//numbers, attributes, abilities, and inline rolls
+					$._number,
 					$.diceRoll,
 					$.groupRoll,
 					seq(
@@ -518,13 +531,13 @@ module.exports = grammar({
 		parenthesized: $ => $._parenthesized,
 		
 		_parenthesized: $ => seq(
-			$.__LEFT_PAREN,
+			alias($.__LEFT_PAREN, $.delimiter_start),
 			$.formula,
-			$.__RIGHT_PAREN,
+			alias($.__RIGHT_PAREN, $.delimiter_end),
 		),
 		
 		function: $ => seq(
-			field("function_name", alias(/abs|ceil|floor|round/, $.keyword)),
+			alias(/abs|ceil|floor|round/, $.function_identifier),
 			$._parenthesized,
 		),
 		
@@ -562,9 +575,9 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		label: $ => seq(
-			$.__LABEL_START,
+			alias($.__LABEL_START, $.delimiter_start),
 			optional(alias($._labelText, $.string)),
-			$.__LABEL_END,
+			alias($.__LABEL_END, $.delimiter_end),
 		),
 		
 		_labelText: $ => prec.right(seq(
@@ -634,14 +647,15 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		diceRoll: $ => prec.right(seq(
-			optional(field("count", alias($._integer, $.number))),
-			/[dD]/,
-			choice(
-				field("sides", alias($._integer, $.number)),
-				field("fate", alias(/[fF]/, $.keyword)),
-			),
+			optional(alias($._integer, $.count)),
+			alias(/[dD]/, $.delimiter),
+			alias($._diceRoll_sides, $.sides),
 			optional(alias($._diceRoll_modifiers, $.modifiers)),
 		)),
+		_diceRoll_sides: $ => choice(
+			$._integer,
+			alias(/[fF]/, $.fate),
+		),
 		
 		_diceRoll_modifiers: $ => repeat1(choice(
 			$._integer,
@@ -654,13 +668,13 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		groupRoll: $ => prec.right(seq(
-			$.__GROUPROLL_START,
+			alias($.__GROUPROLL_START, $.delimiter_start),
 			$.formula,
 			repeat(seq(
 				alias($.__COMMA, $.separator),
 				$.formula,
 			)),
-			$.__GROUPROLL_END,
+			alias($.__GROUPROLL_END, $.delimiter_end),
 			optional(alias($._groupRoll_modifiers, $.modifiers)),
 		)),
 		
@@ -679,13 +693,13 @@ module.exports = grammar({
 		   └─────────────────────────────*/
 		
 		tableRoll: $ => seq(
-			optional(field("count", alias($._integer, $.number))),
-			$.__TABLEROLL_START,
-			field("table_name", alias($._tableName, $.identifier)),
-			$.__TABLEROLL_END,
+			optional(alias($._integer, $.count)),
+			alias($.__TABLEROLL_START, $.delimiter_start),
+			$.table_identifier,
+			alias($.__TABLEROLL_END, $.delimiter_end),
 		),
 		
-		_tableName: $ => prec.right(repeat1($._text_label_or_tableRoll)),
+		table_identifier: $ => prec.right(repeat1($._text_label_or_tableRoll)),
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -693,14 +707,14 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		rollQuery: $ => seq(
-			$.__ROLLQUERY_START,
+			alias($.__ROLLQUERY_START, $.delimiter_start),
 			choice(
-				field("prompt", alias($._rq_text_pd, $.string)),
+				alias($._rq_text_pd, $.prompt),
 				seq(
-					optional(field("prompt", alias($._rq_text_pd, $.string))),
+					optional(alias($._rq_text_pd, $.prompt)),
 					alias($.__PIPE, $.separator),
 					optional(choice(
-						field("default_value", alias($._rq_text_pd, $.string)),
+						alias($._rq_text_pd, $.default_value),
 						seq(
 							optional(alias($._rq_option, $.option)),
 							repeat1(seq(
@@ -711,7 +725,7 @@ module.exports = grammar({
 					)),
 				),
 			),
-			$.__ROLLQUERY_END,
+			alias($.__ROLLQUERY_END, $.delimiter_end),
 		),
 		
 		_rq_text: $ => choice(
@@ -735,14 +749,18 @@ module.exports = grammar({
 			$._rq_text,
 			$.rollQuery,
 			$.abilityCommandButton,
+			$.inlineRoll,
+			alias($.flag_tracker, $.flag),
+			alias($.flag_rollTemplate, $.flag),
+			alias($._rt_property, $.template_property),
 		)),
 		
 		_rq_option: $ => prec.right(choice(
-			field("name", alias($._rq_text_option, $.string)),
+			alias($._rq_text_option, $.option_identifier),
 			seq(
-				optional(field("name", alias($._rq_text_option, $.string))),
+				optional(alias($._rq_text_option, $.option_identifier)),
 				alias($.__COMMA, $.separator),
-				optional(field("value", alias($._rq_text_optionValue, $.string))),
+				optional(alias($._rq_text_optionValue, $.option_value)),
 			),
 		)),
 		
@@ -753,25 +771,7 @@ module.exports = grammar({
 		 /*│ E.g.: &{tracker}, &{template:atkdmg}
 		   └───────────────────────────────────────────────────────────*/
 		
-		/*flag: $ => seq(
-			$.__FLAG_START,
-			alias($._flagName, $.keyword),
-			optional(seq(
-				alias(":", $.separator),
-				alias($._flagValue, $.string),
-			)),
-			$.__FLAG_END,
-		),
-		
-		_flagName: $ => repeat1(choice(
-			/[^#&:}]/,
-			$._placeholder,
-			$.hash,
-			$._htmlEntity_or_ampersand,
-			$.inlineRoll,
-		)),*/
-		
-		_flagValue: $ => repeat1(choice(
+		flag_value: $ => repeat1(choice(
 			/[^#&}]/,
 			$._placeholder,
 			$.hash,
@@ -785,13 +785,13 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		flag_tracker: $ => seq(
-			$.__FLAG_START,
-			field("tracker", alias("tracker", $.keyword)),
+			alias($.__FLAG_START, $.delimiter_start),
+			field("tracker", alias("tracker", $.flag_identifier)),
 			optional(seq(
 				alias(":", $.separator),
-				alias($._flagValue, $.string),
+				$.flag_value,
 			)),
-			$.__FLAG_END,
+			alias($.__FLAG_END, $.delimiter_end),
 		),
 		
 		
@@ -800,11 +800,11 @@ module.exports = grammar({
 		  └──────────────────────────────*/
 		
 		flag_rollTemplate: $ => seq(
-			$.__FLAG_START,
-			field("template", alias("template", $.keyword)),
+			alias($.__FLAG_START, $.delimiter_start),
+			field("template", alias("template", $.flag_identifier)),
 			alias(":", $.separator),
-			alias($._flagValue, $.string),
-			$.__FLAG_END,
+			$.flag_value,
+			alias($.__FLAG_END, $.delimiter_end),
 		),
 		
 		
@@ -817,15 +817,15 @@ module.exports = grammar({
 			optional(seq(
 				choice(
 					alias($._script_common2, $.comment),
-					alias($._rt_property, $.property),
-					field("rtype", alias($._rt_rtype, $.property)),
+					alias($._rt_property, $.template_property),
+					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
 				),
 				repeat(choice(
 					$._script_common1,
 					alias($._script_common2, $.comment),
-					alias($._rt_property, $.property),
-					field("rtype", alias($._rt_rtype, $.property)),
+					alias($._rt_property, $.template_property),
+					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
 					alias(/\{?[^#&{\s]/, $.comment),
 				)),
@@ -834,19 +834,19 @@ module.exports = grammar({
 			repeat(choice(
 				$._script_common1,
 				alias($._script_common2, $.comment),
-				alias($._rt_property, $.property),
-				field("rtype", alias($._rt_rtype, $.property)),
+				alias($._rt_property, $.template_property),
+				field("rtype", alias($._rt_rtype, $.template_property)),
 				/\r?\n/,
 				alias(/\{?[^#&{\s]/, $.comment),
 			)),
 		),
 		
 		_rt_property: $ => seq(
-			$.__ROLLTEMPLATE_PROPERTY_START,
-			optional(alias($._rt_propertyName, $.identifier)),
-			alias("=", $.separator),
-			optional(alias($._rt_propertyValue, $.string)),
-			$.__ROLLTEMPLATE_PROPERTY_END,
+			alias($.__ROLLTEMPLATE_PROPERTY_START, $.delimiter_start),
+			optional(alias($._rt_propertyName, $.property_identifier)),
+			alias("=", $.operator),
+			optional(alias($._rt_propertyValue, $.property_value)),
+			alias($.__ROLLTEMPLATE_PROPERTY_END, $.delimiter_end),
 		),
 		_rt_propertyName: $ => repeat1(choice(
 			/[^#&=}]|\r?\n/,
@@ -863,8 +863,19 @@ module.exports = grammar({
 		
 		_rt_rtype: $ => prec.right(seq(
 			alias($._rt_rtype_attribute, $.attribute),
+			optional(alias($._rt_rtype_formula, $.formula)),
+			alias($.__INLINEROLL_END, $.delimiter_end),
+			optional(/(\s|\r?\n)+/),
+			alias("}}", $.delimiter_end),
+		)),
+		_rt_rtype_attribute: $ => seq(
+			alias("@{", $.delimiter_start),
+			alias("rtype", $.attribute_identifier),
+			alias("}", $.delimiter_end),
+		),
+		_rt_rtype_formula: $ => seq(
 			optional($._labels),
-			repeat(seq(
+			repeat1(seq(
 				choice(
 					seq(
 						$._operator_summation,
@@ -882,14 +893,6 @@ module.exports = grammar({
 				),
 				optional($._labels),
 			)),
-			$.__INLINEROLL_END,
-			optional(/(\s|\r?\n)+/),
-			"}}",
-		)),
-		_rt_rtype_attribute: $ => seq(
-			"@{",
-			field("attribute", alias("rtype", $.identifier)),
-			"}",
 		),
 		
 		

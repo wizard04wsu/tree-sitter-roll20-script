@@ -1,10 +1,8 @@
-build
-node_modules
-/test
-package-lock.json
+/bin/
+/build/
+/node_modules/
+/test/
+/package-lock.json
+*.log
 /parser.*
 /scanner.*
-*.log
-.node-version
-index.js
-src/binding.cc

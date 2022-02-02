@@ -2,18 +2,19 @@
   "name": "tree-sitter-roll20-script",
   "version": "1.0.1",
   "description": "Tree-sitter parser for Roll20 scripts",
-  "main": "bindings/node",
   "repository": "https://github.com/wizard04wsu/tree-sitter-roll20-script",
   "keywords": [
-    "grammar",
-    "syntax",
     "roll20",
-    "macro"
+    "macro",
+    "parser",
+    "lexer",
+    "grammar"
   ],
   "author": "Andy Harrison",
   "license": "MIT",
+  "main": "bindings/node",
   "devDependencies": {
-    "tree-sitter-cli": "^0.15.14"
+    "tree-sitter-cli": "^0.20.4"
   },
   "dependencies": {
     "nan": "^2.15.0"

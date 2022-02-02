@@ -985,27 +985,27 @@ struct Scanner {
 
 extern "C" {
 
-void *tree_sitter_roll20_script_external_scanner_create() {
+void *ts_external_scanner_create() {
 	Debug.log(color(noChange, brightMagenta)+"                                        ");
 	return new Scanner();
 }
 
-bool tree_sitter_roll20_script_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
+bool ts_external_scanner_scan(void *payload, TSLexer *lexer, const bool *valid_symbols) {
 	Scanner *scanner = static_cast<Scanner *>(payload);
 	return scanner->scan(lexer, valid_symbols);
 }
 
-unsigned tree_sitter_roll20_script_external_scanner_serialize(void *payload, char *buffer) {
+unsigned ts_external_scanner_serialize(void *payload, char *buffer) {
 	Scanner *scanner = static_cast<Scanner *>(payload);
 	return scanner->serialize(buffer);
 }
 
-void tree_sitter_roll20_script_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
+void ts_external_scanner_deserialize(void *payload, const char *buffer, unsigned length) {
 	Scanner *scanner = static_cast<Scanner *>(payload);
 	scanner->deserialize(buffer, length);
 }
 
-void tree_sitter_roll20_script_external_scanner_destroy(void *payload) {
+void ts_external_scanner_destroy(void *payload) {
 	Scanner *scanner = static_cast<Scanner *>(payload);
 	delete scanner;
 }
