@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-roll20-script",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Tree-sitter parser for Roll20 scripts",
   "repository": "https://github.com/wizard04wsu/tree-sitter-roll20-script",
   "keywords": [
