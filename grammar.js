@@ -564,11 +564,11 @@ module.exports = grammar({
 		
 		label: $ => seq(
 			alias($.__LABEL_START, $.delimiter_start),
-			optional(alias($._labelText, $.string)),
+			optional(alias($._label_text, $.comment)),
 			alias($.__LABEL_END, $.delimiter_end),
 		),
 		
-		_labelText: $ => prec.right(seq(
+		_label_text: $ => prec.right(seq(
 			choice(
 				/[^#&\[\]{|,}()]/,
 				$._placeholder,
@@ -581,10 +581,10 @@ module.exports = grammar({
 				$.__LEFT_PAREN,
 				$.__RIGHT_PAREN,
 			),
-			repeat($._text_label_or_tableRoll),
+			repeat($._label_text_2),
 		)),
 		
-		_text_label_or_tableRoll: $ => choice(
+		_label_text_2: $ => choice(
 			/[^#&\]{|,}()]/,
 			$._placeholder,
 			$.hash,
@@ -687,7 +687,9 @@ module.exports = grammar({
 			alias($.__TABLEROLL_END, $.delimiter_end),
 		),
 		
-		table_identifier: $ => prec.right(repeat1($._text_label_or_tableRoll)),
+		table_identifier: $ => prec.right(repeat1($._tableRoll_text)),
+		
+		_tableRoll_text: $ => $._label_text_2,
 		
 		
 		/*╔════════════════════════════════════════════════════════════
@@ -823,7 +825,6 @@ module.exports = grammar({
 					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
 					//alias(/\{?[^#&{\s]/, $.comment),
-					$._script_common2,
 				)),
 			)),
 			alias($._flag_rollTemplate, $.flag),
@@ -835,7 +836,6 @@ module.exports = grammar({
 				field("rtype", alias($._rt_rtype, $.template_property)),
 				/\r?\n/,
 				//alias(/\{?[^#&{\s]/, $.comment),
-				$._script_common2,
 			)),
 		),
 		
