@@ -4,9 +4,12 @@ Roll Command: /r 5
 /r 5
 ---
 (script
-	(rollCommand (identifier) (formula
-		(term
-			(number)))))
+	(rollCommand
+		(delimiter)
+		(command_identifier)
+		(formula
+			(term
+				(number_constant)))))
 
 ==================
 Roll Command: /roll 5
@@ -14,9 +17,12 @@ Roll Command: /roll 5
 /roll 5
 ---
 (script
-	(rollCommand (identifier) (formula
-		(term
-			(number)))))
+	(rollCommand
+		(delimiter)
+		(command_identifier)
+		(formula
+			(term
+				(number_constant)))))
 
 ==================
 Roll Command: /r 1+5
@@ -24,12 +30,15 @@ Roll Command: /r 1+5
 /r 1+5
 ---
 (script
-	(rollCommand (identifier) (formula
-		(term
-			(number))
-		(operator)
-		(term
-			(number)))))
+	(rollCommand
+		(delimiter)
+		(command_identifier)
+		(formula
+			(term
+				(number_constant))
+			(operator)
+			(term
+				(number_constant)))))
 
 ==================
 Roll Command: /r 5 &{tracker}
@@ -37,9 +46,14 @@ Roll Command: /r 5 &{tracker}
 /r 5 &{tracker}
 ---
 (script
-	(rollCommand (identifier) (formula
-		(term
-			(number))
-		(flag
-			(keyword)))))
+	(rollCommand
+		(delimiter)
+		(command_identifier)
+		(formula
+			(term
+				(number_constant))
+			(flag
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end)))))
 

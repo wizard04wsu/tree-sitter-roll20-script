@@ -5,10 +5,14 @@ Table Roll: [[t[n]]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(identifier))))))
+					(delimiter_start)
+					(table_identifier)
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Table Roll: [[ t[n] ]]
@@ -17,10 +21,14 @@ Table Roll: [[ t[n] ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(identifier))))))
+					(delimiter_start)
+					(table_identifier)
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Table Roll: [[1t[n]]]
@@ -29,11 +37,16 @@ Table Roll: [[1t[n]]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(number)
-					(identifier))))))
+					(count
+						(number_constant))
+					(delimiter_start)
+					(table_identifier)
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Table Roll: [[ 1t[n] ]]
@@ -42,11 +55,16 @@ Table Roll: [[ 1t[n] ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(number)
-					(identifier))))))
+					(count
+						(number_constant))
+					(delimiter_start)
+					(table_identifier)
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Table Roll: [[ t[n@{a}n] ]]
@@ -55,12 +73,18 @@ Table Roll: [[ t[n@{a}n] ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(identifier
+					(delimiter_start)
+					(table_identifier
 						(attribute
-							(identifier))))))))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Table Roll: [[ t[@{a}] ]]
@@ -69,26 +93,18 @@ Table Roll: [[ t[@{a}] ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(identifier
+					(delimiter_start)
+					(table_identifier
 						(attribute
-							(identifier))))))))
-
-==================
-Table Roll: [[ t[@{a]b}] ]]
-==================
-[[ t[@{a]b}] ]]
----
-(script
-	(inlineRoll
-		(formula
-			(term
-				(tableRoll
-					(identifier
-						(attribute
-							(identifier))))))))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Table Roll: [[ t[@ab] ]]
@@ -97,8 +113,11 @@ Table Roll: [[ t[@ab] ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(tableRoll
-					(identifier))))))
-
+					(delimiter_start)
+					(table_identifier)
+					(delimiter_end))))
+		(delimiter_end)))

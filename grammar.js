@@ -112,7 +112,8 @@ module.exports = grammar({
 		_script: $ => repeat1(choice(
 			$._script_common1,
 			$._script_common2,
-			//alias(/[^#&\s]/, $.string),
+			//alias(/[^#&\s\]]/, $.string),
+			/[^#&\s\]]/,
 		)),
 		
 		_script_common1: $ => choice(
@@ -612,7 +613,7 @@ module.exports = grammar({
 					$.label,
 					optional(/\s+/),
 				)),
-				field("tracker", alias($.flag_tracker, $.flag)),
+				field("tracker", alias($._flag_tracker, $.flag)),
 				optional(/\s+/),
 				repeat(seq(
 					$.label,
@@ -691,7 +692,12 @@ module.exports = grammar({
 		
 		/*╔════════════════════════════════════════════════════════════
 		  ║ Roll Queries
-		  ╚════════════════════════════════════════════════════════════*/
+		  ╚╤═══════════════════════════════════════════════════════════*/
+		 /*│ • If an option has an identifier, optionally a comma, and no value,
+		   │   the identifier acts as the value as well. Which means that HTML
+		   │   entities in the identifier can be interpreted as characters in
+		   │   the value.
+		   └───────────────────────────────────────────────────────────*/
 		
 		rollQuery: $ => seq(
 			alias($.__ROLLQUERY_START, $.delimiter_start),
@@ -737,8 +743,8 @@ module.exports = grammar({
 			$.rollQuery,
 			$.abilityCommandButton,
 			$.inlineRoll,
-			alias($.flag_tracker, $.flag),
-			alias($.flag_rollTemplate, $.flag),
+			alias($._flag_tracker, $.flag),
+			alias($._flag_rollTemplate, $.flag),
 			alias($._rt_property, $.template_property),
 		)),
 		
@@ -771,7 +777,7 @@ module.exports = grammar({
 		  │ Turn Tracker flag
 		  └──────────────────────────────*/
 		
-		flag_tracker: $ => seq(
+		_flag_tracker: $ => seq(
 			alias($.__FLAG_START, $.delimiter_start),
 			field("tracker", alias("tracker", $.flag_identifier)),
 			optional(seq(
@@ -786,7 +792,7 @@ module.exports = grammar({
 		  │ Roll Template flag
 		  └──────────────────────────────*/
 		
-		flag_rollTemplate: $ => seq(
+		_flag_rollTemplate: $ => seq(
 			alias($.__FLAG_START, $.delimiter_start),
 			field("template", alias("template", $.flag_identifier)),
 			alias(":", $.separator),
@@ -804,6 +810,7 @@ module.exports = grammar({
 			optional(seq(
 				choice(
 					//alias($._script_common2, $.comment),
+					$._script_common2,
 					alias($._rt_property, $.template_property),
 					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
@@ -811,20 +818,24 @@ module.exports = grammar({
 				repeat(choice(
 					$._script_common1,
 					//alias($._script_common2, $.comment),
+					$._script_common2,
 					alias($._rt_property, $.template_property),
 					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
 					//alias(/\{?[^#&{\s]/, $.comment),
+					$._script_common2,
 				)),
 			)),
-			alias($.flag_rollTemplate, $.flag),
+			alias($._flag_rollTemplate, $.flag),
 			repeat(choice(
 				$._script_common1,
 				//alias($._script_common2, $.comment),
+				$._script_common2,
 				alias($._rt_property, $.template_property),
 				field("rtype", alias($._rt_rtype, $.template_property)),
 				/\r?\n/,
 				//alias(/\{?[^#&{\s]/, $.comment),
+				$._script_common2,
 			)),
 		),
 		

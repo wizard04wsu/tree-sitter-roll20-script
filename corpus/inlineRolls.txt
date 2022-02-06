@@ -560,40 +560,6 @@ Inline Roll: [[ #m ]]
 		(delimiter_end)))
 
 ==================
-Inline Roll: [[#m ]]@{a}]]
-==================
-[[#m ]]@{a}]]
----
-(script
-	(inlineRoll
-		(delimiter_start)
-		(formula
-			(term
-				(hash)))
-		(delimiter_end))
-	(attribute
-		(delimiter_start)
-		(attribute_identifier)
-		(delimiter_end)))
-
-==================
-Inline Roll: [[#m]]@{a}]]
-==================
-[[#m]]@{a}]]
----
-(script
-	(inlineRoll
-		(delimiter_start)
-		(formula
-			(term
-				(hash)))
-		(delimiter_end))
-	(attribute
-		(delimiter_start)
-		(attribute_identifier)
-		(delimiter_end)))
-
-==================
 Inline Roll: [[5#m ]]
 ==================
 [[5#m ]]
@@ -824,11 +790,15 @@ Tracker Flag: [[5&{tracker}]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
+				(number_constant))
 			(flag
-				(keyword)))))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end)))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5 &{tracker}]]
@@ -837,11 +807,15 @@ Tracker Flag: [[5 &{tracker}]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
+				(number_constant))
 			(flag
-				(keyword)))))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end)))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5[a] &{tracker}]]
@@ -850,12 +824,19 @@ Tracker Flag: [[5[a] &{tracker}]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
-			(label (string))
+				(number_constant))
+			(label
+				(delimiter_start)
+				(string)
+				(delimiter_end))
 			(flag
-				(keyword)))))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end)))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5 + 2 [a] &{tracker}]]
@@ -864,15 +845,22 @@ Tracker Flag: [[5 + 2 [a] &{tracker}]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
+				(number_constant))
 			(operator)
 			(term
-				(number))
-			(label (string))
+				(number_constant))
+			(label
+				(delimiter_start)
+				(string)
+				(delimiter_end))
 			(flag
-				(keyword)))))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end)))
+		(delimiter_end)))
 
 
 
@@ -885,12 +873,19 @@ Tracker Flag: [[5 &{tracker} [a]]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
+				(number_constant))
 			(flag
-				(keyword))
-			(label (string)))))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end))
+			(label
+				(delimiter_start)
+				(string)
+				(delimiter_end)))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5 &{tracker} + 5]]
@@ -899,14 +894,18 @@ Tracker Flag: [[5 &{tracker} + 5]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
+				(number_constant))
 			(flag
-				(keyword))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end))
 			(operator)
 			(term
-				(number)))))
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5 + &{tracker} 5]]
@@ -915,14 +914,18 @@ Tracker Flag: [[5 + &{tracker} 5]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
-				(number))
+				(number_constant))
 			(operator)
 			(flag
-				(keyword))
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end))
 			(term
-				(number)))))
+				(number_constant)))
+		(delimiter_end)))
 
 
 
@@ -935,19 +938,28 @@ Tracker Flag: [[5 + &{tracker} [[2 &{tracker}]] ]]
 [[5 + &{tracker} [[2 &{tracker}]] ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number))
-		(operator)
-		(flag
-			(keyword))
-		(term
-			(number
-				(inlineRoll (formula
-					(term
-						(number))
-					(flag
-						(keyword)))))))))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant))
+			(operator)
+			(flag
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end))
+			(term
+				(inlineRoll
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant))
+						(flag
+							(delimiter_start)
+							(flag_identifier)
+							(delimiter_end)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5 &{tracker} + [[2 &{tracker}]] ]]
@@ -955,19 +967,28 @@ Tracker Flag: [[5 &{tracker} + [[2 &{tracker}]] ]]
 [[5 &{tracker} + [[2 &{tracker}]] ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number))
-		(flag
-			(keyword))
-		(operator)
-		(term
-			(number
-				(inlineRoll (formula
-					(term
-						(number))
-					(flag
-						(keyword)))))))))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant))
+			(flag
+				(delimiter_start)
+				(flag_identifier)
+				(delimiter_end))
+			(operator)
+			(term
+				(inlineRoll
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant))
+						(flag
+							(delimiter_start)
+							(flag_identifier)
+							(delimiter_end)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Tracker Flag: [[5 + [[2 &{tracker}]] ]]
@@ -975,15 +996,22 @@ Tracker Flag: [[5 + [[2 &{tracker}]] ]]
 [[5 + [[2 &{tracker}]] ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number))
-		(operator)
-		(term
-			(number
-				(inlineRoll (formula
-					(term
-						(number))
-					(flag
-						(keyword)))))))))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant))
+			(operator)
+			(term
+				(inlineRoll
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant))
+						(flag
+							(delimiter_start)
+							(flag_identifier)
+							(delimiter_end)))
+					(delimiter_end))))
+		(delimiter_end)))
 
