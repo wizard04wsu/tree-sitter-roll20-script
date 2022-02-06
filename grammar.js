@@ -112,7 +112,7 @@ module.exports = grammar({
 		_script: $ => repeat1(choice(
 			$._script_common1,
 			$._script_common2,
-			alias(/[^#&\s]/, $.string),
+			//alias(/[^#&\s]/, $.string),
 		)),
 		
 		_script_common1: $ => choice(
@@ -126,19 +126,6 @@ module.exports = grammar({
 			$._htmlEntity_or_ampersand,
 			$.abilityCommandButton,
 		),
-		
-		_word: $ => /[^@%#&?{|,}()\[\]\s]+/,
-		
-		_string_and_script: $ => repeat1(choice(
-			alias($._word, $.string),
-			alias(/[@%?]/, $.string),
-			$._placeholder,
-			$.hash,
-			$._htmlEntity_or_ampersand,
-			$.inlineRoll,
-			$.rollQuery,
-			$.abilityCommandButton,
-		)),
 		
 		
 		_htmlEntity_or_ampersand: $ => choice(
@@ -816,28 +803,28 @@ module.exports = grammar({
 			repeat($._script_common1),
 			optional(seq(
 				choice(
-					alias($._script_common2, $.comment),
+					//alias($._script_common2, $.comment),
 					alias($._rt_property, $.template_property),
 					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
 				),
 				repeat(choice(
 					$._script_common1,
-					alias($._script_common2, $.comment),
+					//alias($._script_common2, $.comment),
 					alias($._rt_property, $.template_property),
 					field("rtype", alias($._rt_rtype, $.template_property)),
 					/\r?\n/,
-					alias(/\{?[^#&{\s]/, $.comment),
+					//alias(/\{?[^#&{\s]/, $.comment),
 				)),
 			)),
 			alias($.flag_rollTemplate, $.flag),
 			repeat(choice(
 				$._script_common1,
-				alias($._script_common2, $.comment),
+				//alias($._script_common2, $.comment),
 				alias($._rt_property, $.template_property),
 				field("rtype", alias($._rt_rtype, $.template_property)),
 				/\r?\n/,
-				alias(/\{?[^#&{\s]/, $.comment),
+				//alias(/\{?[^#&{\s]/, $.comment),
 			)),
 		),
 		

@@ -30,15 +30,6 @@
           {
             "type": "SYMBOL",
             "name": "_script_common2"
-          },
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "PATTERN",
-              "value": "[^#&\\s]"
-            },
-            "named": true,
-            "value": "string"
           }
         ]
       }
@@ -80,60 +71,6 @@
           "name": "abilityCommandButton"
         }
       ]
-    },
-    "_word": {
-      "type": "PATTERN",
-      "value": "[^@%#&?{|,}()\\[\\]\\s]+"
-    },
-    "_string_and_script": {
-      "type": "REPEAT1",
-      "content": {
-        "type": "CHOICE",
-        "members": [
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "SYMBOL",
-              "name": "_word"
-            },
-            "named": true,
-            "value": "string"
-          },
-          {
-            "type": "ALIAS",
-            "content": {
-              "type": "PATTERN",
-              "value": "[@%?]"
-            },
-            "named": true,
-            "value": "string"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_placeholder"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "hash"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "_htmlEntity_or_ampersand"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "inlineRoll"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "rollQuery"
-          },
-          {
-            "type": "SYMBOL",
-            "name": "abilityCommandButton"
-          }
-        ]
-      }
     },
     "_htmlEntity_or_ampersand": {
       "type": "CHOICE",
@@ -2325,15 +2262,6 @@
                       "type": "ALIAS",
                       "content": {
                         "type": "SYMBOL",
-                        "name": "_script_common2"
-                      },
-                      "named": true,
-                      "value": "comment"
-                    },
-                    {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "SYMBOL",
                         "name": "_rt_property"
                       },
                       "named": true,
@@ -2371,15 +2299,6 @@
                         "type": "ALIAS",
                         "content": {
                           "type": "SYMBOL",
-                          "name": "_script_common2"
-                        },
-                        "named": true,
-                        "value": "comment"
-                      },
-                      {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "SYMBOL",
                           "name": "_rt_property"
                         },
                         "named": true,
@@ -2401,15 +2320,6 @@
                       {
                         "type": "PATTERN",
                         "value": "\\r?\\n"
-                      },
-                      {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "PATTERN",
-                          "value": "\\{?[^#&{\\s]"
-                        },
-                        "named": true,
-                        "value": "comment"
                       }
                     ]
                   }
@@ -2443,15 +2353,6 @@
                 "type": "ALIAS",
                 "content": {
                   "type": "SYMBOL",
-                  "name": "_script_common2"
-                },
-                "named": true,
-                "value": "comment"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "SYMBOL",
                   "name": "_rt_property"
                 },
                 "named": true,
@@ -2473,15 +2374,6 @@
               {
                 "type": "PATTERN",
                 "value": "\\r?\\n"
-              },
-              {
-                "type": "ALIAS",
-                "content": {
-                  "type": "PATTERN",
-                  "value": "\\{?[^#&{\\s]"
-                },
-                "named": true,
-                "value": "comment"
               }
             ]
           }
@@ -2831,7 +2723,6 @@
       "rollTemplate"
     ]
   ],
-  "precedences": [],
   "externals": [
     {
       "type": "SYMBOL",
