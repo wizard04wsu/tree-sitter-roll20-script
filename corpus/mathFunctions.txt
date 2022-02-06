@@ -4,15 +4,18 @@ Math Function: [[abs(5)]]
 [[abs(5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(function (keyword) (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(function
+					(function_identifier)
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Math Function: [[ abs( 5 ) ]]
@@ -20,15 +23,18 @@ Math Function: [[ abs( 5 ) ]]
 [[ abs( 5 ) ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(function (keyword) (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(function
+					(function_identifier)
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Math Function: [[ceil(5)]]
@@ -36,15 +42,18 @@ Math Function: [[ceil(5)]]
 [[ceil(5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(function (keyword) (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(function
+					(function_identifier)
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Math Function: [[floor(5)]]
@@ -52,15 +61,18 @@ Math Function: [[floor(5)]]
 [[floor(5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(function (keyword) (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(function
+					(function_identifier)
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Math Function: [[round(5)]]
@@ -68,12 +80,15 @@ Math Function: [[round(5)]]
 [[round(5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(function (keyword) (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(function
+					(function_identifier)
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))

@@ -4,12 +4,14 @@ Dice Roll: [[d20]]
 [[d20]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(delimiter)
+					(sides (number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ d20 ]]
@@ -17,12 +19,14 @@ Dice Roll: [[ d20 ]]
 [[ d20 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(delimiter)
+					(sides (number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ D20 ]]
@@ -30,12 +34,14 @@ Dice Roll: [[ D20 ]]
 [[ D20 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(delimiter)
+					(sides (number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[10d20]]
@@ -43,13 +49,15 @@ Dice Roll: [[10d20]]
 [[10d20]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number)
-				(number))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(count (number_constant))
+					(delimiter)
+					(sides (number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ 10d20 ]]
@@ -57,13 +65,15 @@ Dice Roll: [[ 10d20 ]]
 [[ 10d20 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number)
-				(number))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(count (number_constant))
+					(delimiter)
+					(sides (number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ df ]]
@@ -71,12 +81,14 @@ Dice Roll: [[ df ]]
 [[ df ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(keyword))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(delimiter)
+					(sides (fate)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ @{a}d@{a} ]]
@@ -84,17 +96,23 @@ Dice Roll: [[ @{a}d@{a} ]]
 [[ @{a}d@{a} ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number
-					(attribute
-						(identifier)))
-				(number
-					(attribute
-						(identifier))))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(count
+						(attribute
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end)))
+					(delimiter)
+					(sides
+						(attribute
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end))))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ %{b|a}d%{b|a} ]]
@@ -102,21 +120,27 @@ Dice Roll: [[ %{b|a}d%{b|a} ]]
 [[ %{b|a}d%{b|a} ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number
-					(ability
-						(identifier)
-						(separator)
-						(identifier)))
-				(number
-					(ability
-						(identifier)
-						(separator)
-						(identifier))))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(count
+						(ability
+							(delimiter_start)
+							(character_identifier)
+							(separator)
+							(ability_identifier)
+							(delimiter_end)))
+					(delimiter)
+					(sides
+						(ability
+							(delimiter_start)
+							(character_identifier)
+							(separator)
+							(ability_identifier)
+							(delimiter_end))))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
@@ -125,28 +149,44 @@ Dice Roll: [[ @{a}%{b|a}d@{a}%{b|a}c@{s}5@{x} ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(diceRoll
-					(number
+					(count
 						(attribute
-							(identifier))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end))
 						(ability
-							(identifier)
+							(delimiter_start)
+							(character_identifier)
 							(separator)
-							(identifier)))
-					(number
+							(ability_identifier)
+							(delimiter_end)))
+					(delimiter)
+					(sides
 						(attribute
-							(identifier))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end))
 						(ability
-							(identifier)
+							(delimiter_start)
+							(character_identifier)
 							(separator)
-							(identifier)))
+							(ability_identifier)
+							(delimiter_end)))
 					(modifiers
 						(attribute
-							(identifier))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end))
+						(number_constant)
 						(attribute
-							(identifier))))))))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end))))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ d6c@{s}5 ]]
@@ -155,13 +195,19 @@ Dice Roll: [[ d6c@{s}5 ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(diceRoll
-					(number)
+					(delimiter)
+					(sides (number_constant))
 					(modifiers
 						(attribute
-							(identifier))))))))
+							(delimiter_start)
+							(attribute_identifier)
+							(delimiter_end))
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ d6r5r~5 ]]
@@ -170,11 +216,16 @@ Dice Roll: [[ d6r5r~5 ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(diceRoll
-					(number)
-					(modifiers))))))
+					(delimiter)
+					(sides (number_constant))
+					(modifiers
+						(number_constant)
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ d6r5 ]]
@@ -183,11 +234,15 @@ Dice Roll: [[ d6r5 ]]
 ---
 (script
 	(inlineRoll
+		(delimiter_start)
 		(formula
 			(term
 				(diceRoll
-					(number)
-					(modifiers))))))
+					(delimiter)
+					(sides (number_constant))
+					(modifiers
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: [[ d6r~5 ]]
@@ -195,13 +250,16 @@ Dice Roll: [[ d6r~5 ]]
 [[ d6r=5 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number)
-				(modifiers))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(delimiter)
+					(sides (number_constant))
+					(modifiers
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: long one, lower case
@@ -209,14 +267,47 @@ Dice Roll: long one, lower case
 [[ 4d6sar5sar=5ro5ro=5!5!=5!!5!!=5!p!p5!p=5k5kh5kl5d5dh5dl5>1>10f5>10f<5cs5cs>5cf2cf<2m5m5=5mt5mt5=5sasd ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number)
-				(number)
-				(modifiers))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(count (number_constant))
+					(delimiter)
+					(sides (number_constant))
+					(modifiers
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)))))
+		(delimiter_end)))
 
 ==================
 Dice Roll: long one, upper case
@@ -224,11 +315,44 @@ Dice Roll: long one, upper case
 [[ 4D6R5R=5RO5RO=5!5!=5!!5!!=5!P!P5!P=5K5Kh5Kl5D5DH5DL5>1>10F5>10F<5CS5CS>5CF2CF<2M5M5=5MT5MT5=5SASD ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(diceRoll
-				(number)
-				(number)
-				(modifiers))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(diceRoll
+					(count (number_constant))
+					(delimiter)
+					(sides (number_constant))
+					(modifiers
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)
+						(number_constant)))))
+		(delimiter_end)))

@@ -4,11 +4,12 @@ Number: [[5]]
 [[5]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ 5 ]]
@@ -16,11 +17,12 @@ Number: [[ 5 ]]
 [[ 5 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[42]]
@@ -28,11 +30,12 @@ Number: [[42]]
 [[42]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ 42 ]]
@@ -40,11 +43,12 @@ Number: [[ 42 ]]
 [[ 42 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[5.5]]
@@ -52,11 +56,14 @@ Number: [[5.5]]
 [[5.5]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ 5.5 ]]
@@ -64,11 +71,14 @@ Number: [[ 5.5 ]]
 [[ 5.5 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[42.42]]
@@ -76,11 +86,14 @@ Number: [[42.42]]
 [[42.42]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ 42.42 ]]
@@ -88,11 +101,14 @@ Number: [[ 42.42 ]]
 [[ 42.42 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[-5]]
@@ -100,12 +116,13 @@ Number: [[-5]]
 [[-5]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ -5 ]]
@@ -113,12 +130,13 @@ Number: [[ -5 ]]
 [[ -5 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[-42.42]]
@@ -126,12 +144,15 @@ Number: [[-42.42]]
 [[-42.42]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ -42.42 ]]
@@ -139,12 +160,15 @@ Number: [[ -42.42 ]]
 [[ -42.42 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[+5]]
@@ -152,12 +176,13 @@ Number: [[+5]]
 [[+5]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ +5 ]]
@@ -165,12 +190,13 @@ Number: [[ +5 ]]
 [[ +5 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[+42.42]]
@@ -178,12 +204,15 @@ Number: [[+42.42]]
 [[+42.42]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ +42.42 ]]
@@ -191,12 +220,15 @@ Number: [[ +42.42 ]]
 [[ +42.42 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(operator)
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(operator)
+				(number_constant)
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[.5]]
@@ -204,11 +236,13 @@ Number: [[.5]]
 [[.5]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 
 ==================
 Number: [[ .5 ]]
@@ -216,9 +250,11 @@ Number: [[ .5 ]]
 [[ .5 ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(decimal_point)
+				(number_constant)))
+		(delimiter_end)))
 

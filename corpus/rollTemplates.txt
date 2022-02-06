@@ -3,61 +3,84 @@ Roll Template: &{template:atkdmg}
 ==================
 &{template:atkdmg}
 ---
-(script (rollTemplate
-	(flag
-		(keyword)
-		(separator)
-		(string))))
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))))
 
 ==================
 Roll Template: @{wtype}&{template:atkdmg}
 ==================
 @{wtype}&{template:atkdmg}
 ---
-(script (rollTemplate
-	(attribute
-		(identifier))
-	(flag
-		(keyword)
-		(separator)
-		(string))))
+(script
+	(rollTemplate
+		(attribute
+			(delimiter_start)
+			(attribute_identifier)
+			(delimiter_end))
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))))
 
 ==================
 Roll Template: @{wtype} &{template:atkdmg}
 ==================
 @{wtype} &{template:atkdmg}
 ---
-(script (rollTemplate
-	(attribute
-		(identifier))
-	(flag
-		(keyword)
-		(separator)
-		(string))))
+(script
+	(rollTemplate
+		(attribute
+			(delimiter_start)
+			(attribute_identifier)
+			(delimiter_end))
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))))
 
 ==================
 Roll Template: &{template:atkdmg}@{wtype}
 ==================
 &{template:atkdmg}@{wtype}
 ---
-(script (rollTemplate
-	(flag
-		(keyword)
-		(separator)
-		(string))
-	(attribute
-		(identifier))))
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(attribute
+			(delimiter_start)
+			(attribute_identifier)
+			(delimiter_end))))
 
 ==================
 Roll Template: &{template:atkdmg} @{wtype}
 ==================
 &{template:atkdmg} @{wtype}
 ---
-(script (rollTemplate
-	(flag
-		(keyword)
-		(separator)
-		(string))
-	(attribute
-		(identifier))))
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(attribute
+			(delimiter_start)
+			(attribute_identifier)
+			(delimiter_end))))
 

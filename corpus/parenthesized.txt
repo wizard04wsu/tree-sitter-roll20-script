@@ -4,15 +4,17 @@ Parenthesized: [[(5)]]
 [[(5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(parenthesized (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(parenthesized
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Parenthesized: [[ ( 5 ) ]]
@@ -20,15 +22,17 @@ Parenthesized: [[ ( 5 ) ]]
 [[ ( 5 ) ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(parenthesized (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(parenthesized
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Parenthesized: [[(-5-5)]]
@@ -36,20 +40,21 @@ Parenthesized: [[(-5-5)]]
 [[(-5-5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(parenthesized (formula
-				(term
-					(operator)
-					(number)
-				)
-				(operator)
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(parenthesized
+					(delimiter_start)
+					(formula
+						(term
+							(operator)
+							(number_constant))
+						(operator)
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Parenthesized: [[ ( -5 - 5 ) ]]
@@ -57,20 +62,21 @@ Parenthesized: [[ ( -5 - 5 ) ]]
 [[ ( -5 - 5 ) ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(parenthesized (formula
-				(term
-					(operator)
-					(number)
-				)
-				(operator)
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(parenthesized
+					(delimiter_start)
+					(formula
+						(term
+							(operator)
+							(number_constant))
+						(operator)
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Parenthesized: [[5+(5)]]
@@ -78,19 +84,20 @@ Parenthesized: [[5+(5)]]
 [[5+(5)]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-		(operator)
-		(term
-			(parenthesized (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant))
+			(operator)
+			(term
+				(parenthesized
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))
 
 ==================
 Parenthesized: [[ 5 + ( 5 ) ]]
@@ -98,16 +105,17 @@ Parenthesized: [[ 5 + ( 5 ) ]]
 [[ 5 + ( 5 ) ]]
 ---
 (script
-	(inlineRoll (formula
-		(term
-			(number)
-		)
-		(operator)
-		(term
-			(parenthesized (formula
-				(term
-					(number)
-				)
-			))
-		)
-	)))
+	(inlineRoll
+		(delimiter_start)
+		(formula
+			(term
+				(number_constant))
+			(operator)
+			(term
+				(parenthesized
+					(delimiter_start)
+					(formula
+						(term
+							(number_constant)))
+					(delimiter_end))))
+		(delimiter_end)))

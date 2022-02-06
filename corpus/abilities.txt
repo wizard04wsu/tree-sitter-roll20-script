@@ -5,7 +5,9 @@ Ability: %{a}
 ---
 (script
 	(ability
-		(identifier)))
+		(delimiter_start)
+		(ability_identifier)
+		(delimiter_end)))
 
 ==================
 Ability: %{ a }
@@ -14,7 +16,9 @@ Ability: %{ a }
 ---
 (script
 	(ability
-		(identifier)))
+		(delimiter_start)
+		(ability_identifier)
+		(delimiter_end)))
 
 ==================
 Ability: %{c|a}
@@ -23,9 +27,11 @@ Ability: %{c|a}
 ---
 (script
 	(ability
-		(identifier)
+		(delimiter_start)
+		(character_identifier)
 		(separator)
-		(identifier)))
+		(ability_identifier)
+		(delimiter_end)))
 
 ==================
 Ability: %{ c | a }
@@ -34,9 +40,11 @@ Ability: %{ c | a }
 ---
 (script
 	(ability
-		(identifier)
+		(delimiter_start)
+		(character_identifier)
 		(separator)
-		(identifier)))
+		(ability_identifier)
+		(delimiter_end)))
 
 ==================
 Ability: %{selected|a}
@@ -45,9 +53,11 @@ Ability: %{selected|a}
 ---
 (script
 	(ability
-		(keyword)
+		(delimiter_start)
+		(character_token)
 		(separator)
-		(identifier)))
+		(ability_identifier)
+		(delimiter_end)))
 
 ==================
 Ability: %{target|a}
@@ -56,9 +66,11 @@ Ability: %{target|a}
 ---
 (script
 	(ability
-		(keyword)
+		(delimiter_start)
+		(character_token)
 		(separator)
-		(identifier)))
+		(ability_identifier)
+		(delimiter_end)))
 
 ==================
 Ability: %{cc c |a}
@@ -67,6 +79,8 @@ Ability: %{cc c |a}
 ---
 (script
  	(ability
-		(identifier)
+		(delimiter_start)
+		(character_identifier)
 		(separator)
-		(identifier)))
+		(ability_identifier)
+		(delimiter_end)))
