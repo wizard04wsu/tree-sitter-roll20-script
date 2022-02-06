@@ -30,6 +30,10 @@
           {
             "type": "SYMBOL",
             "name": "_script_common2"
+          },
+          {
+            "type": "PATTERN",
+            "value": "[^#&\\s\\]]"
           }
         ]
       }
@@ -1499,7 +1503,7 @@
                   "type": "ALIAS",
                   "content": {
                     "type": "SYMBOL",
-                    "name": "flag_tracker"
+                    "name": "_flag_tracker"
                   },
                   "named": true,
                   "value": "flag"
@@ -2008,7 +2012,7 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
-              "name": "flag_tracker"
+              "name": "_flag_tracker"
             },
             "named": true,
             "value": "flag"
@@ -2017,7 +2021,7 @@
             "type": "ALIAS",
             "content": {
               "type": "SYMBOL",
-              "name": "flag_rollTemplate"
+              "name": "_flag_rollTemplate"
             },
             "named": true,
             "value": "flag"
@@ -2128,7 +2132,7 @@
         ]
       }
     },
-    "flag_tracker": {
+    "_flag_tracker": {
       "type": "SEQ",
       "members": [
         {
@@ -2190,7 +2194,7 @@
         }
       ]
     },
-    "flag_rollTemplate": {
+    "_flag_rollTemplate": {
       "type": "SEQ",
       "members": [
         {
@@ -2259,6 +2263,10 @@
                   "type": "CHOICE",
                   "members": [
                     {
+                      "type": "SYMBOL",
+                      "name": "_script_common2"
+                    },
+                    {
                       "type": "ALIAS",
                       "content": {
                         "type": "SYMBOL",
@@ -2296,6 +2304,10 @@
                         "name": "_script_common1"
                       },
                       {
+                        "type": "SYMBOL",
+                        "name": "_script_common2"
+                      },
+                      {
                         "type": "ALIAS",
                         "content": {
                           "type": "SYMBOL",
@@ -2320,6 +2332,10 @@
                       {
                         "type": "PATTERN",
                         "value": "\\r?\\n"
+                      },
+                      {
+                        "type": "SYMBOL",
+                        "name": "_script_common2"
                       }
                     ]
                   }
@@ -2335,7 +2351,7 @@
           "type": "ALIAS",
           "content": {
             "type": "SYMBOL",
-            "name": "flag_rollTemplate"
+            "name": "_flag_rollTemplate"
           },
           "named": true,
           "value": "flag"
@@ -2348,6 +2364,10 @@
               {
                 "type": "SYMBOL",
                 "name": "_script_common1"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_script_common2"
               },
               {
                 "type": "ALIAS",
@@ -2374,6 +2394,10 @@
               {
                 "type": "PATTERN",
                 "value": "\\r?\\n"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_script_common2"
               }
             ]
           }

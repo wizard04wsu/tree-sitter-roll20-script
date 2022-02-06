@@ -205,54 +205,6 @@
     }
   },
   {
-    "type": "flag",
-    "named": true,
-    "fields": {
-      "template": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "flag_identifier",
-            "named": true
-          }
-        ]
-      },
-      "tracker": {
-        "multiple": false,
-        "required": true,
-        "types": [
-          {
-            "type": "flag_identifier",
-            "named": true
-          }
-        ]
-      }
-    },
-    "children": {
-      "multiple": true,
-      "required": true,
-      "types": [
-        {
-          "type": "delimiter_end",
-          "named": true
-        },
-        {
-          "type": "delimiter_start",
-          "named": true
-        },
-        {
-          "type": "flag_value",
-          "named": true
-        },
-        {
-          "type": "separator",
-          "named": true
-        }
-      ]
-    }
-  },
-  {
     "type": "flag_value",
     "named": true,
     "fields": {},
@@ -531,11 +483,27 @@
           "named": true
         },
         {
+          "type": "abilityCommandButton",
+          "named": true
+        },
+        {
           "type": "attribute",
           "named": true
         },
         {
           "type": "flag",
+          "named": true
+        },
+        {
+          "type": "hash",
+          "named": true
+        },
+        {
+          "type": "htmlEntity",
+          "named": true
+        },
+        {
+          "type": "inlineRoll",
           "named": true
         },
         {
