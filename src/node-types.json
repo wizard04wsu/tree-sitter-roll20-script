@@ -364,15 +364,15 @@
       "required": true,
       "types": [
         {
-          "type": "comment",
-          "named": true
-        },
-        {
           "type": "delimiter_end",
           "named": true
         },
         {
           "type": "delimiter_start",
+          "named": true
+        },
+        {
+          "type": "label_text",
           "named": true
         }
       ]

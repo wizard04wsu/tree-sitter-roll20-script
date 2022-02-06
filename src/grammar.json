@@ -1282,7 +1282,7 @@
                 "name": "_label_text"
               },
               "named": true,
-              "value": "comment"
+              "value": "label_text"
             },
             {
               "type": "BLANK"

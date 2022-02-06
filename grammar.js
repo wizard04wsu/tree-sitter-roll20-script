@@ -564,7 +564,7 @@ module.exports = grammar({
 		
 		label: $ => seq(
 			alias($.__LABEL_START, $.delimiter_start),
-			optional(alias($._label_text, $.comment)),
+			optional(alias($._label_text, $.label_text)),
 			alias($.__LABEL_END, $.delimiter_end),
 		),
 		
