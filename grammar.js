@@ -318,7 +318,6 @@ module.exports = grammar({
 		
 		_acb_identifier_text: $ => prec.right(repeat1(choice(
 			/[^#&|,})]/,
-			$.__PIPE,
 			$.__COMMA,
 			$.__RIGHT_BRACE,
 			$.__RIGHT_PAREN,
