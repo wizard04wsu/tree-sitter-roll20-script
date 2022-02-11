@@ -19,7 +19,7 @@ namespace {
 using namespace std;
 
 
-const bool DEBUGGING = false;
+const bool DEBUGGING = true;
 const unsigned MAX_ENTITY_NAME_LENGTH = 50;
 
 
