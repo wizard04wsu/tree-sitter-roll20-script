@@ -2253,99 +2253,44 @@
         {
           "type": "REPEAT",
           "content": {
-            "type": "SYMBOL",
-            "name": "_script_common1"
-          }
-        },
-        {
-          "type": "CHOICE",
-          "members": [
-            {
-              "type": "SEQ",
-              "members": [
-                {
-                  "type": "CHOICE",
-                  "members": [
-                    {
-                      "type": "SYMBOL",
-                      "name": "_script_common2"
-                    },
-                    {
-                      "type": "ALIAS",
-                      "content": {
-                        "type": "SYMBOL",
-                        "name": "_rt_property"
-                      },
-                      "named": true,
-                      "value": "template_property"
-                    },
-                    {
-                      "type": "FIELD",
-                      "name": "rtype",
-                      "content": {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "SYMBOL",
-                          "name": "_rt_rtype"
-                        },
-                        "named": true,
-                        "value": "template_property"
-                      }
-                    },
-                    {
-                      "type": "PATTERN",
-                      "value": "\\r?\\n"
-                    }
-                  ]
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "_script_common1"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "_script_common2"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SYMBOL",
+                  "name": "_rt_property"
                 },
-                {
-                  "type": "REPEAT",
+                "named": true,
+                "value": "template_property"
+              },
+              {
+                "type": "FIELD",
+                "name": "rtype",
+                "content": {
+                  "type": "ALIAS",
                   "content": {
-                    "type": "CHOICE",
-                    "members": [
-                      {
-                        "type": "SYMBOL",
-                        "name": "_script_common1"
-                      },
-                      {
-                        "type": "SYMBOL",
-                        "name": "_script_common2"
-                      },
-                      {
-                        "type": "ALIAS",
-                        "content": {
-                          "type": "SYMBOL",
-                          "name": "_rt_property"
-                        },
-                        "named": true,
-                        "value": "template_property"
-                      },
-                      {
-                        "type": "FIELD",
-                        "name": "rtype",
-                        "content": {
-                          "type": "ALIAS",
-                          "content": {
-                            "type": "SYMBOL",
-                            "name": "_rt_rtype"
-                          },
-                          "named": true,
-                          "value": "template_property"
-                        }
-                      },
-                      {
-                        "type": "PATTERN",
-                        "value": "\\r?\\n"
-                      }
-                    ]
-                  }
+                    "type": "SYMBOL",
+                    "name": "_rt_rtype"
+                  },
+                  "named": true,
+                  "value": "template_property"
                 }
-              ]
-            },
-            {
-              "type": "BLANK"
-            }
-          ]
+              },
+              {
+                "type": "PATTERN",
+                "value": "\\r?\\n"
+              }
+            ]
+          }
         },
         {
           "type": "ALIAS",

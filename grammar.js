@@ -808,34 +808,20 @@ module.exports = grammar({
 		  ╚════════════════════════════════════════════════════════════*/
 		
 		rollTemplate: $ => seq(
-			repeat($._script_common1),
-			optional(seq(
-				choice(
-					//alias($._script_common2, $.comment),
-					$._script_common2,
-					alias($._rt_property, $.template_property),
-					field("rtype", alias($._rt_rtype, $.template_property)),
-					/\r?\n/,
-				),
-				repeat(choice(
-					$._script_common1,
-					//alias($._script_common2, $.comment),
-					$._script_common2,
-					alias($._rt_property, $.template_property),
-					field("rtype", alias($._rt_rtype, $.template_property)),
-					/\r?\n/,
-					//alias(/\{?[^#&{\s]/, $.comment),
-				)),
-			)),
-			alias($._flag_rollTemplate, $.flag),
 			repeat(choice(
 				$._script_common1,
-				//alias($._script_common2, $.comment),
 				$._script_common2,
 				alias($._rt_property, $.template_property),
 				field("rtype", alias($._rt_rtype, $.template_property)),
 				/\r?\n/,
-				//alias(/\{?[^#&{\s]/, $.comment),
+			)),
+			alias($._flag_rollTemplate, $.flag),
+			repeat(choice(
+				$._script_common1,
+				$._script_common2,
+				alias($._rt_property, $.template_property),
+				field("rtype", alias($._rt_rtype, $.template_property)),
+				/\r?\n/,
 			)),
 		),
 		
