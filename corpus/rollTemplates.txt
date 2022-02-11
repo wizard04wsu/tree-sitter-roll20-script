@@ -84,3 +84,183 @@ Roll Template: &{template:atkdmg} @{wtype}
 			(attribute_identifier)
 			(delimiter_end))))
 
+
+
+
+
+==================
+Roll Template: &{template:t} {{A___[a](~a)}}
+==================
+&{template:t} {{A=[a](~a)}}
+---
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(template_property
+			(delimiter_start)
+			(property_identifier)
+			(operator)
+			(property_value
+				(abilityCommandButton
+					(label
+						(delimiter_start)
+						(label_text)
+						(delimiter_end))
+					(delimiter_start)
+					(ability_identifier)
+					(delimiter_end)))
+			(delimiter_end))))
+
+==================
+Roll Template: &{template:t} {{B___[b](~selected|b)}}
+==================
+&{template:t} {{B=[b](~selected|b)}}
+---
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(template_property
+			(delimiter_start)
+			(property_identifier)
+			(operator)
+			(property_value
+				(abilityCommandButton
+					(label
+						(delimiter_start)
+						(label_text)
+						(delimiter_end))
+					(delimiter_start)
+					(character_token)
+					(separator)
+					(ability_identifier)
+					(delimiter_end)))
+			(delimiter_end))))
+
+==================
+Roll Template: &{template:t} {{B___[b](~selected|b)}} {{C___1}}
+==================
+&{template:t} {{B=[b](~selected|b)}} {{C=1}}
+---
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(template_property
+			(delimiter_start)
+			(property_identifier)
+			(operator)
+			(property_value
+				(abilityCommandButton
+					(label
+						(delimiter_start)
+						(label_text)
+						(delimiter_end))
+					(delimiter_start)
+					(character_token)
+					(separator)
+					(ability_identifier)
+					(delimiter_end)))
+			(delimiter_end))
+		(template_property
+			(delimiter_start)
+			(property_identifier)
+			(operator)
+			(property_value)
+			(delimiter_end))))
+
+==================
+Roll Template: &{template:atkdmg} ?{P|A,a|}
+==================
+&{template:atkdmg} ?{P|A,a|}
+---
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(rollQuery
+			(delimiter_start)
+			(prompt)
+			(separator)
+			(option
+				(option_identifier)
+				(separator)
+				(option_value))
+			(separator)
+			(delimiter_end))))
+
+==================
+Roll Template: &{template:atkdmg} ?{P|A,{{a___1&#125;&#125;|}
+==================
+&{template:atkdmg} ?{P|A,{{a=1&#125;&#125;|}
+---
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(rollQuery
+			(delimiter_start)
+			(prompt)
+			(separator)
+			(option
+				(option_identifier)
+				(separator)
+				(option_value
+					(template_property
+						(delimiter_start)
+						(property_identifier)
+						(operator)
+						(property_value)
+						(delimiter_end))))
+			(separator)
+			(delimiter_end))))
+
+==================
+Roll Template: &{template:atkdmg} ?{|,{{r___R&#125;&#125;|}
+==================
+&{template:atkdmg} ?{|,{{r=R&#125;&#125;|}
+---
+(script
+	(rollTemplate
+		(flag
+			(delimiter_start)
+			(flag_identifier)
+			(separator)
+			(flag_value)
+			(delimiter_end))
+		(rollQuery
+			(delimiter_start)
+			(separator)
+			(option
+				(separator)
+				(option_value
+					(template_property
+						(delimiter_start)
+						(property_identifier)
+						(operator)
+						(property_value)
+						(delimiter_end))))
+			(separator)
+			(delimiter_end))))
+

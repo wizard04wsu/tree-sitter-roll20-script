@@ -721,7 +721,7 @@ Inline Roll Labels: [[ [a] 5 ]]
 		(formula
 			(label
 				(delimiter_start)
-				(string)
+				(label_text)
 				(delimiter_end))
 			(term
 				(number_constant)))
@@ -756,7 +756,7 @@ Inline Roll Labels: [[ 5 [a] ]]
 				(number_constant))
 			(label
 				(delimiter_start)
-				(string)
+				(label_text)
 				(delimiter_end)))
 		(delimiter_end)))
 
@@ -773,7 +773,7 @@ Inline Roll Labels: [[ 5 [a[{|,}()b] ]]
 				(number_constant))
 			(label
 				(delimiter_start)
-				(string)
+				(label_text)
 				(delimiter_end)))
 		(delimiter_end)))
 
@@ -830,7 +830,7 @@ Tracker Flag: [[5[a] &{tracker}]]
 				(number_constant))
 			(label
 				(delimiter_start)
-				(string)
+				(label_text)
 				(delimiter_end))
 			(flag
 				(delimiter_start)
@@ -854,7 +854,7 @@ Tracker Flag: [[5 + 2 [a] &{tracker}]]
 				(number_constant))
 			(label
 				(delimiter_start)
-				(string)
+				(label_text)
 				(delimiter_end))
 			(flag
 				(delimiter_start)
@@ -883,7 +883,7 @@ Tracker Flag: [[5 &{tracker} [a]]]
 				(delimiter_end))
 			(label
 				(delimiter_start)
-				(string)
+				(label_text)
 				(delimiter_end)))
 		(delimiter_end)))
 

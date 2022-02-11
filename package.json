@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-roll20-script",
-  "version": "1.0.2",
+  "version": "1.0.5",
   "description": "Tree-sitter parser for Roll20 scripts",
   "repository": "https://github.com/wizard04wsu/tree-sitter-roll20-script",
   "keywords": [
@@ -14,6 +14,7 @@
   "license": "MIT",
   "main": "bindings/node",
   "devDependencies": {
+    "electron-rebuild": "^3.2.7",
     "tree-sitter-cli": "^0.15.14"
   },
   "dependencies": {

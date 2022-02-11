@@ -264,6 +264,7 @@ struct Scanner {
 	const bool *valid_symbols;
 	
 	NestedElements nest;
+	bool inRollTemplateProperty = false;
 	
 	
 	/*╔════════════════════════════════════════════════════════════
@@ -380,25 +381,11 @@ struct Scanner {
 	
 	template <int N>
 	bool checkEntity(HtmlEntity entity, const int (&symbols)[N], char encodedChar, string rxp, int useAs = AS_CHARACTER) {
-		if (DEBUGGING) {
-			string str = "" +
-				color_passFail(regex_match(entity.entityName, regex(rxp))) + entity.str + "  " +
-				color_passFail(nest.isSafe(encodedChar)) + string({encodedChar}) + "  " +
-				color_passFail(( useAs == AS_CHARACTER && entity.isChar(nest.depth()) )
-					|| ( useAs == AS_ENTITY && entity.isEntity(nest.depth()) )
-					|| ( useAs == AS_START && entity.isEntity(nest.depth()) )) +
-				(useAs==AS_CHARACTER ? "char  " :
-				useAs==AS_START ? "start " :
-				useAs==AS_ENTITY ? "entity" :
-				"n/a   ") +
-				color(green) + "  [ ";
-			
-			for (int i=0; i<N; i++) {
-				if (i > 0) str += color(green)+", ";
-				str += color_passFail(valid_symbols[symbols[i]]) + symbol_strings[symbols[i]];
-			}
-			Debug.log(str + color(green) + " ]");
-		}
+		bool entityMatches = regex_match(entity.entityName, regex(rxp));
+		
+		bool validUse = ( useAs == AS_CHARACTER && entity.isChar(nest.depth() + (inRollTemplateProperty?1:0)) )
+			|| ( useAs == AS_ENTITY && entity.isEntity(nest.depth()) )
+			|| ( useAs == AS_START && entity.isEntity(nest.depth()) );
 		
 		bool validSymbolFound = false;
 		for (int i=0; i<N; i++) {
@@ -408,15 +395,29 @@ struct Scanner {
 			}
 		}
 		
-		return (
-			validSymbolFound
-			&& (
-				( useAs == AS_CHARACTER && entity.isChar(nest.depth()) )
-				|| ( useAs == AS_ENTITY && entity.isEntity(nest.depth()) )
-				|| ( useAs == AS_START && entity.isEntity(nest.depth()) )
-			)
-			&& regex_match(entity.entityName, regex(rxp))
-		);
+		if (DEBUGGING) {
+			string str = "" +
+				//HTML entity; does it match?
+				color_passFail(entityMatches) + entity.str + "  " +
+				//character it represents; is it safe here?
+				color_passFail(nest.isSafe(encodedChar)) + string({encodedChar}) + "  " +
+				//its intended use; can it be that?
+				color_passFail(validUse) +
+				(useAs==AS_CHARACTER ? "char  " :
+				useAs==AS_START ? "start " :
+				useAs==AS_ENTITY ? "entity" :
+				"n/a   ") +
+				color(green) + "  [ ";
+			
+			//highlight accepted symbols
+			for (int i=0; i<N; i++) {
+				if (i > 0) str += color(green)+", ";
+				str += color_passFail(valid_symbols[symbols[i]]) + symbol_strings[symbols[i]];
+			}
+			Debug.log(str + color(green) + " ]");
+		}
+		
+		return ( validSymbolFound && validUse && entityMatches );
 	}
 	
 	
@@ -466,7 +467,6 @@ struct Scanner {
 		
 		HtmlEntity result;
 		string entityName = "";
-		bool inRollTemplateProperty = false;
 		
 		char c = lexer->lookahead;
 		mark_end(lexer);
@@ -894,7 +894,7 @@ struct Scanner {
 							if (valid_symbols[GROUPROLL_END])
 								return match_found(GROUPROLL_END);
 							if (valid_symbols[FLAG_END])
-								return match_found(FLAG_END); 
+								return match_found(FLAG_END);
 						}
 					}
 					else {

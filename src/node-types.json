@@ -372,7 +372,7 @@
           "named": true
         },
         {
-          "type": "string",
+          "type": "label_text",
           "named": true
         }
       ]
