@@ -84,3 +84,58 @@ Ability: %{cc c |a}
 		(separator)
 		(ability_identifier)
 		(delimiter_end)))
+
+
+
+
+
+
+==================
+Ability Command Button: [L](~a)
+==================
+[L](~a)
+---
+(script
+	(abilityCommandButton
+		(label
+			(delimiter_start)
+			(label_text)
+			(delimiter_end))
+		(delimiter_start)
+		(ability_identifier)
+		(delimiter_end)))
+
+==================
+Ability Command Button: [L](~c|a)
+==================
+[L](~c|a)
+---
+(script
+	(abilityCommandButton
+		(label
+			(delimiter_start)
+			(label_text)
+			(delimiter_end))
+		(delimiter_start)
+		(character_identifier)
+		(separator)
+		(ability_identifier)
+		(delimiter_end)))
+
+==================
+Ability Command Button: [L](~target|a)
+==================
+[L](~target|a)
+---
+(script
+	(abilityCommandButton
+		(label
+			(delimiter_start)
+			(label_text)
+			(delimiter_end))
+		(delimiter_start)
+		(character_token)
+		(separator)
+		(ability_identifier)
+		(delimiter_end)))
+

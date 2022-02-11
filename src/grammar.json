@@ -596,10 +596,6 @@
             },
             {
               "type": "SYMBOL",
-              "name": "__PIPE"
-            },
-            {
-              "type": "SYMBOL",
               "name": "__COMMA"
             },
             {
